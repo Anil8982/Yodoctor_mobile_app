@@ -12,6 +12,7 @@ class HeroSection extends StatelessWidget {
     required this.onSearchTap,
     required this.onLocationChanged,
     required this.onQueryChanged,
+    required this.searchLayerLink,
   });
 
   final TextEditingController locationController;
@@ -19,18 +20,19 @@ class HeroSection extends StatelessWidget {
   final VoidCallback onSearchTap;
   final ValueChanged<String> onLocationChanged;
   final ValueChanged<String> onQueryChanged;
+  final LayerLink searchLayerLink;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
     final topPadding = MediaQuery.of(context).padding.top;
 
     return GradientBackground(
-      // Gradient madhe Material Colors vapra (Primary to PrimaryFixed/Tertiary)
       borderRadius: const BorderRadius.vertical(bottom: Radius.circular(32)),
       padding: EdgeInsets.fromLTRB(
         AppSpacing.xl,
-        topPadding + 20,
+        topPadding + 70,
         AppSpacing.xl,
         AppSpacing.xxl,
       ),
@@ -38,28 +40,23 @@ class HeroSection extends StatelessWidget {
         children: <Widget>[
           Text(
             'Your Doctor, Your Health',
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+            style: theme.textTheme.headlineMedium?.copyWith(
               color: colorScheme.onPrimary,
               fontWeight: FontWeight.w900,
             ),
           ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            'Search for Clinics, Doctors & Diseases',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onPrimary.transparency(0.8),
-            ),
-          ),
           const SizedBox(height: AppSpacing.xl),
 
-          // Location Search Field
           _buildSearchWrapper(
             colorScheme,
             child: AppSearchField(
               controller: locationController,
               hintText: 'Location',
               onChanged: onLocationChanged,
-              prefixIcon: Icon(Icons.location_on_rounded, color: colorScheme.primary),
+              prefixIcon: Icon(
+                Icons.location_on_rounded,
+                color: colorScheme.primary,
+              ),
             ),
           ),
 
@@ -68,38 +65,25 @@ class HeroSection extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: _buildSearchWrapper(
-                  colorScheme,
-                  child: AppSearchField(
-                    controller: searchController,
-                    hintText: 'Search doctors...',
-                    onChanged: onQueryChanged,
-                    prefixIcon: Icon(Icons.search_rounded, color: colorScheme.primary),
+                // --- TARGET: BOX HYA LINK LA FOLLOW KAREL ---
+                child: CompositedTransformTarget(
+                  link: searchLayerLink,
+                  child: _buildSearchWrapper(
+                    colorScheme,
+                    child: AppSearchField(
+                      controller: searchController,
+                      hintText: 'Search doctors...',
+                      onChanged: onQueryChanged,
+                      prefixIcon: Icon(
+                        Icons.search_rounded,
+                        color: colorScheme.primary,
+                      ),
+                    ),
                   ),
                 ),
               ),
               const SizedBox(width: AppSpacing.sm),
-
-              // Action Button using Material Primary Container
-              InkWell(
-                onTap: onSearchTap,
-                child: Container(
-                  height: 56,
-                  width: 56,
-                  decoration: BoxDecoration(
-                    color: colorScheme.primaryContainer,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.transparency(0.1),
-                        blurRadius: 8,
-                        offset: const Offset(0, 4),
-                      )
-                    ],
-                  ),
-                  child: Icon(Icons.arrow_forward_rounded, color: colorScheme.onPrimaryContainer),
-                ),
-              ),
+              _buildSearchButton(colorScheme),
             ],
           ),
         ],
@@ -107,7 +91,25 @@ class HeroSection extends StatelessWidget {
     );
   }
 
-  // Material 3 Container for Search Fields
+  Widget _buildSearchButton(ColorScheme colorScheme) {
+    return InkWell(
+      onTap: onSearchTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        height: 56,
+        width: 56,
+        decoration: BoxDecoration(
+          color: colorScheme.primaryContainer,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Icon(
+          Icons.arrow_forward_rounded,
+          color: colorScheme.onPrimaryContainer,
+        ),
+      ),
+    );
+  }
+
   Widget _buildSearchWrapper(ColorScheme colorScheme, {required Widget child}) {
     return Container(
       decoration: BoxDecoration(
@@ -118,7 +120,7 @@ class HeroSection extends StatelessWidget {
             color: Colors.black.transparency(0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
-          )
+          ),
         ],
       ),
       child: child,

@@ -19,20 +19,27 @@ class AppRouter {
   const AppRouter._();
 
   static final GlobalKey<NavigatorState> _rootNavigatorKey =
-      GlobalKey<NavigatorState>();
+  GlobalKey<NavigatorState>();
 
   static final GoRouter router = GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: AppRoutes.dashboard, // Dashboard pasun suru kara
+    initialLocation: AppRoutes.dashboard,
     routes: <RouteBase>[
-      // 1. Auth routes (login/signup) - hyala nav bar nako asel tar baher theva
+      // --- FIND DOCTORS (FULL SCREEN) ---
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: AppRoutes.findDoctors,
+        builder: (context, state) {
+          final query = state.uri.queryParameters['q'] ?? '';
+          return FindDoctorsScreen(initialQuery: query);
+        },
+      ),
 
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return PatientScaffoldShell(navigationShell: navigationShell);
         },
         branches: [
-          // Home Branch
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -41,24 +48,14 @@ class AppRouter {
               ),
             ],
           ),
-          // Search Branch
           StatefulShellBranch(
             routes: [
               GoRoute(
                 path: AppRoutes.search,
-                builder: (context, state) => SearchScreen(),
-              ),
-              // Sub-route for search (Find Doctors)
-              GoRoute(
-                path: AppRoutes.findDoctors,
-                builder: (context, state) {
-                  final query = state.uri.queryParameters['q'] ?? '';
-                  return FindDoctorsScreen(initialQuery: query);
-                },
+                builder: (context, state) => const SearchScreen(),
               ),
             ],
           ),
-          // Family Branch (Placeholder)
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -67,7 +64,6 @@ class AppRouter {
               ),
             ],
           ),
-          // History Branch (Placeholder)
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -79,4 +75,5 @@ class AppRouter {
         ],
       ),
     ],
-  );}
+  );
+}

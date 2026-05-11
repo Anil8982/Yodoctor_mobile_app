@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:yodoctor/modules/patient/screens/dashboard/widgets/patient_header.dart';
+import 'package:yodoctor/modules/patient/widgets/custom_sliver_app_bar.dart';
+import 'package:yodoctor/modules/patient/widgets/patient_drawer.dart';
 
 import '../../../../core/utils/app_spacing.dart';
 import '../../../../core/utils/responsive.dart';
@@ -43,92 +45,15 @@ class DashboardScreen extends StatelessWidget {
           key: _scaffoldKey,
           extendBodyBehindAppBar: true,
           backgroundColor: colorScheme.surface,
-          drawer: Drawer(
-            backgroundColor: colorScheme.surface,
-            child: Column(
-              children: [
-                UserAccountsDrawerHeader(
-                  decoration: BoxDecoration(color: colorScheme.primary),
-                  accountName: Text(
-                    data.user.name,
-                    style: TextStyle(color: colorScheme.onPrimary),
-                  ),
-                  accountEmail: Text(
-                    data.user.email,
-                    style: TextStyle(color: colorScheme.onPrimary.transparency(0.8)),
-                  ),
-                  currentAccountPicture: CircleAvatar(
-                    backgroundColor: colorScheme.onPrimaryContainer,
-                    child: Icon(Icons.person, color: colorScheme.primaryContainer),
-                  ),
-                ),
-                ListTile(
-                  leading: Icon(Icons.home, color: colorScheme.onSurface),
-                  title: Text('Home', style: TextStyle(color: colorScheme.onSurface)),
-                  onTap: () => Navigator.pop(context),
-                ),
-              ],
-            ),
-          ),
+          drawer: PatientDrawer(data: data),
           body: NestedScrollView(
             headerSliverBuilder: (context, innerBoxIsScrolled) {
               return [
-                SliverAppBar(
+                CustomSliverAppBar(
                   expandedHeight: 250.0,
-                  pinned: true,
-                  elevation: 0,
-                  stretch: true,
-                  backgroundColor: colorScheme.primary,
-                  automaticallyImplyLeading: false,
-                  systemOverlayStyle: SystemUiOverlayStyle.light,
-
-                  title: Row(
-                    children: [
-                      InkWell(
-                        onTap: () => _scaffoldKey.currentState?.openDrawer(),
-                        borderRadius: BorderRadius.circular(12),
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: colorScheme.onPrimary.transparency(0.15),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Icon(Icons.notes_rounded, color: colorScheme.onPrimary, size: 24),
-                        ),
-                      ),
-                      const Spacer(),
-                      InkWell(
-                        onTap: () {},
-                        borderRadius: BorderRadius.circular(12),
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: colorScheme.onPrimary.transparency(0.15),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Icon(Icons.notifications_outlined, color: colorScheme.onPrimary, size: 24),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Container(
-                        padding: const EdgeInsets.all(2),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: colorScheme.onPrimary.transparency(0.3)),
-                        ),
-                        child: CircleAvatar(
-                          radius: 18,
-                          backgroundColor: colorScheme.onPrimary.transparency(0.2),
-                          child: Icon(Icons.person_rounded, color: colorScheme.onPrimary, size: 20),
-                        ),
-                      ),
-                    ],
-                  ),
-                  flexibleSpace: FlexibleSpaceBar(
-                    background: PatientHeader(user: data.user),
-                  ),
-                ),
-              ];
+                  scaffoldKey: _scaffoldKey,
+                  background: PatientHeader(user: data.user),
+                ),              ];
             },
             body: RefreshIndicator(
               onRefresh: controller.loadDashboard,

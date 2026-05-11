@@ -1,9 +1,8 @@
+import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../core/utils/app_spacing.dart';
 import '../../../../../core/utils/dummy_data.dart';
-import '../../../../../core/widgets/app_button.dart';
-import 'doctor_action_buttons.dart';
 
 class DoctorCard extends StatelessWidget {
   const DoctorCard({
@@ -21,123 +20,191 @@ class DoctorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: colorScheme.primary,
-                    borderRadius: BorderRadius.circular(16),
+      elevation: 0,
+      margin: const EdgeInsets.only(bottom: AppSpacing.md),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(color: colorScheme.outlineVariant.transparency(0.4)),
+      ),
+      color: colorScheme.surface,
+      child: InkWell(
+        onTap: onProfileTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // --- AVATAR (M3 Style) ---
+                  _buildAvatar(colorScheme, theme),
+                  const SizedBox(width: 16),
+
+                  // --- DOCTOR INFO ---
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          doctor.name,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: -0.2,
+                          ),
+                        ),
+                        Text(
+                          doctor.specialty,
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            color: colorScheme.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        // Consultation Fee (Compact)
+                        Text(
+                          'Consultation: ₹${doctor.consultationFee}',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  child: Center(
-                    child: Text(
-                      doctor.name.split(' ').last.substring(0, 1),
-                      style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                        color: colorScheme.onPrimary,
-                        fontWeight: FontWeight.w800,
+                ],
+              ),
+
+              const SizedBox(height: 12),
+
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
+                decoration: BoxDecoration(
+                  color: colorScheme.surfaceContainerHighest.transparency(0.3),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _buildMetaIcon(
+                      Icons.local_hospital_rounded,
+                      doctor.hospital,
+                      colorScheme,
+                    ),
+                    _buildMetaIcon(
+                      Icons.location_on_rounded,
+                      doctor.location,
+                      colorScheme,
+                    ),
+                    _buildMetaIcon(
+                      Icons.work_rounded,
+                      '${doctor.experienceYears}Y',
+                      colorScheme,
+                    ),
+                    _buildMetaIcon(
+                      Icons.star_rounded,
+                      doctor.rating.toString(),
+                      colorScheme,
+                      isRating: true,
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // --- ACTION BUTTONS ---
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: onContactTap,
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text(
+                        'Contact',
+                        style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        doctor.name,
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w700,
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: FilledButton(
+                      onPressed: onBookTap,
+                      style: FilledButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      Text(
-                        doctor.specialty,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.primary,
-                          fontWeight: FontWeight.w600,
-                        ),
+                      child: const Text(
+                        'Book Now',
+                        style: TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Consultation: ₹${doctor.consultationFee}',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Wrap(
-                        spacing: 12,
-                        runSpacing: 4,
-                        children: <Widget>[
-                          _MetaItem(icon: Icons.local_hospital_outlined, text: doctor.hospital),
-                          _MetaItem(icon: Icons.location_on_outlined, text: doctor.location),
-                          _MetaItem(icon: Icons.work_outline_rounded, text: '${doctor.experienceYears} yrs'),
-                          _MetaItem(
-                            icon: Icons.star_rounded,
-                            text: doctor.rating.toString(),
-                            iconColor: Colors.orange,
-                          ),
-                        ],
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.md),
-            AppButton(
-              label: 'Profile',
-              onPressed: onProfileTap ?? () {},
-              variant: AppButtonVariant.outlined,
-              foregroundColor: colorScheme.onSurface,
-              backgroundColor: colorScheme.onSurfaceVariant.withValues(alpha: 0.1),
-              height: 32,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            DoctorActionButtons(
-              onProfileTap: onProfileTap ?? () {},
-              onBookTap: onBookTap ?? () {},
-              onContactTap: onContactTap ?? () {},
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
-}
 
-class _MetaItem extends StatelessWidget {
-  const _MetaItem({required this.icon, required this.text, this.iconColor});
+  Widget _buildAvatar(ColorScheme colorScheme, ThemeData theme) {
+    return Container(
+      width: 60,
+      height: 60,
+      decoration: BoxDecoration(
+        color: colorScheme.primaryContainer.transparency(0.7),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Center(
+        child: Text(
+          doctor.name.substring(0, 1),
+          style: theme.textTheme.headlineSmall?.copyWith(
+            color: colorScheme.onPrimaryContainer,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
 
-  final IconData icon;
-  final String text;
-  final Color? iconColor;
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
+  Widget _buildMetaIcon(
+    IconData icon,
+    String text,
+    ColorScheme colorScheme, {
+    bool isRating = false,
+  }) {
     return Row(
       mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        Icon(icon, size: 14, color: iconColor ?? colorScheme.onSurfaceVariant),
+      children: [
+        Icon(
+          icon,
+          size: 14,
+          color: isRating ? Colors.amber[700] : colorScheme.onSurfaceVariant,
+        ),
         const SizedBox(width: 4),
         Text(
           text,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: colorScheme.onSurfaceVariant,
+          style: TextStyle(
             fontSize: 11,
+            fontWeight: isRating ? FontWeight.bold : FontWeight.w500,
+            color: colorScheme.onSurfaceVariant,
           ),
         ),
       ],
