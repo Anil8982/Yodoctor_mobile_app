@@ -9,7 +9,11 @@ class PatientScaffoldShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final String currentPath = GoRouterState.of(context).uri.path;
+    final bool showNavBar = currentPath != '/profile';
+
     return Scaffold(
+      extendBody: true,
       body: navigationShell,
       bottomNavigationBar: PatientBottomNav(
         currentIndex: navigationShell.currentIndex,
@@ -19,6 +23,7 @@ class PatientScaffoldShell extends StatelessWidget {
             initialLocation: index == navigationShell.currentIndex,
           );
         },
+        isVisible: showNavBar,
       ),
     );
   }

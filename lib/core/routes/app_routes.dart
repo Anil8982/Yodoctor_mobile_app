@@ -1,10 +1,12 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/modules/patient/patient_pcaffold_shell.dart';
 
 import '../../modules/patient/screens/dashboard/dashboard_screen.dart';
 import '../../modules/patient/screens/find_doctors/find_doctors_screen.dart';
 import '../../modules/patient/screens/search/search_screen.dart';
+import '../../modules/patient/screens/profile/profile_screen.dart';
+import '../../modules/patient/screens/family/family_members_screen.dart';
 
 class AppRoutes {
   const AppRoutes._();
@@ -13,6 +15,9 @@ class AppRoutes {
   static const String search = '/search';
   static const String dashboard = '/dashboard';
   static const String findDoctors = '/doctors';
+  static const String profile = '/profile';
+  static const String family = '/family';
+  static const String history = '/history';
 }
 
 class AppRouter {
@@ -33,6 +38,12 @@ class AppRouter {
           final query = state.uri.queryParameters['q'] ?? '';
           return FindDoctorsScreen(initialQuery: query);
         },
+      ),
+
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: AppRoutes.profile,
+        builder: (context, state) => const ProfileScreen(),
       ),
 
       StatefulShellRoute.indexedStack(
@@ -59,19 +70,20 @@ class AppRouter {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: '/family',
-                builder: (context, state) => const Center(child: Text('Family')),
+                path: AppRoutes.family,
+                builder: (context, state) => const FamilyMembersScreen(),
               ),
             ],
           ),
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: '/history',
+                path: AppRoutes.history,
                 builder: (context, state) => const Center(child: Text('History')),
               ),
             ],
           ),
+
         ],
       ),
     ],

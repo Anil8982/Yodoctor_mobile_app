@@ -19,7 +19,7 @@ class PatientHeader extends StatelessWidget {
       borderRadius: const BorderRadius.vertical(bottom: Radius.circular(32)),
       padding: EdgeInsets.fromLTRB(
         AppSpacing.xl,
-        topPadding + 80,
+        topPadding + 50,
         AppSpacing.xl,
         AppSpacing.xl,
       ),
@@ -28,13 +28,13 @@ class PatientHeader extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const SizedBox(height: 10),
-          Text(
-            'Hello 👋',
-            style: theme.textTheme.bodyLarge?.copyWith(
-              color: colorScheme.onPrimary.transparency(0.85),
-              fontWeight: FontWeight.w500,
-            ),
-          ),
+          // Text(
+          //   'Hello 👋',
+          //   style: theme.textTheme.bodyLarge?.copyWith(
+          //     color: colorScheme.onPrimary.transparency(0.85),
+          //     fontWeight: FontWeight.w500,
+          //   ),
+          // ),
           Text(
             user.name,
             style: theme.textTheme.headlineMedium?.copyWith(

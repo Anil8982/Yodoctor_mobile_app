@@ -6,6 +6,7 @@ import 'core/routes/app_routes.dart';
 import 'modules/patient/controllers/doctor_listing_controller.dart';
 import 'modules/patient/controllers/patient_dashboard_controller.dart';
 import 'modules/patient/controllers/patient_search_controller.dart';
+import 'modules/patient/controllers/profile_controller.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,6 +17,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => PatientSearchController()),
         ChangeNotifierProvider(create: (_) => PatientDashboardController()),
         ChangeNotifierProvider(create: (_) => DoctorListingController()),
+        ChangeNotifierProvider(create: (_) => ProfileController()),
       ],
       child: const YoDoctorApp(),
     ),

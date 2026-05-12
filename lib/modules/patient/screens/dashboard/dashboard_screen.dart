@@ -50,7 +50,7 @@ class DashboardScreen extends StatelessWidget {
             headerSliverBuilder: (context, innerBoxIsScrolled) {
               return [
                 CustomSliverAppBar(
-                  expandedHeight: 250.0,
+                  expandedHeight: 190.0,
                   scaffoldKey: _scaffoldKey,
                   background: PatientHeader(user: data.user),
                 ),              ];

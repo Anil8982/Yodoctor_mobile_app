@@ -6,6 +6,9 @@ class PatientUser {
     required this.location,
     required this.age,
     required this.bloodGroup,
+    required this.mobileNumber,
+    required this.dateOfBirth,
+    required this.gender,
   });
 
   final String id;
@@ -14,6 +17,9 @@ class PatientUser {
   final String location;
   final int age;
   final String bloodGroup;
+  final String mobileNumber;
+  final String dateOfBirth;
+  final String gender;
 }
 
 class PatientToken {
@@ -100,16 +106,39 @@ class PatientDashboardData {
   final List<PatientAppointment> appointments;
 }
 
+class FamilyMember {
+  const FamilyMember({
+    required this.name,
+    required this.lastVisit,
+    required this.relation,
+    required this.gender,
+    required this.age,
+    required this.bloodGroup,
+    required this.initials,
+  });
+
+  final String name;
+  final String lastVisit;
+  final String relation;
+  final String gender;
+  final String age;
+  final String bloodGroup;
+  final String initials;
+}
+
 class DummyData {
   const DummyData._();
 
   static const PatientUser currentUser = PatientUser(
-    id: 'USR-101',
-    name: 'Ravi Patel',
-    email: 'ravi.patel@yodoctor.com',
+    id: '#28',
+    name: 'Anil kushwaha',
+    email: 'aniljohn1462003@gmail.com',
     location: 'Ahmedabad, Gujarat',
-    age: 32,
+    age: 21,
     bloodGroup: 'B+',
+    mobileNumber: '8982840898',
+    dateOfBirth: '14 - 06 - 2002',
+    gender: 'Male',
   );
 
   static const PatientToken todayToken = PatientToken(
@@ -209,6 +238,36 @@ class DummyData {
     'Cardiologist',
     'Child Specialist',
     'Dental Care',
+  ];
+
+  static const List<FamilyMember> familyMembers = <FamilyMember>[
+    FamilyMember(
+      name: 'Meera Patel',
+      lastVisit: '12 Jan 2025',
+      relation: 'Wife',
+      gender: 'Female',
+      age: '35 yrs',
+      bloodGroup: 'B+',
+      initials: 'MP',
+    ),
+    FamilyMember(
+      name: 'Arjun Patel',
+      lastVisit: '5 Feb 2025',
+      relation: 'Son',
+      gender: 'Male',
+      age: '11 yrs',
+      bloodGroup: 'O+',
+      initials: 'AP',
+    ),
+    FamilyMember(
+      name: 'Ramesh Patel',
+      lastVisit: '20 Dec 2024',
+      relation: 'Father',
+      gender: 'Male',
+      age: '69 yrs',
+      bloodGroup: 'A+',
+      initials: 'RP',
+    ),
   ];
 
   static Future<PatientDashboardData> getDashboardData({
