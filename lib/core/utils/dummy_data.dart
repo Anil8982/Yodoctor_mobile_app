@@ -62,6 +62,28 @@ class PatientAppointment {
   final String appointmentStatus;
 }
 
+class AppointmentHistoryItem {
+  const AppointmentHistoryItem({
+    required this.id,
+    required this.doctorName,
+    required this.specialty,
+    required this.patientLabel,
+    required this.date,
+    required this.shift,
+    required this.tokenNumber,
+    required this.status,
+  });
+
+  final String id;
+  final String doctorName;
+  final String specialty;
+  final String patientLabel;
+  final DateTime date;
+  final String shift;
+  final String tokenNumber;
+  final String status;
+}
+
 class DoctorProfile {
   const DoctorProfile({
     required this.id,
@@ -112,18 +134,37 @@ class FamilyMember {
     required this.lastVisit,
     required this.relation,
     required this.gender,
-    required this.age,
     required this.bloodGroup,
     required this.initials,
+    required this.dateOfBirth,
+    required this.heightCm,
+    required this.weightKg,
   });
 
   final String name;
   final String lastVisit;
   final String relation;
   final String gender;
-  final String age;
   final String bloodGroup;
   final String initials;
+  final DateTime dateOfBirth;
+  final double heightCm;
+  final double weightKg;
+
+  String get age {
+    final DateTime now = DateTime.now();
+    int years = now.year - dateOfBirth.year;
+
+    final bool hasBirthdayPassed =
+        now.month > dateOfBirth.month ||
+        (now.month == dateOfBirth.month && now.day >= dateOfBirth.day);
+
+    if (!hasBirthdayPassed) {
+      years -= 1;
+    }
+
+    return '$years yrs';
+  }
 }
 
 class DummyData {
@@ -188,6 +229,59 @@ class DummyData {
     ];
   }
 
+  static final List<AppointmentHistoryItem> appointmentHistory = <AppointmentHistoryItem>[
+    AppointmentHistoryItem(
+      id: 'HIS-1',
+      doctorName: 'Dr. Praveen Singh',
+      specialty: 'Dermatologist',
+      patientLabel: 'Ajay (Family)',
+      date: DateTime(2026, 5, 6),
+      shift: 'EVENING',
+      tokenNumber: '#4',
+      status: 'COMPLETED',
+    ),
+    AppointmentHistoryItem(
+      id: 'HIS-2',
+      doctorName: 'Dr. Praveen Singh',
+      specialty: 'Dermatologist',
+      patientLabel: 'Vineet Kushwaha (Self)',
+      date: DateTime(2026, 5, 6),
+      shift: 'EVENING',
+      tokenNumber: '#3',
+      status: 'COMPLETED',
+    ),
+    AppointmentHistoryItem(
+      id: 'HIS-3',
+      doctorName: 'Dr. Praveen Singh',
+      specialty: 'Dermatologist',
+      patientLabel: 'Ajay (Family)',
+      date: DateTime(2026, 4, 28),
+      shift: 'EVENING',
+      tokenNumber: '#3',
+      status: 'COMPLETED',
+    ),
+    AppointmentHistoryItem(
+      id: 'HIS-4',
+      doctorName: 'Dr. Praveen Singh',
+      specialty: 'Dermatologist',
+      patientLabel: 'Ajay (Family)',
+      date: DateTime(2026, 4, 28),
+      shift: 'EVENING',
+      tokenNumber: '#2',
+      status: 'COMPLETED',
+    ),
+    AppointmentHistoryItem(
+      id: 'HIS-5',
+      doctorName: 'Dr. Praveen Singh',
+      specialty: 'Dermatologist',
+      patientLabel: 'Vineet Kushwaha (Self)',
+      date: DateTime(2026, 4, 28),
+      shift: 'EVENING',
+      tokenNumber: '#1',
+      status: 'COMPLETED',
+    ),
+  ];
+
   static const List<DoctorProfile> allDoctors = <DoctorProfile>[
     DoctorProfile(
       id: 'DOC-1',
@@ -240,33 +334,39 @@ class DummyData {
     'Dental Care',
   ];
 
-  static const List<FamilyMember> familyMembers = <FamilyMember>[
+  static final List<FamilyMember> familyMembers = <FamilyMember>[
     FamilyMember(
       name: 'Meera Patel',
       lastVisit: '12 Jan 2025',
       relation: 'Wife',
       gender: 'Female',
-      age: '35 yrs',
       bloodGroup: 'B+',
       initials: 'MP',
+      dateOfBirth: DateTime(1990, 3, 14),
+      heightCm: 162,
+      weightKg: 58,
     ),
     FamilyMember(
       name: 'Arjun Patel',
       lastVisit: '5 Feb 2025',
       relation: 'Son',
       gender: 'Male',
-      age: '11 yrs',
       bloodGroup: 'O+',
       initials: 'AP',
+      dateOfBirth: DateTime(2014, 8, 21),
+      heightCm: 142,
+      weightKg: 36,
     ),
     FamilyMember(
       name: 'Ramesh Patel',
       lastVisit: '20 Dec 2024',
       relation: 'Father',
       gender: 'Male',
-      age: '69 yrs',
       bloodGroup: 'A+',
       initials: 'RP',
+      dateOfBirth: DateTime(1956, 11, 5),
+      heightCm: 167,
+      weightKg: 69,
     ),
   ];
 
@@ -322,5 +422,10 @@ class DummyData {
   static Future<List<String>> getTrendingSpecialties() async {
     await Future<void>.delayed(const Duration(milliseconds: 140));
     return List<String>.from(trendingSpecialties);
+  }
+
+  static Future<List<AppointmentHistoryItem>> getAppointmentHistory() async {
+    await Future<void>.delayed(const Duration(milliseconds: 220));
+    return List<AppointmentHistoryItem>.from(appointmentHistory);
   }
 }

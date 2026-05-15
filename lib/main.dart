@@ -3,7 +3,9 @@ import 'package:provider/provider.dart';
 import 'package:chroma_theme/chroma_theme.dart';
 
 import 'core/routes/app_routes.dart';
+import 'modules/patient/controllers/appointment_history_controller.dart';
 import 'modules/patient/controllers/doctor_listing_controller.dart';
+import 'modules/patient/controllers/family_controller.dart';
 import 'modules/patient/controllers/patient_dashboard_controller.dart';
 import 'modules/patient/controllers/patient_search_controller.dart';
 import 'modules/patient/controllers/profile_controller.dart';
@@ -18,6 +20,8 @@ void main() {
         ChangeNotifierProvider(create: (_) => PatientDashboardController()),
         ChangeNotifierProvider(create: (_) => DoctorListingController()),
         ChangeNotifierProvider(create: (_) => ProfileController()),
+        ChangeNotifierProvider(create: (_) => FamilyController()),
+        ChangeNotifierProvider(create: (_) => AppointmentHistoryController()),
       ],
       child: const YoDoctorApp(),
     ),

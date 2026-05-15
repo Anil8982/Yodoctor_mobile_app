@@ -8,8 +8,10 @@ import 'package:yodoctor/modules/patient/widgets/custom_sliver_app_bar.dart';
 
 import '../../../../core/routes/app_routes.dart';
 import '../../../../core/utils/app_spacing.dart';
+import '../../../../core/utils/dummy_data.dart';
 import '../../../../core/utils/responsive.dart';
 import '../../controllers/patient_search_controller.dart';
+import '../../widgets/patient_drawer.dart';
 import 'widgets/hero_section.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -20,6 +22,8 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   late final TextEditingController _locationController;
   late final TextEditingController _searchController;
 
@@ -52,6 +56,8 @@ class _SearchScreenState extends State<SearchScreen> {
     final colorScheme = theme.colorScheme;
 
     return Scaffold(
+      key: _scaffoldKey,
+      drawer: const PatientDrawer(user: DummyData.currentUser),
       backgroundColor: colorScheme.surface,
       body: Consumer<PatientSearchController>(
         builder: (context, controller, child) {
@@ -65,6 +71,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   return [
                     CustomSliverAppBar(
                       expandedHeight: 290.0,
+                      scaffoldKey: _scaffoldKey,
                       background: HeroSection(
                         locationController: _locationController,
                         searchController: _searchController,

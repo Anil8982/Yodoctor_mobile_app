@@ -45,7 +45,7 @@ class DashboardScreen extends StatelessWidget {
           key: _scaffoldKey,
           extendBodyBehindAppBar: true,
           backgroundColor: colorScheme.surface,
-          drawer: PatientDrawer(data: data),
+          drawer: PatientDrawer(user: data.user),
           body: NestedScrollView(
             headerSliverBuilder: (context, innerBoxIsScrolled) {
               return [

@@ -1,10 +1,12 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 
-class PatientDrawer extends StatelessWidget {
-  const PatientDrawer({super.key, required this.data});
+import '../../../core/utils/dummy_data.dart';
 
-  final dynamic data;
+class PatientDrawer extends StatelessWidget {
+  const PatientDrawer({super.key, required this.user});
+
+  final PatientUser user;
 
   @override
   Widget build(BuildContext context) {
@@ -26,14 +28,14 @@ class PatientDrawer extends StatelessWidget {
               ),
             ),
             accountName: Text(
-              data.user.name,
+              user.name,
               style: theme.textTheme.titleMedium?.copyWith(
                 color: colorScheme.onPrimary,
                 fontWeight: FontWeight.bold,
               ),
             ),
             accountEmail: Text(
-              data.user.email,
+              user.email,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: colorScheme.onPrimary.transparency(0.8),
               ),
