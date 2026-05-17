@@ -1,171 +1,18 @@
-class PatientUser {
-  const PatientUser({
-    required this.id,
-    required this.name,
-    required this.email,
-    required this.location,
-    required this.age,
-    required this.bloodGroup,
-    required this.mobileNumber,
-    required this.dateOfBirth,
-    required this.gender,
-  });
+export '../models/appointment_history_item.dart';
+export '../models/doctor_profile.dart';
+export '../models/family_member.dart';
+export '../models/patient_appointment.dart';
+export '../models/patient_dashboard_data.dart';
+export '../models/patient_token.dart';
+export '../models/patient_user.dart';
 
-  final String id;
-  final String name;
-  final String email;
-  final String location;
-  final int age;
-  final String bloodGroup;
-  final String mobileNumber;
-  final String dateOfBirth;
-  final String gender;
-}
-
-class PatientToken {
-  const PatientToken({
-    required this.tokenNumber,
-    required this.patientsAhead,
-    required this.estimatedTime,
-    required this.clinicName,
-    required this.nowServing,
-  });
-
-  final String tokenNumber;
-  final int patientsAhead;
-  final String estimatedTime;
-  final String clinicName;
-  final String nowServing;
-}
-
-class PatientAppointment {
-  const PatientAppointment({
-    required this.id,
-    required this.doctorName,
-    required this.specialty,
-    required this.hospital,
-    required this.dateTime,
-    required this.status,
-    required this.isOnline,
-    required this.patientName,
-    required this.appointmentStatus, // Accepted, Pending
-  });
-
-  final String id;
-  final String doctorName;
-  final String specialty;
-  final String hospital;
-  final DateTime dateTime;
-  final String status; // Today, Upcoming, Completed
-  final bool isOnline;
-  final String patientName;
-  final String appointmentStatus;
-}
-
-class AppointmentHistoryItem {
-  const AppointmentHistoryItem({
-    required this.id,
-    required this.doctorName,
-    required this.specialty,
-    required this.patientLabel,
-    required this.date,
-    required this.shift,
-    required this.tokenNumber,
-    required this.status,
-  });
-
-  final String id;
-  final String doctorName;
-  final String specialty;
-  final String patientLabel;
-  final DateTime date;
-  final String shift;
-  final String tokenNumber;
-  final String status;
-}
-
-class DoctorProfile {
-  const DoctorProfile({
-    required this.id,
-    required this.name,
-    required this.specialty,
-    required this.hospital,
-    required this.experienceYears,
-    required this.rating,
-    required this.reviewCount,
-    required this.consultationFee,
-    required this.distanceKm,
-    required this.availableSlot,
-    required this.languages,
-    required this.location,
-  });
-
-  final String id;
-  final String name;
-  final String specialty;
-  final String hospital;
-  final int experienceYears;
-  final double rating;
-  final int reviewCount;
-  final int consultationFee;
-  final double distanceKm;
-  final String availableSlot;
-  final List<String> languages;
-  final String location;
-}
-
-class PatientDashboardData {
-  const PatientDashboardData({
-    required this.user,
-    required this.upcomingVisitsCount,
-    required this.todayToken,
-    required this.appointments,
-  });
-
-  final PatientUser user;
-  final int upcomingVisitsCount;
-  final PatientToken todayToken;
-  final List<PatientAppointment> appointments;
-}
-
-class FamilyMember {
-  const FamilyMember({
-    required this.name,
-    required this.lastVisit,
-    required this.relation,
-    required this.gender,
-    required this.bloodGroup,
-    required this.initials,
-    required this.dateOfBirth,
-    required this.heightCm,
-    required this.weightKg,
-  });
-
-  final String name;
-  final String lastVisit;
-  final String relation;
-  final String gender;
-  final String bloodGroup;
-  final String initials;
-  final DateTime dateOfBirth;
-  final double heightCm;
-  final double weightKg;
-
-  String get age {
-    final DateTime now = DateTime.now();
-    int years = now.year - dateOfBirth.year;
-
-    final bool hasBirthdayPassed =
-        now.month > dateOfBirth.month ||
-        (now.month == dateOfBirth.month && now.day >= dateOfBirth.day);
-
-    if (!hasBirthdayPassed) {
-      years -= 1;
-    }
-
-    return '$years yrs';
-  }
-}
+import '../models/appointment_history_item.dart';
+import '../models/doctor_profile.dart';
+import '../models/family_member.dart';
+import '../models/patient_appointment.dart';
+import '../models/patient_dashboard_data.dart';
+import '../models/patient_token.dart';
+import '../models/patient_user.dart';
 
 class DummyData {
   const DummyData._();
@@ -393,11 +240,11 @@ class DummyData {
     }
 
     if (normalized == 'today') {
-      return allAppointments.where((item) => item.status == 'Today').toList();
+      return allAppointments.where((PatientAppointment item) => item.status == 'Today').toList();
     }
 
     if (normalized == 'next 7 days') {
-      return allAppointments.where((item) => item.status == 'Upcoming').toList();
+      return allAppointments.where((PatientAppointment item) => item.status == 'Upcoming').toList();
     }
 
     return allAppointments;

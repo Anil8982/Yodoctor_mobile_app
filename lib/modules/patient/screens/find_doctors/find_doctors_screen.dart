@@ -1,4 +1,4 @@
-﻿import 'package:chroma_kit/chroma_kit.dart';
+import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/routes/app_routes.dart';
 import '../../../../core/utils/app_spacing.dart';
+import '../../../../core/utils/dummy_data.dart';
 import '../../../../core/utils/responsive.dart';
 import '../../controllers/doctor_listing_controller.dart';
 import 'widgets/doctor_card.dart';
@@ -222,8 +223,11 @@ class _FindDoctorsScreenState extends State<FindDoctorsScreen> {
         delegate: SliverChildBuilderDelegate(
           (context, index) => DoctorCard(
             doctor: controller.doctors[index],
-            onProfileTap: () => _showPlaceholder(context, 'Profile'),
-            onBookTap: () => _showPlaceholder(context, 'Book'),
+            onProfileTap: () => _openDoctorProfile(context, controller.doctors[index]),
+            onBookTap: () => _openBookAppointment(
+              context,
+              controller.doctors[index],
+            ),
           ),
           childCount: controller.doctors.length,
         ),
@@ -241,19 +245,24 @@ class _FindDoctorsScreenState extends State<FindDoctorsScreen> {
       delegate: SliverChildBuilderDelegate(
         (context, index) => DoctorCard(
           doctor: controller.doctors[index],
-          onProfileTap: () => _showPlaceholder(context, 'Profile'),
-          onBookTap: () => _showPlaceholder(context, 'Book'),
+          onProfileTap: () => _openDoctorProfile(context, controller.doctors[index]),
+          onBookTap: () => _openBookAppointment(
+            context,
+            controller.doctors[index],
+          ),
         ),
         childCount: controller.doctors.length,
       ),
     );
   }
 
-  void _showPlaceholder(BuildContext context, String action) {
-    HapticFeedback.lightImpact();
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('$action flow coming soon!')));
+
+  void _openDoctorProfile(BuildContext context, DoctorProfile doctor) {
+    context.push(AppRoutes.doctorDetail, extra: doctor);
+  }
+
+  void _openBookAppointment(BuildContext context, DoctorProfile doctor) {
+    context.push(AppRoutes.bookAppointment, extra: doctor);
   }
 }
 

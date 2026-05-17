@@ -1,0 +1,86 @@
+import 'package:flutter/material.dart';
+
+class AppointmentBottomBar extends StatelessWidget {
+  const AppointmentBottomBar({
+    super.key,
+    required this.consultationFee,
+    required this.canConfirm,
+    required this.onConfirmPressed,
+  });
+
+  final double consultationFee;
+  final bool canConfirm;
+  final VoidCallback onConfirmPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        border: Border(
+          top: BorderSide(
+            color: colorScheme.outlineVariant.withValues(alpha: 0.4),
+            width: 1,
+          ),
+        ),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Consultation Fee',
+                style: textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.outline,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Text(
+                '₹${consultationFee.toStringAsFixed(0)}',
+                style: textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w900,
+                  color: colorScheme.primary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton(
+              onPressed: canConfirm ? onConfirmPressed : null,
+              style: FilledButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+              child: const Text(
+                'Confirm Appointment',
+                style: TextStyle(
+                  fontWeight: FontWeight.w900,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Payable at clinic during visit',
+            style: textTheme.bodySmall?.copyWith(
+              color: colorScheme.outline,
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

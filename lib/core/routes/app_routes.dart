@@ -10,6 +10,8 @@ import '../../modules/patient/screens/profile/profile_screen.dart';
 import '../../modules/patient/screens/family/family_members_screen.dart';
 import '../../modules/patient/screens/family/add_family_member_screen.dart';
 import '../../modules/patient/screens/history/appointments_history_screen.dart';
+import '../../modules/patient/screens/appointments/book_appointment_screen.dart';
+import '../../modules/patient/screens/doctor_detail/doctor_detail_screen.dart';
 
 class AppRoutes {
   const AppRoutes._();
@@ -18,9 +20,11 @@ class AppRoutes {
   static const String search = '/search';
   static const String dashboard = '/dashboard';
   static const String findDoctors = '/doctors';
+  static const String doctorDetail = '/doctors/detail';
   static const String profile = '/profile';
   static const String family = '/family';
   static const String addFamilyMember = '/family/add-member';
+  static const String bookAppointment = '/appointments/book';
   static const String history = '/history';
 }
 
@@ -34,13 +38,23 @@ class AppRouter {
     navigatorKey: _rootNavigatorKey,
     initialLocation: AppRoutes.dashboard,
     routes: <RouteBase>[
-      // --- FIND DOCTORS (FULL SCREEN) ---
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.findDoctors,
         builder: (context, state) {
           final query = state.uri.queryParameters['q'] ?? '';
           return FindDoctorsScreen(initialQuery: query);
+        },
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: AppRoutes.doctorDetail,
+        builder: (context, state) {
+          final doctor = state.extra;
+          final DoctorProfile fallbackDoctor = DummyData.allDoctors.first;
+          return DoctorDetailScreen(
+            doctor: doctor is DoctorProfile ? doctor : fallbackDoctor,
+          );
         },
       ),
 
@@ -56,6 +70,18 @@ class AppRouter {
           final member = state.extra;
           return AddFamilyMemberScreen(
             initialMember: member is FamilyMember ? member : null,
+          );
+        },
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: AppRoutes.bookAppointment,
+        builder: (context, state) {
+          final doctor = state.extra;
+          final DoctorProfile fallbackDoctor = DummyData.allDoctors.first;
+
+          return BookAppointmentScreen(
+            doctor: doctor is DoctorProfile ? doctor : fallbackDoctor,
           );
         },
       ),
