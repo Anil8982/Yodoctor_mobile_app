@@ -1,4 +1,3 @@
-import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import '../../../../../core/utils/dummy_data.dart';
 
@@ -13,7 +12,7 @@ Future<void> showAppointmentDetailsDialog({
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
-    backgroundColor: Colors.transparent,
+    backgroundColor: Theme.of(context).colorScheme.surface.withValues(alpha: 0),
     builder: (context) => _AppointmentDetailsSheet(
       appointment: appointment,
       initialRating: initialRating,
@@ -79,7 +78,7 @@ class _AppointmentDetailsSheetState extends State<_AppointmentDetailsSheet> {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: colorScheme.outlineVariant.transparency(0.4),
+              color: colorScheme.outlineVariant.withValues(alpha: 0.4),
               borderRadius: BorderRadius.circular(10),
             ),
           ),
@@ -126,7 +125,7 @@ class _AppointmentDetailsSheetState extends State<_AppointmentDetailsSheet> {
                 onPressed: () => setState(() => _selectedRating = ratingValue),
                 icon: Icon(
                   isSelected ? Icons.star_rounded : Icons.star_outline_rounded,
-                  color: isSelected ? Colors.amber : colorScheme.outlineVariant,
+                  color: isSelected ? colorScheme.secondary : colorScheme.outlineVariant,
                   size: 36,
                 ),
               );
@@ -140,7 +139,7 @@ class _AppointmentDetailsSheetState extends State<_AppointmentDetailsSheet> {
             decoration: InputDecoration(
               hintText: 'Share your thoughts (optional)',
               filled: true,
-              fillColor: colorScheme.surfaceContainerHighest.transparency(0.2),
+              fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.2),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(20),
                 borderSide: BorderSide.none,
@@ -175,12 +174,12 @@ class _AppointmentDetailsSheetState extends State<_AppointmentDetailsSheet> {
                   child: AnimatedSwitcher(
                     duration: const Duration(milliseconds: 200),
                     child: _isSubmitting
-                        ? const SizedBox(
+                        ? SizedBox(
                       height: 20,
                       width: 20,
                       child: CircularProgressIndicator(
                         strokeWidth: 2.5,
-                        color: Colors.white,
+                        color: colorScheme.onPrimary,
                       ),
                     )
                         : const Row(

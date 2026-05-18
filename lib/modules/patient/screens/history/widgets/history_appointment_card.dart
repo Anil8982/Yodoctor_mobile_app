@@ -221,21 +221,21 @@ class HistoryAppointmentCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
         decoration: BoxDecoration(
-          color: Colors.green.withValues(alpha: 0.14),
+          color: colorScheme.secondaryContainer.withValues(alpha: 0.45),
           borderRadius: BorderRadius.circular(999),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            const CircleAvatar(
+            CircleAvatar(
               radius: 3,
-              backgroundColor: Colors.green,
+              backgroundColor: colorScheme.secondary,
             ),
             const SizedBox(width: 6),
             Text(
               appointment.status,
               style: textTheme.labelLarge?.copyWith(
-                color: Colors.green.shade700,
+                color: colorScheme.onSecondaryContainer,
                 fontWeight: FontWeight.w800,
               ),
             ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../controllers/profile_controller.dart';
 import '../../../../core/utils/app_spacing.dart';
 import 'widgets/profile_header.dart';
@@ -20,13 +21,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: colorScheme.surface,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         scrolledUnderElevation: 0,
-        backgroundColor: colorScheme.primary,
+
+        flexibleSpace: DecoratedBox(
+          decoration: BoxDecoration(gradient: AppTheme.patientGradient),
+        ),
         title: Text(
           'Profile Settings',
           style: TextStyle(

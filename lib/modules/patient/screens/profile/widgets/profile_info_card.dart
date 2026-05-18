@@ -18,12 +18,12 @@ class ProfileInfoCard extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     Widget buildDivider() => Divider(
-          indent: 60,
-          endIndent: 20,
-          thickness: 0.8,
-          height: 1,
-          color: colorScheme.outlineVariant.transparency(0.4),
-        );
+      indent: 60,
+      endIndent: 20,
+      thickness: 0.8,
+      height: 1,
+      color: colorScheme.outlineVariant.transparency(0.4),
+    );
 
     return Card(
       elevation: 0,
@@ -31,9 +31,8 @@ class ProfileInfoCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(28),
         side: BorderSide(color: colorScheme.outlineVariant.transparency(0.4)),
       ),
-      color: colorScheme.surfaceContainerHighest.transparency(0.15),
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 10.0),
         child: Column(
           children: [
             ProfileTextField(

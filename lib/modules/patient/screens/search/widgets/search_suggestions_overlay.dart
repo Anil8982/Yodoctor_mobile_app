@@ -1,4 +1,3 @@
-import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:yodoctor/modules/patient/controllers/patient_search_controller.dart';
 
@@ -54,7 +53,7 @@ class SearchSuggestionsOverlay extends StatelessWidget {
         return ListTile(
           visualDensity: VisualDensity.compact,
           leading: CircleAvatar(
-            backgroundColor: colorScheme.primary.transparency(0.08),
+            backgroundColor: colorScheme.primary.withValues(alpha: 0.08),
             child: Icon(icon, color: colorScheme.primary, size: 20),
           ),
           title: Text(
@@ -66,7 +65,11 @@ class SearchSuggestionsOverlay extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
-          trailing: const Icon(Icons.north_west_rounded, size: 14, color: Colors.grey),
+          trailing: Icon(
+            Icons.north_west_rounded,
+            size: 14,
+            color: colorScheme.onSurfaceVariant,
+          ),
           onTap: () {
             searchController.text = displayTitle;
             controller.clearSuggestions();

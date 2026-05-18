@@ -1,4 +1,3 @@
-import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:yodoctor/modules/patient/controllers/profile_controller.dart';
 
@@ -21,11 +20,11 @@ class ProfileActionBar extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.surface,
         border: Border(
-          top: BorderSide(color: colorScheme.outlineVariant.transparency(0.3)),
+          top: BorderSide(color: colorScheme.outlineVariant.withValues(alpha: 0.3)),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.transparency(0.05),
+            color: colorScheme.shadow.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, -4),
           )
@@ -75,12 +74,12 @@ class ProfileActionBar extends StatelessWidget {
                 ),
               ),
               child: controller.isLoading
-                  ? const SizedBox(
+                  ? SizedBox(
                       height: 20,
                       width: 20,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        color: Colors.white,
+                        color: colorScheme.onPrimary,
                       ),
                     )
                   : const Text(

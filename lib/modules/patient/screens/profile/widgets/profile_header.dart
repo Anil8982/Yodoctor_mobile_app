@@ -1,4 +1,3 @@
-import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:yodoctor/core/utils/dummy_data.dart';
 
@@ -19,7 +18,7 @@ class ProfileHeader extends StatelessWidget {
             Container(
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: colorScheme.primary.transparency(0.1), width: 6),
+                border: Border.all(color: colorScheme.primary.withValues(alpha: 0.1), width: 6),
               ),
               child: CircleAvatar(
                 radius: 65,
@@ -34,7 +33,11 @@ class ProfileHeader extends StatelessWidget {
               CircleAvatar(
                 backgroundColor: colorScheme.primary,
                 radius: 22,
-                child: const Icon(Icons.camera_alt_rounded, color: Colors.white, size: 22),
+                child: Icon(
+                  Icons.camera_alt_rounded,
+                  color: colorScheme.onPrimary,
+                  size: 22,
+                ),
               ),
           ],
         ),
@@ -44,7 +47,7 @@ class ProfileHeader extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
-            color: colorScheme.secondaryContainer.transparency(0.5),
+            color: colorScheme.secondaryContainer.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(100),
           ),
           child: Text(

@@ -1,5 +1,5 @@
-import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 
 import '../../../core/utils/dummy_data.dart';
 
@@ -21,11 +21,7 @@ class PatientDrawer extends StatelessWidget {
           UserAccountsDrawerHeader(
             margin: EdgeInsets.zero,
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [colorScheme.primary, colorScheme.primary.transparency(0.8)],
-              ),
+              gradient: AppTheme.patientGradient,
             ),
             accountName: Text(
               user.name,
@@ -37,7 +33,7 @@ class PatientDrawer extends StatelessWidget {
             accountEmail: Text(
               user.email,
               style: theme.textTheme.bodySmall?.copyWith(
-                color: colorScheme.onPrimary.transparency(0.8),
+                color: colorScheme.onPrimary.withValues(alpha: 0.8),
               ),
             ),
             currentAccountPicture: CircleAvatar(

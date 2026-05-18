@@ -1,4 +1,3 @@
-﻿import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import '../../../../../core/utils/app_spacing.dart';
 import '../../../../../core/widgets/app_search_field.dart';
@@ -117,7 +116,7 @@ class HeroSection extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.transparency(0.05),
+            color: colorScheme.shadow.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -127,3 +126,4 @@ class HeroSection extends StatelessWidget {
     );
   }
 }
+

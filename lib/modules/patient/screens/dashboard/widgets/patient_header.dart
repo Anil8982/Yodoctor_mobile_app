@@ -1,4 +1,3 @@
-﻿import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../core/utils/app_spacing.dart';
@@ -29,9 +28,9 @@ class PatientHeader extends StatelessWidget {
         children: [
           const SizedBox(height: 10),
           // Text(
-          //   'Hello 👋',
+          //   'Hello ??',
           //   style: theme.textTheme.bodyLarge?.copyWith(
-          //     color: colorScheme.onPrimary.transparency(0.85),
+          //     color: colorScheme.onPrimary.withValues(alpha: 0.85),
           //     fontWeight: FontWeight.w500,
           //   ),
           // ),
@@ -46,10 +45,10 @@ class PatientHeader extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              color: colorScheme.onPrimary.transparency(0.15),
+              color: colorScheme.onPrimary.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: colorScheme.onPrimary.transparency(0.1),
+                color: colorScheme.onPrimary.withValues(alpha: 0.1),
               ),
             ),
             child: Row(
@@ -76,3 +75,4 @@ class PatientHeader extends StatelessWidget {
     );
   }
 }
+

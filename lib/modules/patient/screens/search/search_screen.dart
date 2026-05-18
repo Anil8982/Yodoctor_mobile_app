@@ -1,4 +1,3 @@
-﻿import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
@@ -58,7 +57,7 @@ class _SearchScreenState extends State<SearchScreen> {
     return Scaffold(
       key: _scaffoldKey,
       drawer: const PatientDrawer(user: DummyData.currentUser),
-      backgroundColor: colorScheme.surface,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: Consumer<PatientSearchController>(
         builder: (context, controller, child) {
           final horizontalPadding = Responsive.horizontalPadding(context);
@@ -134,7 +133,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(24),
                           border: Border.all(
-                            color: colorScheme.outlineVariant.transparency(0.4),
+                            color: colorScheme.outlineVariant.withValues(alpha: 0.4),
                           ),
                         ),
                         child: SearchSuggestionsOverlay(
@@ -185,7 +184,7 @@ class _SearchScreenState extends State<SearchScreen> {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: colorScheme.primary.transparency(0.05),
+            color: colorScheme.primary.withValues(alpha: 0.05),
             shape: BoxShape.circle,
           ),
           child: Icon(icon, color: colorScheme.primary, size: 24),
@@ -213,3 +212,4 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 }
+

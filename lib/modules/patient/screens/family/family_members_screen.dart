@@ -30,7 +30,7 @@ class _FamilyMembersScreenState extends State<FamilyMembersScreen> {
         return Scaffold(
           key: _scaffoldKey,
           drawer: const PatientDrawer(user: DummyData.currentUser),
-          backgroundColor: colorScheme.surface,
+          backgroundColor: theme.scaffoldBackgroundColor,
           body: NestedScrollView(
             headerSliverBuilder: (context, innerBoxIsScrolled) {
               return <Widget>[

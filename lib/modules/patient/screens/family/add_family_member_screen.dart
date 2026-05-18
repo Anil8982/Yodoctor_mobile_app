@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/dummy_data.dart';
 import '../../../../core/widgets/app_button.dart';
 import '../../controllers/family_controller.dart';
@@ -169,13 +170,23 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        scrolledUnderElevation: 0,
+        backgroundColor: colorScheme.surface.withValues(alpha: 0),
+        foregroundColor: colorScheme.onPrimary,
+        surfaceTintColor: colorScheme.surface.withValues(alpha: 0),
+        flexibleSpace: DecoratedBox(
+          decoration: BoxDecoration(gradient: AppTheme.patientGradient),
+        ),
         centerTitle: true,
         title: Text(
           _isEditing ? 'Update Member' : 'Add New Member',
-          style: const TextStyle(fontWeight: FontWeight.w700),
+          style: textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.w700,
+            color: colorScheme.onPrimary,
+          ),
         ),
       ),
-      backgroundColor: colorScheme.surfaceContainerLowest,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
@@ -190,25 +201,18 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(22),
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: <Color>[
-                          colorScheme.primaryContainer,
-                          colorScheme.primaryContainer.withValues(alpha: 0.65),
-                        ],
-                      ),
+                      gradient: AppTheme.patientGradient,
                     ),
                     child: Row(
                       children: <Widget>[
                         CircleAvatar(
                           radius: 22,
-                          backgroundColor: colorScheme.primary.withValues(alpha: 0.13),
+                          backgroundColor: colorScheme.onPrimary.withValues(alpha: 0.16),
                           child: Icon(
                             _isEditing
                                 ? Icons.manage_accounts_rounded
                                 : Icons.family_restroom_rounded,
-                            color: colorScheme.primary,
+                            color: colorScheme.onPrimary,
                           ),
                         ),
                         const SizedBox(width: 14),
@@ -222,6 +226,7 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
                                     : 'Family Health Profile',
                                 style: textTheme.titleLarge?.copyWith(
                                   fontWeight: FontWeight.w800,
+                                  color: colorScheme.onPrimary,
                                 ),
                               ),
                               const SizedBox(height: 4),
@@ -230,7 +235,7 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
                                     ? 'Keep family details fresh for faster bookings.'
                                     : 'Add details once and use them for faster appointments.',
                                 style: textTheme.bodyMedium?.copyWith(
-                                  color: colorScheme.onSurfaceVariant,
+                                  color: colorScheme.onPrimary.withValues(alpha: 0.9),
                                 ),
                               ),
                             ],

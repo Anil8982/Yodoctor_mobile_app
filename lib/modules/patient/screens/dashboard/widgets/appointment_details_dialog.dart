@@ -14,15 +14,15 @@ class AppointmentDetailsDialog extends StatelessWidget {
     final textTheme = theme.textTheme;
 
     final bool isAccepted = appointment.appointmentStatus == 'ACCEPTED';
-    final Color statusColor = isAccepted ? colorScheme.primary : Colors.orange;
+    final Color statusColor = isAccepted ? colorScheme.primary : colorScheme.secondary;
     final Color statusBg = isAccepted
         ? colorScheme.primaryContainer.withValues(alpha: 0.4)
-        : Colors.orange.withValues(alpha: 0.12);
+        : colorScheme.secondaryContainer.withValues(alpha: 0.45);
 
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
       backgroundColor: colorScheme.surface,
-      surfaceTintColor: Colors.transparent,
+      surfaceTintColor: colorScheme.surface.withValues(alpha: 0),
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 460),
         child: Column(

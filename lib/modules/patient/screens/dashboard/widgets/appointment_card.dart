@@ -1,4 +1,3 @@
-import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import '../../../../../core/utils/app_spacing.dart';
 import '../../../../../core/utils/dummy_data.dart';
@@ -15,25 +14,25 @@ class AppointmentCard extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     final bool isAccepted = appointment.appointmentStatus == 'ACCEPTED';
-    final Color statusColor = isAccepted ? colorScheme.primary : Colors.orange;
-    final Color statusBg = isAccepted ? colorScheme.primaryContainer : colorScheme.errorContainer;
+    final Color statusColor = isAccepted ? colorScheme.primary : colorScheme.secondary;
+    final Color statusBg = isAccepted ? colorScheme.primaryContainer : colorScheme.secondaryContainer;
 
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.sm),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainer.transparency(0.2),
+        color: colorScheme.surfaceContainer.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: colorScheme.outlineVariant.transparency(0.5)),
+        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.5)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.transparency(0.04),
+            color: colorScheme.shadow.withValues(alpha: 0.04),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
         ],
       ),
       child: Material(
-        color: Colors.transparent,
+        color: colorScheme.surface.withValues(alpha: 0),
         child: InkWell(
           borderRadius: BorderRadius.circular(20),
           onTap: () {
@@ -98,7 +97,7 @@ class AppointmentCard extends StatelessWidget {
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                 decoration: BoxDecoration(
-                                  color: statusBg.transparency(0.5),
+                                  color: statusBg.withValues(alpha: 0.5),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: Row(
@@ -143,7 +142,7 @@ class AppointmentCard extends StatelessWidget {
                               const Spacer(),
                               Icon(
                                 Icons.more_horiz_rounded,
-                                color: colorScheme.onSurfaceVariant.transparency(0.5),
+                                color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
                               ),
                             ],
                           ),

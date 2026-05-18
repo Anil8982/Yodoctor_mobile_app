@@ -1,4 +1,3 @@
-import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:yodoctor/core/models/family_member.dart';
 
@@ -71,7 +70,7 @@ class PatientSelectionSection extends StatelessWidget {
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide(color: colorScheme.outlineVariant.transparency(0.6)),
+                      borderSide: BorderSide(color: colorScheme.outlineVariant.withValues(alpha: 0.6)),
                     ),
                   ),
                   items: familyMembers.map((member) {
@@ -117,7 +116,7 @@ class PatientSelectionSection extends StatelessWidget {
           color: isSelected ? colorScheme.primaryContainer : colorScheme.surfaceContainerLow,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? colorScheme.primary : Colors.transparent,
+            color: isSelected ? colorScheme.primary : colorScheme.outlineVariant.withValues(alpha: 0),
             width: 1.5,
           ),
         ),

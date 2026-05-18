@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_theme.dart';
 import '../utils/app_radius.dart';
 
 class GradientBackground extends StatelessWidget {
@@ -18,18 +19,16 @@ class GradientBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final List<Color> gradientColors = colors ?? [
-      colorScheme.primary,
-      colorScheme.secondary,
-    ];
+    final List<Color> gradientColors = colors ?? AppTheme.patientGradient.colors;
+    final AlignmentGeometry begin = AppTheme.patientGradient.begin;
+    final AlignmentGeometry end = AppTheme.patientGradient.end;
 
     return Container(
       padding: padding,
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+          begin: begin,
+          end: end,
           colors: gradientColors,
         ),
         borderRadius: borderRadius ?? AppRadius.card,

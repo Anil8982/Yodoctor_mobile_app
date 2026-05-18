@@ -1,4 +1,3 @@
-import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../core/utils/app_spacing.dart';
@@ -28,7 +27,7 @@ class DoctorCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: AppSpacing.md),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
-        side: BorderSide(color: colorScheme.outlineVariant.transparency(0.4)),
+        side: BorderSide(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
       ),
       color: colorScheme.surface,
       child: InkWell(
@@ -88,7 +87,7 @@ class DoctorCard extends StatelessWidget {
                   vertical: 10,
                 ),
                 decoration: BoxDecoration(
-                  color: colorScheme.surfaceContainerHighest.transparency(0.3),
+                  color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
@@ -169,7 +168,7 @@ class DoctorCard extends StatelessWidget {
       width: 60,
       height: 60,
       decoration: BoxDecoration(
-        color: colorScheme.primaryContainer.transparency(0.7),
+        color: colorScheme.primaryContainer.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Center(
@@ -196,7 +195,7 @@ class DoctorCard extends StatelessWidget {
         Icon(
           icon,
           size: 14,
-          color: isRating ? Colors.amber[700] : colorScheme.onSurfaceVariant,
+          color: isRating ? colorScheme.secondary : colorScheme.onSurfaceVariant,
         ),
         const SizedBox(width: 4),
         Text(

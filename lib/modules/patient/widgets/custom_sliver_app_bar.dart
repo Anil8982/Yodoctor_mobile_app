@@ -1,7 +1,7 @@
-import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 
 class CustomSliverAppBar extends StatelessWidget {
   const CustomSliverAppBar({
@@ -24,7 +24,7 @@ class CustomSliverAppBar extends StatelessWidget {
       pinned: true,
       elevation: 0,
       stretch: true,
-      backgroundColor: colorScheme.primary,
+      backgroundColor: colorScheme.surface.withValues(alpha: 0),
       automaticallyImplyLeading: false,
       systemOverlayStyle: SystemUiOverlayStyle.light,
 
@@ -60,9 +60,12 @@ class CustomSliverAppBar extends StatelessWidget {
         ],
       ),
 
-      flexibleSpace: FlexibleSpaceBar(
-        stretchModes: const [StretchMode.zoomBackground],
-        background: background,
+      flexibleSpace: Container(
+        decoration: BoxDecoration(gradient: AppTheme.patientGradient),
+        child: FlexibleSpaceBar(
+          stretchModes: const [StretchMode.zoomBackground],
+          background: background,
+        ),
       ),
     );
   }
@@ -78,7 +81,7 @@ class CustomSliverAppBar extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: colorScheme.onPrimary.transparency(0.15),
+          color: colorScheme.onPrimary.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Icon(icon, color: colorScheme.onPrimary, size: 24),
@@ -94,11 +97,11 @@ class CustomSliverAppBar extends StatelessWidget {
         padding: const EdgeInsets.all(2),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          border: Border.all(color: colorScheme.onPrimary.transparency(0.3)),
+          border: Border.all(color: colorScheme.onPrimary.withValues(alpha: 0.3)),
         ),
         child: CircleAvatar(
           radius: 18,
-          backgroundColor: colorScheme.onPrimary.transparency(0.2),
+          backgroundColor: colorScheme.onPrimary.withValues(alpha: 0.2),
           child: Icon(Icons.person_rounded, color: colorScheme.onPrimary, size: 20),
         ),
       ),

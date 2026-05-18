@@ -1,4 +1,3 @@
-﻿import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -32,7 +31,7 @@ class DashboardScreen extends StatelessWidget {
 
         if (loading && data == null) {
           return Scaffold(
-            backgroundColor: colorScheme.surface,
+            backgroundColor: theme.scaffoldBackgroundColor,
             body: const Center(child: CircularProgressIndicator()),
           );
         }
@@ -44,7 +43,7 @@ class DashboardScreen extends StatelessWidget {
         return Scaffold(
           key: _scaffoldKey,
           extendBodyBehindAppBar: true,
-          backgroundColor: colorScheme.surface,
+          backgroundColor: theme.scaffoldBackgroundColor,
           drawer: PatientDrawer(user: data.user),
           body: NestedScrollView(
             headerSliverBuilder: (context, innerBoxIsScrolled) {
@@ -150,10 +149,10 @@ class _EmptyAppointments extends StatelessWidget {
         decoration: BoxDecoration(
           color: colorScheme.surfaceContainerLow,
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: colorScheme.outlineVariant.transparency(0.5)),
+          border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.5)),
           boxShadow: [
             BoxShadow(
-              color: colorScheme.shadow.transparency(0.03),
+              color: colorScheme.shadow.withValues(alpha: 0.03),
               blurRadius: 20,
               offset: const Offset(0, 10),
             )
@@ -165,7 +164,7 @@ class _EmptyAppointments extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: colorScheme.secondaryContainer.transparency(0.4),
+                color: colorScheme.secondaryContainer.withValues(alpha: 0.4),
                 shape: BoxShape.circle,
               ),
               child: Icon(Icons.event_busy_rounded, size: 40, color: colorScheme.secondary),
@@ -203,3 +202,4 @@ class _EmptyAppointments extends StatelessWidget {
     );
   }
 }
+

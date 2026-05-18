@@ -108,7 +108,7 @@ class FamilyMemberCard extends StatelessWidget {
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: Theme.of(context).colorScheme.surface.withValues(alpha: 0),
       builder: (BuildContext modalContext) {
         final ColorScheme colorScheme = Theme.of(modalContext).colorScheme;
         final TextTheme textTheme = Theme.of(modalContext).textTheme;

@@ -1,10 +1,10 @@
-import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/routes/app_routes.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/app_spacing.dart';
 import '../../../../core/utils/dummy_data.dart';
 import '../../../../core/utils/responsive.dart';
@@ -53,11 +53,13 @@ class _FindDoctorsScreenState extends State<FindDoctorsScreen> {
         final double horizontal = Responsive.horizontalPadding(context);
 
         return Scaffold(
-          backgroundColor: colorScheme.surface,
+          backgroundColor: theme.scaffoldBackgroundColor,
           appBar: AppBar(
-            backgroundColor: colorScheme.primary,
             elevation: 0,
             scrolledUnderElevation: 0,
+            flexibleSpace: DecoratedBox(
+              decoration: BoxDecoration(gradient: AppTheme.patientGradient),
+            ),
             centerTitle: false,
             leadingWidth: 72,
             leading: Center(child: _buildBackButton(context, colorScheme)),
@@ -75,7 +77,7 @@ class _FindDoctorsScreenState extends State<FindDoctorsScreen> {
                   Text(
                     'Results for "${controller.activeQuery}"',
                     style: theme.textTheme.labelSmall?.copyWith(
-                      color: colorScheme.onPrimary.transparency(0.8),
+                      color: colorScheme.onPrimary.withValues(alpha: 0.8),
                     ),
                   ),
               ],

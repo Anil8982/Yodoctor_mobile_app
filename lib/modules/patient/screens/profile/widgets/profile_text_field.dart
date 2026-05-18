@@ -21,9 +21,13 @@ class ProfileTextField extends StatelessWidget {
 
     return Focus(
       canRequestFocus: isEditing,
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
         width: double.infinity,
-        color: isEditing ? colorScheme.surface : Colors.transparent,
+        decoration: BoxDecoration(
+          color: colorScheme.surfaceContainerHighest.transparency(0.15),
+          borderRadius: BorderRadius.circular(12),
+        ),
         child: TextFormField(
           controller: controller,
           readOnly: !isEditing,
@@ -31,7 +35,7 @@ class ProfileTextField extends StatelessWidget {
           decoration: InputDecoration(
             labelText: label,
             labelStyle: TextStyle(
-              color: isEditing ? colorScheme.primary : colorScheme.outline,
+              color: !isEditing ? colorScheme.primary : colorScheme.secondary,
               fontWeight: FontWeight.w800,
               fontSize: 12,
             ),
@@ -40,13 +44,38 @@ class ProfileTextField extends StatelessWidget {
               child: Icon(
                 icon,
                 size: 22,
-                color: isEditing ? colorScheme.primary : colorScheme.outline.transparency(0.6),
+                color: !isEditing
+                    ? colorScheme.primary
+                    : colorScheme.secondary.transparency(0.9),
               ),
             ),
+
+            suffixIcon: isEditing
+                ? Padding(
+                    padding: const EdgeInsets.only(right: 16.0),
+                    child: Icon(
+                      Icons.edit_note_rounded,
+                      color: colorScheme.primary,
+                      size: 22,
+                    ),
+                  )
+                : null,
+
             border: InputBorder.none,
             enabledBorder: InputBorder.none,
-            focusedBorder: InputBorder.none,
-            contentPadding: const EdgeInsets.symmetric(vertical: 16),
+            focusedBorder: isEditing
+                ? UnderlineInputBorder(
+                    borderSide: BorderSide(
+                      color: colorScheme.primary,
+                      width: 2,
+                    ),
+                  )
+                : InputBorder.none,
+
+            contentPadding: const EdgeInsets.symmetric(
+              vertical: 16,
+              horizontal: 4,
+            ),
           ),
           style: TextStyle(
             fontSize: 16,

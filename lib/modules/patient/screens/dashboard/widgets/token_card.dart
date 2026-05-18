@@ -1,4 +1,3 @@
-import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import '../../../../../core/utils/dummy_data.dart';
 
@@ -21,11 +20,11 @@ class TokenCard extends StatelessWidget {
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: colorScheme.primary.transparency(0.4),
+          color: colorScheme.primary.withValues(alpha: 0.4),
         ),
         boxShadow: [
           BoxShadow(
-            color: colorScheme.shadow.transparency(0.04),
+            color: colorScheme.shadow.withValues(alpha: 0.04),
             blurRadius: 18,
             offset: const Offset(0, 6),
           ),
@@ -94,13 +93,13 @@ class TokenCard extends StatelessWidget {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.orange.transparency(0.12),
+                          color: colorScheme.secondaryContainer.withValues(alpha: 0.45),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
                           'WAITING',
                           style: theme.textTheme.labelSmall?.copyWith(
-                            color: Colors.orange,
+                            color: colorScheme.onSecondaryContainer,
                             fontWeight: FontWeight.w900,
                             fontSize: 10,
                           ),
@@ -123,7 +122,7 @@ class TokenCard extends StatelessWidget {
                   Divider(
                     height: 1,
                     thickness: 0.6,
-                    color: colorScheme.outlineVariant.transparency(0.3),
+                    color: colorScheme.outlineVariant.withValues(alpha: 0.3),
                   ),
 
                   const SizedBox(height: 10),

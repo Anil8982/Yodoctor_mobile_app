@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/routes/app_routes.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/dummy_data.dart';
 import '../../controllers/family_controller.dart';
 import 'widgets/appointment_queue_dialog.dart';
@@ -76,13 +77,21 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
     final List<FamilyMember> familyMembers = context.watch<FamilyController>().members;
 
     return Scaffold(
-      backgroundColor: colorScheme.surface,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         scrolledUnderElevation: 0,
-        backgroundColor: colorScheme.surface,
+        backgroundColor: colorScheme.surface.withValues(alpha: 0),
+        foregroundColor: colorScheme.onPrimary,
+        surfaceTintColor: colorScheme.surface.withValues(alpha: 0),
+        flexibleSpace: DecoratedBox(
+          decoration: BoxDecoration(gradient: AppTheme.patientGradient),
+        ),
         title: Text(
           'Book Appointment',
-          style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900),
+          style: textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.w900,
+            color: colorScheme.onPrimary,
+          ),
         ),
       ),
       body: SafeArea(
