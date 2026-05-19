@@ -80,9 +80,6 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         scrolledUnderElevation: 0,
-        backgroundColor: colorScheme.surface.withValues(alpha: 0),
-        foregroundColor: colorScheme.onPrimary,
-        surfaceTintColor: colorScheme.surface.withValues(alpha: 0),
         flexibleSpace: DecoratedBox(
           decoration: BoxDecoration(gradient: AppTheme.patientGradient),
         ),

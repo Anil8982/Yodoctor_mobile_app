@@ -1,4 +1,4 @@
-import 'package:chroma_kit/chroma_kit.dart';
+﻿import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
 
@@ -6,8 +6,6 @@ enum AppRole { doctor, patient }
 
 class AppTheme {
   AppTheme._();
-
-  // ── 🚀 EXACT COMPATIBILITY GETTERS (No Code Breaking!) ──
 
   // Gradients Forwarding
   static LinearGradient get doctorGradient => AppColors.doctorGradient;

@@ -76,33 +76,42 @@ class _FamilyMembersScreenState extends State<FamilyMembersScreen> {
   }
 
   Future<void> _openAddMemberScreen(BuildContext context) async {
-    final bool? wasAdded = await context.push<bool>(AppRoutes.addFamilyMember);
+    final messenger = ScaffoldMessenger.of(context);
+    final colorScheme = Theme.of(context).colorScheme;
+
+    final bool? wasAdded =
+    await context.push<bool>(AppRoutes.addFamilyMember);
+
     if (!mounted || wasAdded != true) return;
 
-    ScaffoldMessenger.of(context).showSnackBar(
+    messenger.showSnackBar(
       SnackBar(
         content: const Text('Member added successfully.'),
         behavior: SnackBarBehavior.floating,
-        backgroundColor: Theme.of(context).colorScheme.secondary,
+        backgroundColor: colorScheme.secondary,
       ),
     );
   }
 
   Future<void> _openEditMemberScreen(
-    BuildContext context,
-    FamilyMember member,
-  ) async {
+      BuildContext context,
+      FamilyMember member,
+      ) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final colorScheme = Theme.of(context).colorScheme;
+
     final bool? wasUpdated = await context.push<bool>(
       AppRoutes.addFamilyMember,
       extra: member,
     );
+
     if (!mounted || wasUpdated != true) return;
 
-    ScaffoldMessenger.of(context).showSnackBar(
+    messenger.showSnackBar(
       SnackBar(
         content: const Text('Member updated successfully.'),
         behavior: SnackBarBehavior.floating,
-        backgroundColor: Theme.of(context).colorScheme.secondary,
+        backgroundColor: colorScheme.secondary,
       ),
     );
   }

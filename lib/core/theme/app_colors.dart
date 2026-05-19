@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class AppColors {
   AppColors._();
 
-  // ── 🎯 Exact Brand Hex Tokens ────────────────────────────
+  // ── Brand Hex Tokens ────────────────────────────
   static const Color yoBlue = Color(0xFF1565C0);
   static const Color yoBlueDark = Color(0xFF0D47A1);
   static const Color yoBlueLight = Color(0xFFE3F0FF);
@@ -29,7 +29,7 @@ class AppColors {
   static const Color inputFill = Color(0xFFF0F6FF);
   static const Color inputFillGreen = Color(0xFFF1F8F1);
 
-  // ── 🎨 Core Brand Gradients ──────────────────────────────
+  // ── Core Brand Gradients ──────────────────────────────
   static const LinearGradient doctorGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
