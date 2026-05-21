@@ -124,6 +124,7 @@ import 'modules/patient/controllers/family_controller.dart';
 import 'modules/patient/controllers/patient_dashboard_controller.dart';
 import 'modules/patient/controllers/patient_search_controller.dart';
 import 'modules/patient/controllers/profile_controller.dart';
+import 'modules/patient/controllers/certificate_request.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -137,6 +138,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => ProfileController()),
         ChangeNotifierProvider(create: (_) => FamilyController()),
         ChangeNotifierProvider(create: (_) => AppointmentHistoryController()),
+        ChangeNotifierProvider(create: (_) => CertificateController()),
       ],
       child: const YoDoctorApp(),
     ),

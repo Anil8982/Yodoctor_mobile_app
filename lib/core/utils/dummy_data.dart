@@ -5,6 +5,7 @@ export '../models/patient_appointment.dart';
 export '../models/patient_dashboard_data.dart';
 export '../models/patient_token.dart';
 export '../models/patient_user.dart';
+export '../../modules/patient/controllers/medical_certificate.dart';
 
 import '../models/appointment_history_item.dart';
 import '../models/doctor_profile.dart';
@@ -13,6 +14,7 @@ import '../models/patient_appointment.dart';
 import '../models/patient_dashboard_data.dart';
 import '../models/patient_token.dart';
 import '../models/patient_user.dart';
+import '../../modules/patient/controllers/medical_certificate.dart';
 
 class DummyData {
   const DummyData._();
@@ -171,6 +173,64 @@ class DummyData {
       availableSlot: '04:45 PM',
       languages: <String>['English', 'Hindi', 'Kannada'],
       location: 'Bangalore',
+    ),
+  ];
+
+  static final List<MedicalCertificate> dummyCertificates = <MedicalCertificate>[
+    MedicalCertificate(
+      id: 'CERT-1',
+      type: 'Medical Fitness',
+      patientName: 'Ajay',
+      dateOfBirth: '2004-02-12',
+      gender: 'Male',
+      bloodGroup: 'A+',
+      heightCm: 167.0,
+      weightKg: 67.0,
+      medicalConditions: 'None',
+      medications: 'None',
+      doctor: allDoctors[0],
+      purpose: 'Travel',
+      additionalNotes: 'Required for travel clearance.',
+      status: 'APPROVED',
+      requestDate: DateTime.now().subtract(const Duration(days: 5)),
+      issuedDate: DateTime.now().subtract(const Duration(days: 4)),
+      documents: const <String>['profile_photo.jpg', 'aadhaar_card.png'],
+    ),
+    MedicalCertificate(
+      id: 'CERT-2',
+      type: 'Vaccination',
+      patientName: 'Anil kushwaha',
+      dateOfBirth: '14-06-2002',
+      gender: 'Male',
+      bloodGroup: 'B+',
+      heightCm: 175.0,
+      weightKg: 70.0,
+      medicalConditions: 'None',
+      medications: 'None',
+      doctor: allDoctors[1],
+      purpose: 'Employment',
+      additionalNotes: 'Need Hepatitis B vaccine certificate.',
+      status: 'PENDING',
+      requestDate: DateTime.now().subtract(const Duration(days: 1)),
+      documents: const <String>['vaccination_card.jpg'],
+    ),
+    MedicalCertificate(
+      id: 'CERT-3',
+      type: 'Second Opinion',
+      patientName: 'Meera Patel',
+      dateOfBirth: '1990-03-14',
+      gender: 'Female',
+      bloodGroup: 'B+',
+      heightCm: 162.0,
+      weightKg: 58.0,
+      medicalConditions: 'Migraine',
+      medications: 'Sumatriptan 50mg',
+      doctor: allDoctors[2],
+      purpose: 'Treatment Review',
+      additionalNotes: 'Checking neurologist opinion on headache treatment.',
+      status: 'REJECTED',
+      requestDate: DateTime.now().subtract(const Duration(days: 10)),
+      documents: const <String>['mri_brain_report.pdf'],
     ),
   ];
 

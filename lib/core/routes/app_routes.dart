@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/utils/dummy_data.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/doctor_login_screen.dart';
@@ -17,6 +17,8 @@ import '../../modules/patient/screens/find_doctors/find_doctors_screen.dart';
 import '../../modules/patient/screens/history/appointments_history_screen.dart';
 import '../../modules/patient/screens/profile/profile_screen.dart';
 import '../../modules/patient/screens/search/search_screen.dart';
+import '../../modules/patient/screens/certificates/apply_certificate_screen.dart';
+import '../../modules/patient/screens/certificates/certificate_wallet_screen.dart';
 
 class AppRoutes {
   const AppRoutes._();
@@ -38,6 +40,8 @@ class AppRoutes {
   static const String addFamilyMember = '/family/add-member';
   static const String bookAppointment = '/appointments/book';
   static const String history = '/history';
+  static const String certificateWallet = '/certificates';
+  static const String applyCertificate = '/certificates/apply';
 }
 
 class AppRouter {
@@ -120,6 +124,16 @@ class AppRouter {
             doctor: doctor is DoctorProfile ? doctor : fallbackDoctor,
           );
         },
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: AppRoutes.certificateWallet,
+        builder: (context, state) => const CertificateWalletScreen(),
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: AppRoutes.applyCertificate,
+        builder: (context, state) => const ApplyCertificateScreen(),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
