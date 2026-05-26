@@ -82,7 +82,7 @@ class DashboardScreen extends StatelessWidget {
                     if (loading) LinearProgressIndicator(color: colorScheme.primary, backgroundColor: colorScheme.primaryContainer),
                     _buildAppointmentsContent(data, mobile),
 
-                    const SizedBox(height: 50),
+                    // const SizedBox(height: 50),
                   ],
                 ),
               ),

@@ -139,7 +139,7 @@ class _CertificateWalletScreenState extends State<CertificateWalletScreen> {
                   child: controller.certificates.isEmpty
                       ? _buildEmptyState(context, controller.selectedFilter)
                       : ListView.separated(
-                          padding: EdgeInsets.fromLTRB(horizontalPadding, 16, horizontalPadding, 120),
+                          padding: EdgeInsets.fromLTRB(horizontalPadding, 16, horizontalPadding, 0),
                           itemCount: controller.certificates.length,
                           separatorBuilder: (_, _) => const SizedBox(height: 12),
                           itemBuilder: (context, index) {
@@ -151,18 +151,15 @@ class _CertificateWalletScreenState extends State<CertificateWalletScreen> {
               ],
             ),
           ),
-          floatingActionButton: Padding(
-            padding: const EdgeInsets.only(bottom: 80.0),
-            child: FloatingActionButton.extended(
-              onPressed: () {
-                controller.initFormWithDefaults(DummyData.currentUser);
-                context.push(AppRoutes.applyCertificate);
-              },
-              icon: const Icon(Icons.add_rounded),
-              label: const Text('Apply Certificate'),
-              backgroundColor: colorScheme.primary,
-              foregroundColor: colorScheme.onPrimary,
-            ),
+          floatingActionButton: FloatingActionButton.extended(
+            onPressed: () {
+              controller.initFormWithDefaults(DummyData.currentUser);
+              context.push(AppRoutes.applyCertificate);
+            },
+            icon: const Icon(Icons.add_rounded),
+            label: const Text('Apply Certificate'),
+            backgroundColor: colorScheme.primary,
+            foregroundColor: colorScheme.onPrimary,
           ),
         );
       },

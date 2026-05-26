@@ -39,8 +39,7 @@ dependencies:
   chroma_kit: ^1.1.0
   go_router: ^17.2.3
   intl: ^0.19.0
-
-
+  persistent_bottom_nav_bar: ^6.2.1
 
 dev_dependencies:
   flutter_test:
