@@ -7,7 +7,6 @@ import 'package:yodoctor/modules/auth/screens/landing/landing_screen.dart';
 import 'package:yodoctor/modules/auth/screens/patient/patient_login_screen.dart';
 import 'package:yodoctor/modules/auth/screens/patient/patient_register_screen.dart';
 import 'package:yodoctor/modules/patient/patient_pcaffold_shell.dart';
-
 import '../../modules/patient/screens/appointments/book_appointment_screen.dart';
 import '../../modules/patient/screens/dashboard/dashboard_screen.dart';
 import '../../modules/patient/screens/doctor_detail/doctor_detail_screen.dart';
@@ -48,7 +47,7 @@ class AppRouter {
   const AppRouter._();
 
   static final GlobalKey<NavigatorState> _rootNavigatorKey =
-      GlobalKey<NavigatorState>();
+  GlobalKey<NavigatorState>();
 
   static final GoRouter router = GoRouter(
     navigatorKey: _rootNavigatorKey,
@@ -57,27 +56,32 @@ class AppRouter {
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.landing,
-        builder: (context, state) =>  LandingScreen(),
+        builder: (context, state) => LandingScreen(),
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.patientLogin,
-        builder: (context, state) =>  PatientLoginScreen(),
+        builder: (context, state) => PatientLoginScreen(),
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.patientRegister,
-        builder: (context, state) =>  PatientRegisterScreen(),
+        builder: (context, state) => PatientRegisterScreen(),
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.doctorLogin,
-        builder: (context, state) =>  DoctorLoginScreen(),
+        builder: (context, state) => DoctorLoginScreen(),
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.doctorRegister,
-        builder: (context, state) =>  DoctorRegisterScreen(),
+        builder: (context, state) => DoctorRegisterScreen(),
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: AppRoutes.search,
+        builder: (context, state) => const SearchScreen(),
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
@@ -127,19 +131,17 @@ class AppRouter {
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
-        path: AppRoutes.certificateWallet,
-        builder: (context, state) => const CertificateWalletScreen(),
-      ),
-      GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.applyCertificate,
         builder: (context, state) => const ApplyCertificateScreen(),
       ),
+
+      // StatefulShellRoute
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return PatientScaffoldShell(navigationShell: navigationShell);
         },
         branches: [
+          // Index 0: Home / Dashboard
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -151,11 +153,12 @@ class AppRouter {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: AppRoutes.search,
-                builder: (context, state) => const SearchScreen(),
+                path: AppRoutes.certificateWallet,
+                builder: (context, state) => const CertificateWalletScreen(),
               ),
             ],
           ),
+          // Index 2: Family
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -164,6 +167,7 @@ class AppRouter {
               ),
             ],
           ),
+          // Index 3: History
           StatefulShellBranch(
             routes: [
               GoRoute(

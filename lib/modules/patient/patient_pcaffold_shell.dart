@@ -10,8 +10,7 @@ class PatientScaffoldShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final String currentPath = GoRouterState.of(context).uri.path;
-    final bool showNavBar = currentPath != '/profile';
-
+    final bool showNavBar = currentPath != '/profile' && currentPath != '/certificates/apply';
     return Scaffold(
       extendBody: true,
       body: navigationShell,

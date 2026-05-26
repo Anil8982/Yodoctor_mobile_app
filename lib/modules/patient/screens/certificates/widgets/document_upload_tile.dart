@@ -10,6 +10,7 @@ class DocumentUploadTile extends StatelessWidget {
     required this.onUpload,
     required this.onRemove,
     this.isRequired = false,
+    this.hasError = false,
   });
 
   final String label;
@@ -19,12 +20,30 @@ class DocumentUploadTile extends StatelessWidget {
   final Function(String fileName) onUpload;
   final VoidCallback onRemove;
   final bool isRequired;
+  final bool hasError;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final isUploading = uploadProgress != null;
+    final isUploaded = uploadedFileName != null;
+
+    Color getTileBgColor() {
+      if (isUploaded) return colorScheme.primaryContainer.withValues(alpha: 0.15);
+      if (hasError) return colorScheme.errorContainer.withValues(alpha: 0.2);
+      return colorScheme.outlineVariant.withValues(alpha: 0.1);
+    }
+
+    Color getBorderColor() {
+      if (isUploaded) return colorScheme.primary;
+      if (hasError) return colorScheme.error.withValues(alpha: 0.8);
+      return colorScheme.outlineVariant;
+    }
+
+    double getBorderWidth() {
+      return (isUploaded || hasError) ? 1.5 : 1.0;
+    }
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
@@ -38,13 +57,16 @@ class DocumentUploadTile extends StatelessWidget {
                 style: theme.textTheme.labelMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   letterSpacing: 0.5,
-                  color: colorScheme.onSurface,
+                  color: hasError ? colorScheme.error : colorScheme.onSurfaceVariant,
                 ),
               ),
               if (isRequired)
                 Text(
                   ' *',
-                  style: TextStyle(color: colorScheme.error, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    color: colorScheme.error,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
             ],
           ),
@@ -52,29 +74,23 @@ class DocumentUploadTile extends StatelessWidget {
           Container(
             width: double.infinity,
             decoration: BoxDecoration(
-              color: uploadedFileName != null
-                  ? colorScheme.primaryContainer.withValues(alpha: 0.1)
-                  : colorScheme.surfaceContainerLow,
+              color: getTileBgColor(),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: uploadedFileName != null
-                    ? colorScheme.primary
-                    : colorScheme.outlineVariant.withValues(alpha: 0.4),
-                style: uploadedFileName != null ? BorderStyle.solid : BorderStyle.solid,
-                width: uploadedFileName != null ? 1.5 : 1,
+                color: getBorderColor(),
+                width: getBorderWidth(),
               ),
             ),
             child: Material(
               color: Colors.transparent,
               child: InkWell(
-                onTap: isUploading || uploadedFileName != null
+                onTap: isUploading || isUploaded
                     ? null
                     : () {
-                        // Generate a dummy file name based on key label
-                        final extension = label.contains('Report') ? 'pdf' : 'jpg';
-                        final cleanLabel = label.toLowerCase().replaceAll(' ', '_');
-                        onUpload('${cleanLabel}_upload.$extension');
-                      },
+                  final extension = label.contains('Report') ? 'pdf' : 'jpg';
+                  final cleanLabel = label.toLowerCase().replaceAll(' ', '_');
+                  onUpload('${cleanLabel}_upload.$extension');
+                },
                 borderRadius: BorderRadius.circular(16),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
@@ -119,7 +135,7 @@ class DocumentUploadTile extends StatelessWidget {
                             ),
                           ],
                         ),
-                      ] else if (uploadedFileName != null) ...[
+                      ] else if (isUploaded) ...[
                         Row(
                           children: [
                             Container(
@@ -130,7 +146,7 @@ class DocumentUploadTile extends StatelessWidget {
                               ),
                               child: Icon(
                                 Icons.file_present_rounded,
-                                color: colorScheme.primary,
+                                color: colorScheme.onPrimaryContainer,
                                 size: 20,
                               ),
                             ),
@@ -153,6 +169,7 @@ class DocumentUploadTile extends StatelessWidget {
                                     'Document uploaded successfully',
                                     style: theme.textTheme.bodySmall?.copyWith(
                                       color: colorScheme.primary,
+                                      fontWeight: FontWeight.w600,
                                     ),
                                   ),
                                 ],
@@ -171,12 +188,16 @@ class DocumentUploadTile extends StatelessWidget {
                             Container(
                               padding: const EdgeInsets.all(10),
                               decoration: BoxDecoration(
-                                color: colorScheme.surfaceContainerHighest,
+                                color: hasError
+                                    ? colorScheme.errorContainer
+                                    : colorScheme.surfaceContainerHighest,
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(
                                 Icons.cloud_upload_outlined,
-                                color: colorScheme.onSurfaceVariant,
+                                color: hasError
+                                    ? colorScheme.onErrorContainer
+                                    : colorScheme.onSurfaceVariant,
                                 size: 22,
                               ),
                             ),
@@ -189,14 +210,14 @@ class DocumentUploadTile extends StatelessWidget {
                                     'Click to upload',
                                     style: theme.textTheme.bodyMedium?.copyWith(
                                       fontWeight: FontWeight.bold,
-                                      color: colorScheme.onSurface,
+                                      color: hasError ? colorScheme.error : colorScheme.onSurface,
                                     ),
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
-                                    hint,
+                                    hasError ? 'This document is required!' : hint,
                                     style: theme.textTheme.bodySmall?.copyWith(
-                                      color: colorScheme.onSurfaceVariant,
+                                      color: hasError ? colorScheme.error : colorScheme.onSurfaceVariant,
                                     ),
                                   ),
                                 ],

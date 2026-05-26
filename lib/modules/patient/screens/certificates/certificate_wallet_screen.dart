@@ -7,6 +7,9 @@ import '../../../../core/routes/app_routes.dart';
 import '../../../../core/utils/dummy_data.dart';
 import '../../../../core/utils/responsive.dart';
 import '../../controllers/certificate_request.dart';
+import '../../widgets/custom_sliver_app_bar.dart';
+import '../../widgets/patient_drawer.dart';
+import 'widgets/certificate_header.dart';
 import 'widgets/certificate_preview_dialog.dart';
 
 class CertificateWalletScreen extends StatefulWidget {
@@ -17,6 +20,7 @@ class CertificateWalletScreen extends StatefulWidget {
 }
 
 class _CertificateWalletScreenState extends State<CertificateWalletScreen> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final TextEditingController _searchController = TextEditingController();
 
   @override
@@ -34,121 +38,131 @@ class _CertificateWalletScreenState extends State<CertificateWalletScreen> {
     return Consumer<CertificateController>(
       builder: (context, controller, child) {
         return Scaffold(
+          key: _scaffoldKey,
+          drawer: const PatientDrawer(user: DummyData.currentUser),
           backgroundColor: theme.scaffoldBackgroundColor,
-          appBar: AppBar(
-            title: const Text('Medical Certificates'),
-            elevation: 0,
-          ),
-          body: Column(
-            children: [
-              // Search & Filter header
-              Container(
-                color: colorScheme.surface,
-                padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 12),
-                child: Column(
-                  children: [
-                    // Search bar
-                    ValueListenableBuilder<TextEditingValue>(
-                      valueListenable: _searchController,
-                      builder: (context, value, child) {
-                        return TextField(
-                          controller: _searchController,
-                          onChanged: controller.setSearchQuery,
-                          style: Theme.of(context).textTheme.bodyMedium,
-                          decoration: InputDecoration(
-                            hintText: 'Search by type or doctor...',
-                            prefixIcon: const Icon(Icons.search_rounded, size: 22),
-
-                            suffixIcon: value.text.isNotEmpty
-                                ? IconButton(
-                              icon: const Icon(Icons.clear_rounded, size: 20),
-                              onPressed: () {
-                                _searchController.clear();
-                                controller.setSearchQuery('');
-                              },
-                            )
-                                : null,
-
-                            filled: true,
-                            fillColor: Theme.of(context).colorScheme.surfaceContainerLow,
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(14),
-                              borderSide: BorderSide(
-                                color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.35),
-                                width: 1.0,
+          body: NestedScrollView(
+            headerSliverBuilder: (context, innerBoxIsScrolled) {
+              return <Widget>[
+                CustomSliverAppBar(
+                  expandedHeight: 220,
+                  scaffoldKey: _scaffoldKey,
+                  background: CertificateHeader(
+                    certificateCount: controller.certificates.length,
+                    selectedFilter: controller.selectedFilter,
+                  ),
+                ),
+              ];
+            },
+            body: Column(
+              children: [
+                Container(
+                  color: colorScheme.surface,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: horizontalPadding,
+                    vertical: 12,
+                  ),
+                  child: Column(
+                    children: [
+                      ValueListenableBuilder<TextEditingValue>(
+                        valueListenable: _searchController,
+                        builder: (context, value, child) {
+                          return TextField(
+                            controller: _searchController,
+                            onChanged: controller.setSearchQuery,
+                            style: Theme.of(context).textTheme.bodyMedium,
+                            decoration: InputDecoration(
+                              hintText: 'Search by type or doctor...',
+                              prefixIcon: const Icon(Icons.search_rounded, size: 22),
+                              suffixIcon: value.text.isNotEmpty
+                                  ? IconButton(
+                                      icon: const Icon(Icons.clear_rounded, size: 20),
+                                      onPressed: () {
+                                        _searchController.clear();
+                                        controller.setSearchQuery('');
+                                      },
+                                    )
+                                  : null,
+                              filled: true,
+                              fillColor: Theme.of(context).colorScheme.surfaceContainerLow,
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 14,
                               ),
-                            ),
-
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(14),
-                              borderSide: BorderSide(
-                                color: Theme.of(context).colorScheme.primary,
-                                width: 2.0,
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(14),
+                                borderSide: BorderSide(
+                                  color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.35),
+                                  width: 1.0,
+                                ),
                               ),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 12),
-
-                    // Filter chips row
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      physics: const BouncingScrollPhysics(),
-                      child: Row(
-                        children: ['All', 'Pending', 'Approved', 'Rejected'].map((filter) {
-                          final isSelected = controller.selectedFilter == filter;
-                          return Padding(
-                            padding: const EdgeInsets.only(right: 8.0),
-                            child: FilterChip(
-                              label: Text(filter),
-                              selected: isSelected,
-                              onSelected: (_) => controller.setFilter(filter),
-                              selectedColor: colorScheme.primaryContainer,
-                              labelStyle: TextStyle(
-                                color: isSelected ? colorScheme.onPrimaryContainer : colorScheme.onSurface,
-                                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(14),
+                                borderSide: BorderSide(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  width: 2.0,
+                                ),
                               ),
-                              showCheckmark: false,
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
                             ),
                           );
-                        }).toList(),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              // Certificates list
-              Expanded(
-                child: controller.certificates.isEmpty
-                    ? _buildEmptyState(context, controller.selectedFilter)
-                    : ListView.separated(
-                        padding: EdgeInsets.fromLTRB(horizontalPadding, 16, horizontalPadding, 80),
-                        itemCount: controller.certificates.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 12),
-                        itemBuilder: (context, index) {
-                          final cert = controller.certificates[index];
-                          return _buildCertificateCard(context, cert);
                         },
                       ),
-              ),
-            ],
+                      const SizedBox(height: 12),
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        physics: const BouncingScrollPhysics(),
+                        child: Row(
+                          children: ['All', 'Pending', 'Approved', 'Rejected'].map((filter) {
+                            final isSelected = controller.selectedFilter == filter;
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: FilterChip(
+                                label: Text(filter),
+                                selected: isSelected,
+                                onSelected: (_) => controller.setFilter(filter),
+                                selectedColor: colorScheme.primaryContainer,
+                                labelStyle: TextStyle(
+                                  color: isSelected ? colorScheme.onPrimaryContainer : colorScheme.onSurface,
+                                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                ),
+                                showCheckmark: false,
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: controller.certificates.isEmpty
+                      ? _buildEmptyState(context, controller.selectedFilter)
+                      : ListView.separated(
+                          padding: EdgeInsets.fromLTRB(horizontalPadding, 16, horizontalPadding, 120),
+                          itemCount: controller.certificates.length,
+                          separatorBuilder: (_, _) => const SizedBox(height: 12),
+                          itemBuilder: (context, index) {
+                            final cert = controller.certificates[index];
+                            return _buildCertificateCard(context, cert);
+                          },
+                        ),
+                ),
+              ],
+            ),
           ),
-          floatingActionButton: FloatingActionButton.extended(
-            onPressed: () {
-              // Pre-fill the form wizard with patient user defaults
-              controller.initFormWithDefaults(DummyData.currentUser);
-              context.push(AppRoutes.applyCertificate);
-            },
-            icon: const Icon(Icons.add_rounded),
-            label: const Text('Apply Certificate'),
-            backgroundColor: colorScheme.primary,
-            foregroundColor: colorScheme.onPrimary,
+          floatingActionButton: Padding(
+            padding: const EdgeInsets.only(bottom: 80.0),
+            child: FloatingActionButton.extended(
+              onPressed: () {
+                controller.initFormWithDefaults(DummyData.currentUser);
+                context.push(AppRoutes.applyCertificate);
+              },
+              icon: const Icon(Icons.add_rounded),
+              label: const Text('Apply Certificate'),
+              backgroundColor: colorScheme.primary,
+              foregroundColor: colorScheme.onPrimary,
+            ),
           ),
         );
       },
@@ -160,7 +174,6 @@ class _CertificateWalletScreenState extends State<CertificateWalletScreen> {
     final colorScheme = theme.colorScheme;
     final dateStr = DateFormat('dd MMM yyyy').format(cert.requestDate);
 
-    // Dynamic icon selection
     IconData getIcon() {
       switch (cert.type.toLowerCase()) {
         case 'medical fitness':
@@ -176,11 +189,10 @@ class _CertificateWalletScreenState extends State<CertificateWalletScreen> {
       }
     }
 
-    // Dynamic status color
     Color getStatusColor() {
       switch (cert.status.toUpperCase()) {
         case 'APPROVED':
-          return colorScheme.primary; // Under patient theme, primary is yoGreen (success)
+          return colorScheme.primary;
         case 'PENDING':
           return Colors.orange;
         case 'REJECTED':
@@ -201,7 +213,6 @@ class _CertificateWalletScreenState extends State<CertificateWalletScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Row 1: Icon, Type & Status
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -253,8 +264,6 @@ class _CertificateWalletScreenState extends State<CertificateWalletScreen> {
               ],
             ),
             const Divider(height: 24, thickness: 0.5),
-
-            // Row 2: Doctor info
             Row(
               children: [
                 Icon(Icons.person_pin_rounded, color: colorScheme.onSurfaceVariant, size: 16),
@@ -278,8 +287,6 @@ class _CertificateWalletScreenState extends State<CertificateWalletScreen> {
               ],
             ),
             const SizedBox(height: 12),
-
-            // Row 3: Actions
             if (cert.status.toUpperCase() == 'APPROVED') ...[
               const SizedBox(height: 4),
               SizedBox(

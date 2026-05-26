@@ -8,17 +8,14 @@ class CertificateController extends ChangeNotifier {
   final List<MedicalCertificate> _certificates;
   bool _isLoading = false;
 
-  // Search & Filter state
   String _selectedFilter = 'All';
   String _searchQuery = '';
 
-  // Form Wizard State (Apply Certificate Flow)
   String? _selectedType;
   DoctorProfile? _assignedDoctor;
   String? _purpose;
   final TextEditingController additionalNotesController = TextEditingController();
 
-  // Personal Info
   final TextEditingController fullNameController = TextEditingController();
   final TextEditingController dobController = TextEditingController();
   String? _gender;
@@ -28,7 +25,8 @@ class CertificateController extends ChangeNotifier {
   final TextEditingController medicalConditionsController = TextEditingController();
   final TextEditingController medicationsController = TextEditingController();
 
-  // Document Upload Mock State (Stores uploaded file name or null)
+  bool _showValidationError = false;
+
   final Map<String, String?> _uploadedDocs = {
     'Profile Photo': null,
     'Government ID Proof': null,
@@ -36,7 +34,6 @@ class CertificateController extends ChangeNotifier {
     'Prescription': null,
   };
 
-  // Uploading progress indicators (stores mock uploading progress 0.0 to 1.0 or null)
   final Map<String, double?> _uploadProgress = {
     'Profile Photo': null,
     'Government ID Proof': null,
@@ -44,14 +41,11 @@ class CertificateController extends ChangeNotifier {
     'Prescription': null,
   };
 
-  // Getters
   List<MedicalCertificate> get certificates {
     return _certificates.where((cert) {
-      // Apply status filter
       if (_selectedFilter != 'All' && cert.status.toUpperCase() != _selectedFilter.toUpperCase()) {
         return false;
       }
-      // Apply search query filter
       if (_searchQuery.isNotEmpty) {
         final query = _searchQuery.toLowerCase();
         return cert.type.toLowerCase().contains(query) ||
@@ -66,17 +60,16 @@ class CertificateController extends ChangeNotifier {
   String get selectedFilter => _selectedFilter;
   String get searchQuery => _searchQuery;
 
-  // Wizard Getters
   String? get selectedType => _selectedType;
   DoctorProfile? get assignedDoctor => _assignedDoctor;
   String? get purpose => _purpose;
   String? get gender => _gender;
   String get bloodGroup => _bloodGroup;
+  bool get showValidationError => _showValidationError;
 
   String? getUploadedDoc(String documentKey) => _uploadedDocs[documentKey];
   double? getUploadProgress(String documentKey) => _uploadProgress[documentKey];
 
-  // Setters & Actions
   void setFilter(String filter) {
     _selectedFilter = filter;
     notifyListeners();
@@ -112,12 +105,26 @@ class CertificateController extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Mock upload document with simulation timer
+  void clearValidationError() {
+    _showValidationError = false;
+    notifyListeners();
+  }
+
+  bool validateDocuments() {
+    if (_uploadedDocs['Profile Photo'] == null || _uploadedDocs['Government ID Proof'] == null) {
+      _showValidationError = true;
+      notifyListeners();
+      return false;
+    }
+    _showValidationError = false;
+    notifyListeners();
+    return true;
+  }
+
   Future<void> uploadDocument(String documentKey, String fileName) async {
     _uploadProgress[documentKey] = 0.0;
     notifyListeners();
 
-    // Simulate upload progress steps
     for (int i = 1; i <= 5; i++) {
       await Future<void>.delayed(const Duration(milliseconds: 150));
       _uploadProgress[documentKey] = i * 0.2;
@@ -135,7 +142,6 @@ class CertificateController extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Pre-fill fields with user data when launching wizard
   void initFormWithDefaults(PatientUser user) {
     resetForm();
     fullNameController.text = user.name;
@@ -148,6 +154,7 @@ class CertificateController extends ChangeNotifier {
     _selectedType = null;
     _assignedDoctor = null;
     _purpose = null;
+    _showValidationError = false;
     additionalNotesController.clear();
 
     fullNameController.clear();
@@ -163,8 +170,11 @@ class CertificateController extends ChangeNotifier {
     _uploadProgress.updateAll((key, value) => null);
   }
 
-  // Submit flow
   Future<bool> submitRequest() async {
+    if (!validateDocuments()) {
+      return false;
+    }
+
     if (_selectedType == null || _assignedDoctor == null || fullNameController.text.isEmpty) {
       return false;
     }
@@ -172,7 +182,6 @@ class CertificateController extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    // Simulate server submission delay
     await Future<void>.delayed(const Duration(milliseconds: 1000));
 
     final docList = _uploadedDocs.values.whereType<String>().toList();

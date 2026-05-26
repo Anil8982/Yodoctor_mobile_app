@@ -28,7 +28,7 @@ class HeroSection extends StatelessWidget {
     final topPadding = MediaQuery.of(context).padding.top;
 
     return GradientBackground(
-      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(32)),
+      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(0)),
       padding: EdgeInsets.fromLTRB(
         AppSpacing.xl,
         topPadding + 70,

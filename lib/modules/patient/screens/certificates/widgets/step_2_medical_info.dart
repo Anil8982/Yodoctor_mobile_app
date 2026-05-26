@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:yodoctor/modules/patient/controllers/certificate_request.dart';
 import 'step_header_helper.dart';
-import 'custom_text_field.dart'; // Isolated base theme field use kela
+import 'custom_text_field.dart';
 
 class Step2MedicalInfo extends StatelessWidget {
   final GlobalKey<FormState> formKey;

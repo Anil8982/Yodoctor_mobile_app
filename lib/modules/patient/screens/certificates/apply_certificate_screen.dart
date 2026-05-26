@@ -115,7 +115,7 @@ class _ApplyCertificateScreenState extends State<ApplyCertificateScreen> {
               children: [
                 Expanded(
                   child: OutlinedButton(
-                    onPressed: () => _handleBackNavigation(),
+                    onPressed: () => _handleBackNavigation(controller),
                     style: OutlinedButton.styleFrom(
                       minimumSize: const Size.fromHeight(52),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
@@ -168,8 +168,11 @@ class _ApplyCertificateScreenState extends State<ApplyCertificateScreen> {
     }
   }
 
-  void _handleBackNavigation() {
+  void _handleBackNavigation(CertificateController controller) {
     if (_currentStep > 1) {
+      if (_currentStep == 3) {
+        controller.clearValidationError();
+      }
       setState(() => _currentStep--);
     } else {
       context.pop();
@@ -192,14 +195,13 @@ class _ApplyCertificateScreenState extends State<ApplyCertificateScreen> {
         setState(() => _currentStep = 3);
       }
     } else if (_currentStep == 3) {
-      if (controller.getUploadedDoc('Profile Photo') == null ||
-          controller.getUploadedDoc('Government ID Proof') == null) {
+      if (controller.validateDocuments()) {
+        setState(() => _currentStep = 4);
+      } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Please upload required verification files.'), behavior: SnackBarBehavior.floating),
         );
-        return;
       }
-      setState(() => _currentStep = 4);
     } else if (_currentStep == 4) {
       if (!_confirmDisclaimer) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -212,8 +214,8 @@ class _ApplyCertificateScreenState extends State<ApplyCertificateScreen> {
       if (success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Row(
-              children: const [
+            content: const Row(
+              children: [
                 Icon(Icons.check_circle_rounded, color: Colors.white),
                 SizedBox(width: 10),
                 Text('Certificate Request Dispatched!'),
