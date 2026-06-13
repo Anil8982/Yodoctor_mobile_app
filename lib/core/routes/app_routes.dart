@@ -192,6 +192,8 @@ import 'package:yodoctor/modules/auth/screens/landing/landing_screen.dart';
 import 'package:yodoctor/modules/auth/screens/patient/patient_login_screen.dart';
 import 'package:yodoctor/modules/auth/screens/patient/patient_register_screen.dart';
 import 'package:yodoctor/modules/patient/patient_pcaffold_shell.dart';
+import 'package:yodoctor/modules/doctor/doctor_scaffold_shell.dart';
+import 'package:yodoctor/modules/doctor/screens/manual_booking/manual_booking_screen.dart';
 
 import '../../modules/patient/screens/appointments/book_appointment_screen.dart';
 import '../../modules/patient/screens/doctor_detail/doctor_detail_screen.dart';
@@ -217,6 +219,8 @@ class AppRoutes {
 
   static const String search = '/search';
   static const String dashboard = '/dashboard';
+  static const String doctorDashboard = '/doctor/dashboard';
+  static const String doctorManualBooking = '/doctor/dashboard/manualbooking';
   static const String findDoctors = '/doctors';
   static const String doctorDetail = '/doctors/detail';
   static const String profile = '/profile';
@@ -323,6 +327,16 @@ class AppRouter {
         parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.dashboard,
         builder: (context, state) => const PatientScaffoldShell(),
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: AppRoutes.doctorDashboard,
+        builder: (context, state) => const DoctorScaffoldShell(),
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: AppRoutes.doctorManualBooking,
+        builder: (context, state) => const ManualBookingScreen(),
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
