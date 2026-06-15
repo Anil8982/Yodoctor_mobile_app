@@ -412,35 +412,39 @@ class MiniActionCard extends StatelessWidget {
 
     return _DoctorDashboardCard(
       onTap: onTap,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _IconTile(
-            icon: icon,
-            backgroundColor: containerColor,
-            foregroundColor: foregroundColor,
-          ),
-          const SizedBox(height: AppSpacing.xl),
-          Text(
-            title,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: theme.textTheme.titleSmall?.copyWith(
-              color: colorScheme.onSurface,
-              fontWeight: FontWeight.w900,
+      child: SizedBox(
+        height: 130,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _IconTile(
+              icon: icon,
+              backgroundColor: containerColor,
+              foregroundColor: foregroundColor,
             ),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            subtitle,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-              height: 1.35,
+            // const SizedBox(height: AppSpacing.xl),
+            Spacer(),
+            Text(
+              title,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.titleSmall?.copyWith(
+                color: colorScheme.onSurface,
+                fontWeight: FontWeight.w900,
+              ),
             ),
-          ),
-        ],
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              subtitle,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+                height: 1.35,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

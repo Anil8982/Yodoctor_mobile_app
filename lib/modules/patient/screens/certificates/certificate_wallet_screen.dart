@@ -342,7 +342,7 @@ class _CertificateWalletScreenState extends State<CertificateWalletScreen> {
           ),
           const SizedBox(height: 4),
           Text(
-            'No certificates match the "$filter" filter.',
+            'No certificate match the "$filter" filter.',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../../controllers/medical_certificate.dart';
+import '../../../../../core/models/medical_certificate.dart';
 
 class CertificatePreviewDialog extends StatelessWidget {
   const CertificatePreviewDialog({super.key, required this.certificate});

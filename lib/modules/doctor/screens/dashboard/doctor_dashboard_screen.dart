@@ -16,9 +16,11 @@ class DoctorDashboardScreen extends StatefulWidget {
   const DoctorDashboardScreen({
     super.key,
     this.onShowQR,
+    this.onOpenAppointments,
   });
 
   final VoidCallback? onShowQR;
+  final VoidCallback? onOpenAppointments;
 
   @override
   State<DoctorDashboardScreen> createState() => _DoctorDashboardScreenState();
@@ -126,11 +128,8 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                   icon: Icons.format_list_bulleted_rounded,
                   title: 'Today\'s Queue',
                   subtitle: 'View and manage live patient queue',
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Today\'s Queue panel coming soon')),
-                    );
-                  },
+                  onTap: widget.onOpenAppointments ??
+                      () => context.push(AppRoutes.doctorAppointments),
                 ),
               ),
               const SizedBox(width: AppSpacing.md),
@@ -241,7 +240,6 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
         ],
       );
     } else {
-      // Tablet/Desktop Web Grid Layout: 3 Columns matching the desktop view
       return LayoutBuilder(
         builder: (context, constraints) {
           final double itemWidth = (constraints.maxWidth - (AppSpacing.md * 2)) / 3;
@@ -268,7 +266,8 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                   icon: Icons.format_list_bulleted_rounded,
                   title: 'Today\'s Queue',
                   subtitle: 'View and manage live patient queue',
-                  onTap: () {},
+                  onTap: widget.onOpenAppointments ??
+                      () => context.push(AppRoutes.doctorAppointments),
                 ),
               ),
               SizedBox(
@@ -321,34 +320,30 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                   onShowQR: widget.onShowQR ?? () => _showComingSoon(context, 'QR code panel coming soon'),
                 ),
               ),
-              Expanded(
-                child: MiniActionCard(
-                  icon: Icons.warning_amber_rounded,
-                  title: 'Emergency Cancellations',
-                  subtitle: 'Cancel remaining slot appointments',
-                  containerColor: Theme.of(context).colorScheme.errorContainer,
-                  foregroundColor: Theme.of(context).colorScheme.error,
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Emergency cancellations initiated')),
-                    );
-                  },
-                ),
+              MiniActionCard(
+                icon: Icons.warning_amber_rounded,
+                title: 'Emergency Cancellations',
+                subtitle: 'Cancel remaining slot appointments',
+                containerColor: Theme.of(context).colorScheme.errorContainer,
+                foregroundColor: Theme.of(context).colorScheme.error,
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Emergency cancellations initiated')),
+                  );
+                },
               ),
 
-              Expanded(
-                child: MiniActionCard(
-                  icon: Icons.star_rounded,
-                  title: 'Patient Reviews',
-                  subtitle: 'Read feedback from your patients',
-                  containerColor: Theme.of(context).colorScheme.secondaryContainer,
-                  foregroundColor: Theme.of(context).colorScheme.secondary,
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Reviews list panel coming soon')),
-                    );
-                  },
-                ),
+              MiniActionCard(
+                icon: Icons.star_rounded,
+                title: 'Patient Reviews',
+                subtitle: 'Read feedback from your patients',
+                containerColor: Theme.of(context).colorScheme.secondaryContainer,
+                foregroundColor: Theme.of(context).colorScheme.secondary,
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Reviews list panel coming soon')),
+                  );
+                },
               )
             ],
           );

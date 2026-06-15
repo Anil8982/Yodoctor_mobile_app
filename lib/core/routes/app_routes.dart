@@ -7,8 +7,13 @@
 // import 'package:yodoctor/modules/auth/screens/patient/patient_login_screen.dart';
 // import 'package:yodoctor/modules/auth/screens/patient/patient_register_screen.dart';
 // import 'package:yodoctor/modules/patient/patient_pcaffold_shell.dart';
+// import 'package:yodoctor/modules/doctor/doctor_scaffold_shell.dart';
+// import 'package:yodoctor/modules/doctor/screens/manual_booking/manual_booking_screen.dart';
+// import 'package:yodoctor/modules/doctor/screens/appointments/doctor_appointment_history_screen.dart';
+// import 'package:yodoctor/modules/doctor/screens/dashboard/doctor_dashboard_screen.dart';
+// import 'package:yodoctor/modules/patient/screens/dashboard/dashboard_screen.dart';
+//
 // import '../../modules/patient/screens/appointments/book_appointment_screen.dart';
-// import '../../modules/patient/screens/dashboard/dashboard_screen.dart';
 // import '../../modules/patient/screens/doctor_detail/doctor_detail_screen.dart';
 // import '../../modules/patient/screens/family/add_family_member_screen.dart';
 // import '../../modules/patient/screens/family/family_members_screen.dart';
@@ -31,23 +36,29 @@
 //   static const String doctorRegister = '/auth/doctor/register';
 //
 //   static const String search = '/search';
-//   static const String dashboard = '/dashboard';
 //   static const String findDoctors = '/doctors';
 //   static const String doctorDetail = '/doctors/detail';
 //   static const String profile = '/profile';
-//   static const String family = '/family';
 //   static const String addFamilyMember = '/family/add-member';
 //   static const String bookAppointment = '/appointments/book';
+//   static const String applyCertificate = '/certificate/apply';
+//
+//   // Patient Shell Sub-routes
+//   static const String dashboard = '/dashboard';
+//   static const String certificateWallet = '/certificate';
+//   static const String family = '/family';
 //   static const String history = '/history';
-//   static const String certificateWallet = '/certificates';
-//   static const String applyCertificate = '/certificates/apply';
+//
+//   // Doctor Shell Sub-routes
+//   static const String doctorDashboard = '/doctor/dashboard';
+//   static const String doctorAppointments = '/doctor/appointments';
+//   static const String doctorManualBooking = '/doctor/manual-booking';
 // }
 //
 // class AppRouter {
 //   const AppRouter._();
 //
-//   static final GlobalKey<NavigatorState> _rootNavigatorKey =
-//   GlobalKey<NavigatorState>();
+//   static final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 //
 //   static final GoRouter router = GoRouter(
 //     navigatorKey: _rootNavigatorKey,
@@ -123,7 +134,6 @@
 //         builder: (context, state) {
 //           final doctor = state.extra;
 //           final DoctorProfile fallbackDoctor = DummyData.allDoctors.first;
-//
 //           return BookAppointmentScreen(
 //             doctor: doctor is DoctorProfile ? doctor : fallbackDoctor,
 //           );
@@ -135,13 +145,12 @@
 //         builder: (context, state) => const ApplyCertificateScreen(),
 //       ),
 //
-//       // StatefulShellRoute
+//       // 1. Patient Side Shell (Bottom Nav Controller)
 //       StatefulShellRoute.indexedStack(
 //         builder: (context, state, navigationShell) {
 //           return PatientScaffoldShell(navigationShell: navigationShell);
 //         },
 //         branches: [
-//           // Index 0: Home / Dashboard
 //           StatefulShellBranch(
 //             routes: [
 //               GoRoute(
@@ -158,7 +167,6 @@
 //               ),
 //             ],
 //           ),
-//           // Index 2: Family
 //           StatefulShellBranch(
 //             routes: [
 //               GoRoute(
@@ -167,12 +175,44 @@
 //               ),
 //             ],
 //           ),
-//           // Index 3: History
 //           StatefulShellBranch(
 //             routes: [
 //               GoRoute(
 //                 path: AppRoutes.history,
 //                 builder: (context, state) => const AppointmentsHistoryScreen(),
+//               ),
+//             ],
+//           ),
+//         ],
+//       ),
+//
+//       // 2. Doctor Side Shell (Bottom Nav Controller) - नॅव्हिबार स्थिर ठेवण्यासाठी फिक्स केला
+//       StatefulShellRoute.indexedStack(
+//         builder: (context, state, navigationShell) {
+//           return DoctorScaffoldShell(navigationShell: navigationShell);
+//         },
+//         branches: [
+//           StatefulShellBranch(
+//             routes: [
+//               GoRoute(
+//                 path: AppRoutes.doctorDashboard,
+//                 builder: (context, state) => const DoctorDashboardScreen(),
+//               ),
+//             ],
+//           ),
+//           StatefulShellBranch(
+//             routes: [
+//               GoRoute(
+//                 path: AppRoutes.doctorAppointments,
+//                 builder: (context, state) => const DoctorAppointmentHistoryScreen(),
+//               ),
+//             ],
+//           ),
+//           StatefulShellBranch(
+//             routes: [
+//               GoRoute(
+//                 path: AppRoutes.doctorManualBooking,
+//                 builder: (context, state) => const ManualBookingScreen(),
 //               ),
 //             ],
 //           ),
@@ -191,9 +231,14 @@ import 'package:yodoctor/modules/auth/screens/doctor/doctor_register_screen.dart
 import 'package:yodoctor/modules/auth/screens/landing/landing_screen.dart';
 import 'package:yodoctor/modules/auth/screens/patient/patient_login_screen.dart';
 import 'package:yodoctor/modules/auth/screens/patient/patient_register_screen.dart';
+import 'package:yodoctor/modules/doctor/screens/certificate/certificate_review_screen.dart';
 import 'package:yodoctor/modules/patient/patient_pcaffold_shell.dart';
 import 'package:yodoctor/modules/doctor/doctor_scaffold_shell.dart';
 import 'package:yodoctor/modules/doctor/screens/manual_booking/manual_booking_screen.dart';
+import 'package:yodoctor/modules/doctor/screens/appointments/doctor_appointment_history_screen.dart';
+import 'package:yodoctor/modules/doctor/screens/dashboard/doctor_dashboard_screen.dart';
+import 'package:yodoctor/modules/patient/screens/dashboard/dashboard_screen.dart';
+import 'package:yodoctor/modules/doctor/screens/certificate/doctor_certificate_dashboard_screen.dart';
 
 import '../../modules/patient/screens/appointments/book_appointment_screen.dart';
 import '../../modules/patient/screens/doctor_detail/doctor_detail_screen.dart';
@@ -218,25 +263,31 @@ class AppRoutes {
   static const String doctorRegister = '/auth/doctor/register';
 
   static const String search = '/search';
-  static const String dashboard = '/dashboard';
-  static const String doctorDashboard = '/doctor/dashboard';
-  static const String doctorManualBooking = '/doctor/dashboard/manualbooking';
   static const String findDoctors = '/doctors';
   static const String doctorDetail = '/doctors/detail';
   static const String profile = '/profile';
-  static const String family = '/family';
   static const String addFamilyMember = '/family/add-member';
   static const String bookAppointment = '/appointments/book';
+  static const String applyCertificate = '/certificate/apply';
+
+  // Patient Shell Sub-routes
+  static const String dashboard = '/dashboard';
+  static const String certificateWallet = '/certificate';
+  static const String family = '/family';
   static const String history = '/history';
-  static const String certificateWallet = '/certificates';
-  static const String applyCertificate = '/certificates/apply';
+
+  // Doctor Shell Sub-routes
+  static const String doctorDashboard = '/doctor/dashboard';
+  static const String doctorAppointments = '/doctor/appointments';
+  static const String doctorManualBooking = '/doctor/manual-booking';
+  static const String doctorCertificates = '/doctor/certificates';
+  static const String doctorCertificateReview = '/doctor/certificates/review';
 }
 
 class AppRouter {
   const AppRouter._();
 
-  static final GlobalKey<NavigatorState> _rootNavigatorKey =
-  GlobalKey<NavigatorState>();
+  static final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
   static final GoRouter router = GoRouter(
     navigatorKey: _rootNavigatorKey,
@@ -312,7 +363,6 @@ class AppRouter {
         builder: (context, state) {
           final doctor = state.extra;
           final DoctorProfile fallbackDoctor = DummyData.allDoctors.first;
-
           return BookAppointmentScreen(
             doctor: doctor is DoctorProfile ? doctor : fallbackDoctor,
           );
@@ -323,35 +373,100 @@ class AppRouter {
         path: AppRoutes.applyCertificate,
         builder: (context, state) => const ApplyCertificateScreen(),
       ),
+
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
-        path: AppRoutes.dashboard,
-        builder: (context, state) => const PatientScaffoldShell(),
+        path: AppRoutes.doctorCertificateReview,
+        builder: (context, state) => const CertificateReviewScreen(),
       ),
       GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
-        path: AppRoutes.doctorDashboard,
-        builder: (context, state) => const DoctorScaffoldShell(),
-      ),
-      GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.doctorManualBooking,
         builder: (context, state) => const ManualBookingScreen(),
       ),
-      GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
-        path: AppRoutes.certificateWallet,
-        builder: (context, state) => const CertificateWalletScreen(),
+
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) {
+          return PatientScaffoldShell(navigationShell: navigationShell);
+        },
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.dashboard,
+                builder: (context, state) => DashboardScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.certificateWallet,
+                builder: (context, state) => const CertificateWalletScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.family,
+                builder: (context, state) => const FamilyMembersScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.history,
+                builder: (context, state) => const AppointmentsHistoryScreen(),
+              ),
+            ],
+          ),
+        ],
       ),
-      GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
-        path: AppRoutes.family,
-        builder: (context, state) => const FamilyMembersScreen(),
-      ),
-      GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
-        path: AppRoutes.history,
-        builder: (context, state) => const AppointmentsHistoryScreen(),
+
+      // 2. Doctor Side Shell (Bottom Nav Controller)
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) {
+          return DoctorScaffoldShell(navigationShell: navigationShell);
+        },
+        branches: [
+          // Index 0: Dashboard
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.doctorDashboard,
+                builder: (context, state) => const DoctorDashboardScreen(),
+              ),
+            ],
+          ),
+          // Index 1: Appointment History
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.doctorAppointments,
+                builder: (context, state) => const DoctorAppointmentHistoryScreen(),
+              ),
+            ],
+          ),
+          // Index 2: Placeholder for QR Modal action in Tab view
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.doctorManualBooking,
+                builder: (context, state) => const ManualBookingScreen(),
+              ),
+            ],
+          ),
+          // Index 3: Certificates Dashboard
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.doctorCertificates,
+                builder: (context, state) => const DoctorCertificateDashboardScreen(),
+              ),
+            ],
+          ),
+        ],
       ),
     ],
   );

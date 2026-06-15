@@ -108,14 +108,20 @@ class DoctorDrawer extends StatelessWidget {
                     onTap: () => _showComingSoon(context, 'Doctor profile coming soon'),
                   ),
                   _DoctorDrawerItem(
-                    icon: Icons.format_list_bulleted_rounded,
-                    label: 'Today\'s Queue',
-                    onTap: () => _showComingSoon(context, 'Queue management coming soon'),
+                    icon: Icons.calendar_month_rounded,
+                    label: 'Appointment History',
+                    onTap: () {
+                      Navigator.pop(context);
+                      context.push(AppRoutes.doctorAppointments);
+                    },
                   ),
                   _DoctorDrawerItem(
                     icon: Icons.book_online_rounded,
                     label: 'Manual Booking',
-                    onTap: () => _showComingSoon(context, 'Manual booking coming soon'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      context.push(AppRoutes.doctorManualBooking);
+                    },
                   ),
                   _DoctorDrawerItem(
                     icon: Icons.star_outline_rounded,

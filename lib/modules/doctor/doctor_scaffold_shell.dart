@@ -1,12 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 
 import '../../core/utils/app_spacing.dart';
+import 'screens/appointments/doctor_appointment_history_screen.dart';
 import 'screens/dashboard/doctor_dashboard_screen.dart';
+import 'screens/certificate/doctor_certificate_dashboard_screen.dart'; // 👈 इम्पोर्ट असल्याची खात्री कर
 import 'widgets/doctor_bottom_nav.dart';
 
 class DoctorScaffoldShell extends StatefulWidget {
-  const DoctorScaffoldShell({super.key});
+  const DoctorScaffoldShell({
+    super.key,
+    required this.navigationShell,
+  });
+
+  final StatefulNavigationShell navigationShell;
 
   @override
   State<DoctorScaffoldShell> createState() => _DoctorScaffoldShellState();
@@ -19,7 +27,7 @@ class _DoctorScaffoldShellState extends State<DoctorScaffoldShell> {
   @override
   void initState() {
     super.initState();
-    _controller = PersistentTabController(initialIndex: 0);
+    _controller = PersistentTabController(initialIndex: widget.navigationShell.currentIndex);
   }
 
   @override
@@ -30,11 +38,25 @@ class _DoctorScaffoldShellState extends State<DoctorScaffoldShell> {
 
   List<Widget> _buildScreens() {
     return [
-      DoctorDashboardScreen(onShowQR: () => openQRCodeModal(context)),
-      _buildPlaceholderScreen("Today's Queue", Icons.format_list_bulleted_rounded),
+      // Screen 0
+      DoctorDashboardScreen(
+        onShowQR: () => openQRCodeModal(context),
+        onOpenAppointments: () {
+          setState(() {
+            _lastActiveIndex = 1;
+            _controller.index = 1;
+            widget.navigationShell.goBranch(1);
+          });
+        },
+      ),
+      // Screen 1
+      const DoctorAppointmentHistoryScreen(),
+      // Screen 2:
       const Scaffold(body: SizedBox.shrink()),
+      // Screen 3
+      const DoctorCertificateDashboardScreen(),
+      // Screen 4:
       _buildPlaceholderScreen('Patient Reviews', Icons.star_rounded),
-      _buildPlaceholderScreen('Medical Certificates', Icons.wallet_membership_rounded),
     ];
   }
 
@@ -258,14 +280,16 @@ class _DoctorScaffoldShellState extends State<DoctorScaffoldShell> {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    if (_controller.index != widget.navigationShell.currentIndex) {
+      _controller.index = widget.navigationShell.currentIndex;
+    }
 
     return PersistentTabView(
       context,
       controller: _controller,
       screens: _buildScreens(),
       items: DoctorBottomNav.navBarItems(context),
-      backgroundColor: colorScheme.surface,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       handleAndroidBackButtonPress: true,
       resizeToAvoidBottomInset: true,
       stateManagement: true,
@@ -274,9 +298,10 @@ class _DoctorScaffoldShellState extends State<DoctorScaffoldShell> {
       navBarHeight: kBottomNavigationBarHeight + 10,
       decoration: NavBarDecoration(
         borderRadius: BorderRadius.zero,
-        colorBehindNavBar: colorScheme.surfaceContainer,
         border: Border(
-          top: BorderSide(color: colorScheme.outlineVariant.withValues(alpha: 0.35)),
+          top: BorderSide(
+            color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.35),
+          ),
         ),
       ),
       navBarStyle: NavBarStyle.style15,
@@ -284,9 +309,10 @@ class _DoctorScaffoldShellState extends State<DoctorScaffoldShell> {
         if (index == 2) {
           _controller.index = _lastActiveIndex;
           openQRCodeModal(context);
-          return;
+        } else {
+          _lastActiveIndex = index;
+          widget.navigationShell.goBranch(index);
         }
-        _lastActiveIndex = index;
       },
     );
   }

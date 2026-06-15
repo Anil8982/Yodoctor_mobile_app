@@ -40,7 +40,7 @@ class CertificateHeader extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           Text(
-            'Track requests and download approved certificates.',
+            'Track requests and download approved certificate.',
             style: textTheme.bodyMedium?.copyWith(
               color: colorScheme.onPrimary.withValues(alpha: 0.9),
             ),
@@ -65,7 +65,7 @@ class CertificateHeader extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  '$certificateCount certificates | $selectedFilter',
+                  '$certificateCount certificate | $selectedFilter',
                   style: textTheme.bodySmall?.copyWith(
                     color: colorScheme.onPrimary,
                     fontWeight: FontWeight.w700,

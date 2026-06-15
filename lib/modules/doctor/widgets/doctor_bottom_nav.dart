@@ -15,8 +15,8 @@ class DoctorBottomNav {
         inactiveColorPrimary: colorScheme.onSurfaceVariant,
       ),
       PersistentBottomNavBarItem(
-        icon: const Icon(Icons.format_list_bulleted_rounded),
-        title: "Queue",
+        icon: const Icon(Icons.calendar_month_rounded),
+        title: "History",
         activeColorPrimary: colorScheme.primary,
         inactiveColorPrimary: colorScheme.onSurfaceVariant,
       ),
@@ -41,17 +41,18 @@ class DoctorBottomNav {
         inactiveColorPrimary: colorScheme.onSurfaceVariant,
       ),
       PersistentBottomNavBarItem(
-        icon: const Icon(Icons.star_rounded),
-        title: "Reviews",
-        activeColorPrimary: colorScheme.primary,
-        inactiveColorPrimary: colorScheme.onSurfaceVariant,
-      ),
-      PersistentBottomNavBarItem(
         icon: const Icon(Icons.wallet_membership_rounded),
         title: "Certificates",
         activeColorPrimary: colorScheme.primary,
         inactiveColorPrimary: colorScheme.onSurfaceVariant,
       ),
+      PersistentBottomNavBarItem(
+        icon: const Icon(Icons.star_rounded),
+        title: "Reviews",
+        activeColorPrimary: colorScheme.primary,
+        inactiveColorPrimary: colorScheme.onSurfaceVariant,
+      ),
+
     ];
   }
 }
