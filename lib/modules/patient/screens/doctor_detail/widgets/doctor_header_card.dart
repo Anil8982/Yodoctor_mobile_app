@@ -167,7 +167,9 @@ class _DoctorHeaderCardState extends State<DoctorHeaderCard> {
             child: Divider(height: 1, thickness: 0.8),
           ),
           InkWell(
-            onTap: () {},
+            onTap: () {
+              // context.push(AppRoutes.certificateWallet);
+            },
             borderRadius: BorderRadius.circular(12),
             child: Container(
               width: double.infinity,
@@ -205,7 +207,7 @@ class _DoctorHeaderCardState extends State<DoctorHeaderCard> {
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center, // बटण उभ्या रेषेत नेहमी सेंटरला लॉक राहील
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
                 'About Doctor',
@@ -223,7 +225,7 @@ class _DoctorHeaderCardState extends State<DoctorHeaderCard> {
                 },
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                  color: Colors.transparent, // क्लिकेबल एरिया वाढवण्यासाठी
+                  color: Colors.transparent,
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -236,7 +238,6 @@ class _DoctorHeaderCardState extends State<DoctorHeaderCard> {
                         ),
                       ),
                       const SizedBox(width: 2),
-                      // आयकॉन बदलताना येणारा झटका रोखण्यासाठी AnimatedRotation किंवा साधा स्मूथ आयकॉन
                       Icon(
                         _isAboutExpanded
                             ? Icons.keyboard_arrow_up_rounded

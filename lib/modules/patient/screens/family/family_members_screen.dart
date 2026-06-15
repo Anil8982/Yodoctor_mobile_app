@@ -44,7 +44,7 @@ class _FamilyMembersScreenState extends State<FamilyMembersScreen> {
             body: controller.members.isEmpty
                 ? _buildEmptyState(context)
                 : ListView.separated(
-                    padding: const EdgeInsets.fromLTRB(16, 20, 16, 150),
+                    padding: const EdgeInsets.fromLTRB(16, 20, 16, 20),
                     itemCount: controller.members.length,
                     physics: const BouncingScrollPhysics(),
                     separatorBuilder: (context, index) => const SizedBox(height: 12),
@@ -60,15 +60,12 @@ class _FamilyMembersScreenState extends State<FamilyMembersScreen> {
           ),
 
           floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-          floatingActionButton: Padding(
-            padding: const EdgeInsets.only(bottom: 75),
-            child: FloatingActionButton.extended(
-              onPressed: () => _openAddMemberScreen(context),
-              icon: const Icon(Icons.person_add_rounded),
-              label: const Text('Add Member'),
-              backgroundColor: colorScheme.primary,
-              foregroundColor: colorScheme.onPrimary,
-            ),
+          floatingActionButton: FloatingActionButton.extended(
+            onPressed: () => _openAddMemberScreen(context),
+            icon: const Icon(Icons.person_add_rounded),
+            label: const Text('Add Member'),
+            backgroundColor: colorScheme.primary,
+            foregroundColor: colorScheme.onPrimary,
           ),
         );
       },

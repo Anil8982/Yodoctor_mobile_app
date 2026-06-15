@@ -1,6 +1,7 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/auth/screens/patient/patient_register_screen.dart';
@@ -62,6 +63,7 @@ class _PatientLoginScreenState extends State<PatientLoginScreen>
     }
 
     if (!mounted) return;
+    Provider.of<AppRoleProvider>(context, listen: false).setRole(AppRole.patient);
     context.go(AppRoutes.dashboard);
   }
 
