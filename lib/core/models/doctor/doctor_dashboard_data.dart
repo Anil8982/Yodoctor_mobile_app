@@ -1,4 +1,4 @@
-import 'doctor_profile.dart';
+import 'doctor_dashboard_profile.dart';
 
 class DoctorDashboardData {
   const DoctorDashboardData({
@@ -9,14 +9,15 @@ class DoctorDashboardData {
     required this.isAvailable,
   });
 
-  final DoctorProfile doctor;
+  final DoctorDashboardProfile doctor;
+
   final int pendingRequests;
   final int todayQueueCount;
   final int completedTodayCount;
   final bool isAvailable;
 
   DoctorDashboardData copyWith({
-    DoctorProfile? doctor,
+    DoctorDashboardProfile? doctor,
     int? pendingRequests,
     int? todayQueueCount,
     int? completedTodayCount,

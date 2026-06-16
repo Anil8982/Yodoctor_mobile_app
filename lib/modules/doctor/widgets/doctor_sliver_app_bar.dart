@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
+import 'package:yodoctor/core/routes/app_routes.dart';
 
 import '../../../core/theme/app_theme.dart';
 
@@ -11,6 +13,7 @@ class DoctorSliverAppBar extends StatelessWidget {
     this.scaffoldKey,
     this.onProfileTap,
     this.onNotificationTap,
+    this.isNavBar = true,
   });
 
   final double expandedHeight;
@@ -18,6 +21,7 @@ class DoctorSliverAppBar extends StatelessWidget {
   final GlobalKey<ScaffoldState>? scaffoldKey;
   final VoidCallback? onProfileTap;
   final VoidCallback? onNotificationTap;
+  final bool isNavBar;
 
   @override
   Widget build(BuildContext context) {
@@ -35,18 +39,28 @@ class DoctorSliverAppBar extends StatelessWidget {
       title: Row(
         children: [
           _DoctorHeaderAction(
-            icon: Icons.notes_rounded,
-            onTap: () => scaffoldKey?.currentState?.openDrawer(),
+            icon: isNavBar ? Icons.notes_rounded : Icons.arrow_back_ios_new_rounded,
+            onTap: () {
+              if (isNavBar) {
+                scaffoldKey?.currentState?.openDrawer();
+              } else {
+                context.pop();
+              }
+            },
           ),
           const Spacer(),
           _DoctorHeaderAction(
             icon: Icons.notifications_outlined,
             onTap: onNotificationTap ?? () => _showMessage(context, 'Notifications coming soon'),
           ),
-          const SizedBox(width: 12),
-          _DoctorProfileAvatar(
-            onTap: onProfileTap ?? () => _showMessage(context, 'Doctor profile coming soon'),
-          ),
+          if (isNavBar) ...[
+            const SizedBox(width: 12),
+            _DoctorProfileAvatar(
+              onTap: onProfileTap ?? () {
+                context.push(AppRoutes.doctorProfile);
+              },
+            ),
+          ],
         ],
       ),
       flexibleSpace: Container(
@@ -89,7 +103,7 @@ class _DoctorHeaderAction extends StatelessWidget {
           borderRadius: BorderRadius.circular(14),
           border: Border.all(color: colorScheme.onPrimary.withValues(alpha: 0.08)),
         ),
-        child: Icon(icon, color: colorScheme.onPrimary, size: 24),
+        child: Icon(icon, color: colorScheme.onPrimary, size: 20),
       ),
     );
   }

@@ -41,7 +41,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
 
         if (loading && data == null) {
           return Scaffold(
-            backgroundColor: theme.scaffoldBackgroundColor,
+            backgroundColor: colorScheme.surfaceContainerLow,
             body: const Center(child: CircularProgressIndicator()),
           );
         }
@@ -53,7 +53,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
         return Scaffold(
           key: _scaffoldKey,
           extendBodyBehindAppBar: true,
-          backgroundColor: theme.scaffoldBackgroundColor,
+          backgroundColor: colorScheme.surfaceContainerLow,
           drawer: DoctorDrawer(doctor: data.doctor),
           body: NestedScrollView(
             headerSliverBuilder: (context, innerBoxIsScrolled) {
@@ -62,10 +62,10 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                   expandedHeight: 180.0,
                   scaffoldKey: _scaffoldKey,
                   background: DoctorHeader(
-                    name: data.doctor.name,
-                    specialty: data.doctor.specialty,
+                    name: data.doctor.fullName,
+                    specialty: data.doctor.specialization,
                     experienceYears: data.doctor.experienceYears,
-                    rating: data.doctor.rating,
+                    rating: 5.0,
                     isAvailable: data.isAvailable,
                     onToggleAvailable: (val) {
                       HapticFeedback.lightImpact();
@@ -85,7 +85,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                   horizontalPadding,
                   AppSpacing.lg,
                   horizontalPadding,
-                  AppSpacing.xl + 40, // Extra padding at bottom for navigation bar clearance
+                  AppSpacing.xl + 40,
                 ),
                 child: ResponsiveContainer(
                   child: Column(
@@ -111,16 +111,14 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
   }
 
   Widget _buildDashboardGrid(BuildContext context, dynamic data, bool isMobile) {
-    // final colorScheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     if (isMobile) {
-      // Mobile Layout: Column containing full-width/half-width rows
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-
-
-          // Row 2: Today's Queue & Manual Booking (Side by side)
+          // Row 1: Today's Queue & Manual Booking (Side by side)
           Row(
             children: [
               Expanded(
@@ -129,7 +127,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                   title: 'Today\'s Queue',
                   subtitle: 'View and manage live patient queue',
                   onTap: widget.onOpenAppointments ??
-                      () => context.push(AppRoutes.doctorAppointments),
+                          () => context.push(AppRoutes.doctorAppointments),
                 ),
               ),
               const SizedBox(width: AppSpacing.md),
@@ -145,10 +143,9 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
           ),
           const SizedBox(height: AppSpacing.md),
 
-          // Row 3: Stats row (Pending, Today, Done)
+          // Row 2: Stats row (Pending, Today, Done)
           LayoutBuilder(
             builder: (context, constraints) {
-              // Calculate width for 2 columns with spacing accounted for
               final double cardWidth = (constraints.maxWidth - AppSpacing.sm) / 2;
 
               return Wrap(
@@ -175,7 +172,6 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                       icon: Icons.people_outline_rounded,
                     ),
                   ),
-                  // The 3rd card takes full width elegantly at the bottom
                   SizedBox(
                     width: constraints.maxWidth,
                     child: StatCard(
@@ -184,7 +180,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                       badgeText: 'DONE',
                       type: StatType.completed,
                       icon: Icons.check_circle_outline_rounded,
-                      isFullWidth: true, // Custom flag to optimize layout if wide
+                      isFullWidth: true,
                     ),
                   ),
                 ],
@@ -194,23 +190,21 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
 
           const SizedBox(height: AppSpacing.md),
 
-          // Row 4: Direct Booking Card (Full width)
           DirectBookingCard(
             onShowQR: widget.onShowQR ?? () => _showComingSoon(context, 'QR code panel coming soon'),
           ),
           const SizedBox(height: AppSpacing.md),
 
-          // Row 5: Emergency Cancellations & Reviews
+          // Row 3: Emergency Cancellations & Reviews
           Row(
             children: [
-              // 1. Emergency Cancellations Card
               Expanded(
                 child: MiniActionCard(
                   icon: Icons.warning_amber_rounded,
                   title: 'Emergency Cancellations',
-                  subtitle: 'Cancel remaining slot appointments',
-                  containerColor: Theme.of(context).colorScheme.errorContainer,
-                  foregroundColor: Theme.of(context).colorScheme.error,
+                  subtitle: 'Cancel remaining slots',
+                  containerColor: colorScheme.errorContainer.withValues(alpha: 0.4),
+                  foregroundColor: colorScheme.error,
                   onTap: () {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Emergency cancellations initiated')),
@@ -219,15 +213,13 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                 ),
               ),
               const SizedBox(width: AppSpacing.md),
-
-              // 2. Patient Reviews Card
               Expanded(
                 child: MiniActionCard(
                   icon: Icons.star_rounded,
                   title: 'Patient Reviews',
-                  subtitle: 'Read feedback from your patients',
-                  containerColor: Theme.of(context).colorScheme.secondaryContainer,
-                  foregroundColor: Theme.of(context).colorScheme.secondary,
+                  subtitle: 'Read feedback',
+                  containerColor: colorScheme.secondaryContainer.withValues(alpha: 0.4),
+                  foregroundColor: colorScheme.secondary,
                   onTap: () {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Reviews list panel coming soon')),
@@ -240,6 +232,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
         ],
       );
     } else {
+      // 🎯 WEB / TABLET LAYOUT
       return LayoutBuilder(
         builder: (context, constraints) {
           final double itemWidth = (constraints.maxWidth - (AppSpacing.md * 2)) / 3;
@@ -248,15 +241,15 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
             spacing: AppSpacing.md,
             runSpacing: AppSpacing.md,
             children: [
-              // Row 1: Profile, Queue, Manual Booking
+              // Row 1
               SizedBox(
                 width: itemWidth,
                 height: 140,
                 child: DoctorProfileCard(
-                  name: data.doctor.name,
-                  specialty: data.doctor.specialty,
+                  name: data.doctor.fullName,
+                  specialty: data.doctor.specialization,
                   experienceYears: data.doctor.experienceYears,
-                  rating: data.doctor.rating,
+                  rating: 5.0,
                 ),
               ),
               SizedBox(
@@ -267,7 +260,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                   title: 'Today\'s Queue',
                   subtitle: 'View and manage live patient queue',
                   onTap: widget.onOpenAppointments ??
-                      () => context.push(AppRoutes.doctorAppointments),
+                          () => context.push(AppRoutes.doctorAppointments),
                 ),
               ),
               SizedBox(
@@ -281,7 +274,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                 ),
               ),
 
-              // Row 2: Pending Requests stat, Today's queue stat, Completed Today stat
+              // Row 2
               SizedBox(
                 width: itemWidth,
                 child: StatCard(
@@ -313,37 +306,41 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                 ),
               ),
 
-              // Row 3: Patient Direct Booking card, Emergency cancellations, Patient reviews
               SizedBox(
                 width: itemWidth,
                 child: DirectBookingCard(
                   onShowQR: widget.onShowQR ?? () => _showComingSoon(context, 'QR code panel coming soon'),
                 ),
               ),
-              MiniActionCard(
-                icon: Icons.warning_amber_rounded,
-                title: 'Emergency Cancellations',
-                subtitle: 'Cancel remaining slot appointments',
-                containerColor: Theme.of(context).colorScheme.errorContainer,
-                foregroundColor: Theme.of(context).colorScheme.error,
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Emergency cancellations initiated')),
-                  );
-                },
+              SizedBox(
+                width: itemWidth,
+                child: MiniActionCard(
+                  icon: Icons.warning_amber_rounded,
+                  title: 'Emergency Cancellations',
+                  subtitle: 'Cancel remaining slot appointments',
+                  containerColor: colorScheme.errorContainer.withValues(alpha: 0.4),
+                  foregroundColor: colorScheme.error,
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Emergency cancellations initiated')),
+                    );
+                  },
+                ),
               ),
-
-              MiniActionCard(
-                icon: Icons.star_rounded,
-                title: 'Patient Reviews',
-                subtitle: 'Read feedback from your patients',
-                containerColor: Theme.of(context).colorScheme.secondaryContainer,
-                foregroundColor: Theme.of(context).colorScheme.secondary,
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Reviews list panel coming soon')),
-                  );
-                },
+              SizedBox(
+                width: itemWidth,
+                child: MiniActionCard(
+                  icon: Icons.star_rounded,
+                  title: 'Patient Reviews',
+                  subtitle: 'Read feedback from your patients',
+                  containerColor: colorScheme.secondaryContainer.withValues(alpha: 0.4),
+                  foregroundColor: colorScheme.secondary,
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Reviews list panel coming soon')),
+                    );
+                  },
+                ),
               )
             ],
           );

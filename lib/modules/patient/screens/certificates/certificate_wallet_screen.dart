@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:yodoctor/core/models/medical_certificate.dart';
 
 import '../../../../core/routes/app_routes.dart';
 import '../../../../core/utils/dummy_data.dart';

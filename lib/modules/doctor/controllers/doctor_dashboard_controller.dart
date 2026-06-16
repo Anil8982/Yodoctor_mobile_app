@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import '../../../core/models/doctor/doctor_dashboard_data.dart';
 import '../../../core/utils/dummy_data.dart';
 
 class DoctorDashboardController extends ChangeNotifier {

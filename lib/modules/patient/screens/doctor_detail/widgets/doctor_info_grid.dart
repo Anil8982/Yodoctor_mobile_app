@@ -1,6 +1,6 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
-import '../../../../../core/models/doctor_profile.dart';
+import '../../../../../core/models/patient/doctor_profile.dart';
 
 class DoctorInfoGrid extends StatelessWidget {
   const DoctorInfoGrid({super.key, required this.doctor});

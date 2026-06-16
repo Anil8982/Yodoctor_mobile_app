@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yodoctor/core/models/medical_certificate.dart';
 import '../../../core/utils/dummy_data.dart';
 
 class CertificateController extends ChangeNotifier {

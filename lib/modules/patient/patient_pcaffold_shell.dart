@@ -26,8 +26,12 @@ class _PatientScaffoldShellState extends State<PatientScaffoldShell> {
   @override
   void initState() {
     super.initState();
+    final int initialNavIndex = widget.navigationShell.currentIndex >= 2
+        ? widget.navigationShell.currentIndex + 1
+        : widget.navigationShell.currentIndex;
 
-    _controller = PersistentTabController(initialIndex: widget.navigationShell.currentIndex);
+    _controller = PersistentTabController(initialIndex: initialNavIndex);
+    _lastActiveIndex = initialNavIndex;
   }
 
   @override
@@ -70,8 +74,12 @@ class _PatientScaffoldShellState extends State<PatientScaffoldShell> {
 
   @override
   Widget build(BuildContext context) {
-    if (_controller.index != widget.navigationShell.currentIndex) {
-      _controller.index = widget.navigationShell.currentIndex;
+    final int expectedNavIndex = widget.navigationShell.currentIndex >= 2
+        ? widget.navigationShell.currentIndex + 1
+        : widget.navigationShell.currentIndex;
+
+    if (_controller.index != expectedNavIndex) {
+      _controller.index = expectedNavIndex;
     }
 
     return PersistentTabView(
@@ -102,7 +110,9 @@ class _PatientScaffoldShellState extends State<PatientScaffoldShell> {
           _openQRScanner();
         } else {
           _lastActiveIndex = index;
-          widget.navigationShell.goBranch(index);
+
+          final int routerBranchIndex = index >= 2 ? index - 1 : index;
+          widget.navigationShell.goBranch(routerBranchIndex);
         }
       },
     );

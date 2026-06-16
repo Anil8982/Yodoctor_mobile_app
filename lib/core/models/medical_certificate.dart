@@ -1,4 +1,4 @@
-import 'doctor_profile.dart';
+import 'patient/doctor_profile.dart';
 
 class MedicalCertificate {
   const MedicalCertificate({

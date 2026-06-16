@@ -40,7 +40,7 @@ class _DoctorAppointmentHistoryScreenState extends State<DoctorAppointmentHistor
       key: _scaffoldKey,
       backgroundColor: colorScheme.surfaceContainer,
       extendBodyBehindAppBar: true,
-      drawer: const DoctorDrawer(doctor: DummyData.currentDoctor),
+      drawer: const DoctorDrawer(doctor: DummyData.currentDoctorProfile),
       body: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [

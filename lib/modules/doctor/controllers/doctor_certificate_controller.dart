@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/utils/dummy_data.dart';
+import '../../../../core/models/medical_certificate.dart';
 
 class DoctorCertificateController extends ChangeNotifier {
   final List<MedicalCertificate> _allCertificates = List.from(DummyData.dummyCertificates);

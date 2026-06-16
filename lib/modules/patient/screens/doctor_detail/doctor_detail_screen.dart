@@ -5,7 +5,7 @@ import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
 import '../../../../core/utils/app_spacing.dart';
 import '../../../../core/utils/responsive.dart';
-import '../../../../core/models/doctor_profile.dart';
+import '../../../../core/models/patient/doctor_profile.dart';
 import 'widgets/doctor_header_card.dart';
 import 'widgets/doctor_info_grid.dart';
 

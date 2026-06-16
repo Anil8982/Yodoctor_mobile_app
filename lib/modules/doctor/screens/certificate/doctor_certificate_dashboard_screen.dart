@@ -54,7 +54,7 @@ class _DoctorCertificateDashboardScreenState extends State<DoctorCertificateDash
           key: _scaffoldKey,
           backgroundColor: colorScheme.surfaceContainerLow,
           extendBodyBehindAppBar: true,
-          drawer: const DoctorDrawer(doctor: DummyData.currentDoctor),
+          drawer: const DoctorDrawer(doctor: DummyData.currentDoctorProfile),
           body: NestedScrollView(
             headerSliverBuilder: (context, innerBoxIsScrolled) {
               return [

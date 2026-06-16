@@ -5,17 +5,20 @@ import 'package:provider/provider.dart';
 import '../../../core/routes/app_routes.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/app_spacing.dart';
-import '../../../core/utils/dummy_data.dart';
+// 🎯 आपल्या नवीन मॉडेलचा इम्पोर्ट (तुझ्या पाथनुसार ॲडजस्ट कर भाऊ)
+import '../../../core/models/doctor/doctor_dashboard_profile.dart';
 
 class DoctorDrawer extends StatelessWidget {
   const DoctorDrawer({super.key, required this.doctor});
 
-  final DoctorProfile doctor;
+  final DoctorDashboardProfile doctor;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+
+    final String currentRoute = GoRouterState.of(context).uri.toString();
 
     return Drawer(
       backgroundColor: colorScheme.surface,
@@ -66,7 +69,7 @@ class DoctorDrawer extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          doctor.name,
+                          doctor.fullName,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: theme.textTheme.titleMedium?.copyWith(
@@ -76,7 +79,7 @@ class DoctorDrawer extends StatelessWidget {
                         ),
                         const SizedBox(height: AppSpacing.xxs),
                         Text(
-                          doctor.specialty,
+                          doctor.specialization,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: theme.textTheme.bodySmall?.copyWith(
@@ -85,13 +88,14 @@ class DoctorDrawer extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: AppSpacing.xs),
-                        _DrawerBadge(label: 'Verified Specialist'),
+                        const _DrawerBadge(label: 'Verified Specialist'),
                       ],
                     ),
                   ),
                 ],
               ),
             ),
+
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
@@ -99,17 +103,25 @@ class DoctorDrawer extends StatelessWidget {
                   _DoctorDrawerItem(
                     icon: Icons.home_rounded,
                     label: 'Home',
-                    selected: true,
-                    onTap: () => Navigator.pop(context),
+                    selected: currentRoute == AppRoutes.doctorDashboard,
+                    onTap: () {
+                      Navigator.pop(context);
+                      context.go(AppRoutes.doctorDashboard);
+                    },
                   ),
                   _DoctorDrawerItem(
                     icon: Icons.person_outline_rounded,
                     label: 'Doctor Profile',
-                    onTap: () => _showComingSoon(context, 'Doctor profile coming soon'),
+                    selected: currentRoute.contains('profile') || currentRoute.contains('doctorprofilesection'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      context.push(AppRoutes.doctorProfile);
+                    },
                   ),
                   _DoctorDrawerItem(
                     icon: Icons.calendar_month_rounded,
                     label: 'Appointment History',
+                    selected: currentRoute == AppRoutes.doctorAppointments,
                     onTap: () {
                       Navigator.pop(context);
                       context.push(AppRoutes.doctorAppointments);
@@ -118,6 +130,7 @@ class DoctorDrawer extends StatelessWidget {
                   _DoctorDrawerItem(
                     icon: Icons.book_online_rounded,
                     label: 'Manual Booking',
+                    selected: currentRoute == AppRoutes.doctorManualBooking,
                     onTap: () {
                       Navigator.pop(context);
                       context.push(AppRoutes.doctorManualBooking);
@@ -131,7 +144,11 @@ class DoctorDrawer extends StatelessWidget {
                   _DoctorDrawerItem(
                     icon: Icons.card_membership_rounded,
                     label: 'Medical Certificates',
-                    onTap: () => _showComingSoon(context, 'Certificates panel coming soon'),
+                    selected: currentRoute.contains('certificate'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      // context.push(AppRoutes.doctorCertificateDashboard);
+                    },
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
@@ -150,6 +167,7 @@ class DoctorDrawer extends StatelessWidget {
                 ],
               ),
             ),
+
             Padding(
               padding: const EdgeInsets.all(AppSpacing.lg),
               child: Text(
@@ -167,7 +185,6 @@ class DoctorDrawer extends StatelessWidget {
   }
 
   void _showComingSoon(BuildContext context, String message) {
-    Navigator.pop(context);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message)),
     );
@@ -199,14 +216,15 @@ class _DoctorDrawerItem extends StatelessWidget {
       child: ListTile(
         onTap: onTap,
         selected: selected,
-        selectedTileColor: colorScheme.primaryContainer.withValues(alpha: 0.7),
+        selectedTileColor: colorScheme.primaryContainer.withValues(alpha: 0.35),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        leading: Icon(icon, color: itemColor),
+        leading: Icon(icon, color: itemColor, size: 22),
         title: Text(
           label,
           style: TextStyle(
-            color: foregroundColor ?? colorScheme.onSurface,
-            fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+            color: foregroundColor ?? (selected ? colorScheme.primary : colorScheme.onSurface),
+            fontWeight: selected ? FontWeight.w900 : FontWeight.w700,
+            fontSize: 14,
           ),
         ),
       ),
@@ -235,11 +253,11 @@ class _DrawerBadge extends StatelessWidget {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: colorScheme.onPrimary,
-              fontSize: 9,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 0.6,
-            ),
+          color: colorScheme.onPrimary,
+          fontSize: 9,
+          fontWeight: FontWeight.w900,
+          letterSpacing: 0.6,
+        ),
       ),
     );
   }

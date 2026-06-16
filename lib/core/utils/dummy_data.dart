@@ -1,22 +1,21 @@
 export '../models/appointment_history_item.dart';
-export '../models/doctor_profile.dart';
-export '../models/family_member.dart';
-export '../models/patient_appointment.dart';
-export '../models/patient_dashboard_data.dart';
-export '../models/patient_token.dart';
-export '../models/patient_user.dart';
-export '../models/doctor_dashboard_data.dart';
-export '../models/medical_certificate.dart';
+export '../models/patient/doctor_profile.dart';
+export '../models/patient/family_member.dart';
+export '../models/patient/patient_appointment.dart';
+export '../models/patient/patient_dashboard_data.dart';
+export '../models/patient/patient_token.dart';
+export '../models/patient/patient_user.dart';
+import '../models/doctor/doctor_dashboard_profile.dart';
+import '../models/doctor/doctor_dashboard_data.dart';
+import '../models/medical_certificate.dart';
 
 import '../models/appointment_history_item.dart';
-import '../models/doctor_profile.dart';
-import '../models/family_member.dart';
-import '../models/patient_appointment.dart';
-import '../models/patient_dashboard_data.dart';
-import '../models/patient_token.dart';
-import '../models/patient_user.dart';
-import '../models/doctor_dashboard_data.dart';
-import '../models/medical_certificate.dart';
+import '../models/patient/doctor_profile.dart';
+import '../models/patient/family_member.dart';
+import '../models/patient/patient_appointment.dart';
+import '../models/patient/patient_dashboard_data.dart';
+import '../models/patient/patient_token.dart';
+import '../models/patient/patient_user.dart';
 
 class DummyData {
   const DummyData._();
@@ -312,7 +311,6 @@ class DummyData {
     ),
   ];
 
-
   static const List<String> trendingSpecialties = <String>[
     'Neurologist',
     'Cardiologist',
@@ -355,6 +353,56 @@ class DummyData {
       weightKg: 69,
     ),
   ];
+
+  static const DoctorDashboardProfile currentDoctorProfile = DoctorDashboardProfile(
+    id: 'DOC-VERMA',
+    fullName: 'Dr. Rahul Verma',
+    email: 'rahul.verma@yodoctor.com',
+    mobile: '9876543210',
+    gender: 'Male',
+    aboutYou: 'My goal is to provide honest advice, accurate diagnosis, and the best possible treatment. Feel free to consult me for any orthopedic and bone-related health issues.',
+    profilePictureUrl: 'assets/images/doctorLogo.jpg',
+    primaryQualification: 'MS - Orthopedics',
+    specialization: 'Orthopedic',
+    experienceYears: 6,
+    registrationNumber: 'MCI-78234',
+    stateCouncil: 'Madhya Pradesh Medical Council',
+    registrationValidTill: '12-12-2032',
+    clinicName: 'Yo Hospital',
+    city: 'Bhopal',
+    state: 'Madhya Pradesh',
+    pincode: '462001',
+    landmark: 'Near Shahpura Lake',
+    googleMapsLink: 'https://maps.google.com/?q=23.2599,77.4126',
+    fullAddress: 'Plot No. 42, Yo Hospital, Shahpura, Bhopal, MP',
+    practiceType: 'Hospital Attached',
+    affiliatedHospitalName: 'Yo Hospital General',
+    consultationFee: 400,
+    avgDurationMinutes: 20,
+    availableDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+    shiftTimings: {
+      'Mon': {'morning': '09:00 AM - 01:00 PM', 'evening': '05:00 PM - 09:00 PM'},
+      'Tue': {'morning': '09:00 AM - 01:00 PM', 'evening': '05:00 PM - 09:00 PM'},
+      'Wed': {'morning': '09:00 AM - 01:00 PM', 'evening': '05:00 PM - 09:00 PM'},
+      'Thu': {'morning': '09:00 AM - 01:00 PM', 'evening': '05:00 PM - 09:00 PM'},
+      'Fri': {'morning': '09:00 AM - 01:00 PM', 'evening': '05:00 PM - 09:00 PM'},
+      'Sat': {'morning': '09:00 AM - 01:00 PM', 'evening': '04:00 PM - 07:00 PM'},
+    },
+    documents: [
+      {'type': 'Profile Picture', 'status': 'Uploaded', 'fileName': 'profile_pic.jpg'},
+      {'type': 'Medical Registration Certificate', 'status': 'Uploaded', 'fileName': 'mci_cert.pdf'},
+      {'type': 'Government ID Proof', 'status': 'Uploaded', 'fileName': 'aadhar.jpg'},
+    ],
+  );
+
+  static DoctorDashboardData _doctorDashboardData = DoctorDashboardData(
+    doctor: currentDoctorProfile,
+    pendingRequests: 3,
+    todayQueueCount: 14,
+    completedTodayCount: 8,
+    isAvailable: true,
+  );
+
 
   static Future<PatientDashboardData> getDashboardData({
     String filter = 'All',
@@ -414,29 +462,6 @@ class DummyData {
     await Future<void>.delayed(const Duration(milliseconds: 220));
     return List<AppointmentHistoryItem>.from(appointmentHistory);
   }
-
-  static const DoctorProfile currentDoctor = DoctorProfile(
-    id: 'DOC-VERMA',
-    name: 'Dr. Rahul Verma',
-    specialty: 'Orthopedic',
-    hospital: 'Yo Hospital',
-    experienceYears: 6,
-    rating: 0.0,
-    reviewCount: 0,
-    consultationFee: 400,
-    distanceKm: 0.0,
-    availableSlot: 'Available Now',
-    languages: <String>['English', 'Hindi'],
-    location: 'Bhopal',
-  );
-
-  static DoctorDashboardData _doctorDashboardData = DoctorDashboardData(
-    doctor: currentDoctor,
-    pendingRequests: 0,
-    todayQueueCount: 0,
-    completedTodayCount: 0,
-    isAvailable: true,
-  );
 
   static Future<DoctorDashboardData> getDoctorDashboardData() async {
     await Future<void>.delayed(const Duration(milliseconds: 180));

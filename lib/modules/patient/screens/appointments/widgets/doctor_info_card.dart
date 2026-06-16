@@ -1,6 +1,6 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
-import 'package:yodoctor/core/models/doctor_profile.dart';
+import 'package:yodoctor/core/models/patient/doctor_profile.dart';
 
 class DoctorInfoCard extends StatelessWidget {
   const DoctorInfoCard({super.key, required this.doctor});
