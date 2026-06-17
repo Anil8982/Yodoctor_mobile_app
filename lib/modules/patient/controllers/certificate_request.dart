@@ -1,54 +1,118 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/models/medical_certificate.dart';
 import '../../../core/utils/dummy_data.dart';
 
-class CertificateController extends ChangeNotifier {
-  CertificateController()
-      : _certificates = List<MedicalCertificate>.from(DummyData.dummyCertificates);
+// 🎯 Immutable state structure for tracking certificates data and dynamic form fields
+class CertificateFormState {
+  final List<MedicalCertificate> allCertificates;
+  final bool isLoading;
+  final String selectedFilter;
+  final String searchQuery;
+  final String? selectedType;
+  final DoctorProfile? assignedDoctor;
+  final String? purpose;
+  final String? gender;
+  final String bloodGroup;
+  final bool showValidationError;
+  final Map<String, String?> uploadedDocs;
+  final Map<String, double?> uploadProgress;
 
-  final List<MedicalCertificate> _certificates;
-  bool _isLoading = false;
+  CertificateFormState({
+    this.allCertificates = const [],
+    this.isLoading = false,
+    this.selectedFilter = 'All',
+    this.searchQuery = '',
+    this.selectedType,
+    this.assignedDoctor,
+    this.purpose,
+    this.gender,
+    this.bloodGroup = 'A+',
+    this.showValidationError = false,
+    this.uploadedDocs = const {
+      'Profile Photo': null,
+      'Government ID Proof': null,
+      'Medical Reports': null,
+      'Prescription': null,
+    },
+    this.uploadProgress = const {
+      'Profile Photo': null,
+      'Government ID Proof': null,
+      'Medical Reports': null,
+      'Prescription': null,
+    },
+  });
 
-  String _selectedFilter = 'All';
-  String _searchQuery = '';
+  CertificateFormState copyWith({
+    List<MedicalCertificate>? allCertificates,
+    bool? isLoading,
+    String? selectedFilter,
+    String? searchQuery,
+    String? selectedType,
+    DoctorProfile? assignedDoctor,
+    String? purpose,
+    String? gender,
+    String? bloodGroup,
+    bool? showValidationError,
+    Map<String, String?>? uploadedDocs,
+    Map<String, double?>? uploadProgress,
+  }) {
+    return CertificateFormState(
+      allCertificates: allCertificates ?? this.allCertificates,
+      isLoading: isLoading ?? this.isLoading,
+      selectedFilter: selectedFilter ?? this.selectedFilter,
+      searchQuery: searchQuery ?? this.searchQuery,
+      selectedType: selectedType ?? this.selectedType,
+      assignedDoctor: assignedDoctor ?? this.assignedDoctor,
+      purpose: purpose ?? this.purpose,
+      gender: gender ?? this.gender,
+      bloodGroup: bloodGroup ?? this.bloodGroup,
+      showValidationError: showValidationError ?? this.showValidationError,
+      uploadedDocs: uploadedDocs ?? this.uploadedDocs,
+      uploadProgress: uploadProgress ?? this.uploadProgress,
+    );
+  }
+}
 
-  String? _selectedType;
-  DoctorProfile? _assignedDoctor;
-  String? _purpose;
-  final TextEditingController additionalNotesController = TextEditingController();
+// 🎯 Manual Riverpod Notifier implementation managing certificate workflow
+class CertificateNotifier extends Notifier<CertificateFormState> {
 
-  final TextEditingController fullNameController = TextEditingController();
-  final TextEditingController dobController = TextEditingController();
-  String? _gender;
-  String _bloodGroup = 'A+';
-  final TextEditingController heightController = TextEditingController();
-  final TextEditingController weightController = TextEditingController();
-  final TextEditingController medicalConditionsController = TextEditingController();
-  final TextEditingController medicationsController = TextEditingController();
+  // Permanent text editing controllers
+  final additionalNotesController = TextEditingController();
+  final fullNameController = TextEditingController();
+  final dobController = TextEditingController();
+  final heightController = TextEditingController();
+  final weightController = TextEditingController();
+  final medicalConditionsController = TextEditingController();
+  final medicationsController = TextEditingController();
 
-  bool _showValidationError = false;
+  @override
+  CertificateFormState build() {
+    // Hook up automated lifecycle cleanup loop to clear memory leaks
+    ref.onDispose(() {
+      additionalNotesController.dispose();
+      fullNameController.dispose();
+      dobController.dispose();
+      heightController.dispose();
+      weightController.dispose();
+      medicalConditionsController.dispose();
+      medicationsController.dispose();
+    });
 
-  final Map<String, String?> _uploadedDocs = {
-    'Profile Photo': null,
-    'Government ID Proof': null,
-    'Medical Reports': null,
-    'Prescription': null,
-  };
+    return CertificateFormState(
+      allCertificates: List<MedicalCertificate>.from(DummyData.dummyCertificates),
+    );
+  }
 
-  final Map<String, double?> _uploadProgress = {
-    'Profile Photo': null,
-    'Government ID Proof': null,
-    'Medical Reports': null,
-    'Prescription': null,
-  };
-
-  List<MedicalCertificate> get certificates {
-    return _certificates.where((cert) {
-      if (_selectedFilter != 'All' && cert.status.toUpperCase() != _selectedFilter.toUpperCase()) {
+  // Pure data computation matching sync querying profiles
+  List<MedicalCertificate> getFilteredCertificates() {
+    final current = state;
+    return current.allCertificates.where((cert) {
+      if (current.selectedFilter != 'All' && cert.status.toUpperCase() != current.selectedFilter.toUpperCase()) {
         return false;
       }
-      if (_searchQuery.isNotEmpty) {
-        final query = _searchQuery.toLowerCase();
+      if (current.searchQuery.isNotEmpty) {
+        final query = current.searchQuery.toLowerCase();
         return cert.type.toLowerCase().contains(query) ||
             cert.doctor.name.toLowerCase().contains(query) ||
             cert.patientName.toLowerCase().contains(query);
@@ -57,172 +121,131 @@ class CertificateController extends ChangeNotifier {
     }).toList();
   }
 
-  bool get isLoading => _isLoading;
-  String get selectedFilter => _selectedFilter;
-  String get searchQuery => _searchQuery;
-
-  String? get selectedType => _selectedType;
-  DoctorProfile? get assignedDoctor => _assignedDoctor;
-  String? get purpose => _purpose;
-  String? get gender => _gender;
-  String get bloodGroup => _bloodGroup;
-  bool get showValidationError => _showValidationError;
-
-  String? getUploadedDoc(String documentKey) => _uploadedDocs[documentKey];
-  double? getUploadProgress(String documentKey) => _uploadProgress[documentKey];
-
-  void setFilter(String filter) {
-    _selectedFilter = filter;
-    notifyListeners();
-  }
-
-  void setSearchQuery(String query) {
-    _searchQuery = query;
-    notifyListeners();
-  }
-
-  void setSelectedType(String type) {
-    _selectedType = type;
-    notifyListeners();
-  }
-
-  void setAssignedDoctor(DoctorProfile doctor) {
-    _assignedDoctor = doctor;
-    notifyListeners();
-  }
-
-  void setPurpose(String purpose) {
-    _purpose = purpose;
-    notifyListeners();
-  }
-
-  void setGender(String gender) {
-    _gender = gender;
-    notifyListeners();
-  }
-
-  void setBloodGroup(String bg) {
-    _bloodGroup = bg;
-    notifyListeners();
-  }
-
-  void clearValidationError() {
-    _showValidationError = false;
-    notifyListeners();
-  }
+  void setFilter(String filter) => state = state.copyWith(selectedFilter: filter);
+  void setSearchQuery(String query) => state = state.copyWith(searchQuery: query);
+  void setSelectedType(String type) => state = state.copyWith(selectedType: type);
+  void setAssignedDoctor(DoctorProfile doctor) => state = state.copyWith(assignedDoctor: doctor);
+  void setPurpose(String purpose) => state = state.copyWith(purpose: purpose);
+  void setGender(String gender) => state = state.copyWith(gender: gender);
+  void setBloodGroup(String bg) => state = state.copyWith(bloodGroup: bg);
+  void clearValidationError() => state = state.copyWith(showValidationError: false);
 
   bool validateDocuments() {
-    if (_uploadedDocs['Profile Photo'] == null || _uploadedDocs['Government ID Proof'] == null) {
-      _showValidationError = true;
-      notifyListeners();
+    if (state.uploadedDocs['Profile Photo'] == null || state.uploadedDocs['Government ID Proof'] == null) {
+      state = state.copyWith(showValidationError: true);
       return false;
     }
-    _showValidationError = false;
-    notifyListeners();
+    state = state.copyWith(showValidationError: false);
     return true;
   }
 
+  // Emulate structural background asynchronous upload progress updates
   Future<void> uploadDocument(String documentKey, String fileName) async {
-    _uploadProgress[documentKey] = 0.0;
-    notifyListeners();
+    final currentProgress = Map<String, double?>.from(state.uploadProgress);
+    currentProgress[documentKey] = 0.0;
+    state = state.copyWith(uploadProgress: currentProgress);
 
     for (int i = 1; i <= 5; i++) {
       await Future<void>.delayed(const Duration(milliseconds: 150));
-      _uploadProgress[documentKey] = i * 0.2;
-      notifyListeners();
+      final chunkProgress = Map<String, double?>.from(state.uploadProgress);
+      chunkProgress[documentKey] = i * 0.2;
+      state = state.copyWith(uploadProgress: chunkProgress);
     }
 
-    _uploadedDocs[documentKey] = fileName;
-    _uploadProgress[documentKey] = null;
-    notifyListeners();
+    final finalDocs = Map<String, String?>.from(state.uploadedDocs)..[documentKey] = fileName;
+    final finalProgress = Map<String, double?>.from(state.uploadProgress)..[documentKey] = null;
+    state = state.copyWith(uploadedDocs: finalDocs, uploadProgress: finalProgress);
   }
 
   void removeDocument(String documentKey) {
-    _uploadedDocs[documentKey] = null;
-    _uploadProgress[documentKey] = null;
-    notifyListeners();
+    final updatedDocs = Map<String, String?>.from(state.uploadedDocs)..[documentKey] = null;
+    final updatedProgress = Map<String, double?>.from(state.uploadProgress)..[documentKey] = null;
+    state = state.copyWith(uploadedDocs: updatedDocs, uploadProgress: updatedProgress);
   }
 
   void initFormWithDefaults(PatientUser user) {
     resetForm();
     fullNameController.text = user.name;
     dobController.text = user.dateOfBirth;
-    _gender = user.gender;
-    _bloodGroup = user.bloodGroup;
+    state = state.copyWith(gender: user.gender, bloodGroup: user.bloodGroup);
   }
 
   void resetForm() {
-    _selectedType = null;
-    _assignedDoctor = null;
-    _purpose = null;
-    _showValidationError = false;
     additionalNotesController.clear();
-
     fullNameController.clear();
     dobController.clear();
-    _gender = null;
-    _bloodGroup = 'A+';
     heightController.clear();
     weightController.clear();
     medicalConditionsController.clear();
     medicationsController.clear();
 
-    _uploadedDocs.updateAll((key, value) => null);
-    _uploadProgress.updateAll((key, value) => null);
+    state = state.copyWith(
+      selectedType: null,
+      assignedDoctor: null,
+      purpose: null,
+      showValidationError: false,
+      gender: null,
+      bloodGroup: 'A+',
+      uploadedDocs: {
+        'Profile Photo': null,
+        'Government ID Proof': null,
+        'Medical Reports': null,
+        'Prescription': null,
+      },
+      uploadProgress: {
+        'Profile Photo': null,
+        'Government ID Proof': null,
+        'Medical Reports': null,
+        'Prescription': null,
+      },
+    );
   }
 
+  // Handle transaction submission pipeline
   Future<bool> submitRequest() async {
-    if (!validateDocuments()) {
+    if (!validateDocuments()) return false;
+    if (state.selectedType == null || state.assignedDoctor == null || fullNameController.text.isEmpty) {
       return false;
     }
 
-    if (_selectedType == null || _assignedDoctor == null || fullNameController.text.isEmpty) {
-      return false;
-    }
-
-    _isLoading = true;
-    notifyListeners();
-
+    state = state.copyWith(isLoading: true);
     await Future<void>.delayed(const Duration(milliseconds: 1000));
 
-    final docList = _uploadedDocs.values.whereType<String>().toList();
+    final docList = state.uploadedDocs.values.whereType<String>().toList();
 
     final newCert = MedicalCertificate(
-      id: 'CERT-${_certificates.length + 1}',
-      type: _selectedType!,
+      id: 'CERT-${state.allCertificates.length + 1}',
+      type: state.selectedType!,
       patientName: fullNameController.text,
       dateOfBirth: dobController.text.isNotEmpty ? dobController.text : 'N/A',
-      gender: _gender ?? 'N/A',
-      bloodGroup: _bloodGroup,
+      gender: state.gender ?? 'N/A',
+      bloodGroup: state.bloodGroup,
       heightCm: double.tryParse(heightController.text) ?? 170.0,
       weightKg: double.tryParse(weightController.text) ?? 65.0,
       medicalConditions: medicalConditionsController.text.isNotEmpty ? medicalConditionsController.text : 'None',
       medications: medicationsController.text.isNotEmpty ? medicationsController.text : 'None',
-      doctor: _assignedDoctor!,
-      purpose: _purpose ?? 'Other',
+      doctor: state.assignedDoctor!,
+      purpose: state.purpose ?? 'Other',
       additionalNotes: additionalNotesController.text,
       status: 'PENDING',
       requestDate: DateTime.now(),
       documents: docList,
     );
 
-    _certificates.insert(0, newCert);
-    _isLoading = false;
+    final updatedList = List<MedicalCertificate>.from(state.allCertificates)..insert(0, newCert);
+
+    // Clear state data variables cleanly on successful request transaction completion
+    state = state.copyWith(
+      allCertificates: updatedList,
+      isLoading: false,
+    );
     resetForm();
-    notifyListeners();
 
     return true;
   }
-
-  @override
-  void dispose() {
-    additionalNotesController.dispose();
-    fullNameController.dispose();
-    dobController.dispose();
-    heightController.dispose();
-    weightController.dispose();
-    medicalConditionsController.dispose();
-    medicationsController.dispose();
-    super.dispose();
-  }
 }
+
+// 🎯 Provider declaration mapped with an autoDispose tag setup
+final certificateProvider = NotifierProvider.autoDispose<CertificateNotifier, CertificateFormState>(
+  CertificateNotifier.new,
+);

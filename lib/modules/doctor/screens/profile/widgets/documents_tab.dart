@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
 import 'package:yodoctor/modules/doctor/controllers/doctor_profile_controller.dart';
 
-class DocumentsTab extends StatefulWidget {
+class DocumentsTab extends ConsumerWidget {
   const DocumentsTab({super.key, required this.controller});
-  final DoctorProfileController controller;
+  final DoctorProfileNotifier controller;
 
   @override
-  State<DocumentsTab> createState() => _DocumentsTabState();
-}
-
-class _DocumentsTabState extends State<DocumentsTab> {
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+
+    // Watch current form state reactively from provider
+    final formState = ref.watch(doctorProfileProvider);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.lg),
@@ -26,7 +25,7 @@ class _DocumentsTabState extends State<DocumentsTab> {
           Text('Manage your official medical certifications and identity proofs required for compliance checks.', style: theme.textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant)),
           const SizedBox(height: AppSpacing.xl),
 
-          if (widget.controller.uploadedDocs.isEmpty)
+          if (formState.uploadedDocs.isEmpty)
             Center(
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: AppSpacing.xl),
@@ -37,10 +36,10 @@ class _DocumentsTabState extends State<DocumentsTab> {
             ListView.separated(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: widget.controller.uploadedDocs.length,
+              itemCount: formState.uploadedDocs.length,
               separatorBuilder: (context, index) => const SizedBox(height: AppSpacing.md),
               itemBuilder: (context, index) {
-                final doc = widget.controller.uploadedDocs[index];
+                final doc = formState.uploadedDocs[index];
                 final String docName = doc['name'] ?? 'Document';
                 final String status = doc['status'] ?? 'Pending';
                 final bool isVerified = status.toLowerCase() == 'verified';

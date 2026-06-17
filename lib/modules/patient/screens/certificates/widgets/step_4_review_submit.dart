@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/modules/patient/controllers/certificate_request.dart';
 import 'step_header_helper.dart';
 
-class Step4ReviewSubmit extends StatelessWidget {
-  final CertificateController controller;
+class Step4ReviewSubmit extends ConsumerWidget {
+  final CertificateNotifier controller;
   final bool confirmDisclaimer;
   final ValueChanged<bool?> onDisclaimerChanged;
 
@@ -15,9 +16,12 @@ class Step4ReviewSubmit extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+
+    // Watch current form state reactively from provider
+    final formState = ref.watch(certificateProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -28,10 +32,10 @@ class Step4ReviewSubmit extends StatelessWidget {
           context,
           title: 'Certificate Baseline Parameters',
           items: [
-            {'label': 'Certificate Type', 'value': controller.selectedType ?? 'N/A'},
-            {'label': 'Assigned Medical Doctor', 'value': controller.assignedDoctor?.name ?? 'N/A'},
-            {'label': 'Medical Specialty', 'value': controller.assignedDoctor?.specialty ?? 'N/A'},
-            {'label': 'Intended Purpose', 'value': controller.purpose ?? 'N/A'},
+            {'label': 'Certificate Type', 'value': formState.selectedType ?? 'N/A'},
+            {'label': 'Assigned Medical Doctor', 'value': formState.assignedDoctor?.name ?? 'N/A'},
+            {'label': 'Medical Specialty', 'value': formState.assignedDoctor?.specialty ?? 'N/A'},
+            {'label': 'Intended Purpose', 'value': formState.purpose ?? 'N/A'},
             {'label': 'Additional Context Notes', 'value': controller.additionalNotesController.text.isNotEmpty ? controller.additionalNotesController.text : 'None'},
           ],
         ),
@@ -42,8 +46,8 @@ class Step4ReviewSubmit extends StatelessWidget {
           items: [
             {'label': 'Full Legal Name', 'value': controller.fullNameController.text},
             {'label': 'Date of Birth', 'value': controller.dobController.text},
-            {'label': 'Biological Gender', 'value': controller.gender ?? 'N/A'},
-            {'label': 'Blood Group Staging', 'value': controller.bloodGroup},
+            {'label': 'Biological Gender', 'value': formState.gender ?? 'N/A'},
+            {'label': 'Blood Group Staging', 'value': formState.bloodGroup},
             {'label': 'Height Metric', 'value': controller.heightController.text.isNotEmpty ? '${controller.heightController.text} cm' : 'N/A'},
             {'label': 'Weight Metric', 'value': controller.weightController.text.isNotEmpty ? '${controller.weightController.text} kg' : 'N/A'},
             {'label': 'Chronic Medical Conditions', 'value': controller.medicalConditionsController.text.isNotEmpty ? controller.medicalConditionsController.text : 'None'},
@@ -53,7 +57,7 @@ class Step4ReviewSubmit extends StatelessWidget {
         const SizedBox(height: 20),
         Text('Uploaded Verification Materials', style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold, color: colorScheme.onSurface)),
         const SizedBox(height: 10),
-        _buildDocumentReviewRow(context, controller),
+        _buildDocumentReviewRow(context, formState),
         const SizedBox(height: 24),
         Container(
           padding: const EdgeInsets.all(16),
@@ -139,7 +143,7 @@ class Step4ReviewSubmit extends StatelessWidget {
     );
   }
 
-  Widget _buildDocumentReviewRow(BuildContext context, CertificateController controller) {
+  Widget _buildDocumentReviewRow(BuildContext context, CertificateFormState formState) {
     final docs = ['Profile Photo', 'Government ID Proof', 'Medical Reports', 'Prescription'];
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
@@ -149,7 +153,8 @@ class Step4ReviewSubmit extends StatelessWidget {
       physics: const BouncingScrollPhysics(),
       child: Row(
         children: docs.map((docKey) {
-          final fileName = controller.getUploadedDoc(docKey);
+          // Extract uploaded documentation directly from immutable state wrapper
+          final fileName = formState.uploadedDocs[docKey];
           if (fileName == null) return const SizedBox.shrink();
 
           return Container(

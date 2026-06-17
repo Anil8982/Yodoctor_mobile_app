@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'widgets/doctor_header.dart';
 import 'widgets/dashboard_cards.dart';
@@ -12,7 +12,7 @@ import '../../../../core/utils/app_spacing.dart';
 import '../../../../core/utils/responsive.dart';
 import '../../controllers/doctor_dashboard_controller.dart';
 
-class DoctorDashboardScreen extends StatefulWidget {
+class DoctorDashboardScreen extends ConsumerStatefulWidget {
   const DoctorDashboardScreen({
     super.key,
     this.onShowQR,
@@ -23,10 +23,10 @@ class DoctorDashboardScreen extends StatefulWidget {
   final VoidCallback? onOpenAppointments;
 
   @override
-  State<DoctorDashboardScreen> createState() => _DoctorDashboardScreenState();
+  ConsumerState<DoctorDashboardScreen> createState() => _DoctorDashboardScreenState();
 }
 
-class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
+class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
@@ -34,21 +34,22 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return Consumer<DoctorDashboardController>(
-      builder: (context, controller, child) {
-        final loading = controller.isLoading;
-        final data = controller.dashboardData;
+    // Watch AsyncValue from Riverpod provider
+    final dashboardAsync = ref.watch(doctorDashboardProvider);
 
-        if (loading && data == null) {
-          return Scaffold(
-            backgroundColor: colorScheme.surfaceContainerLow,
-            body: const Center(child: CircularProgressIndicator()),
-          );
-        }
-        if (data == null) return const SizedBox.shrink();
-
+    return dashboardAsync.when(
+      loading: () => Scaffold(
+        backgroundColor: colorScheme.surfaceContainerLow,
+        body: const Center(child: CircularProgressIndicator()),
+      ),
+      error: (error, stackTrace) => Scaffold(
+        backgroundColor: colorScheme.surfaceContainerLow,
+        body: Center(child: Text('Error: $error', style: theme.textTheme.bodyMedium)),
+      ),
+      data: (data) {
         final bool isMobile = Responsive.isMobile(context);
         final double horizontalPadding = Responsive.horizontalPadding(context);
+        final bool isRefreshing = dashboardAsync.isRefreshing;
 
         return Scaffold(
           key: _scaffoldKey,
@@ -69,14 +70,14 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                     isAvailable: data.isAvailable,
                     onToggleAvailable: (val) {
                       HapticFeedback.lightImpact();
-                      controller.toggleAvailability(val);
+                      ref.read(doctorDashboardProvider.notifier).toggleAvailability(val);
                     },
                   ),
                 ),
               ];
             },
             body: RefreshIndicator(
-              onRefresh: controller.loadDashboard,
+              onRefresh: () => ref.read(doctorDashboardProvider.notifier).loadDashboard(),
               color: colorScheme.primary,
               backgroundColor: colorScheme.surface,
               child: SingleChildScrollView(
@@ -91,7 +92,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      if (loading) ...[
+                      if (isRefreshing) ...[
                         LinearProgressIndicator(
                           color: colorScheme.primary,
                           backgroundColor: colorScheme.primaryContainer,
@@ -118,7 +119,6 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Row 1: Today's Queue & Manual Booking (Side by side)
           Row(
             children: [
               Expanded(
@@ -143,7 +143,6 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
           ),
           const SizedBox(height: AppSpacing.md),
 
-          // Row 2: Stats row (Pending, Today, Done)
           LayoutBuilder(
             builder: (context, constraints) {
               final double cardWidth = (constraints.maxWidth - AppSpacing.sm) / 2;
@@ -195,7 +194,6 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
           ),
           const SizedBox(height: AppSpacing.md),
 
-          // Row 3: Emergency Cancellations & Reviews
           Row(
             children: [
               Expanded(
@@ -232,7 +230,6 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
         ],
       );
     } else {
-      // 🎯 WEB / TABLET LAYOUT
       return LayoutBuilder(
         builder: (context, constraints) {
           final double itemWidth = (constraints.maxWidth - (AppSpacing.md * 2)) / 3;
@@ -241,7 +238,6 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
             spacing: AppSpacing.md,
             runSpacing: AppSpacing.md,
             children: [
-              // Row 1
               SizedBox(
                 width: itemWidth,
                 height: 140,
@@ -274,7 +270,6 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                 ),
               ),
 
-              // Row 2
               SizedBox(
                 width: itemWidth,
                 child: StatCard(

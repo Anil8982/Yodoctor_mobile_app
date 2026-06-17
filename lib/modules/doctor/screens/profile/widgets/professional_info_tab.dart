@@ -5,7 +5,7 @@ import 'profile_input_field.dart';
 
 class ProfessionalInfoTab extends StatelessWidget {
   const ProfessionalInfoTab({super.key, required this.controller});
-  final DoctorProfileController controller;
+  final DoctorProfileNotifier controller;
 
   @override
   Widget build(BuildContext context) {

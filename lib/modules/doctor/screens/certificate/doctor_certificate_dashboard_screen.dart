@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/modules/doctor/controllers/doctor_certificate_controller.dart';
 import '../../../../core/utils/app_spacing.dart';
 import '../../../../core/utils/responsive.dart';
@@ -7,17 +8,16 @@ import '../../widgets/doctor_drawer.dart';
 import '../../widgets/doctor_sliver_app_bar.dart';
 import 'widgets/certificate_list_cards.dart';
 
-class DoctorCertificateDashboardScreen extends StatefulWidget {
+class DoctorCertificateDashboardScreen extends ConsumerStatefulWidget {
   const DoctorCertificateDashboardScreen({super.key});
 
   @override
-  State<DoctorCertificateDashboardScreen> createState() => _DoctorCertificateDashboardScreenState();
+  ConsumerState<DoctorCertificateDashboardScreen> createState() => _DoctorCertificateDashboardScreenState();
 }
 
-class _DoctorCertificateDashboardScreenState extends State<DoctorCertificateDashboardScreen> with SingleTickerProviderStateMixin {
+class _DoctorCertificateDashboardScreenState extends ConsumerState<DoctorCertificateDashboardScreen> with SingleTickerProviderStateMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final TextEditingController _searchController = TextEditingController();
-  final DoctorCertificateController _controller = DoctorCertificateController();
   late TabController _tabController;
 
   @override
@@ -26,7 +26,7 @@ class _DoctorCertificateDashboardScreenState extends State<DoctorCertificateDash
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(() {
       if (!_tabController.indexIsChanging) {
-        _controller.setTabIndex(_tabController.index);
+        ref.read(doctorCertificateProvider.notifier).setTabIndex(_tabController.index);
       }
     });
   }
@@ -35,7 +35,6 @@ class _DoctorCertificateDashboardScreenState extends State<DoctorCertificateDash
   void dispose() {
     _searchController.dispose();
     _tabController.dispose();
-    _controller.dispose();
     super.dispose();
   }
 
@@ -45,96 +44,93 @@ class _DoctorCertificateDashboardScreenState extends State<DoctorCertificateDash
     final colorScheme = theme.colorScheme;
     final double horizontalPadding = Responsive.horizontalPadding(context);
 
-    return ListenableBuilder(
-      listenable: _controller,
-      builder: (context, _) {
-        final filteredCerts = _controller.filteredCertificates;
+    final certificateState = ref.watch(doctorCertificateProvider);
+    final notifier = ref.read(doctorCertificateProvider.notifier);
+    final filteredCerts = notifier.filteredCertificates;
 
-        return Scaffold(
-          key: _scaffoldKey,
-          backgroundColor: colorScheme.surfaceContainerLow,
-          extendBodyBehindAppBar: true,
-          drawer: const DoctorDrawer(doctor: DummyData.currentDoctorProfile),
-          body: NestedScrollView(
-            headerSliverBuilder: (context, innerBoxIsScrolled) {
-              return [
-                DoctorSliverAppBar(
-                  expandedHeight: 140.0,
-                  scaffoldKey: _scaffoldKey,
-                  background: FlexibleSpaceBar(
-                    title: Text(
-                      'Certificate Requests',
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        color: colorScheme.onPrimary,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: -0.5,
-                      ),
-                    ),
-                    titlePadding: EdgeInsets.only(left: horizontalPadding + 4, bottom: AppSpacing.lg),
-                    centerTitle: false,
+    return Scaffold(
+      key: _scaffoldKey,
+      backgroundColor: colorScheme.surfaceContainerLow,
+      extendBodyBehindAppBar: true,
+      drawer: const DoctorDrawer(doctor: DummyData.currentDoctorProfile),
+      body: NestedScrollView(
+        headerSliverBuilder: (context, innerBoxIsScrolled) {
+          return [
+            DoctorSliverAppBar(
+              expandedHeight: 140.0,
+              scaffoldKey: _scaffoldKey,
+              background: FlexibleSpaceBar(
+                title: Text(
+                  'Certificate Requests',
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    color: colorScheme.onPrimary,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -0.5,
                   ),
                 ),
-              ];
-            },
-            body: SafeArea(
-              top: false,
-              child: Column(
-                children: [
-                  Container(
-                    color: colorScheme.surface,
-                    child: TabBar(
-                      controller: _tabController,
-                      labelColor: colorScheme.primary,
-                      unselectedLabelColor: colorScheme.onSurfaceVariant,
-                      indicatorColor: colorScheme.primary,
-                      indicatorSize: TabBarIndicatorSize.tab,
-                      dividerColor: colorScheme.outlineVariant.withValues(alpha: 0.5),
-                      labelStyle: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
-                      unselectedLabelStyle: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
-                      tabs: const [
-                        Tab(text: 'All Requests'),
-                        Tab(text: 'Issued Certs'),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: CustomScrollView(
-                      slivers: [
-                        SliverPadding(
-                          padding: EdgeInsets.fromLTRB(horizontalPadding, AppSpacing.xl, horizontalPadding, AppSpacing.xxxl),
-                          sliver: SliverToBoxAdapter(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _buildSummaryCards(context),
-                                const SizedBox(height: AppSpacing.xl),
-                                _buildToolbar(context),
-                                const SizedBox(height: AppSpacing.lg),
-                                if (filteredCerts.isEmpty)
-                                  const _EmptyHistory()
-                                else
-                                  CertificateListCards(
-                                    certificates: filteredCerts,
-                                    isIssuedTab: _controller.activeTabIndex == 1,
-                                  ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                titlePadding: EdgeInsets.only(left: horizontalPadding + 4, bottom: AppSpacing.lg),
+                centerTitle: false,
               ),
             ),
+          ];
+        },
+        body: SafeArea(
+          top: false,
+          child: Column(
+            children: [
+              Container(
+                color: colorScheme.surface,
+                child: TabBar(
+                  controller: _tabController,
+                  labelColor: colorScheme.primary,
+                  unselectedLabelColor: colorScheme.onSurfaceVariant,
+                  indicatorColor: colorScheme.primary,
+                  indicatorSize: TabBarIndicatorSize.tab,
+                  dividerColor: colorScheme.outlineVariant.withValues(alpha: 0.5),
+                  labelStyle: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
+                  unselectedLabelStyle: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+                  tabs: const [
+                    Tab(text: 'All Requests'),
+                    Tab(text: 'Issued Certs'),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: CustomScrollView(
+                  slivers: [
+                    SliverPadding(
+                      padding: EdgeInsets.fromLTRB(horizontalPadding, AppSpacing.xl, horizontalPadding, AppSpacing.xxxl),
+                      sliver: SliverToBoxAdapter(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildSummaryCards(context, certificateState, notifier),
+                            const SizedBox(height: AppSpacing.xl),
+                            _buildToolbar(context, certificateState, notifier),
+                            const SizedBox(height: AppSpacing.lg),
+                            if (filteredCerts.isEmpty)
+                              const _EmptyHistory()
+                            else
+                              CertificateListCards(
+                                certificates: filteredCerts,
+                                isIssuedTab: certificateState.activeTabIndex == 1,
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 
-  Widget _buildSummaryCards(BuildContext context) {
-    final isIssuedTab = _controller.activeTabIndex == 1;
+  Widget _buildSummaryCards(BuildContext context, CertificateState state, DoctorCertificateNotifier notifier) {
+    final isIssuedTab = state.activeTabIndex == 1;
     final colorScheme = Theme.of(context).colorScheme;
 
     return SingleChildScrollView(
@@ -143,16 +139,16 @@ class _DoctorCertificateDashboardScreenState extends State<DoctorCertificateDash
       child: Row(
         children: isIssuedTab
             ? [
-          _buildCard(context, 'Total Issued', '${_controller.totalIssuedCount}', colorScheme.primary, colorScheme.primaryContainer),
+          _buildCard(context, 'Total Issued', '${notifier.totalIssuedCount}', colorScheme.primary, colorScheme.primaryContainer),
           const SizedBox(width: AppSpacing.md),
-          _buildCard(context, 'This Month', '${_controller.thisMonthIssuedCount}', colorScheme.secondary, colorScheme.secondaryContainer),
+          _buildCard(context, 'This Month', '${notifier.thisMonthIssuedCount}', colorScheme.secondary, colorScheme.secondaryContainer),
           const SizedBox(width: AppSpacing.md),
           _buildCard(context, 'Expiring Soon', '1', colorScheme.error, colorScheme.errorContainer),
         ]
             : [
-          _buildCard(context, 'Pending Requests', '${_controller.pendingCount}', colorScheme.tertiary, colorScheme.tertiaryContainer),
+          _buildCard(context, 'Pending Requests', '${notifier.pendingCount}', colorScheme.tertiary, colorScheme.tertiaryContainer),
           const SizedBox(width: AppSpacing.md),
-          _buildCard(context, 'Total Requests', '${_controller.totalCount}', colorScheme.primary, colorScheme.primaryContainer),
+          _buildCard(context, 'Total Requests', '${notifier.totalCount}', colorScheme.primary, colorScheme.primaryContainer),
         ],
       ),
     );
@@ -200,14 +196,14 @@ class _DoctorCertificateDashboardScreenState extends State<DoctorCertificateDash
     );
   }
 
-  Widget _buildToolbar(BuildContext context) {
+  Widget _buildToolbar(BuildContext context, CertificateState state, DoctorCertificateNotifier notifier) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final isMobile = Responsive.isMobile(context);
 
     final searchField = TextField(
       controller: _searchController,
-      onChanged: _controller.updateSearchQuery,
+      onChanged: notifier.updateSearchQuery,
       style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
       decoration: InputDecoration(
         hintText: 'Search patient or ID...',
@@ -250,7 +246,7 @@ class _DoctorCertificateDashboardScreenState extends State<DoctorCertificateDash
     );
 
     final typeDropdown = DropdownButtonFormField<String>(
-      initialValue: _controller.selectedTypeFilter,
+      initialValue: state.selectedTypeFilter,
       decoration: dropdownDecoration,
       style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700, color: colorScheme.onSurface),
       dropdownColor: colorScheme.surface,
@@ -259,11 +255,11 @@ class _DoctorCertificateDashboardScreenState extends State<DoctorCertificateDash
         DropdownMenuItem(value: 'Medical Fitness', child: Text('Medical Fitness')),
         DropdownMenuItem(value: 'Vaccination', child: Text('Vaccination')),
       ],
-      onChanged: (val) => _controller.updateTypeFilter(val!),
+      onChanged: (val) => notifier.updateTypeFilter(val!),
     );
 
     final statusDropdown = DropdownButtonFormField<String>(
-      initialValue: _controller.selectedStatusFilter,
+      initialValue: state.selectedStatusFilter,
       decoration: dropdownDecoration,
       style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700, color: colorScheme.onSurface),
       dropdownColor: colorScheme.surface,
@@ -272,7 +268,7 @@ class _DoctorCertificateDashboardScreenState extends State<DoctorCertificateDash
         DropdownMenuItem(value: 'Verification', child: Text('Verification')),
         DropdownMenuItem(value: 'Pending', child: Text('Pending')),
       ],
-      onChanged: (val) => _controller.updateStatusFilter(val!),
+      onChanged: (val) => notifier.updateStatusFilter(val!),
     );
 
     if (isMobile) {
@@ -283,7 +279,7 @@ class _DoctorCertificateDashboardScreenState extends State<DoctorCertificateDash
           Row(
             children: [
               Expanded(child: typeDropdown),
-              if (_controller.activeTabIndex == 0) ...[
+              if (state.activeTabIndex == 0) ...[
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(child: statusDropdown),
               ]
@@ -298,7 +294,7 @@ class _DoctorCertificateDashboardScreenState extends State<DoctorCertificateDash
         SizedBox(width: 280, child: searchField),
         const SizedBox(width: AppSpacing.md),
         SizedBox(width: 180, child: typeDropdown),
-        if (_controller.activeTabIndex == 0) ...[
+        if (state.activeTabIndex == 0) ...[
           const SizedBox(width: AppSpacing.md),
           SizedBox(width: 170, child: statusDropdown),
         ],

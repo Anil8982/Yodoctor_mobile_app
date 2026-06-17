@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/modules/patient/controllers/profile_controller.dart';
 
-class ProfileActionBar extends StatelessWidget {
-  final ProfileController controller;
+class ProfileActionBar extends ConsumerWidget {
+  final ProfileNotifier controller;
   final VoidCallback onComplete;
 
   const ProfileActionBar({
@@ -12,8 +13,11 @@ class ProfileActionBar extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
+
+    // Watch profile state reactively for background transaction status flags
+    final profileState = ref.watch(profileProvider);
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -53,39 +57,39 @@ class ProfileActionBar extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(
             child: FilledButton(
-              onPressed: controller.isLoading
+              onPressed: profileState.isLoading
                   ? null
                   : () async {
-                      await controller.updateProfile();
-                      onComplete();
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Profile Updated Successfully!'),
-                            behavior: SnackBarBehavior.floating,
-                          ),
-                        );
-                      }
-                    },
+                await controller.updateProfile();
+                onComplete();
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Profile Updated Successfully!'),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                }
+              },
               style: FilledButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),
-              child: controller.isLoading
+              child: profileState.isLoading
                   ? SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: colorScheme.onPrimary,
-                      ),
-                    )
+                height: 20,
+                width: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: colorScheme.onPrimary,
+                ),
+              )
                   : const Text(
-                      "Save Changes",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
+                "Save Changes",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
           ),
         ],

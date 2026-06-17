@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/modules/patient/screens/search/widgets/search_suggestions_overlay.dart';
 import 'package:yodoctor/modules/patient/screens/search/widgets/specialty_card_list.dart';
@@ -10,14 +10,14 @@ import '../../../../core/utils/responsive.dart';
 import '../../controllers/patient_search_controller.dart';
 import 'widgets/hero_section.dart';
 
-class SearchScreen extends StatefulWidget {
+class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
 
   @override
-  State<SearchScreen> createState() => _SearchScreenState();
+  ConsumerState<SearchScreen> createState() => _SearchScreenState();
 }
 
-class _SearchScreenState extends State<SearchScreen> {
+class _SearchScreenState extends ConsumerState<SearchScreen> {
   late final TextEditingController _locationController;
   late final TextEditingController _searchController;
 
@@ -26,13 +26,15 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   void initState() {
     super.initState();
-    final controller = context.read<PatientSearchController>();
-    _locationController = TextEditingController(text: controller.location);
-    _searchController = TextEditingController(text: controller.query);
+    // Read the current state once for initial text assignment safely
+    final controllerState = ref.read(patientSearchProvider);
+    _locationController = TextEditingController(text: controllerState.location);
+    _searchController = TextEditingController(text: controllerState.query);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (controller.trendingSpecialties.isEmpty) {
-        controller.loadTrendingSpecialties();
+      final notifier = ref.read(patientSearchProvider.notifier);
+      if (ref.read(patientSearchProvider).trendingSpecialties.isEmpty) {
+        notifier.loadTrendingSpecialties();
       }
     });
   }
@@ -48,116 +50,115 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final horizontalPadding = Responsive.horizontalPadding(context);
+
+    // Watch the manual notifier search state structure reactively
+    final searchState = ref.watch(patientSearchProvider);
+    final notifier = ref.read(patientSearchProvider.notifier);
+    final hasSuggestions = searchState.doctorSuggestions.isNotEmpty;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      body: Consumer<PatientSearchController>(
-        builder: (context, controller, child) {
-          final horizontalPadding = Responsive.horizontalPadding(context);
-          final hasSuggestions = controller.doctorSuggestions.isNotEmpty;
+      body: Stack(
+        children: [
+          NestedScrollView(
+            headerSliverBuilder: (context, innerBoxIsScrolled) {
+              return [
+                SliverAppBar(
+                  expandedHeight: 290,
+                  pinned: true,
+                  stretch: true,
+                  elevation: 0,
+                  backgroundColor: colorScheme.primary,
+                  title: Text(
+                    'Search Doctors',
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      color: colorScheme.onPrimary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  flexibleSpace: FlexibleSpaceBar(
+                    stretchModes: const [StretchMode.zoomBackground],
+                    background: HeroSection(
+                      locationController: _locationController,
+                      searchController: _searchController,
+                      searchLayerLink: _searchLink,
+                      onLocationChanged: (val) => notifier.updateLocation(val),
+                      onQueryChanged: (val) => notifier.updateQuery(val),
+                      onSearchTap: () => _onSearchTap(context, notifier),
+                    ),
+                  ),
+                ),
+              ];
+            },
 
-          return Stack(
-            children: [
-              NestedScrollView(
-                headerSliverBuilder: (context, innerBoxIsScrolled) {
-                  return [
-                    SliverAppBar(
-                      expandedHeight: 290,
-                      pinned: true,
-                      stretch: true,
-                      elevation: 0,
-                      backgroundColor: colorScheme.primary,
-                      title: Text(
-                        'Search Doctors',
-                        style: theme.textTheme.titleLarge?.copyWith(
-                          color: colorScheme.onPrimary,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      flexibleSpace: FlexibleSpaceBar(
-                        stretchModes: const [StretchMode.zoomBackground],
-                        background: HeroSection(
-                          locationController: _locationController,
-                          searchController: _searchController,
-                          searchLayerLink: _searchLink,
-                          onLocationChanged: (val) => controller.updateLocation(val),
-                          onQueryChanged: (val) => controller.updateQuery(val),
-                          onSearchTap: () => _onSearchTap(context, controller),
-                        ),
+            body: SingleChildScrollView(
+              padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: AppSpacing.xl),
+
+                  // 1. QUICK ACTION BAR (Icon + Text in a row)
+                  _buildQuickActions(colorScheme),
+
+                  const SizedBox(height: AppSpacing.xxl),
+
+                  // 2. FEATURED SPECIALTIES (With Depth)
+                  _buildSectionHeader(theme, 'Featured Specialties'),
+                  SpecialtyCardList(
+                    specialties: searchState.trendingSpecialties,
+                    onTap: (specialtyName) {
+                      notifier.selectTrending(specialtyName);
+                      _searchController.text = specialtyName;
+                      _onSearchTap(context, notifier);
+                    },
+                  ),
+                  const SizedBox(height: AppSpacing.xxl),
+
+                  const SizedBox(height: 100),
+                ],
+              ),
+            ),
+          ),
+
+          if (hasSuggestions)
+            Positioned(
+              width:
+              MediaQuery.of(context).size.width -
+                  (horizontalPadding * 2) -
+                  64,
+              child: CompositedTransformFollower(
+                link: _searchLink,
+                showWhenUnlinked: false,
+                offset: const Offset(0, 56),
+                child: Material(
+                  elevation: 24,
+                  borderRadius: BorderRadius.circular(24),
+                  color: colorScheme.surface,
+                  child: Container(
+                    constraints: const BoxConstraints(maxHeight: 350),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(
+                        color: colorScheme.outlineVariant.withValues(alpha: 0.4),
                       ),
                     ),
-                  ];
-                },
-
-                body: SingleChildScrollView(
-                  padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: AppSpacing.xl),
-
-                      // 1. QUICK ACTION BAR (Icon + Text in a row)
-                      _buildQuickActions(colorScheme),
-
-                      const SizedBox(height: AppSpacing.xxl),
-
-                      // 2. FEATURED SPECIALTIES (With Depth)
-                      _buildSectionHeader(theme, 'Featured Specialties'),
-                      SpecialtyCardList(
-                        specialties: controller.trendingSpecialties,
-                        onTap: (specialtyName) {
-                          controller.selectTrending(specialtyName);
-                          _searchController.text = specialtyName;
-                          _onSearchTap(context, controller);
-                        },
-                      ),
-                      const SizedBox(height: AppSpacing.xxl),
-
-                      const SizedBox(height: 100),
-                    ],
+                    child: SearchSuggestionsOverlay(
+                      controller: notifier,
+                      searchController: _searchController,
+                      onSearchTap: _onSearchTap,
+                    ),
                   ),
                 ),
               ),
-
-              if (hasSuggestions)
-                Positioned(
-                  width:
-                      MediaQuery.of(context).size.width -
-                      (horizontalPadding * 2) -
-                      64,
-                  child: CompositedTransformFollower(
-                    link: _searchLink,
-                    showWhenUnlinked: false,
-                    offset: const Offset(0, 56),
-                    child: Material(
-                      elevation: 24,
-                      borderRadius: BorderRadius.circular(24),
-                      color: colorScheme.surface,
-                      child: Container(
-                        constraints: const BoxConstraints(maxHeight: 350),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(24),
-                          border: Border.all(
-                            color: colorScheme.outlineVariant.withValues(alpha: 0.4),
-                          ),
-                        ),
-                        child: SearchSuggestionsOverlay(
-                          controller: controller,
-                          searchController: _searchController,
-                          onSearchTap: _onSearchTap,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-            ],
-          );
-        },
+            ),
+        ],
       ),
     );
   }
 
-  void _onSearchTap(BuildContext context, PatientSearchController controller) {
+  void _onSearchTap(BuildContext context, PatientSearchNotifier notifier) {
     final query = _searchController.text.trim();
     if (query.isEmpty) {
       context.push(AppRoutes.findDoctors);
@@ -217,4 +218,3 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 }
-

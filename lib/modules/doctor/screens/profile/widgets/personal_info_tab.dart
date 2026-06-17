@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
 import 'package:yodoctor/modules/doctor/controllers/doctor_profile_controller.dart';
 import 'profile_input_field.dart';
 
-class PersonalInfoTab extends StatelessWidget {
+class PersonalInfoTab extends ConsumerWidget {
   const PersonalInfoTab({super.key, required this.controller});
-  final DoctorProfileController controller;
+  final DoctorProfileNotifier controller;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+
+    // Watch current form state reactively from provider
+    final formState = ref.watch(doctorProfileProvider);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.lg),
@@ -59,7 +63,7 @@ class PersonalInfoTab extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.xs),
             DropdownButtonFormField<String>(
-              initialValue: controller.selectedGender,
+              initialValue: formState.selectedGender,
               dropdownColor: colorScheme.surfaceContainerHigh,
               style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700, color: colorScheme.onSurface),
               icon: Icon(Icons.keyboard_arrow_down_rounded, color: colorScheme.onSurfaceVariant),

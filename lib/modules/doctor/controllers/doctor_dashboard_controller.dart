@@ -1,56 +1,39 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/models/doctor/doctor_dashboard_data.dart';
 import '../../../core/utils/dummy_data.dart';
 
-class DoctorDashboardController extends ChangeNotifier {
-  bool _isLoading = false;
-  String? _errorMessage;
-  DoctorDashboardData? _dashboardData;
-
-  bool get isLoading => _isLoading;
-  String? get errorMessage => _errorMessage;
-  DoctorDashboardData? get dashboardData => _dashboardData;
-
-  DoctorDashboardController() {
-    loadDashboard();
+class DoctorDashboardNotifier extends AsyncNotifier<DoctorDashboardData> {
+  @override
+  Future<DoctorDashboardData> build() async {
+    return await DummyData.getDoctorDashboardData();
   }
 
   Future<void> loadDashboard() async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
-
-    try {
-      _dashboardData = await DummyData.getDoctorDashboardData();
-    } catch (_) {
-      _errorMessage = 'Unable to load doctor dashboard. Please try again.';
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      return await DummyData.getDoctorDashboardData();
+    });
   }
 
   Future<void> toggleAvailability(bool available) async {
-    if (_dashboardData == null) return;
-    
-    // Optimistic UI update
-    _dashboardData = _dashboardData!.copyWith(isAvailable: available);
-    notifyListeners();
+    final previousState = state;
+    if (!previousState.hasValue) return;
+
+    final updatedData = previousState.value!.copyWith(isAvailable: available);
+    state = AsyncValue.data(updatedData);
 
     try {
       await DummyData.toggleDoctorAvailability(available);
-      // Ensure sync
-      _dashboardData = await DummyData.getDoctorDashboardData();
-    } catch (_) {
-      // Revert if error
-      _dashboardData = _doctorDashboardDataRevert(available);
-      _errorMessage = 'Failed to update availability status.';
-    } finally {
-      notifyListeners();
+
+      final freshData = await DummyData.getDoctorDashboardData();
+      state = AsyncValue.data(freshData);
+    } catch (error, stackTrace) {
+      state = AsyncValue.data(previousState.value!.copyWith(isAvailable: !available));
+      state = AsyncValue.error('Failed to update availability status.', stackTrace);
     }
   }
-
-  DoctorDashboardData _doctorDashboardDataRevert(bool attempted) {
-    return _dashboardData!.copyWith(isAvailable: !attempted);
-  }
 }
+
+final doctorDashboardProvider = AsyncNotifierProvider.autoDispose<DoctorDashboardNotifier, DoctorDashboardData>(
+  DoctorDashboardNotifier.new,
+);

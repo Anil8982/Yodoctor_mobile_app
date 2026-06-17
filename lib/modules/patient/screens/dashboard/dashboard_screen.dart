@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/modules/patient/screens/dashboard/widgets/patient_header.dart';
 import 'package:yodoctor/modules/patient/widgets/custom_sliver_app_bar.dart';
 import 'package:yodoctor/modules/patient/widgets/patient_drawer.dart';
@@ -14,31 +14,36 @@ import 'widgets/appointment_filter_chips.dart';
 import 'widgets/token_card.dart';
 import 'widgets/search_doctor_card.dart';
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends ConsumerWidget {
   DashboardScreen({super.key});
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final bool mobile = Responsive.isMobile(context);
+    final double horizontal = Responsive.horizontalPadding(context);
 
-    return Consumer<PatientDashboardController>(
-      builder: (context, controller, child) {
-        final loading = controller.isLoading;
-        final data = controller.dashboardData;
+    // Watch dynamic asynchronous state wrappers directly from dashboard provider
+    final dashboardAsync = ref.watch(patientDashboardProvider);
+    final notifier = ref.read(patientDashboardProvider.notifier);
 
-        if (loading && data == null) {
-          return Scaffold(
-            backgroundColor: theme.scaffoldBackgroundColor,
-            body: const Center(child: CircularProgressIndicator()),
-          );
-        }
+    return dashboardAsync.when(
+      loading: () => Scaffold(
+        backgroundColor: theme.scaffoldBackgroundColor,
+        body: const Center(child: CircularProgressIndicator()),
+      ),
+      error: (error, stackTrace) => Scaffold(
+        body: Center(child: Text('Error: $error', style: theme.textTheme.bodyMedium)),
+      ),
+      // 🎯 Process matching payload structures directly from immutable state wrapper
+      data: (dashboardState) {
+        final data = dashboardState.dashboardData;
         if (data == null) return const SizedBox.shrink();
 
-        final bool mobile = Responsive.isMobile(context);
-        final double horizontal = Responsive.horizontalPadding(context);
+        final bool isRefreshing = dashboardAsync.isRefreshing;
 
         return Scaffold(
           key: _scaffoldKey,
@@ -52,10 +57,11 @@ class DashboardScreen extends StatelessWidget {
                   expandedHeight: 190.0,
                   scaffoldKey: _scaffoldKey,
                   background: PatientHeader(user: data.user),
-                ),              ];
+                ),
+              ];
             },
             body: RefreshIndicator(
-              onRefresh: controller.loadDashboard,
+              onRefresh: () => notifier.loadDashboard(),
               color: colorScheme.primary,
               backgroundColor: colorScheme.surface,
               child: SingleChildScrollView(
@@ -66,23 +72,25 @@ class DashboardScreen extends StatelessWidget {
                   children: [
                     SearchDoctorCard(),
                     const SizedBox(height: AppSpacing.xl),
-                    TokenCard(token: data.todayToken ),
+                    TokenCard(token: data.todayToken),
                     const SizedBox(height: AppSpacing.xl),
                     _buildSectionHeader(context, colorScheme, 'Upcoming Appointments'),
                     const SizedBox(height: AppSpacing.sm),
                     AppointmentFilterChips(
-                      filters: PatientDashboardController.availableFilters,
-                      selectedFilter: controller.selectedFilter,
+                      filters: PatientDashboardNotifier.availableFilters,
+                      selectedFilter: dashboardState.selectedFilter,
                       onFilterSelected: (filter) {
                         HapticFeedback.selectionClick();
-                        controller.setFilter(filter);
+                        notifier.setFilter(filter);
                       },
                     ),
                     const SizedBox(height: AppSpacing.md),
-                    if (loading) LinearProgressIndicator(color: colorScheme.primary, backgroundColor: colorScheme.primaryContainer),
+                    if (isRefreshing)
+                      LinearProgressIndicator(
+                        color: colorScheme.primary,
+                        backgroundColor: colorScheme.primaryContainer,
+                      ),
                     _buildAppointmentsContent(data, mobile),
-
-                    // const SizedBox(height: 50),
                   ],
                 ),
               ),
@@ -92,7 +100,6 @@ class DashboardScreen extends StatelessWidget {
       },
     );
   }
-
 
   Widget _buildSectionHeader(BuildContext context, ColorScheme colorScheme, String title) {
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
@@ -134,7 +141,6 @@ class DashboardScreen extends StatelessWidget {
     });
   }
 }
-
 
 class _EmptyAppointments extends StatelessWidget {
   const _EmptyAppointments();
@@ -204,4 +210,3 @@ class _EmptyAppointments extends StatelessWidget {
     );
   }
 }
-

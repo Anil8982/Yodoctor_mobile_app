@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/modules/patient/controllers/certificate_request.dart';
 import 'step_header_helper.dart';
 import 'custom_text_field.dart';
 
-class Step2MedicalInfo extends StatelessWidget {
+class Step2MedicalInfo extends ConsumerWidget {
   final GlobalKey<FormState> formKey;
-  final CertificateController controller;
+  final CertificateNotifier controller;
 
   const Step2MedicalInfo({super.key, required this.formKey, required this.controller});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
+
+    // Watch current form state reactively from provider
+    final formState = ref.watch(certificateProvider);
 
     return Form(
       key: formKey,
@@ -54,7 +58,7 @@ class Step2MedicalInfo extends StatelessWidget {
               const SizedBox(width: 16),
               Expanded(
                 child: DropdownButtonFormField<String>(
-                  initialValue: controller.gender,
+                  initialValue: formState.gender,
                   decoration: InputDecoration(
                     labelText: 'Gender *',
                     enabledBorder: OutlineInputBorder(
@@ -75,7 +79,7 @@ class Step2MedicalInfo extends StatelessWidget {
             children: [
               Expanded(
                 child: DropdownButtonFormField<String>(
-                  initialValue: controller.bloodGroup,
+                  initialValue: formState.bloodGroup,
                   decoration: InputDecoration(
                     labelText: 'Blood Group *',
                     enabledBorder: OutlineInputBorder(

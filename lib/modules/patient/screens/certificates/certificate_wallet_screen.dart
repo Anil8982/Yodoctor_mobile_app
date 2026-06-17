@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:yodoctor/core/models/medical_certificate.dart';
@@ -13,14 +13,14 @@ import '../../widgets/patient_drawer.dart';
 import 'widgets/certificate_header.dart';
 import 'widgets/certificate_preview_dialog.dart';
 
-class CertificateWalletScreen extends StatefulWidget {
+class CertificateWalletScreen extends ConsumerStatefulWidget {
   const CertificateWalletScreen({super.key});
 
   @override
-  State<CertificateWalletScreen> createState() => _CertificateWalletScreenState();
+  ConsumerState<CertificateWalletScreen> createState() => _CertificateWalletScreenState();
 }
 
-class _CertificateWalletScreenState extends State<CertificateWalletScreen> {
+class _CertificateWalletScreenState extends ConsumerState<CertificateWalletScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final TextEditingController _searchController = TextEditingController();
 
@@ -36,134 +36,151 @@ class _CertificateWalletScreenState extends State<CertificateWalletScreen> {
     final colorScheme = theme.colorScheme;
     final horizontalPadding = Responsive.horizontalPadding(context);
 
-    return Consumer<CertificateController>(
-      builder: (context, controller, child) {
-        return Scaffold(
-          key: _scaffoldKey,
-          drawer: const PatientDrawer(user: DummyData.currentUser),
-          backgroundColor: theme.scaffoldBackgroundColor,
-          body: NestedScrollView(
-            headerSliverBuilder: (context, innerBoxIsScrolled) {
-              return <Widget>[
-                CustomSliverAppBar(
-                  expandedHeight: 220,
-                  scaffoldKey: _scaffoldKey,
-                  background: CertificateHeader(
-                    certificateCount: controller.certificates.length,
-                    selectedFilter: controller.selectedFilter,
-                  ),
-                ),
-              ];
-            },
-            body: Column(
-              children: [
-                Container(
-                  color: colorScheme.surface,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: horizontalPadding,
-                    vertical: 12,
-                  ),
-                  child: Column(
-                    children: [
-                      ValueListenableBuilder<TextEditingValue>(
-                        valueListenable: _searchController,
-                        builder: (context, value, child) {
-                          return TextField(
-                            controller: _searchController,
-                            onChanged: controller.setSearchQuery,
-                            style: Theme.of(context).textTheme.bodyMedium,
-                            decoration: InputDecoration(
-                              hintText: 'Search by type or doctor...',
-                              prefixIcon: const Icon(Icons.search_rounded, size: 22),
-                              suffixIcon: value.text.isNotEmpty
-                                  ? IconButton(
-                                      icon: const Icon(Icons.clear_rounded, size: 20),
-                                      onPressed: () {
-                                        _searchController.clear();
-                                        controller.setSearchQuery('');
-                                      },
-                                    )
-                                  : null,
-                              filled: true,
-                              fillColor: Theme.of(context).colorScheme.surfaceContainerLow,
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 14,
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(14),
-                                borderSide: BorderSide(
-                                  color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.35),
-                                  width: 1.0,
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(14),
-                                borderSide: BorderSide(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  width: 2.0,
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 12),
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        physics: const BouncingScrollPhysics(),
-                        child: Row(
-                          children: ['All', 'Pending', 'Approved', 'Rejected'].map((filter) {
-                            final isSelected = controller.selectedFilter == filter;
-                            return Padding(
-                              padding: const EdgeInsets.only(right: 8.0),
-                              child: FilterChip(
-                                label: Text(filter),
-                                selected: isSelected,
-                                onSelected: (_) => controller.setFilter(filter),
-                                selectedColor: colorScheme.primaryContainer,
-                                labelStyle: TextStyle(
-                                  color: isSelected ? colorScheme.onPrimaryContainer : colorScheme.onSurface,
-                                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                                ),
-                                showCheckmark: false,
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: controller.certificates.isEmpty
-                      ? _buildEmptyState(context, controller.selectedFilter)
-                      : ListView.separated(
-                          padding: EdgeInsets.fromLTRB(horizontalPadding, 16, horizontalPadding, 0),
-                          itemCount: controller.certificates.length,
-                          separatorBuilder: (_, _) => const SizedBox(height: 12),
-                          itemBuilder: (context, index) {
-                            final cert = controller.certificates[index];
-                            return _buildCertificateCard(context, cert);
-                          },
-                        ),
-                ),
-              ],
+    // Watch dynamic state layout values from profile notifier provider
+    final formState = ref.watch(certificateProvider);
+    final notifier = ref.read(certificateProvider.notifier);
+
+    // Process matching dataset filter pipeline arrays cleanly
+    final filteredCertificates = notifier.getFilteredCertificates();
+
+    return Scaffold(
+      key: _scaffoldKey,
+      drawer: const PatientDrawer(user: DummyData.currentUser),
+      backgroundColor: theme.scaffoldBackgroundColor,
+      body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
+        slivers: <Widget>[
+          CustomSliverAppBar(
+            expandedHeight: 220,
+            scaffoldKey: _scaffoldKey,
+            background: CertificateHeader(
+              certificateCount: filteredCertificates.length,
+              selectedFilter: formState.selectedFilter,
             ),
           ),
-          floatingActionButton: FloatingActionButton.extended(
-            onPressed: () {
-              controller.initFormWithDefaults(DummyData.currentUser);
-              context.push(AppRoutes.applyCertificate);
-            },
-            icon: const Icon(Icons.add_rounded),
-            label: const Text('Apply Certificate'),
-            backgroundColor: colorScheme.primary,
-            foregroundColor: colorScheme.onPrimary,
+          SliverAppBar(
+            leading: const SizedBox.shrink(),
+            leadingWidth: 0,
+            automaticallyImplyLeading: false,
+            backgroundColor: colorScheme.surface,
+            pinned: false,
+            floating: true,
+            snap: true,
+            scrolledUnderElevation: 0,
+            elevation: 0,
+            toolbarHeight: 120,
+            titleSpacing: 0,
+            title: Container(
+              color: colorScheme.surface,
+              padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ValueListenableBuilder<TextEditingValue>(
+                    valueListenable: _searchController,
+                    builder: (context, value, child) {
+                      return TextField(
+                        controller: _searchController,
+                        onChanged: notifier.setSearchQuery,
+                        style: theme.textTheme.bodyMedium,
+                        decoration: InputDecoration(
+                          hintText: 'Search by type or doctor...',
+                          prefixIcon: const Icon(Icons.search_rounded, size: 22),
+                          suffixIcon: value.text.isNotEmpty
+                              ? IconButton(
+                            icon: const Icon(Icons.clear_rounded, size: 20),
+                            onPressed: () {
+                              _searchController.clear();
+                              notifier.setSearchQuery('');
+                            },
+                          )
+                              : null,
+                          filled: true,
+                          fillColor: theme.colorScheme.surfaceContainerLow,
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 14,
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: BorderSide(
+                              color: theme.colorScheme.outlineVariant.withValues(alpha: 0.35),
+                              width: 1.0,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: BorderSide(
+                              color: theme.colorScheme.primary,
+                              width: 2.0,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    physics: const BouncingScrollPhysics(),
+                    child: Row(
+                      children: ['All', 'Pending', 'Approved', 'Rejected'].map((filter) {
+                        final isSelected = formState.selectedFilter == filter;
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 8.0),
+                          child: FilterChip(
+                            label: Text(filter),
+
+                            selected: isSelected,
+                            onSelected: (_) => notifier.setFilter(filter),
+                            selectedColor: colorScheme.primaryContainer,
+                            labelStyle: TextStyle(
+                              color: isSelected ? colorScheme.onPrimaryContainer : colorScheme.onSurface,
+                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                            ),
+                            showCheckmark: false,
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-        );
-      },
+          filteredCertificates.isEmpty
+              ? SliverFillRemaining(
+            hasScrollBody: false,
+            child: _buildEmptyState(context, formState.selectedFilter),
+          )
+              : SliverPadding(
+            padding: EdgeInsets.fromLTRB(horizontalPadding, 12, horizontalPadding, 95),
+            sliver: SliverList(
+              delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                  final cert = filteredCertificates[index];
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 12.0),
+                    child: _buildCertificateCard(context, cert),
+                  );
+                },
+                childCount: filteredCertificates.length,
+              ),
+            ),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          notifier.initFormWithDefaults(DummyData.currentUser);
+          context.push(AppRoutes.applyCertificate);
+        },
+        icon: const Icon(Icons.add_rounded),
+        label: const Text('Apply Certificate'),
+        backgroundColor: colorScheme.primary,
+        foregroundColor: colorScheme.onPrimary,
+      ),
     );
   }
 
@@ -201,6 +218,7 @@ class _CertificateWalletScreenState extends State<CertificateWalletScreen> {
     }
 
     return Card(
+      margin: EdgeInsets.zero, // Controlled boundary inside SliverPadding spacing parameters
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),

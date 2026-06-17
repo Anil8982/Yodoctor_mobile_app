@@ -4,12 +4,15 @@ import 'package:yodoctor/modules/doctor/controllers/doctor_profile_controller.da
 
 class ProfileHeaderSection extends StatelessWidget {
   const ProfileHeaderSection({super.key, required this.controller});
-  final DoctorProfileController controller;
+  final DoctorProfileNotifier controller;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+
+    // Access state data structure from manual notifier
+    final formState = controller.state;
 
     return Container(
       padding: const EdgeInsets.fromLTRB(
@@ -113,7 +116,7 @@ class ProfileHeaderSection extends StatelessWidget {
                     ),
                   ),
                   child: Text(
-                    'ID: ${controller.profile?.id ?? 'PENDING'}',
+                    'ID: ${formState.profile?.id ?? 'PENDING'}',
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: colorScheme.onPrimary,
                       fontSize: 10,

@@ -28,7 +28,7 @@ class DoctorProfileScreen extends StatelessWidget {
         },
         body: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.lg,
+            horizontal: AppSpacing.sm,
             vertical: AppSpacing.md,
           ),
           child: Column(
@@ -70,7 +70,7 @@ class DoctorProfileScreen extends StatelessWidget {
                       cardColor: colorScheme.surface,
                     ),
                   ),
-                  const SizedBox(width: AppSpacing.md),
+                  const SizedBox(width: AppSpacing.xxs),
                   Expanded(
                     child: _buildStatCard(
                       context,
@@ -82,7 +82,7 @@ class DoctorProfileScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: AppSpacing.xl),
+              const SizedBox(height: AppSpacing.sm),
 
               // 🎯 1. Professional & Council Compliance Card
               _buildSectionCard(
@@ -95,7 +95,7 @@ class DoctorProfileScreen extends StatelessWidget {
                   _buildInfoRow(context, 'Valid Till', doctor.registrationValidTill),
                 ],
               ),
-              const SizedBox(height: AppSpacing.lg),
+              const SizedBox(height: AppSpacing.sm),
 
               // 🎯 2. Clinic Information Card
               _buildSectionCard(
@@ -109,7 +109,7 @@ class DoctorProfileScreen extends StatelessWidget {
                   _buildInfoRow(context, 'Address', doctor.fullAddress, maxLines: 3),
                 ],
               ),
-              const SizedBox(height: AppSpacing.lg),
+              const SizedBox(height: AppSpacing.sm),
 
               // 🎯 3. Availability & Consultation Card
               _buildSectionCard(
@@ -126,7 +126,7 @@ class DoctorProfileScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: AppSpacing.lg),
+              const SizedBox(height: AppSpacing.sm),
 
               // 🎯 4. Documents Verification Status Summary
               _buildSectionCard(
@@ -169,7 +169,7 @@ class DoctorProfileScreen extends StatelessWidget {
                   );
                 }).toList(),
               ),
-              const SizedBox(height: AppSpacing.xxxl),
+              // const SizedBox(height: AppSpacing.sm),
             ],
           ),
         ),

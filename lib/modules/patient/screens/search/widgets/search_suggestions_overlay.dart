@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/modules/patient/controllers/patient_search_controller.dart';
 
-class SearchSuggestionsOverlay extends StatelessWidget {
-  final PatientSearchController controller;
+class SearchSuggestionsOverlay extends ConsumerWidget {
+  final PatientSearchNotifier controller;
   final TextEditingController searchController;
-  final Function(BuildContext, PatientSearchController) onSearchTap;
+  final Function(BuildContext, PatientSearchNotifier) onSearchTap;
 
   const SearchSuggestionsOverlay({
     super.key,
@@ -14,25 +15,28 @@ class SearchSuggestionsOverlay extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+
+    // Watch search controller's internal autocomplete data states reactively
+    final searchState = ref.watch(patientSearchProvider);
 
     return ListView.separated(
       padding: const EdgeInsets.symmetric(vertical: 8),
       shrinkWrap: true,
-      itemCount: controller.doctorSuggestions.length,
+      itemCount: searchState.doctorSuggestions.length,
       separatorBuilder: (context, index) =>
       const Divider(height: 1, indent: 20, endIndent: 20),
       itemBuilder: (context, index) {
-        final doc = controller.doctorSuggestions[index];
-        final query = controller.query.toLowerCase();
+        final doc = searchState.doctorSuggestions[index];
+        final query = searchState.query.toLowerCase();
 
         String displayTitle = '';
         String displaySubtitle = '';
         IconData icon = Icons.person_search_rounded;
 
-        // Contextual Logic for matching fields
+        // Contextual Logic for matching fields against reactive query strings
         if (doc.name.toLowerCase().contains(query)) {
           displayTitle = doc.name;
           displaySubtitle = "${doc.specialty} • ${doc.hospital}";

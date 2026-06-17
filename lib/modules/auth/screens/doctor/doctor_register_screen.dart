@@ -1,5 +1,6 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/modules/auth/models/doctor_register_model.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/register_steps/step1_personal.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/register_steps/step2_professional.dart';
@@ -8,16 +9,17 @@ import 'package:yodoctor/modules/auth/screens/doctor/register_steps/step4_practi
 import 'package:yodoctor/modules/auth/screens/doctor/register_steps/step5_consultation.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/register_steps/step6_documents.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/register_steps/step7_declaration.dart';
-import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:yodoctor/core/theme/app_theme.dart' hide AppRole;
+import 'package:yodoctor/core/providers/app_role_provider.dart';
 
-class DoctorRegisterScreen extends StatefulWidget {
+class DoctorRegisterScreen extends ConsumerStatefulWidget {
   const DoctorRegisterScreen({super.key});
 
   @override
-  State<DoctorRegisterScreen> createState() => _DoctorRegisterScreenState();
+  ConsumerState<DoctorRegisterScreen> createState() => _DoctorRegisterScreenState();
 }
 
-class _DoctorRegisterScreenState extends State<DoctorRegisterScreen>
+class _DoctorRegisterScreenState extends ConsumerState<DoctorRegisterScreen>
     with SingleTickerProviderStateMixin {
   int _currentStep = 0;
   final DoctorFormData _formData = DoctorFormData();
@@ -77,9 +79,15 @@ class _DoctorRegisterScreenState extends State<DoctorRegisterScreen>
   }
 
   Future<void> _handleSubmit() async {
+    setState(() => _isLoading = true);
     await Future.delayed(const Duration(seconds: 2));
+    setState(() => _isLoading = false);
+
     if (!mounted) return;
     final colorScheme = Theme.of(context).colorScheme;
+
+    ref.read(appRoleProvider.notifier).setRole(AppRole.doctor);
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: const Text('Registration submitted successfully!'),
@@ -88,7 +96,12 @@ class _DoctorRegisterScreenState extends State<DoctorRegisterScreen>
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
+
+    // Context router pipeline transitions to doctor dashboard channel smoothly
+    // context.go(AppRoutes.doctorDashboard);
   }
+
+  bool _isLoading = false; // Shared private variable for state submit loading trackers
 
   @override
   Widget build(BuildContext context) {
@@ -119,7 +132,7 @@ class _DoctorRegisterScreenState extends State<DoctorRegisterScreen>
                         children: [
                           GestureDetector(
                             onTap: () =>
-                                _currentStep == 0 ? Navigator.pop(context) : _prevStep(),
+                            _currentStep == 0 ? Navigator.pop(context) : _prevStep(),
                             child: Container(
                               width: 38,
                               height: 38,
@@ -214,7 +227,11 @@ class _DoctorRegisterScreenState extends State<DoctorRegisterScreen>
                     Step6Documents(data: _formData, onNext: _nextStep, onBack: _prevStep),
                   ),
                   _scrollable(
-                    Step7Declaration(data: _formData, onBack: _prevStep, onSubmit: _handleSubmit),
+                    Step7Declaration(
+                      data: _formData,
+                      onBack: _prevStep,
+                      onSubmit: _isLoading ? () async {} : _handleSubmit,
+                    ),
                   ),
                 ],
               ),
@@ -256,14 +273,14 @@ class _DoctorRegisterScreenState extends State<DoctorRegisterScreen>
                     child: done
                         ? Icon(Icons.check, size: 12, color: colorScheme.primary)
                         : Text(
-                            '${i + 1}',
-                            style: textTheme.labelSmall?.copyWith(
-                              color: active
-                                  ? colorScheme.primary
-                                  : colorScheme.onPrimary.transparency(0.7),
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
+                      '${i + 1}',
+                      style: textTheme.labelSmall?.copyWith(
+                        color: active
+                            ? colorScheme.primary
+                            : colorScheme.onPrimary.transparency(0.7),
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
                   ),
                 ),
                 if (i < _stepLabels.length - 1)

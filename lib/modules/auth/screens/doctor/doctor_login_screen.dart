@@ -1,20 +1,23 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
-import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:yodoctor/core/theme/app_theme.dart' hide AppRole;
+import 'package:yodoctor/core/providers/app_role_provider.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/doctor_register_screen.dart';
 import 'package:yodoctor/modules/auth/widgets/auth_widgets.dart';
 
-class DoctorLoginScreen extends StatefulWidget {
+// 🎯 FIX: Converted to ConsumerStatefulWidget to link Riverpod's reactive capabilities natively
+class DoctorLoginScreen extends ConsumerStatefulWidget {
   const DoctorLoginScreen({super.key});
 
   @override
-  State<DoctorLoginScreen> createState() => _DoctorLoginScreenState();
+  ConsumerState<DoctorLoginScreen> createState() => _DoctorLoginScreenState();
 }
 
-class _DoctorLoginScreenState extends State<DoctorLoginScreen>
+// 🎯 FIX: Inherited from ConsumerState to support contextual ref updates within the animation lifecycle
+class _DoctorLoginScreenState extends ConsumerState<DoctorLoginScreen>
     with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
@@ -63,7 +66,8 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen>
     }
 
     if (!mounted) return;
-    Provider.of<AppRoleProvider>(context, listen: false).setRole(AppRole.doctor);
+
+    ref.read(appRoleProvider.notifier).setRole(AppRole.doctor);
     context.go(AppRoutes.doctorDashboard);
   }
 

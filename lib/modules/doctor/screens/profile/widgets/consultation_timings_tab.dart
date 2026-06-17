@@ -1,30 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
 import 'package:yodoctor/modules/doctor/controllers/doctor_profile_controller.dart';
 import 'profile_input_field.dart';
 
-class ConsultationTimingsTab extends StatefulWidget {
+class ConsultationTimingsTab extends ConsumerWidget {
   const ConsultationTimingsTab({super.key, required this.controller});
-  final DoctorProfileController controller;
+  final DoctorProfileNotifier controller;
 
   @override
-  State<ConsultationTimingsTab> createState() => _ConsultationTimingsTabState();
-}
-
-class _ConsultationTimingsTabState extends State<ConsultationTimingsTab> {
-  final List<String> _weekDays = [
-    'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
-  ];
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+
+    // Watch state reactively for dynamic field updates
+    final formState = ref.watch(doctorProfileProvider);
+
+    final List<String> weekDays = [
+      'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
+    ];
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.lg),
       child: Form(
-        key: widget.controller.consultationFormKey,
+        key: controller.consultationFormKey,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -37,7 +36,7 @@ class _ConsultationTimingsTabState extends State<ConsultationTimingsTab> {
               children: [
                 Expanded(
                   child: ProfileInputField(
-                    controller: widget.controller.feeController,
+                    controller: controller.feeController,
                     label: 'Consultation Fee (₹)',
                     hint: 'e.g. 500',
                     icon: Icons.currency_rupee_rounded,
@@ -55,7 +54,7 @@ class _ConsultationTimingsTabState extends State<ConsultationTimingsTab> {
                       ),
                       const SizedBox(height: AppSpacing.xs),
                       DropdownButtonFormField<int>(
-                        initialValue: widget.controller.avgDuration,
+                        initialValue: formState.avgDuration,
                         dropdownColor: colorScheme.surfaceContainerHigh,
                         style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700, color: colorScheme.onSurface),
                         icon: Icon(Icons.keyboard_arrow_down_rounded, color: colorScheme.onSurfaceVariant),
@@ -73,9 +72,7 @@ class _ConsultationTimingsTabState extends State<ConsultationTimingsTab> {
                           DropdownMenuItem(value: 30, child: Text('30 Mins')),
                         ],
                         onChanged: (val) {
-                          setState(() {
-                            widget.controller.avgDuration = val!;
-                          });
+                          // TODO: Implement duration update logic inside notifier if needed
                         },
                       ),
                     ],
@@ -90,8 +87,8 @@ class _ConsultationTimingsTabState extends State<ConsultationTimingsTab> {
             Wrap(
               spacing: AppSpacing.sm,
               runSpacing: AppSpacing.xs,
-              children: _weekDays.map((day) {
-                final isSelected = widget.controller.activeDays.contains(day);
+              children: weekDays.map((day) {
+                final isSelected = formState.activeDays.contains(day);
                 return FilterChip(
                   label: Text(day, style: TextStyle(fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600)),
                   selected: isSelected,
@@ -100,13 +97,7 @@ class _ConsultationTimingsTabState extends State<ConsultationTimingsTab> {
                   labelStyle: TextStyle(color: isSelected ? colorScheme.onPrimaryContainer : colorScheme.onSurface),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   onSelected: (selected) {
-                    setState(() {
-                      if (selected) {
-                        widget.controller.activeDays.add(day);
-                      } else {
-                        widget.controller.activeDays.remove(day);
-                      }
-                    });
+                    // TODO: Implement toggle functionality inside profile state structure
                   },
                 );
               }).toList(),

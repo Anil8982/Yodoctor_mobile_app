@@ -1,35 +1,34 @@
-import 'package:flutter/foundation.dart';
-
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/utils/dummy_data.dart';
 
-class FamilyController extends ChangeNotifier {
-  FamilyController()
-    : _members = List<FamilyMember>.from(DummyData.familyMembers);
+class FamilyNotifier extends Notifier<List<FamilyMember>> {
 
-  final List<FamilyMember> _members;
-
-  List<FamilyMember> get members => List<FamilyMember>.unmodifiable(_members);
+  @override
+  List<FamilyMember> build() {
+    return List<FamilyMember>.from(DummyData.familyMembers);
+  }
 
   void addMember(FamilyMember member) {
-    _members.insert(0, member);
-    notifyListeners();
+    state = [member, ...state];
   }
 
   void removeMember(FamilyMember member) {
-    _members.remove(member);
-    notifyListeners();
+    state = state.where((item) => item != member).toList();
   }
 
   void updateMember({
     required FamilyMember oldMember,
     required FamilyMember updatedMember,
   }) {
-    final int index = _members.indexOf(oldMember);
-    if (index == -1) {
-      return;
-    }
+    final int index = state.indexOf(oldMember);
+    if (index == -1) return;
 
-    _members[index] = updatedMember;
-    notifyListeners();
+    final updatedList = List<FamilyMember>.from(state);
+    updatedList[index] = updatedMember;
+    state = updatedList;
   }
 }
+
+final familyProvider = NotifierProvider.autoDispose<FamilyNotifier, List<FamilyMember>>(
+  FamilyNotifier.new,
+);

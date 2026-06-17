@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/utils/dummy_data.dart';
 import '../../../../core/utils/responsive.dart';
 import '../../controllers/appointment_history_controller.dart';
@@ -11,33 +10,39 @@ import 'widgets/history_appointment_card.dart';
 import 'widgets/history_header.dart';
 import 'widgets/history_table_header.dart';
 
-class AppointmentsHistoryScreen extends StatefulWidget {
+class AppointmentsHistoryScreen extends ConsumerStatefulWidget {
   const AppointmentsHistoryScreen({super.key});
 
   @override
-  State<AppointmentsHistoryScreen> createState() => _AppointmentsHistoryScreenState();
+  ConsumerState<AppointmentsHistoryScreen> createState() => _AppointmentsHistoryScreenState();
 }
 
-class _AppointmentsHistoryScreenState extends State<AppointmentsHistoryScreen> {
+class _AppointmentsHistoryScreenState extends ConsumerState<AppointmentsHistoryScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<AppointmentHistoryController>(
-      builder: (
-        BuildContext context,
-        AppointmentHistoryController controller,
-        _,
-      ) {
-        final bool isLoadingInitial = controller.isLoading && controller.appointments.isEmpty;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final double horizontal = Responsive.horizontalPadding(context);
 
-        if (isLoadingInitial) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
+    // Watch unified history state structure from manual notifier provider
+    final appointmentsAsync = ref.watch(appointmentHistoryProvider);
+    final notifier = ref.read(appointmentHistoryProvider.notifier);
 
-        final double horizontal = Responsive.horizontalPadding(context);
+    return appointmentsAsync.when(
+      loading: () => Scaffold(
+        backgroundColor: colorScheme.surfaceContainerLow,
+        body: const Center(child: CircularProgressIndicator()),
+      ),
+      error: (error, stackTrace) => Scaffold(
+        backgroundColor: colorScheme.surfaceContainerLow,
+        body: Center(child: Text('Error: $error', style: theme.textTheme.bodyMedium)),
+      ),
+      // 🎯 FIX: Destructured the wrapper state payload to safely extract structural appointments array
+      data: (historyState) {
+        final appointments = historyState.appointments;
+        final bool isRefreshing = appointmentsAsync.isRefreshing;
 
         return Scaffold(
           key: _scaffoldKey,
@@ -49,7 +54,7 @@ class _AppointmentsHistoryScreenState extends State<AppointmentsHistoryScreen> {
                   expandedHeight: 220,
                   scaffoldKey: _scaffoldKey,
                   background: HistoryHeader(
-                    appointmentCount: controller.appointments.length,
+                    appointmentCount: appointments.length,
                   ),
                 ),
               ];
@@ -58,64 +63,62 @@ class _AppointmentsHistoryScreenState extends State<AppointmentsHistoryScreen> {
               padding: EdgeInsets.fromLTRB(horizontal, 0, horizontal, 20),
               child: Column(
                 children: <Widget>[
-                  if (controller.isLoading) const LinearProgressIndicator(),
+                  if (isRefreshing) const LinearProgressIndicator(),
                   if (MediaQuery.sizeOf(context).width >= 980) ...<Widget>[
                     const HistoryTableHeader(),
                     const SizedBox(height: 12),
                   ],
                   Expanded(
-                    child: controller.appointments.isEmpty
+                    child: appointments.isEmpty
                         ? _buildEmptyState(context)
                         : ListView.separated(
-                            physics: const BouncingScrollPhysics(),
-                            itemCount: controller.appointments.length,
-                            separatorBuilder: (_, _) => const SizedBox(height: 12),
-                            itemBuilder: (BuildContext context, int index) {
-                              final appointment = controller.appointments[index];
+                      physics: const BouncingScrollPhysics(),
+                      itemCount: appointments.length,
+                      separatorBuilder: (_, _) => const SizedBox(height: 12),
+                      itemBuilder: (BuildContext context, int index) {
+                        final appointment = appointments[index];
 
-                              return HistoryAppointmentCard(
-                                appointment: appointment,
-                                onViewDetails: () {
-                                  showAppointmentDetailsDialog(
-                                    context: context,
-                                    appointment: appointment,
-                                    initialRating: controller.ratingFor(appointment.id),
-                                    initialFeedback: controller.feedbackFor(appointment.id),
-                                    onSubmitRating: (int rating, String feedback) async {
-                                      await controller.submitRating(
-                                        appointmentId: appointment.id,
-                                        rating: rating,
-                                        feedback: feedback,
-                                      );
+                        return HistoryAppointmentCard(
+                          appointment: appointment,
+                          onViewDetails: () {
+                            showAppointmentDetailsDialog(
+                              context: context,
+                              appointment: appointment,
+                              initialRating: notifier.ratingFor(appointment.id),
+                              initialFeedback: notifier.feedbackFor(appointment.id),
+                              onSubmitRating: (int rating, String feedback) async {
+                                await notifier.submitRating(
+                                  appointmentId: appointment.id,
+                                  rating: rating,
+                                  feedback: feedback,
+                                );
 
-                                      if (!context.mounted) {
-                                        return;
-                                      }
+                                if (!context.mounted) return;
 
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            'Thanks! You rated ${appointment.doctorName} $rating stars.',
-                                          ),
-                                          behavior: SnackBarBehavior.floating,
-                                        ),
-                                      );
-                                    },
-                                    onDownloadPrescription: () {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            'Prescription download started for ${appointment.tokenNumber}.',
-                                          ),
-                                          behavior: SnackBarBehavior.floating,
-                                        ),
-                                      );
-                                    },
-                                  );
-                                },
-                              );
-                            },
-                          ),
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      'Thanks! You rated ${appointment.doctorName} $rating stars.',
+                                    ),
+                                    behavior: SnackBarBehavior.floating,
+                                  ),
+                                );
+                              },
+                              onDownloadPrescription: () {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      'Prescription download started for ${appointment.tokenNumber}.',
+                                    ),
+                                    behavior: SnackBarBehavior.floating,
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        );
+                      },
+                    ),
                   ),
                 ],
               ),

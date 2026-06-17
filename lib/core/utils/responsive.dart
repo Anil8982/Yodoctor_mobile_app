@@ -21,7 +21,7 @@ class Responsive {
   static double horizontalPadding(BuildContext context) {
     if (isDesktop(context)) return 40;
     if (isTablet(context)) return 28;
-    return 20;
+    return 15;
   }
 }
 

@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/utils/dummy_data.dart';
 import 'package:yodoctor/modules/patient/controllers/certificate_request.dart';
 import 'certificate_type_card.dart';
 import 'step_header_helper.dart';
-import 'custom_text_field.dart'; // Navin text widget import kela
+import 'custom_text_field.dart';
 
-class Step1TypeSelection extends StatelessWidget {
+class Step1TypeSelection extends ConsumerWidget {
   final GlobalKey<FormState> formKey;
-  final CertificateController controller;
+  final CertificateNotifier controller;
 
   Step1TypeSelection({super.key, required this.formKey, required this.controller});
 
@@ -20,8 +21,11 @@ class Step1TypeSelection extends StatelessWidget {
   ];
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
+
+    // Watch current form state reactively from provider
+    final formState = ref.watch(certificateProvider);
 
     return Form(
       key: formKey,
@@ -46,14 +50,15 @@ class Step1TypeSelection extends StatelessWidget {
                 title: type['title'],
                 description: type['desc'],
                 icon: type['icon'],
-                isSelected: controller.selectedType == type['title'],
+                // Read reactive properties from formState payload safely
+                isSelected: formState.selectedType == type['title'],
                 onTap: () => controller.setSelectedType(type['title']),
               );
             },
           ),
           const SizedBox(height: 28),
           DropdownButtonFormField<DoctorProfile>(
-            initialValue: controller.assignedDoctor,
+            initialValue: formState.assignedDoctor,
             decoration: InputDecoration(
               labelText: 'Assigned Doctor *',
               prefixIcon: const Icon(Icons.person_search_rounded, size: 22),
@@ -70,7 +75,7 @@ class Step1TypeSelection extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           DropdownButtonFormField<String>(
-            initialValue: controller.purpose,
+            initialValue: formState.purpose,
             decoration: InputDecoration(
               labelText: 'Purpose of Certificate *',
               prefixIcon: const Icon(Icons.assignment_turned_in_rounded, size: 22),

@@ -1,17 +1,19 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:yodoctor/core/theme/app_theme.dart' hide AppRole;
+import 'package:yodoctor/core/providers/app_role_provider.dart';
 import 'package:yodoctor/modules/auth/widgets/auth_widgets.dart';
 
-class PatientRegisterScreen extends StatefulWidget {
+class PatientRegisterScreen extends ConsumerStatefulWidget {
   const PatientRegisterScreen({super.key});
 
   @override
-  State<PatientRegisterScreen> createState() => _PatientRegisterScreenState();
+  ConsumerState<PatientRegisterScreen> createState() => _PatientRegisterScreenState();
 }
 
-class _PatientRegisterScreenState extends State<PatientRegisterScreen>
+class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
     with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
 
@@ -76,6 +78,14 @@ class _PatientRegisterScreenState extends State<PatientRegisterScreen>
     setState(() => _isLoading = true);
     await Future.delayed(const Duration(seconds: 2));
     setState(() => _isLoading = false);
+
+    if (!mounted) return;
+
+    // 🎯 FIX: Update the global role state to patient using the manual notifier configuration channel
+    ref.read(appRoleProvider.notifier).setRole(AppRole.patient);
+
+    // Context flow router pipeline transitions immediately following profile setup parameters boundary
+    // context.go(AppRoutes.dashboard);
   }
 
   Future<void> _pickDateOfBirth() async {
@@ -300,7 +310,7 @@ class _PatientRegisterScreenState extends State<PatientRegisterScreen>
                                               color: _selectedDOB != null
                                                   ? colorScheme.onSurface
                                                   : colorScheme.onSurfaceVariant
-                                                        .transparency(0.65),
+                                                  .transparency(0.65),
                                             ),
                                           ),
                                           const Spacer(),
@@ -413,10 +423,10 @@ class _PatientRegisterScreenState extends State<PatientRegisterScreen>
                                       ),
                                       child: _agreedToTerms
                                           ? Icon(
-                                              Icons.check,
-                                              color: colorScheme.onPrimary,
-                                              size: 14,
-                                            )
+                                        Icons.check,
+                                        color: colorScheme.onPrimary,
+                                        size: 14,
+                                      )
                                           : null,
                                     ),
                                     const SizedBox(width: 10),
