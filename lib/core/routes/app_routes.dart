@@ -330,7 +330,6 @@
 
 
 
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/utils/dummy_data.dart';
@@ -498,6 +497,7 @@ class AppRouter {
         path: AppRoutes.doctorCertificateReview,
         builder: (context, state) => const CertificateReviewScreen(),
       ),
+      // 🎯 मॅन्युअल बुकिंगची स्क्रीन जर स्वतंत्रपणे कुठे पुश करायची असेल तर हा राऊट इथेच राहील भाऊ
       GoRoute(
         path: AppRoutes.doctorManualBooking,
         builder: (context, state) => const ManualBookingScreen(),
@@ -585,11 +585,13 @@ class AppRouter {
           ),
         ],
       ),
+      // 🎯 Doctor Side Shell
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return DoctorScaffoldShell(navigationShell: navigationShell);
         },
         branches: [
+          // Index 0: Dashboard
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -598,6 +600,7 @@ class AppRouter {
               ),
             ],
           ),
+          // Index 1: Appointment History
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -606,14 +609,7 @@ class AppRouter {
               ),
             ],
           ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: AppRoutes.doctorManualBooking,
-                builder: (context, state) => const ManualBookingScreen(),
-              ),
-            ],
-          ),
+          // Index 2: Certificates Dashboard
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -622,6 +618,7 @@ class AppRouter {
               ),
             ],
           ),
+          // Index 3: Reviews Dashboard
           StatefulShellBranch(
             routes: [
               GoRoute(

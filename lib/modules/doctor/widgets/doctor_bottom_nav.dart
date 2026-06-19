@@ -21,26 +21,6 @@ class DoctorBottomNav {
         inactiveColorPrimary: colorScheme.onSurfaceVariant,
       ),
       PersistentBottomNavBarItem(
-        icon: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: colorScheme.primary,
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: colorScheme.primary.withValues(alpha: 0.35),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              )
-            ],
-          ),
-          child: Icon(Icons.qr_code_rounded, color: colorScheme.onPrimary, size: 26),
-        ),
-        title: "QR Code",
-        activeColorPrimary: colorScheme.primary,
-        inactiveColorPrimary: colorScheme.onSurfaceVariant,
-      ),
-      PersistentBottomNavBarItem(
         icon: const Icon(Icons.wallet_membership_rounded),
         title: "Certificates",
         activeColorPrimary: colorScheme.primary,
@@ -52,7 +32,6 @@ class DoctorBottomNav {
         activeColorPrimary: colorScheme.primary,
         inactiveColorPrimary: colorScheme.onSurfaceVariant,
       ),
-
     ];
   }
 }
