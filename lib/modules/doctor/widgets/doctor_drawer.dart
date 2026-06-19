@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 import '../../../core/routes/app_routes.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/app_spacing.dart';
-// 🎯 आपल्या नवीन मॉडेलचा इम्पोर्ट (तुझ्या पाथनुसार ॲडजस्ट कर भाऊ)
 import '../../../core/models/doctor/doctor_dashboard_profile.dart';
 
 class DoctorDrawer extends StatelessWidget {
@@ -17,7 +16,6 @@ class DoctorDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-
     final String currentRoute = GoRouterState.of(context).uri.toString();
 
     return Drawer(
@@ -95,7 +93,6 @@ class DoctorDrawer extends StatelessWidget {
                 ],
               ),
             ),
-
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
@@ -147,7 +144,15 @@ class DoctorDrawer extends StatelessWidget {
                     selected: currentRoute.contains('certificate'),
                     onTap: () {
                       Navigator.pop(context);
-                      // context.push(AppRoutes.doctorCertificateDashboard);
+                    },
+                  ),
+                  _DoctorDrawerItem(
+                    icon: Icons.workspace_premium_rounded,
+                    label: 'My Subscription',
+                    selected: currentRoute == AppRoutes.doctorSubscription,
+                    onTap: () {
+                      Navigator.pop(context);
+                      context.push(AppRoutes.doctorSubscription);
                     },
                   ),
                   Padding(
@@ -167,7 +172,6 @@ class DoctorDrawer extends StatelessWidget {
                 ],
               ),
             ),
-
             Padding(
               padding: const EdgeInsets.all(AppSpacing.lg),
               child: Text(

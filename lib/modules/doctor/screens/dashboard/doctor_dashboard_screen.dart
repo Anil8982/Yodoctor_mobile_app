@@ -33,8 +33,6 @@ class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-
-    // Watch AsyncValue from Riverpod provider
     final dashboardAsync = ref.watch(doctorDashboardProvider);
 
     return dashboardAsync.when(
@@ -126,8 +124,7 @@ class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
                   icon: Icons.format_list_bulleted_rounded,
                   title: 'Today\'s Queue',
                   subtitle: 'View and manage live patient queue',
-                  onTap: widget.onOpenAppointments ??
-                          () => context.push(AppRoutes.doctorAppointments),
+                  onTap: () => context.push(AppRoutes.doctorLiveQueue),
                 ),
               ),
               const SizedBox(width: AppSpacing.md),
@@ -255,8 +252,7 @@ class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
                   icon: Icons.format_list_bulleted_rounded,
                   title: 'Today\'s Queue',
                   subtitle: 'View and manage live patient queue',
-                  onTap: widget.onOpenAppointments ??
-                          () => context.push(AppRoutes.doctorAppointments),
+                  onTap: () => context.push(AppRoutes.doctorLiveQueue),
                 ),
               ),
               SizedBox(

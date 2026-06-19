@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
 import 'package:yodoctor/core/utils/responsive.dart';
-import '../doctor_appointment_history_screen.dart';
+import '../../../controllers/appointment_history_controller.dart';
 
 class HistoryToolbar extends StatelessWidget {
   const HistoryToolbar({
@@ -43,7 +43,10 @@ class HistoryToolbar extends StatelessWidget {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          SingleChildScrollView(scrollDirection: Axis.horizontal, child: filterBar),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: filterBar,
+          ),
           const SizedBox(height: AppSpacing.sm),
           searchField,
         ],

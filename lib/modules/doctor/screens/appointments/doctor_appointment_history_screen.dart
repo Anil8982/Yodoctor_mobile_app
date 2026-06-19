@@ -1,4 +1,7 @@
+import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/utils/app_spacing.dart';
 import '../../../../core/utils/dummy_data.dart';
@@ -6,23 +9,21 @@ import '../../../../core/utils/responsive.dart';
 import '../../widgets/doctor_drawer.dart';
 import '../../widgets/doctor_sliver_app_bar.dart';
 
+import '../../controllers/appointment_history_controller.dart';
 import 'widgets/history_toolbar.dart';
 import 'widgets/appointment_history_table.dart';
 import 'widgets/mobile_appointment_list.dart';
 
-enum DoctorAppointmentFilter { today, lastSevenDays, all }
-
-class DoctorAppointmentHistoryScreen extends StatefulWidget {
+class DoctorAppointmentHistoryScreen extends ConsumerStatefulWidget {
   const DoctorAppointmentHistoryScreen({super.key});
 
   @override
-  State<DoctorAppointmentHistoryScreen> createState() => _DoctorAppointmentHistoryScreenState();
+  ConsumerState<DoctorAppointmentHistoryScreen> createState() => _DoctorAppointmentHistoryScreenState();
 }
 
-class _DoctorAppointmentHistoryScreenState extends State<DoctorAppointmentHistoryScreen> {
+class _DoctorAppointmentHistoryScreenState extends ConsumerState<DoctorAppointmentHistoryScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final TextEditingController _searchController = TextEditingController();
-  DoctorAppointmentFilter _selectedFilter = DoctorAppointmentFilter.all;
 
   @override
   void dispose() {
@@ -34,8 +35,12 @@ class _DoctorAppointmentHistoryScreenState extends State<DoctorAppointmentHistor
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final appointments = _filteredAppointments();
     final double horizontalPadding = Responsive.horizontalPadding(context);
+
+    final historyState = ref.watch(appointmentHistoryProvider);
+    final historyNotifier = ref.read(appointmentHistoryProvider.notifier);
+    final filteredAppointments = historyNotifier.getFilteredHistory();
+
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: colorScheme.surfaceContainer,
@@ -84,17 +89,17 @@ class _DoctorAppointmentHistoryScreenState extends State<DoctorAppointmentHistor
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           HistoryToolbar(
-                            selectedFilter: _selectedFilter,
+                            selectedFilter: historyState.selectedFilter,
                             searchController: _searchController,
-                            onFilterChanged: (filter) => setState(() => _selectedFilter = filter),
-                            onSearchChanged: (_) => setState(() {}),
+                            onFilterChanged: historyNotifier.setFilter,
+                            onSearchChanged: historyNotifier.setSearchQuery,
                           ),
                           const SizedBox(height: AppSpacing.lg),
-                          if (appointments.isEmpty)
+                          if (filteredAppointments.isEmpty)
                             const _EmptyHistory()
                           else if (Responsive.isMobile(context))
                             MobileAppointmentList(
-                              appointments: appointments,
+                              appointments: filteredAppointments,
                               onPrescriptionTap: _openPrescription,
                               patientIdentityBuilder: _buildPatientIdentity,
                               statusChipBuilder: _buildStatusChip,
@@ -103,7 +108,7 @@ class _DoctorAppointmentHistoryScreenState extends State<DoctorAppointmentHistor
                             )
                           else
                             AppointmentHistoryTable(
-                              appointments: appointments,
+                              appointments: filteredAppointments,
                               onPrescriptionTap: _openPrescription,
                               patientNameParser: _patientName,
                               patientIdentityBuilder: _buildPatientIdentity,
@@ -121,33 +126,6 @@ class _DoctorAppointmentHistoryScreenState extends State<DoctorAppointmentHistor
         ),
       ),
     );
-  }
-
-  List<AppointmentHistoryItem> _filteredAppointments() {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final query = _searchController.text.trim().toLowerCase();
-
-    return DummyData.appointmentHistory.where((appointment) {
-      final appointmentDay = DateTime(
-        appointment.date.year,
-        appointment.date.month,
-        appointment.date.day,
-      );
-      final matchesDate = switch (_selectedFilter) {
-        DoctorAppointmentFilter.today => appointmentDay == today,
-        DoctorAppointmentFilter.lastSevenDays =>
-        !appointmentDay.isBefore(today.subtract(const Duration(days: 7))) &&
-            !appointmentDay.isAfter(today),
-        DoctorAppointmentFilter.all => true,
-      };
-      final matchesSearch = query.isEmpty ||
-          appointment.patientLabel.toLowerCase().contains(query) ||
-          appointment.tokenNumber.toLowerCase().contains(query) ||
-          appointment.status.toLowerCase().contains(query);
-
-      return matchesDate && matchesSearch;
-    }).toList();
   }
 
   Widget _buildPatientIdentity(AppointmentHistoryItem appointment) {
@@ -208,19 +186,31 @@ class _DoctorAppointmentHistoryScreenState extends State<DoctorAppointmentHistor
 
   Widget _buildStatusChip(String status) {
     final colorScheme = Theme.of(context).colorScheme;
-    final completed = status.toUpperCase() == 'COMPLETED';
-    final foreground = completed ? colorScheme.secondary : colorScheme.error;
-    final background = completed ? colorScheme.secondaryContainer : colorScheme.errorContainer;
+    final statusUpper = status.toUpperCase();
+    final completed = statusUpper == 'COMPLETED';
+    final cancelled = statusUpper == 'CANCELLED';
+
+    final foreground = completed
+        ? colorScheme.secondary
+        : cancelled
+        ? colorScheme.error
+        : Colors.orange;
+
+    final background = completed
+        ? colorScheme.secondaryContainer
+        : cancelled
+        ? colorScheme.errorContainer
+        : Colors.orange.transparency(0.15);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
       decoration: BoxDecoration(
-        color: background.withValues(alpha: 0.65),
+        color: background,
         borderRadius: BorderRadius.circular(99),
         border: Border.all(color: foreground.withValues(alpha: 0.2)),
       ),
       child: Text(
-        completed ? 'Completed' : 'Cancelled',
+        status,
         style: Theme.of(context).textTheme.labelMedium?.copyWith(
           color: foreground,
           fontWeight: FontWeight.w800,
@@ -248,55 +238,61 @@ class _DoctorAppointmentHistoryScreenState extends State<DoctorAppointmentHistor
     );
   }
 
+  // void _openPrescription(AppointmentHistoryItem appointment) {
+  //   showModalBottomSheet<void>(
+  //     context: context,
+  //     showDragHandle: true,
+  //     builder: (context) {
+  //       final theme = Theme.of(context);
+  //       final colorScheme = theme.colorScheme;
+  //
+  //       return Padding(
+  //         padding: const EdgeInsets.fromLTRB(AppSpacing.xl, 0, AppSpacing.xl, AppSpacing.xxl),
+  //         child: Column(
+  //           mainAxisSize: MainAxisSize.min,
+  //           children: [
+  //             Icon(Icons.receipt_long_rounded, size: 44, color: colorScheme.primary),
+  //             const SizedBox(height: AppSpacing.md),
+  //             Text(
+  //               'Prescription',
+  //               style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900),
+  //             ),
+  //             const SizedBox(height: AppSpacing.xs),
+  //             Text(
+  //               'Create a prescription for ${_patientName(appointment.patientLabel)}.',
+  //               textAlign: TextAlign.center,
+  //               style: theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
+  //             ),
+  //             const SizedBox(height: AppSpacing.xl),
+  //             SizedBox(
+  //               width: double.infinity,
+  //               child: FilledButton.icon(
+  //                 onPressed: () {
+  //                   Navigator.pop(context);
+  //                   _showMessage('Prescription editor coming soon');
+  //                 },
+  //                 icon: const Icon(Icons.add_rounded),
+  //                 label: const Text('Create Prescription'),
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
+
   void _openPrescription(AppointmentHistoryItem appointment) {
-    showModalBottomSheet<void>(
-      context: context,
-      showDragHandle: true,
-      builder: (context) {
-        final theme = Theme.of(context);
-        final colorScheme = theme.colorScheme;
-
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(AppSpacing.xl, 0, AppSpacing.xl, AppSpacing.xxl),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.receipt_long_rounded, size: 44, color: colorScheme.primary),
-              const SizedBox(height: AppSpacing.md),
-              Text(
-                'Prescription',
-                style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900),
-              ),
-              const SizedBox(height: AppSpacing.xs),
-              Text(
-                'Create a prescription for ${_patientName(appointment.patientLabel)}.',
-                textAlign: TextAlign.center,
-                style: theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
-              ),
-              const SizedBox(height: AppSpacing.xl),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton.icon(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    _showMessage('Prescription editor coming soon');
-                  },
-                  icon: const Icon(Icons.add_rounded),
-                  label: const Text('Create Prescription'),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
+    context.push(
+      '/doctor/add-prescription/${appointment.id}?name=${Uri.encodeComponent(appointment.patientLabel)}&token=${Uri.encodeComponent(appointment.tokenNumber)}',
     );
   }
-
-  void _showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
-  }
+  //
+  // void _showMessage(String message) {
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     SnackBar(content: Text(message)),
+  //   );
+  // }
 
   String _patientName(String label) {
     return label.replaceAll(RegExp(r'\s*\([^)]*\)'), '').trim();

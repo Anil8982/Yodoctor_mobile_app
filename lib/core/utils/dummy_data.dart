@@ -5,6 +5,10 @@ export '../models/patient/patient_appointment.dart';
 export '../models/patient/patient_dashboard_data.dart';
 export '../models/patient/patient_token.dart';
 export '../models/patient/patient_user.dart';
+import 'package:flutter/material.dart';
+import 'package:yodoctor/core/models/doctor/review_item.dart';
+import 'package:yodoctor/core/models/notification_item.dart';
+
 import '../models/doctor/doctor_dashboard_profile.dart';
 import '../models/doctor/doctor_dashboard_data.dart';
 import '../models/medical_certificate.dart';
@@ -81,11 +85,112 @@ class DummyData {
 
   static final List<AppointmentHistoryItem> appointmentHistory = <AppointmentHistoryItem>[
     AppointmentHistoryItem(
+      id: 'HIS-2026-T1',
+      doctorName: 'Dr. Rahul Verma',
+      specialty: 'Orthopedic',
+      patientLabel: 'Aditya Patil (24M)',
+      date: DateTime.now(),
+      shift: 'Morning Shift',
+      status: 'COMPLETED',
+      tokenNumber: '01',
+    ),
+    AppointmentHistoryItem(
+      id: 'HIS-2026-T2',
+      doctorName: 'Dr. Rahul Verma',
+      specialty: 'Orthopedic',
+      patientLabel: 'Sakshi Deshmukh (22F)',
+      date: DateTime.now(),
+      shift: 'Morning Shift',
+      status: 'IN PROGRESS',
+      tokenNumber: '02',
+    ),
+    AppointmentHistoryItem(
+      id: 'HIS-2026-T3',
+      doctorName: 'Dr. Rahul Verma',
+      specialty: 'Orthopedic',
+      patientLabel: 'Anil Kushwaha (Self)',
+      date: DateTime.now(),
+      shift: 'Morning Shift',
+      status: 'WAITING',
+      tokenNumber: '03',
+    ),
+    AppointmentHistoryItem(
+      id: 'HIS-2026-T4',
+      doctorName: 'Dr. Rahul Verma',
+      specialty: 'Orthopedic',
+      patientLabel: 'Sagar Jadhav (30M)',
+      date: DateTime.now(),
+      shift: 'Morning Shift',
+      status: 'WAITING',
+      tokenNumber: '04',
+    ),
+    AppointmentHistoryItem(
+      id: 'HIS-2026-T5',
+      doctorName: 'Dr. Rahul Verma',
+      specialty: 'Orthopedic',
+      patientLabel: 'Rohan Shinde (27M)',
+      date: DateTime.now(),
+      shift: 'Morning Shift',
+      status: 'SKIPPED',
+      tokenNumber: '05',
+    ),
+    AppointmentHistoryItem(
+      id: 'HIS-2026-T6',
+      doctorName: 'Dr. Rahul Verma',
+      specialty: 'Orthopedic',
+      patientLabel: 'Kiran Pawar (35F)',
+      date: DateTime.now(),
+      shift: 'Morning Shift',
+      status: 'WAITING',
+      tokenNumber: '06',
+    ),
+    AppointmentHistoryItem(
+      id: 'HIS-2026-T7',
+      doctorName: 'Dr. Rahul Verma',
+      specialty: 'Orthopedic',
+      patientLabel: 'Vijay Kale (42M)',
+      date: DateTime.now(),
+      shift: 'Evening Shift',
+      status: 'WAITING',
+      tokenNumber: '07',
+    ),
+    AppointmentHistoryItem(
+      id: 'HIS-2026-T8',
+      doctorName: 'Dr. Rahul Verma',
+      specialty: 'Orthopedic',
+      patientLabel: 'Sneha Kulkarni (29F)',
+      date: DateTime.now(),
+      shift: 'Evening Shift',
+      status: 'CANCELLED',
+      tokenNumber: '08',
+    ),
+    AppointmentHistoryItem(
+      id: 'HIS-2026-T9',
+      doctorName: 'Dr. Rahul Verma',
+      specialty: 'Orthopedic',
+      patientLabel: 'Amol Joshi (50M)',
+      date: DateTime.now(),
+      shift: 'Evening Shift',
+      status: 'WAITING',
+      tokenNumber: '09',
+    ),
+    AppointmentHistoryItem(
+      id: 'HIS-2026-T10',
+      doctorName: 'Dr. Rahul Verma',
+      specialty: 'Orthopedic',
+      patientLabel: 'Pooja Rathi (31F)',
+      date: DateTime.now(),
+      shift: 'Evening Shift',
+      status: 'WAITING',
+      tokenNumber: '10',
+    ),
+
+    AppointmentHistoryItem(
       id: 'HIS-1',
       doctorName: 'Dr. Praveen Singh',
       specialty: 'Dermatologist',
       patientLabel: 'Ajay (Family)',
-      date: DateTime(2026, 5, 6),
+      date: DateTime(2026, 6, 15),
       shift: 'EVENING',
       tokenNumber: '#4',
       status: 'COMPLETED',
@@ -95,7 +200,7 @@ class DummyData {
       doctorName: 'Dr. Praveen Singh',
       specialty: 'Dermatologist',
       patientLabel: 'Vineet Kushwaha (Self)',
-      date: DateTime(2026, 5, 6),
+      date: DateTime(2026, 6, 12),
       shift: 'EVENING',
       tokenNumber: '#3',
       status: 'COMPLETED',
@@ -105,7 +210,7 @@ class DummyData {
       doctorName: 'Dr. Praveen Singh',
       specialty: 'Dermatologist',
       patientLabel: 'Ajay (Family)',
-      date: DateTime(2026, 4, 28),
+      date: DateTime(2026, 6, 10),
       shift: 'EVENING',
       tokenNumber: '#3',
       status: 'COMPLETED',
@@ -115,7 +220,7 @@ class DummyData {
       doctorName: 'Dr. Praveen Singh',
       specialty: 'Dermatologist',
       patientLabel: 'Ajay (Family)',
-      date: DateTime(2026, 4, 28),
+      date: DateTime(2026, 5, 28),
       shift: 'EVENING',
       tokenNumber: '#2',
       status: 'COMPLETED',
@@ -125,13 +230,32 @@ class DummyData {
       doctorName: 'Dr. Praveen Singh',
       specialty: 'Dermatologist',
       patientLabel: 'Vineet Kushwaha (Self)',
-      date: DateTime(2026, 4, 28),
+      date: DateTime(2026, 5, 25),
       shift: 'EVENING',
       tokenNumber: '#1',
       status: 'COMPLETED',
     ),
+    AppointmentHistoryItem(
+      id: 'HIS-6',
+      doctorName: 'Dr. Rahul Verma',
+      specialty: 'Orthopedic',
+      patientLabel: 'Deepak Chaudhari (38M)',
+      date: DateTime(2026, 5, 20),
+      shift: 'MORNING',
+      tokenNumber: '#7',
+      status: 'CANCELLED',
+    ),
+    AppointmentHistoryItem(
+      id: 'HIS-7',
+      doctorName: 'Dr. Rahul Verma',
+      specialty: 'Orthopedic',
+      patientLabel: 'Nisha Sethi (45F)',
+      date: DateTime(2026, 5, 18),
+      shift: 'EVENING',
+      tokenNumber: '#11',
+      status: 'COMPLETED',
+    ),
   ];
-
   static const List<DoctorProfile> allDoctors = <DoctorProfile>[
     DoctorProfile(
       id: 'DOC-1',
@@ -394,6 +518,78 @@ class DummyData {
       {'type': 'Government ID Proof', 'status': 'Uploaded', 'fileName': 'aadhar.jpg'},
     ],
   );
+
+
+
+  static final List<NotificationItem> dummyNotifications = <NotificationItem>[
+    NotificationItem(
+      id: 'NOTIF-1',
+      title: 'New Booking Request',
+      description: 'Aditya Patil has booked an appointment for Morning Shift.',
+      timestamp: DateTime.now().subtract(const Duration(minutes: 15)),
+      icon: Icons.calendar_today_rounded,
+      iconColor: Colors.blue,
+    ),
+    NotificationItem(
+      id: 'NOTIF-2',
+      title: 'Emergency Token Alert',
+      description: 'Token #04 (Sagar Jadhav) requires immediate priority attention.',
+      timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+      icon: Icons.emergency_rounded,
+      iconColor: Colors.red,
+    ),
+    NotificationItem(
+      id: 'NOTIF-3',
+      title: 'Certificate Request',
+      description: 'Sakshi Deshmukh submitted a medical fitness certificate request.',
+      timestamp: DateTime.now().subtract(const Duration(hours: 3)),
+      icon: Icons.assignment_ind_rounded,
+      iconColor: Colors.purple,
+    ),
+    NotificationItem(
+      id: 'NOTIF-4',
+      title: 'Subscription Renewed',
+      description: 'Your YoDoctor premium plan has been successfully renewed.',
+      timestamp: DateTime.now().subtract(const Duration(days: 1)),
+      icon: Icons.verified_user_rounded,
+      iconColor: Colors.green,
+      isRead: true,
+    ),
+    NotificationItem(
+      id: 'NOTIF-5',
+      title: 'System Update',
+      description: 'Version 1.0.4 is now live with enhanced offline capabilities.',
+      timestamp: DateTime.now().subtract(const Duration(days: 3)),
+      icon: Icons.system_update_rounded,
+      iconColor: Colors.orange,
+      isRead: true,
+    ),
+  ];
+
+
+  static final List<ReviewItem> dummyReviews = <ReviewItem>[
+    ReviewItem(
+      id: 'REV-1',
+      patientName: 'Aditya Patil',
+      rating: 5.0,
+      comment: 'Excellent doctor! Dr. Verma explained the orthopedic diagnosis very clearly and the treatment plan worked perfectly.',
+      date: DateTime.now().subtract(const Duration(days: 2)),
+    ),
+    ReviewItem(
+      id: 'REV-2',
+      patientName: 'Sakshi Deshmukh',
+      rating: 4.5,
+      comment: 'Very professional environment. The live token system helped reduce the waiting time drastically.',
+      date: DateTime.now().subtract(const Duration(days: 5)),
+    ),
+    ReviewItem(
+      id: 'REV-3',
+      patientName: 'Sagar Jadhav',
+      rating: 4.0,
+      comment: 'Good experience, highly recommended for joint pain issues.',
+      date: DateTime.now().subtract(const Duration(days: 12)),
+    ),
+  ];
 
   static DoctorDashboardData _doctorDashboardData = DoctorDashboardData(
     doctor: currentDoctorProfile,

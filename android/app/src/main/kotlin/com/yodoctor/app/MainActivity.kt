@@ -1,4 +1,4 @@
-package in.yodoctor.app
+package com.yodoctor.app
 
 import io.flutter.embedding.android.FlutterActivity
 

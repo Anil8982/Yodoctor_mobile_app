@@ -73,7 +73,9 @@ class MobileAppointmentList extends StatelessWidget {
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton.icon(
-                    onPressed: () => onPrescriptionTap(appointment),
+                    onPressed: () {
+                      onPrescriptionTap(appointment);
+                    },
                     icon: const Icon(Icons.add_rounded),
                     label: const Text('Prescription'),
                   ),

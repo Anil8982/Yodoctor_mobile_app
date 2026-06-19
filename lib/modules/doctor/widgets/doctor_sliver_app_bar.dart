@@ -51,7 +51,9 @@ class DoctorSliverAppBar extends StatelessWidget {
           const Spacer(),
           _DoctorHeaderAction(
             icon: Icons.notifications_outlined,
-            onTap: onNotificationTap ?? () => _showMessage(context, 'Notifications coming soon'),
+            onTap: onNotificationTap ?? () {
+              context.push(AppRoutes.doctorNotifications);
+              },
           ),
           if (isNavBar) ...[
             const SizedBox(width: 12),
@@ -73,11 +75,11 @@ class DoctorSliverAppBar extends StatelessWidget {
     );
   }
 
-  void _showMessage(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
-  }
+  // void _showMessage(BuildContext context, String message) {
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     SnackBar(content: Text(message)),
+  //   );
+  // }
 }
 
 class _DoctorHeaderAction extends StatelessWidget {
