@@ -3,8 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'package:yodoctor/modules/patient/screens/dashboard/dashboard_screen.dart';
 import 'package:yodoctor/modules/patient/screens/certificates/certificate_wallet_screen.dart';
-import 'package:yodoctor/modules/patient/screens/family/family_members_screen.dart';
 import 'package:yodoctor/modules/patient/screens/history/appointments_history_screen.dart';
+import 'package:yodoctor/modules/patient/screens/services/services_screen.dart';
 import 'package:yodoctor/modules/patient/widgets/patient_bottom_nav.dart';
 
 class PatientScaffoldShell extends StatefulWidget {
@@ -45,7 +45,8 @@ class _PatientScaffoldShellState extends State<PatientScaffoldShell> {
       DashboardScreen(),
       const CertificateWalletScreen(),
       const Scaffold(body: SizedBox.shrink()),
-      const FamilyMembersScreen(),
+      // const FamilyMembersScreen(),
+      const ServicesScreen(),
       const AppointmentsHistoryScreen(),
     ];
   }

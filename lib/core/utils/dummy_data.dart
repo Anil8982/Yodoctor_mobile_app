@@ -8,6 +8,7 @@ export '../models/patient/patient_user.dart';
 import 'package:flutter/material.dart';
 import 'package:yodoctor/core/models/doctor/review_item.dart';
 import 'package:yodoctor/core/models/notification_item.dart';
+import 'package:yodoctor/core/models/patient/lab_test_model.dart';
 
 import '../models/doctor/doctor_dashboard_profile.dart';
 import '../models/doctor/doctor_dashboard_data.dart';
@@ -668,4 +669,65 @@ class DummyData {
     await Future<void>.delayed(const Duration(milliseconds: 100));
     _doctorDashboardData = _doctorDashboardData.copyWith(isAvailable: available);
   }
+
+
+  static const List<LabCategory> labCategories = [
+    LabCategory(id: 'all', name: 'All Tests', icon: Icons.grid_view_rounded),
+    LabCategory(id: 'blood', name: 'Blood Tests', icon: Icons.bloodtype_rounded),
+    LabCategory(id: 'diabetes', name: 'Diabetes', icon: Icons.water_drop_rounded),
+    LabCategory(id: 'fullbody', name: 'Full Body', icon: Icons.accessibility_new_rounded),
+    LabCategory(id: 'heart', name: 'Heart', icon: Icons.favorite_rounded),
+  ];
+
+  static const List<LabPackage> labPackages = [
+    LabPackage(
+      id: 'PKG-1',
+      title: 'Full Body Checkup Advanced',
+      subtitle: 'Comprehensive health screening with 85+ parameters',
+      originalPrice: 3499.0,
+      currentPrice: 1499.0,
+      discountPercentage: 57,
+      parametersCount: 85,
+      reportDuration: '24-48 hrs',
+      homeSampleAvailable: true,
+      categoryId: 'fullbody',
+    ),
+    LabPackage(
+      id: 'TEST-1',
+      title: 'CBC (Complete Blood Count)',
+      subtitle: 'Detect anemia, infection & overall health status',
+      originalPrice: 500.0,
+      currentPrice: 200.0,
+      discountPercentage: 60,
+      parametersCount: 23,
+      reportDuration: '24 Hours',
+      homeSampleAvailable: true,
+      categoryId: 'blood',
+    ),
+    LabPackage(
+      id: 'TEST-2',
+      title: 'Liver Function Test (LFT)',
+      subtitle: 'Evaluate liver health and function',
+      originalPrice: 1200.0,
+      currentPrice: 850.0,
+      discountPercentage: 29,
+      parametersCount: 12,
+      reportDuration: '24 Hours',
+      homeSampleAvailable: true,
+      categoryId: 'blood',
+    ),
+    LabPackage(
+      id: 'TEST-3',
+      title: 'HbA1c (Glycated Haemoglobin)',
+      subtitle: 'Average blood sugar levels over past 3 months',
+      originalPrice: 600.0,
+      currentPrice: 299.0,
+      discountPercentage: 50,
+      parametersCount: 1,
+      reportDuration: '24 Hours',
+      homeSampleAvailable: true,
+      categoryId: 'diabetes',
+    ),
+  ];
+
 }

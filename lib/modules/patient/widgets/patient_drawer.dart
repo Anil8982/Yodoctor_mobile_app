@@ -76,6 +76,18 @@ class PatientDrawer extends StatelessWidget {
                     context.push(AppRoutes.history);
                   },
                 ),
+
+                _buildDrawerItem(
+                  context,
+                  icon: Icons.family_restroom_rounded,
+                  label: 'Family Members',
+                  colorScheme: colorScheme,
+                  onTap: () {
+                    Navigator.pop(context);
+                    context.push(AppRoutes.family);
+                  },
+                ),
+
                 _buildDrawerItem(
                   context,
                   icon: Icons.card_membership_rounded,
