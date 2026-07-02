@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../../../../core/models/patient_appointment.dart';
+import '../../../../../core/models/patient/patient_appointment.dart';
 
 class AppointmentDetailsDialog extends StatelessWidget {
   const AppointmentDetailsDialog({super.key, required this.appointment});

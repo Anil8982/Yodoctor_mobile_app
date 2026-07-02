@@ -1,51 +1,65 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/utils/dummy_data.dart';
 
-class PatientDashboardController extends ChangeNotifier {
+// 🎯 Unified immutable state structure holding dashboard data payload and dynamic criteria keys
+class PatientDashboardState {
+  final PatientDashboardData? dashboardData;
+  final String selectedFilter;
+
+  PatientDashboardState({
+    this.dashboardData,
+    this.selectedFilter = 'All',
+  });
+
+  PatientDashboardState copyWith({
+    PatientDashboardData? dashboardData,
+    String? selectedFilter,
+  }) {
+    return PatientDashboardState(
+      dashboardData: dashboardData ?? this.dashboardData,
+      selectedFilter: selectedFilter ?? this.selectedFilter,
+    );
+  }
+}
+
+// 🎯 FIX: Extended manual AsyncNotifier base class to handle asynchronous state pipelines safely
+class PatientDashboardNotifier extends AsyncNotifier<PatientDashboardState> {
+
   static const List<String> availableFilters = <String>[
     'All',
     'Today',
     'Next 7 Days',
   ];
 
-  bool _isLoading = false;
-  String? _errorMessage;
-  PatientDashboardData? _dashboardData;
-  String _selectedFilter = 'All';
-
-  bool get isLoading => _isLoading;
-  String? get errorMessage => _errorMessage;
-  PatientDashboardData? get dashboardData => _dashboardData;
-  String get selectedFilter => _selectedFilter;
-
-
-  PatientDashboardController() {
-    loadDashboard();
+  @override
+  Future<PatientDashboardState> build() async {
+    // Automatically triggers initial dashboard data query on build cycle setup
+    final data = await DummyData.getDashboardData(filter: 'All');
+    return PatientDashboardState(dashboardData: data, selectedFilter: 'All');
   }
 
+  // Explicitly fetch or reload repository dashboard data items
   Future<void> loadDashboard({String? filter}) async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
+    final currentFilter = filter ?? state.value?.selectedFilter ?? 'All';
 
-    if (filter != null) {
-      _selectedFilter = filter;
-    }
-
-    try {
-      _dashboardData = await DummyData.getDashboardData(
-        filter: _selectedFilter,
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final data = await DummyData.getDashboardData(filter: currentFilter);
+      return PatientDashboardState(
+        dashboardData: data,
+        selectedFilter: currentFilter,
       );
-    } catch (_) {
-      _errorMessage = 'Unable to load dashboard data. Please try again.';
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
+    });
   }
 
+  // Set active filter criteria and trigger background reload loop
   Future<void> setFilter(String filter) async {
-    if (_selectedFilter == filter) return;
+    if (state.value?.selectedFilter == filter) return;
     await loadDashboard(filter: filter);
   }
 }
+
+// 🎯 Provider registration mapping clean manual notifier architecture setup
+final patientDashboardProvider = AsyncNotifierProvider.autoDispose<PatientDashboardNotifier, PatientDashboardState>(
+  PatientDashboardNotifier.new,
+);

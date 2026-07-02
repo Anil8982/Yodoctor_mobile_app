@@ -1,10 +1,11 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/modules/patient/controllers/profile_controller.dart';
 import 'profile_text_field.dart';
 
-class ProfileInfoCard extends StatelessWidget {
-  final ProfileController controller;
+class ProfileInfoCard extends ConsumerWidget {
+  final ProfileNotifier controller;
   final bool isEditing;
 
   const ProfileInfoCard({
@@ -14,7 +15,7 @@ class ProfileInfoCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
 
     Widget buildDivider() => Divider(
@@ -24,6 +25,9 @@ class ProfileInfoCard extends StatelessWidget {
       height: 1,
       color: colorScheme.outlineVariant.transparency(0.4),
     );
+
+    // Watch the profile state fields reactively if needed to sync dynamic layout rebuilds
+    ref.watch(profileProvider);
 
     return Card(
       elevation: 0,

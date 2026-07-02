@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:yodoctor/core/models/family_member.dart';
+import 'package:yodoctor/core/models/patient/family_member.dart';
 
 class PatientSelectionSection extends StatelessWidget {
   const PatientSelectionSection({

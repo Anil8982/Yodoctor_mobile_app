@@ -1,19 +1,21 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
-import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:yodoctor/core/theme/app_theme.dart' hide AppRole;
+import 'package:yodoctor/core/providers/app_role_provider.dart';
 import 'package:yodoctor/modules/auth/screens/patient/patient_register_screen.dart';
 import 'package:yodoctor/modules/auth/widgets/auth_widgets.dart';
 
-class PatientLoginScreen extends StatefulWidget {
+class PatientLoginScreen extends ConsumerStatefulWidget {
   const PatientLoginScreen({super.key});
 
   @override
-  State<PatientLoginScreen> createState() => _PatientLoginScreenState();
+  ConsumerState<PatientLoginScreen> createState() => _PatientLoginScreenState();
 }
 
-class _PatientLoginScreenState extends State<PatientLoginScreen>
+class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
     with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
@@ -62,6 +64,8 @@ class _PatientLoginScreenState extends State<PatientLoginScreen>
     }
 
     if (!mounted) return;
+
+    ref.read(appRoleProvider.notifier).setRole(AppRole.patient);
     context.go(AppRoutes.dashboard);
   }
 

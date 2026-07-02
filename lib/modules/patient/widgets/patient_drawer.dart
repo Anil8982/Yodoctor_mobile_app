@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
 
 import '../../../core/utils/dummy_data.dart';
@@ -59,14 +61,42 @@ class PatientDrawer extends StatelessWidget {
                   icon: Icons.person_outline_rounded,
                   label: 'My Profile',
                   colorScheme: colorScheme,
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.pop(context);
+                    context.push(AppRoutes.profile);
+                  },
                 ),
                 _buildDrawerItem(
                   context,
                   icon: Icons.history_rounded,
                   label: 'Appointments',
                   colorScheme: colorScheme,
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.pop(context);
+                    context.push(AppRoutes.history);
+                  },
+                ),
+
+                _buildDrawerItem(
+                  context,
+                  icon: Icons.family_restroom_rounded,
+                  label: 'Family Members',
+                  colorScheme: colorScheme,
+                  onTap: () {
+                    Navigator.pop(context);
+                    context.push(AppRoutes.family);
+                  },
+                ),
+
+                _buildDrawerItem(
+                  context,
+                  icon: Icons.card_membership_rounded,
+                  label: 'Medical Certificates',
+                  colorScheme: colorScheme,
+                  onTap: () {
+                    Navigator.pop(context);
+                    context.push(AppRoutes.certificateWallet);
+                  },
                 ),
                 const Divider(indent: 8, endIndent: 8),
                 _buildDrawerItem(
@@ -75,7 +105,10 @@ class PatientDrawer extends StatelessWidget {
                   label: 'Logout',
                   colorScheme: colorScheme,
                   textColor: colorScheme.error,
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.pop(context);
+                    context.go(AppRoutes.landing);
+                  },
                 ),
               ],
             ),

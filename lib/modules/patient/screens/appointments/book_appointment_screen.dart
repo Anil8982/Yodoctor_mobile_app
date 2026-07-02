@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 
 import '../../../../core/routes/app_routes.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -14,18 +14,16 @@ import 'widgets/doctor_info_card.dart';
 import 'widgets/patient_selection_section.dart';
 import 'widgets/session_selection_section.dart';
 
-class BookAppointmentScreen extends StatefulWidget {
+class BookAppointmentScreen extends ConsumerStatefulWidget {
   const BookAppointmentScreen({super.key, required this.doctor});
 
   final DoctorProfile doctor;
 
-  Widget build(BuildContext context) => const SizedBox();
-
   @override
-  State<BookAppointmentScreen> createState() => _BookAppointmentScreenState();
+  ConsumerState<BookAppointmentScreen> createState() => _BookAppointmentScreenState();
 }
 
-class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
+class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
   bool _isSelf = true;
   FamilyMember? _selectedFamilyMember;
   DateTime _selectedDate = DateTime.now();
@@ -74,7 +72,9 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
-    final List<FamilyMember> familyMembers = context.watch<FamilyController>().members;
+
+    // Watch dynamic sync updates from the manual family provider loop
+    final familyMembers = ref.watch(familyProvider);
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,

@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/modules/patient/controllers/profile_controller.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../controllers/profile_controller.dart';
 import '../../../../core/utils/app_spacing.dart';
 import 'widgets/profile_header.dart';
 import 'widgets/profile_info_card.dart';
 import 'widgets/profile_action_bar.dart';
 
-class ProfileScreen extends StatefulWidget {
+class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
+  ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   bool isEditing = false;
 
   void toggleEdit() => setState(() => isEditing = !isEditing);
@@ -22,13 +22,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = Theme.of(context).colorScheme;
+    final colorScheme = theme.colorScheme;
+
+    // Watch profile state and read notifier channel directly from Riverpod
+    final profileState = ref.watch(profileProvider);
+    final notifier = ref.read(profileProvider.notifier);
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         scrolledUnderElevation: 0,
-
         flexibleSpace: DecoratedBox(
           decoration: BoxDecoration(gradient: AppTheme.patientGradient),
         ),
@@ -64,10 +67,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],
         iconTheme: IconThemeData(color: colorScheme.onPrimary),
       ),
-
-      body: Consumer<ProfileController>(
-        builder: (context, controller, child) {
-          if (controller.user == null) return const Center(child: CircularProgressIndicator());
+      body: Builder(
+        builder: (context) {
+          // Check async validation states from immutable wrapper safely
+          if (profileState.user == null) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
           return Column(
             children: [
@@ -77,9 +82,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   physics: const BouncingScrollPhysics(),
                   child: Column(
                     children: [
-                      ProfileHeader(user: controller.user!, isEditing: isEditing),
+                      ProfileHeader(user: profileState.user!, isEditing: isEditing),
                       const SizedBox(height: 32),
-                      ProfileInfoCard(controller: controller, isEditing: isEditing),
+                      ProfileInfoCard(controller: notifier, isEditing: isEditing),
                       const SizedBox(height: 24),
                     ],
                   ),
@@ -87,7 +92,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               if (isEditing)
                 ProfileActionBar(
-                  controller: controller,
+                  controller: notifier,
                   onComplete: () => setState(() => isEditing = false),
                 ),
             ],

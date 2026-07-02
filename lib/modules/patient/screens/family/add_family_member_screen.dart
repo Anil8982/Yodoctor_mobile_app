@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/dummy_data.dart';
@@ -10,7 +10,7 @@ import '../../controllers/family_controller.dart';
 import 'widgets/member_form_dropdown_field.dart';
 import 'widgets/member_form_text_field.dart';
 
-class AddFamilyMemberScreen extends StatefulWidget {
+class AddFamilyMemberScreen extends ConsumerStatefulWidget {
   const AddFamilyMemberScreen({
     super.key,
     this.initialMember,
@@ -19,10 +19,10 @@ class AddFamilyMemberScreen extends StatefulWidget {
   final FamilyMember? initialMember;
 
   @override
-  State<AddFamilyMemberScreen> createState() => _AddFamilyMemberScreenState();
+  ConsumerState<AddFamilyMemberScreen> createState() => _AddFamilyMemberScreenState();
 }
 
-class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
+class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
   static const List<String> _genderOptions = <String>[
     'Male',
     'Female',
@@ -44,11 +44,15 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
     'Father',
     'Mother',
     'Spouse',
+    'Wife',
+    'Husband',
     'Son',
     'Daughter',
     'Brother',
     'Sister',
     'Grandparent',
+    'Uncle',
+    'Aunt',
     'Other',
   ];
 
@@ -150,14 +154,14 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
       return;
     }
 
-    final FamilyController familyController = context.read<FamilyController>();
+    final familyNotifier = ref.read(familyProvider.notifier);
     if (_isEditing) {
-      familyController.updateMember(
+      familyNotifier.updateMember(
         oldMember: widget.initialMember!,
         updatedMember: member,
       );
     } else {
-      familyController.addMember(member);
+      familyNotifier.addMember(member);
     }
 
     context.pop(true);
@@ -458,18 +462,8 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
 
   String _formatDate(DateTime date) {
     const List<String> months = <String>[
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
     ];
 
     final String day = date.day.toString().padLeft(2, '0');

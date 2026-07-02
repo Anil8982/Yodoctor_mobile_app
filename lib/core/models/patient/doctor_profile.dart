@@ -26,4 +26,21 @@ class DoctorProfile {
   final String availableSlot;
   final List<String> languages;
   final String location;
+
+  factory DoctorProfile.fromJson(Map<String, dynamic> json) {
+    return DoctorProfile(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      specialty: json['specialty'] as String,
+      hospital: json['hospital'] as String,
+      experienceYears: json['experienceYears'] as int,
+      rating: (json['rating'] as num?)?.toDouble() ?? 0.0,
+      reviewCount: json['reviewCount'] as int? ?? 0,
+      consultationFee: json['consultationFee'] as int,
+      distanceKm: (json['distanceKm'] as num?)?.toDouble() ?? 0.0,
+      availableSlot: json['availableSlot'] as String,
+      languages: List<String>.from(json['languages'] ?? []),
+      location: json['location'] as String,
+    );
+  }
 }
