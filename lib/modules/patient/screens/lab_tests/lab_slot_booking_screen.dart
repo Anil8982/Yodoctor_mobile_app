@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/models/patient/booking_state_model.dart';
+import 'package:yodoctor/core/routes/app_routes.dart';
+import 'package:yodoctor/core/utils/input_decoration_helper.dart';
 import 'package:yodoctor/modules/patient/controllers/booking_controller.dart';
 import 'package:yodoctor/modules/patient/controllers/lab_test_controller.dart';
 
@@ -202,9 +205,10 @@ class _LabSlotBookingScreenState extends ConsumerState<LabSlotBookingScreen> {
             Expanded(
               child: TextFormField(
                 controller: _nameController,
-                decoration: _buildInputDecoration(
-                  'Full Name *',
-                  Icons.person_outline_rounded,
+                decoration: AppInputDecoration.build(
+                  context,
+                  label: 'Full Name *',
+                  prefixIcon: Icons.person_outline_rounded,
                 ),
                 onChanged: (val) => ref
                     .read(labBookingProvider.notifier)
@@ -217,7 +221,7 @@ class _LabSlotBookingScreenState extends ConsumerState<LabSlotBookingScreen> {
               child: TextFormField(
                 controller: _ageController,
                 keyboardType: TextInputType.number,
-                decoration: _buildInputDecoration('Age *', null),
+                decoration: AppInputDecoration.build(context, label: 'Age *'),
                 onChanged: (val) => ref
                     .read(labBookingProvider.notifier)
                     .updatePatientDetails(age: val),
@@ -229,9 +233,10 @@ class _LabSlotBookingScreenState extends ConsumerState<LabSlotBookingScreen> {
         TextFormField(
           controller: _phoneController,
           keyboardType: TextInputType.phone,
-          decoration: _buildInputDecoration(
-            'Phone Number *',
-            Icons.phone_android_rounded,
+          decoration: AppInputDecoration.build(
+            context,
+            label: 'Phone Number *',
+            prefixIcon: Icons.phone_android_rounded,
           ),
           onChanged: (val) => ref
               .read(labBookingProvider.notifier)
@@ -329,9 +334,10 @@ class _LabSlotBookingScreenState extends ConsumerState<LabSlotBookingScreen> {
         TextFormField(
           controller: _addressController,
           maxLines: 2,
-          decoration: _buildInputDecoration(
-            'Full Address *',
-            Icons.home_rounded,
+          decoration: AppInputDecoration.build(
+            context,
+            label: 'Full Address *',
+            prefixIcon: Icons.home_rounded,
           ),
           onChanged: (val) =>
               ref.read(labBookingProvider.notifier).updateAddress(val),
@@ -578,7 +584,11 @@ class _LabSlotBookingScreenState extends ConsumerState<LabSlotBookingScreen> {
             child: SizedBox(
               height: 48,
               child: ElevatedButton(
-                onPressed: isReady ? () {} : null,
+                onPressed: isReady ? () {
+                  if (_formKey.currentState?.validate() ?? false) {
+                    _showSuccessDialog(context);
+                  }
+                } : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: colorScheme.primary,
                   foregroundColor: colorScheme.onPrimary,
@@ -599,67 +609,87 @@ class _LabSlotBookingScreenState extends ConsumerState<LabSlotBookingScreen> {
     );
   }
 
-  InputDecoration _buildInputDecoration(String label, IconData? prefixIcon) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+  void _showSuccessDialog(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
 
-    return InputDecoration(
-      labelText: label,
-      alignLabelWithHint: true,
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+          content: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.green.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.check_circle_rounded,
+                    color: Colors.green,
+                    size: 64,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                const Text(
+                  'Slot Booked Successfully!',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  'Your lab test slot has been successfully reserved. Our team will contact you shortly.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: colorScheme.onSurfaceVariant,
+                    fontSize: 13,
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 24),
 
-      labelStyle: TextStyle(
-        color: colorScheme.outline.withValues(alpha: 0.8),
-        fontSize: 14,
-        fontWeight: FontWeight.w500,
-      ),
-      floatingLabelStyle: TextStyle(
-        color: colorScheme.primary,
-        fontWeight: FontWeight.bold,
-        fontSize: 14,
-      ),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    context.pop();
+                    context.push(AppRoutes.homeServiceBooking);
+                  },
+                  icon: const Icon(Icons.home_repair_service_rounded, size: 18),
+                  label: const Text('Book Home Care Service'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: colorScheme.primary,
+                    foregroundColor: colorScheme.onPrimary,
+                    minimumSize: const Size.fromHeight(48),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    elevation: 0,
+                  ),
+                ),
+                const SizedBox(height: 8),
 
-      prefixIcon: prefixIcon != null
-          ? Icon(
-              prefixIcon,
-              size: 20,
-              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
-            )
-          : null,
-
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      filled: true,
-
-      fillColor: theme.cardColor,
-
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide(
-          color: colorScheme.outlineVariant.withValues(alpha: 0.4),
-        ),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide(
-          color: colorScheme.outlineVariant.withValues(alpha: 0.4),
-        ),
-      ),
-
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide(color: colorScheme.primary, width: 1.8),
-      ),
-
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide(color: colorScheme.error, width: 1),
-      ),
-      focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide(color: colorScheme.error, width: 1.8),
-      ),
+                TextButton(
+                  onPressed: () {
+                    context.pop();
+                    context.go(AppRoutes.dashboard);
+                  },
+                  child: Text(
+                    'Go to Dashboard',
+                    style: TextStyle(
+                      color: colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
-
   String _getWeekdayName(int weekday) {
     const names = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
     return names[weekday - 1];

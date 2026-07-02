@@ -59,7 +59,7 @@ final List<MedicalService> medicalServicesList = [
   const MedicalService(
     title: 'Home Nursing Care Service booking',
     subtitle: 'Care at your home',
-    route: '#',
+    route: AppRoutes.homeServiceBooking,
     icon: Icons.home_repair_service_rounded,
     baseColor: Color(0xFF66BB6A),
   ),

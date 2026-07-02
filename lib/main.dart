@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/core/routes/app_router.dart';
 
-import 'core/routes/app_routes.dart';
 import 'core/theme/app_theme.dart' hide AppRole;
 import 'core/providers/app_role_provider.dart';
 
