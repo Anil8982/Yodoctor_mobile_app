@@ -2,7 +2,7 @@ import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
 
-enum AppRole { doctor, patient }
+enum AppRole { doctor, patient, admin }
 
 class AppRoleProvider extends ChangeNotifier {
   AppRole _role = AppRole.doctor;
@@ -22,6 +22,7 @@ class AppTheme {
   // Gradients Forwarding
   static LinearGradient get doctorGradient => AppColors.doctorGradient;
   static LinearGradient get patientGradient => AppColors.patientGradient;
+    static LinearGradient get adminGradient => AppColors.adminGradient;
   static LinearGradient get brandGradient => AppColors.brandGradient;
   static LinearGradient get backgroundGradient => AppColors.backgroundGradient;
 
@@ -32,6 +33,10 @@ class AppTheme {
   static Color get yoGreen => AppColors.yoGreen;
   static Color get yoGreenDark => AppColors.yoGreenDark;
   static Color get yoGreenLight => AppColors.yoGreenLight;
+
+  static Color get yoPurple => AppColors.yoPurple;
+  static Color get yoPurpleDark => AppColors.yoPurpleDark;
+  static Color get yoPurpleLight => AppColors.yoPurpleLight;
 
   // Primary & Secondary Aliases
   static Color get primary => AppColors.yoBlue;
@@ -84,6 +89,14 @@ class AppTheme {
     );
   }
 
+  // ── 🛠️  3. Admin Production ThemeData ─────────────────────
+  static ThemeData get adminTheme {
+    return _buildTheme(
+      colorScheme: AppColors.adminColorScheme,
+      gradient: AppColors.adminGradient,
+    );
+  }
+
   // ── 🏗️ Core Theme Spec Factory ────────────────────────────
   static ThemeData _buildTheme({
     required ColorScheme colorScheme,
@@ -108,7 +121,7 @@ class AppTheme {
       cardTheme: CardThemeData(
         color: colorScheme.surface,
         elevation: 2,
-        shadowColor: Colors.black.transparency( 0.05),
+        shadowColor: Colors.black.transparency(0.05),
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(24)),
         ),
@@ -117,7 +130,10 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: colorScheme.surface,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
         hintStyle: const TextStyle(color: AppColors.textHint),
         border: const OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(16)),
@@ -129,10 +145,7 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: const BorderRadius.all(Radius.circular(16)),
-          borderSide: BorderSide(
-            color: colorScheme.primary,
-            width: 1.4,
-          ),
+          borderSide: BorderSide(color: colorScheme.primary, width: 1.4),
         ),
       ),
 
@@ -166,20 +179,80 @@ class AppTheme {
 
   // ── 📝 Typography Structure ──────────────────────────────
   static const TextTheme _textTheme = TextTheme(
-    displayLarge: TextStyle(fontSize: 57, fontWeight: FontWeight.w400, color: AppColors.textPrimary),
-    displayMedium: TextStyle(fontSize: 45, fontWeight: FontWeight.w400, color: AppColors.textPrimary),
-    displaySmall: TextStyle(fontSize: 36, fontWeight: FontWeight.w400, color: AppColors.textPrimary),
-    headlineLarge: TextStyle(fontSize: 32, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
-    headlineMedium: TextStyle(fontSize: 28, fontWeight: FontWeight.w500, color: AppColors.textPrimary),
-    headlineSmall: TextStyle(fontSize: 24, fontWeight: FontWeight.w500, color: AppColors.textPrimary),
-    titleLarge: TextStyle(fontSize: 22, fontWeight: FontWeight.w500, color: AppColors.textPrimary),
-    titleMedium: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: AppColors.textPrimary),
-    titleSmall: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.textPrimary),
-    bodyLarge: TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: AppColors.textPrimary),
-    bodyMedium: TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: AppColors.textSecondary),
-    bodySmall: TextStyle(fontSize: 12, fontWeight: FontWeight.w400, color: AppColors.textHint),
-    labelLarge: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.textPrimary),
-    labelMedium: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: AppColors.textSecondary),
-    labelSmall: TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: AppColors.textHint),
+    displayLarge: TextStyle(
+      fontSize: 57,
+      fontWeight: FontWeight.w400,
+      color: AppColors.textPrimary,
+    ),
+    displayMedium: TextStyle(
+      fontSize: 45,
+      fontWeight: FontWeight.w400,
+      color: AppColors.textPrimary,
+    ),
+    displaySmall: TextStyle(
+      fontSize: 36,
+      fontWeight: FontWeight.w400,
+      color: AppColors.textPrimary,
+    ),
+    headlineLarge: TextStyle(
+      fontSize: 32,
+      fontWeight: FontWeight.w600,
+      color: AppColors.textPrimary,
+    ),
+    headlineMedium: TextStyle(
+      fontSize: 28,
+      fontWeight: FontWeight.w500,
+      color: AppColors.textPrimary,
+    ),
+    headlineSmall: TextStyle(
+      fontSize: 24,
+      fontWeight: FontWeight.w500,
+      color: AppColors.textPrimary,
+    ),
+    titleLarge: TextStyle(
+      fontSize: 22,
+      fontWeight: FontWeight.w500,
+      color: AppColors.textPrimary,
+    ),
+    titleMedium: TextStyle(
+      fontSize: 16,
+      fontWeight: FontWeight.w500,
+      color: AppColors.textPrimary,
+    ),
+    titleSmall: TextStyle(
+      fontSize: 14,
+      fontWeight: FontWeight.w500,
+      color: AppColors.textPrimary,
+    ),
+    bodyLarge: TextStyle(
+      fontSize: 16,
+      fontWeight: FontWeight.w400,
+      color: AppColors.textPrimary,
+    ),
+    bodyMedium: TextStyle(
+      fontSize: 14,
+      fontWeight: FontWeight.w400,
+      color: AppColors.textSecondary,
+    ),
+    bodySmall: TextStyle(
+      fontSize: 12,
+      fontWeight: FontWeight.w400,
+      color: AppColors.textHint,
+    ),
+    labelLarge: TextStyle(
+      fontSize: 14,
+      fontWeight: FontWeight.w500,
+      color: AppColors.textPrimary,
+    ),
+    labelMedium: TextStyle(
+      fontSize: 12,
+      fontWeight: FontWeight.w500,
+      color: AppColors.textSecondary,
+    ),
+    labelSmall: TextStyle(
+      fontSize: 11,
+      fontWeight: FontWeight.w500,
+      color: AppColors.textHint,
+    ),
   );
 }

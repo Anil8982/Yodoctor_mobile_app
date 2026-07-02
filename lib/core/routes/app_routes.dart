@@ -182,10 +182,14 @@
 //   );
 // }
 
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/utils/dummy_data.dart';
+import 'package:yodoctor/modules/admin/admin_scaffold_shell.dart';
+import 'package:yodoctor/modules/admin/screens/dashboard/admin_dashboard_screen.dart';
+import 'package:yodoctor/modules/admin/screens/doctors_management/screens/doctor_management_screen.dart';
+import 'package:yodoctor/modules/admin/screens/enquiries/screens/enquiry_screen.dart';
+import 'package:yodoctor/modules/admin/screens/home_care_bookings/screens/home_care_bookings_screen.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/doctor_login_screen.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/doctor_register_screen.dart';
 import 'package:yodoctor/modules/auth/screens/landing/landing_screen.dart';
@@ -219,8 +223,14 @@ class AppRoutes {
 
   static const String search = '/search';
   static const String dashboard = '/dashboard';
+  static const String adminDashboard = '/admin/dashboard';
+
   static const String doctorDashboard = '/doctor/dashboard';
   static const String doctorManualBooking = '/doctor/dashboard/manualbooking';
+  static const String doctorsManagement =
+      '/doctorsmanagement';
+  static const String enquiry = '/enquiry';
+  static const String homeCareBooking = '/homecarebookings';
   static const String findDoctors = '/doctors';
   static const String doctorDetail = '/doctors/detail';
   static const String profile = '/profile';
@@ -236,7 +246,7 @@ class AppRouter {
   const AppRouter._();
 
   static final GlobalKey<NavigatorState> _rootNavigatorKey =
-  GlobalKey<NavigatorState>();
+      GlobalKey<NavigatorState>();
 
   static final GoRouter router = GoRouter(
     navigatorKey: _rootNavigatorKey,
@@ -269,17 +279,26 @@ class AppRouter {
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
-        path: AppRoutes.search,
-        builder: (context, state) => const SearchScreen(),
+        path: AppRoutes.enquiry,
+        builder: (context, state) => EnquiryScreen(),
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
-        path: AppRoutes.findDoctors,
-        builder: (context, state) {
-          final query = state.uri.queryParameters['q'] ?? '';
-          return FindDoctorsScreen(initialQuery: query);
-        },
+        path: AppRoutes.homeCareBooking,
+        builder: (context, state) => HomeCareBookingsScreen(),
       ),
+       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: AppRoutes.doctorsManagement,
+        builder: (context, state) => DoctorsManagementScreen(),
+      ),
+
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: AppRoutes.search,
+        builder: (context, state) => const SearchScreen(),
+      ),
+
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.doctorDetail,
@@ -332,6 +351,11 @@ class AppRouter {
         parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.doctorDashboard,
         builder: (context, state) => const DoctorScaffoldShell(),
+      ),
+       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: AppRoutes.adminDashboard,
+        builder: (context, state) => const AdminScaffoldShell(),
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,

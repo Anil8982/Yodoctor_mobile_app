@@ -63,8 +63,21 @@ class _PatientLoginScreenState extends State<PatientLoginScreen>
     }
 
     if (!mounted) return;
-    Provider.of<AppRoleProvider>(context, listen: false).setRole(AppRole.patient);
-    context.go(AppRoutes.dashboard);
+
+    // Check if the email is the admin email
+    if (email == 'admin@gmail.com' || email.toLowerCase().contains('admin')) {
+      Provider.of<AppRoleProvider>(
+        context,
+        listen: false,
+      ).setRole(AppRole.admin);
+      context.go(AppRoutes.adminDashboard);
+    } else {
+      Provider.of<AppRoleProvider>(
+        context,
+        listen: false,
+      ).setRole(AppRole.patient);
+      context.go(AppRoutes.dashboard);
+    }
   }
 
   @override
@@ -103,7 +116,10 @@ class _PatientLoginScreenState extends State<PatientLoginScreen>
               child: Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 16,
+                    ),
                     child: Row(
                       children: [
                         GestureDetector(
@@ -193,7 +209,8 @@ class _PatientLoginScreenState extends State<PatientLoginScreen>
                               AuthHeader(
                                 role: 'Patient Portal',
                                 title: 'Welcome Back!',
-                                subtitle: 'Login to book appointments and consult doctors.',
+                                subtitle:
+                                    'Login to book appointments and consult doctors.',
                                 color: AppTheme.secondary,
                                 icon: Icons.person_rounded,
                               ),
@@ -238,7 +255,8 @@ class _PatientLoginScreenState extends State<PatientLoginScreen>
                                     scale: 0.9,
                                     child: Checkbox(
                                       value: _rememberMe,
-                                      onChanged: (v) => setState(() => _rememberMe = v!),
+                                      onChanged: (v) =>
+                                          setState(() => _rememberMe = v!),
                                       activeColor: AppTheme.secondary,
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(4),
@@ -254,9 +272,13 @@ class _PatientLoginScreenState extends State<PatientLoginScreen>
                                   const Spacer(),
                                   TextButton(
                                     onPressed: () {
-                                      ScaffoldMessenger.of(context).showSnackBar(
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
                                         const SnackBar(
-                                          content: Text('Forgot password feature coming soon'),
+                                          content: Text(
+                                            'Forgot password feature coming soon',
+                                          ),
                                         ),
                                       );
                                     },
@@ -308,7 +330,8 @@ class _PatientLoginScreenState extends State<PatientLoginScreen>
                                       onTap: () => Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (_) => const PatientRegisterScreen(),
+                                          builder: (_) =>
+                                              const PatientRegisterScreen(),
                                         ),
                                       ),
                                       child: Text(
@@ -366,4 +389,4 @@ class _PatientLoginScreenState extends State<PatientLoginScreen>
       ),
     );
   }
-}
+} 

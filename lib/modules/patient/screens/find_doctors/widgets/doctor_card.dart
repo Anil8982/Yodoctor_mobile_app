@@ -1,37 +1,38 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../core/models/doctor_profile.dart';
 import '../../../../../core/utils/app_spacing.dart';
-import '../../../../../core/utils/dummy_data.dart';
 
 class DoctorCard extends StatelessWidget {
   const DoctorCard({
     super.key,
     required this.doctor,
-    this.onProfileTap,
-    this.onBookTap,
-    this.onContactTap,
+    this.onViewDetails,
   });
 
   final DoctorProfile doctor;
-  final VoidCallback? onProfileTap;
-  final VoidCallback? onBookTap;
-  final VoidCallback? onContactTap;
+  final VoidCallback? onViewDetails;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
+    // TODO: Replace with doctor.status once added to DoctorProfile
+    const status = "Approved";
+
     return Card(
       elevation: 0,
       margin: const EdgeInsets.only(bottom: AppSpacing.md),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
-        side: BorderSide(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
+        side: BorderSide(
+          color: colorScheme.outlineVariant.withOpacity(0.4),
+        ),
       ),
       color: colorScheme.surface,
       child: InkWell(
-        onTap: onProfileTap,
+        onTap: onViewDetails,
         borderRadius: BorderRadius.circular(20),
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -41,22 +42,32 @@ class DoctorCard extends StatelessWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // --- AVATAR (M3 Style) ---
                   _buildAvatar(colorScheme, theme),
+
                   const SizedBox(width: 16),
 
-                  // --- DOCTOR INFO ---
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          doctor.name,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: -0.2,
-                          ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                doctor.name,
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: -0.2,
+                                ),
+                              ),
+                            ),
+
+                            _buildStatusChip(status),
+                          ],
                         ),
+
+                        const SizedBox(height: 4),
+
                         Text(
                           doctor.specialty,
                           style: theme.textTheme.labelMedium?.copyWith(
@@ -64,13 +75,39 @@ class DoctorCard extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(height: 6),
-                        // Consultation Fee (Compact)
-                        Text(
-                          'Consultation: ₹${doctor.consultationFee}',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                            fontWeight: FontWeight.w500,
+
+                        const SizedBox(height: 12),
+
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 10,
+                          ),
+                          decoration: BoxDecoration(
+                            color: colorScheme.surfaceContainerHighest
+                                .withOpacity(.35),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              _buildMetaIcon(
+                                Icons.location_on_rounded,
+                                doctor.location,
+                                colorScheme,
+                              ),
+                              _buildMetaIcon(
+                                Icons.work_rounded,
+                                '${doctor.experienceYears}Y',
+                                colorScheme,
+                              ),
+                              _buildMetaIcon(
+                                Icons.star_rounded,
+                                doctor.rating.toString(),
+                                colorScheme,
+                                isRating: true,
+                              ),
+                            ],
                           ),
                         ),
                       ],
@@ -79,82 +116,24 @@ class DoctorCard extends StatelessWidget {
                 ],
               ),
 
-              const SizedBox(height: 12),
+              const SizedBox(height: 18),
 
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 10,
-                ),
-                decoration: BoxDecoration(
-                  color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    _buildMetaIcon(
-                      Icons.local_hospital_rounded,
-                      doctor.hospital,
-                      colorScheme,
-                    ),
-                    _buildMetaIcon(
-                      Icons.location_on_rounded,
-                      doctor.location,
-                      colorScheme,
-                    ),
-                    _buildMetaIcon(
-                      Icons.work_rounded,
-                      '${doctor.experienceYears}Y',
-                      colorScheme,
-                    ),
-                    _buildMetaIcon(
-                      Icons.star_rounded,
-                      doctor.rating.toString(),
-                      colorScheme,
-                      isRating: true,
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 16),
-
-              // --- ACTION BUTTONS ---
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: onContactTap,
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: const Text(
-                        'Contact',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  onPressed: onViewDetails,
+                  icon: const Icon(Icons.visibility_outlined),
+                  label: const Text(
+                    "View Details",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 13),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: FilledButton(
-                      onPressed: onBookTap,
-                      style: FilledButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: const Text(
-                        'Book Now',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
             ],
           ),
@@ -168,7 +147,7 @@ class DoctorCard extends StatelessWidget {
       width: 60,
       height: 60,
       decoration: BoxDecoration(
-        color: colorScheme.primaryContainer.withValues(alpha: 0.7),
+        color: colorScheme.primaryContainer.withOpacity(.7),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Center(
@@ -178,6 +157,27 @@ class DoctorCard extends StatelessWidget {
             color: colorScheme.onPrimaryContainer,
             fontWeight: FontWeight.bold,
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatusChip(String status) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 10,
+        vertical: 4,
+      ),
+      decoration: BoxDecoration(
+        color: _statusColor(status).withOpacity(.12),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        status,
+        style: TextStyle(
+          color: _statusColor(status),
+          fontWeight: FontWeight.w600,
+          fontSize: 11,
         ),
       ),
     );
@@ -195,18 +195,38 @@ class DoctorCard extends StatelessWidget {
         Icon(
           icon,
           size: 14,
-          color: isRating ? colorScheme.secondary : colorScheme.onSurfaceVariant,
+          color: isRating
+              ? Colors.amber.shade700
+              : colorScheme.onSurfaceVariant,
         ),
         const SizedBox(width: 4),
         Text(
           text,
           style: TextStyle(
             fontSize: 11,
-            fontWeight: isRating ? FontWeight.bold : FontWeight.w500,
+            fontWeight: isRating
+                ? FontWeight.bold
+                : FontWeight.w500,
             color: colorScheme.onSurfaceVariant,
           ),
         ),
       ],
     );
+  }
+
+  Color _statusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'approved':
+        return Colors.green;
+
+      case 'pending':
+        return Colors.orange;
+
+      case 'rejected':
+        return Colors.red;
+
+      default:
+        return Colors.grey;
+    }
   }
 }

@@ -1,0 +1,225 @@
+import 'package:flutter/material.dart';
+import 'package:yodoctor/core/models/admin_dashboard_data.dart';
+
+class QuickActionsWidget extends StatelessWidget {
+  const QuickActionsWidget({
+    super.key,
+    required this.data,
+  });
+
+  final AdminDashboardData data;
+
+  @override
+  Widget build(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width < 600;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'QUICK ACTIONS',
+          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                letterSpacing: 1.2,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey,
+              ),
+        ),
+        const SizedBox(height: 16),
+
+        isMobile
+            ? Column(
+                children: [
+                  _buildCard(
+                    context,
+                    icon: Icons.pending_actions_outlined,
+                    iconColor: Colors.orange,
+                    title: 'Pending Approvals',
+                    subtitle: 'Doctors waiting for verification',
+                    count: data.pendingApprovals.toString(),
+                    onTap: () {},
+                  ),
+                  const SizedBox(height: 12),
+                  _buildCard(
+                    context,
+                    icon: Icons.people_outline,
+                    iconColor: Colors.blue,
+                    title: 'All Doctors',
+                    subtitle: 'View and manage registered doctors',
+                    count: data.totalDoctors.toString(),
+                    onTap: () {},
+                  ),
+                  const SizedBox(height: 12),
+                  _buildCard(
+                    context,
+                    icon: Icons.notifications_none,
+                    iconColor: Colors.purple,
+                    title: 'Notifications',
+                    subtitle: 'View all admin notifications',
+                    count: '0',
+                    onTap: () {},
+                  ),
+                ],
+              )
+            : Row(
+                children: [
+                  Expanded(
+                    child: _buildCard(
+                      context,
+                      icon: Icons.pending_actions_outlined,
+                      iconColor: Colors.orange,
+                      title: 'Pending Approvals',
+                      subtitle: 'Doctors waiting for verification',
+                      count: data.pendingApprovals.toString(),
+                      onTap: () {},
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: _buildCard(
+                      context,
+                      icon: Icons.people_outline,
+                      iconColor: Colors.blue,
+                      title: 'All Doctors',
+                      subtitle: 'View and manage registered doctors',
+                      count: data.totalDoctors.toString(),
+                      onTap: () {},
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: _buildCard(
+                      context,
+                      icon: Icons.notifications_none,
+                      iconColor: Colors.purple,
+                      title: 'Notifications',
+                      subtitle: 'View all admin notifications',
+                      count: '0',
+                      onTap: () {},
+                    ),
+                  ),
+                ],
+              ),
+      ],
+    );
+  }
+
+  Widget _buildCard(
+    BuildContext context, {
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+    required String subtitle,
+    required String count,
+    required VoidCallback onTap,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(20),
+      onTap: onTap,
+      child: Container(
+        height: 180,
+        padding: const EdgeInsets.all(15),
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: colorScheme.outlineVariant,
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.03),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  height: 42,
+                  width: 42,
+                  decoration: BoxDecoration(
+                    color: iconColor.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    icon,
+                    color: iconColor,
+                    size: 20,
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    count,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            /// Title + Subtitle
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                ),
+                Text(
+                  subtitle,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                ),
+              ],
+            ),
+
+            /// View Button
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'View',
+                  style: TextStyle(
+                    color: colorScheme.primary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Icon(
+                  Icons.arrow_forward_rounded,
+                  size: 16,
+                  color: colorScheme.primary,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

@@ -8,6 +8,10 @@ export '../models/patient_user.dart';
 export '../models/doctor_dashboard_data.dart';
 export '../../modules/patient/controllers/medical_certificate.dart';
 
+import 'package:yodoctor/core/models/admin_dashboard_data.dart';
+import 'package:yodoctor/core/models/admin_user.dart';
+import 'package:yodoctor/modules/admin/screens/enquiries/models/enquiry_model.dart';
+
 import '../models/appointment_history_item.dart';
 import '../models/doctor_profile.dart';
 import '../models/family_member.dart';
@@ -80,58 +84,59 @@ class DummyData {
     ];
   }
 
-  static final List<AppointmentHistoryItem> appointmentHistory = <AppointmentHistoryItem>[
-    AppointmentHistoryItem(
-      id: 'HIS-1',
-      doctorName: 'Dr. Praveen Singh',
-      specialty: 'Dermatologist',
-      patientLabel: 'Ajay (Family)',
-      date: DateTime(2026, 5, 6),
-      shift: 'EVENING',
-      tokenNumber: '#4',
-      status: 'COMPLETED',
-    ),
-    AppointmentHistoryItem(
-      id: 'HIS-2',
-      doctorName: 'Dr. Praveen Singh',
-      specialty: 'Dermatologist',
-      patientLabel: 'Vineet Kushwaha (Self)',
-      date: DateTime(2026, 5, 6),
-      shift: 'EVENING',
-      tokenNumber: '#3',
-      status: 'COMPLETED',
-    ),
-    AppointmentHistoryItem(
-      id: 'HIS-3',
-      doctorName: 'Dr. Praveen Singh',
-      specialty: 'Dermatologist',
-      patientLabel: 'Ajay (Family)',
-      date: DateTime(2026, 4, 28),
-      shift: 'EVENING',
-      tokenNumber: '#3',
-      status: 'COMPLETED',
-    ),
-    AppointmentHistoryItem(
-      id: 'HIS-4',
-      doctorName: 'Dr. Praveen Singh',
-      specialty: 'Dermatologist',
-      patientLabel: 'Ajay (Family)',
-      date: DateTime(2026, 4, 28),
-      shift: 'EVENING',
-      tokenNumber: '#2',
-      status: 'COMPLETED',
-    ),
-    AppointmentHistoryItem(
-      id: 'HIS-5',
-      doctorName: 'Dr. Praveen Singh',
-      specialty: 'Dermatologist',
-      patientLabel: 'Vineet Kushwaha (Self)',
-      date: DateTime(2026, 4, 28),
-      shift: 'EVENING',
-      tokenNumber: '#1',
-      status: 'COMPLETED',
-    ),
-  ];
+  static final List<AppointmentHistoryItem> appointmentHistory =
+      <AppointmentHistoryItem>[
+        AppointmentHistoryItem(
+          id: 'HIS-1',
+          doctorName: 'Dr. Praveen Singh',
+          specialty: 'Dermatologist',
+          patientLabel: 'Ajay (Family)',
+          date: DateTime(2026, 5, 6),
+          shift: 'EVENING',
+          tokenNumber: '#4',
+          status: 'COMPLETED',
+        ),
+        AppointmentHistoryItem(
+          id: 'HIS-2',
+          doctorName: 'Dr. Praveen Singh',
+          specialty: 'Dermatologist',
+          patientLabel: 'Vineet Kushwaha (Self)',
+          date: DateTime(2026, 5, 6),
+          shift: 'EVENING',
+          tokenNumber: '#3',
+          status: 'COMPLETED',
+        ),
+        AppointmentHistoryItem(
+          id: 'HIS-3',
+          doctorName: 'Dr. Praveen Singh',
+          specialty: 'Dermatologist',
+          patientLabel: 'Ajay (Family)',
+          date: DateTime(2026, 4, 28),
+          shift: 'EVENING',
+          tokenNumber: '#3',
+          status: 'COMPLETED',
+        ),
+        AppointmentHistoryItem(
+          id: 'HIS-4',
+          doctorName: 'Dr. Praveen Singh',
+          specialty: 'Dermatologist',
+          patientLabel: 'Ajay (Family)',
+          date: DateTime(2026, 4, 28),
+          shift: 'EVENING',
+          tokenNumber: '#2',
+          status: 'COMPLETED',
+        ),
+        AppointmentHistoryItem(
+          id: 'HIS-5',
+          doctorName: 'Dr. Praveen Singh',
+          specialty: 'Dermatologist',
+          patientLabel: 'Vineet Kushwaha (Self)',
+          date: DateTime(2026, 4, 28),
+          shift: 'EVENING',
+          tokenNumber: '#1',
+          status: 'COMPLETED',
+        ),
+      ];
 
   static const List<DoctorProfile> allDoctors = <DoctorProfile>[
     DoctorProfile(
@@ -178,63 +183,65 @@ class DummyData {
     ),
   ];
 
-  static final List<MedicalCertificate> dummyCertificates = <MedicalCertificate>[
-    MedicalCertificate(
-      id: 'CERT-1',
-      type: 'Medical Fitness',
-      patientName: 'Ajay',
-      dateOfBirth: '2004-02-12',
-      gender: 'Male',
-      bloodGroup: 'A+',
-      heightCm: 167.0,
-      weightKg: 67.0,
-      medicalConditions: 'None',
-      medications: 'None',
-      doctor: allDoctors[0],
-      purpose: 'Travel',
-      additionalNotes: 'Required for travel clearance.',
-      status: 'APPROVED',
-      requestDate: DateTime.now().subtract(const Duration(days: 5)),
-      issuedDate: DateTime.now().subtract(const Duration(days: 4)),
-      documents: const <String>['profile_photo.jpg', 'aadhaar_card.png'],
-    ),
-    MedicalCertificate(
-      id: 'CERT-2',
-      type: 'Vaccination',
-      patientName: 'Anil kushwaha',
-      dateOfBirth: '14-06-2002',
-      gender: 'Male',
-      bloodGroup: 'B+',
-      heightCm: 175.0,
-      weightKg: 70.0,
-      medicalConditions: 'None',
-      medications: 'None',
-      doctor: allDoctors[1],
-      purpose: 'Employment',
-      additionalNotes: 'Need Hepatitis B vaccine certificate.',
-      status: 'PENDING',
-      requestDate: DateTime.now().subtract(const Duration(days: 1)),
-      documents: const <String>['vaccination_card.jpg'],
-    ),
-    MedicalCertificate(
-      id: 'CERT-3',
-      type: 'Second Opinion',
-      patientName: 'Meera Patel',
-      dateOfBirth: '1990-03-14',
-      gender: 'Female',
-      bloodGroup: 'B+',
-      heightCm: 162.0,
-      weightKg: 58.0,
-      medicalConditions: 'Migraine',
-      medications: 'Sumatriptan 50mg',
-      doctor: allDoctors[2],
-      purpose: 'Treatment Review',
-      additionalNotes: 'Checking neurologist opinion on headache treatment.',
-      status: 'REJECTED',
-      requestDate: DateTime.now().subtract(const Duration(days: 10)),
-      documents: const <String>['mri_brain_report.pdf'],
-    ),
-  ];
+  static final List<MedicalCertificate> dummyCertificates =
+      <MedicalCertificate>[
+        MedicalCertificate(
+          id: 'CERT-1',
+          type: 'Medical Fitness',
+          patientName: 'Ajay',
+          dateOfBirth: '2004-02-12',
+          gender: 'Male',
+          bloodGroup: 'A+',
+          heightCm: 167.0,
+          weightKg: 67.0,
+          medicalConditions: 'None',
+          medications: 'None',
+          doctor: allDoctors[0],
+          purpose: 'Travel',
+          additionalNotes: 'Required for travel clearance.',
+          status: 'APPROVED',
+          requestDate: DateTime.now().subtract(const Duration(days: 5)),
+          issuedDate: DateTime.now().subtract(const Duration(days: 4)),
+          documents: const <String>['profile_photo.jpg', 'aadhaar_card.png'],
+        ),
+        MedicalCertificate(
+          id: 'CERT-2',
+          type: 'Vaccination',
+          patientName: 'Anil kushwaha',
+          dateOfBirth: '14-06-2002',
+          gender: 'Male',
+          bloodGroup: 'B+',
+          heightCm: 175.0,
+          weightKg: 70.0,
+          medicalConditions: 'None',
+          medications: 'None',
+          doctor: allDoctors[1],
+          purpose: 'Employment',
+          additionalNotes: 'Need Hepatitis B vaccine certificate.',
+          status: 'PENDING',
+          requestDate: DateTime.now().subtract(const Duration(days: 1)),
+          documents: const <String>['vaccination_card.jpg'],
+        ),
+        MedicalCertificate(
+          id: 'CERT-3',
+          type: 'Second Opinion',
+          patientName: 'Meera Patel',
+          dateOfBirth: '1990-03-14',
+          gender: 'Female',
+          bloodGroup: 'B+',
+          heightCm: 162.0,
+          weightKg: 58.0,
+          medicalConditions: 'Migraine',
+          medications: 'Sumatriptan 50mg',
+          doctor: allDoctors[2],
+          purpose: 'Treatment Review',
+          additionalNotes:
+              'Checking neurologist opinion on headache treatment.',
+          status: 'REJECTED',
+          requestDate: DateTime.now().subtract(const Duration(days: 10)),
+          documents: const <String>['mri_brain_report.pdf'],
+        ),
+      ];
 
   static const List<String> trendingSpecialties = <String>[
     'Neurologist',
@@ -302,11 +309,15 @@ class DummyData {
     }
 
     if (normalized == 'today') {
-      return allAppointments.where((PatientAppointment item) => item.status == 'Today').toList();
+      return allAppointments
+          .where((PatientAppointment item) => item.status == 'Today')
+          .toList();
     }
 
     if (normalized == 'next 7 days') {
-      return allAppointments.where((PatientAppointment item) => item.status == 'Upcoming').toList();
+      return allAppointments
+          .where((PatientAppointment item) => item.status == 'Upcoming')
+          .toList();
     }
 
     return allAppointments;
@@ -368,6 +379,80 @@ class DummyData {
 
   static Future<void> toggleDoctorAvailability(bool available) async {
     await Future<void>.delayed(const Duration(milliseconds: 100));
-    _doctorDashboardData = _doctorDashboardData.copyWith(isAvailable: available);
+    _doctorDashboardData = _doctorDashboardData.copyWith(
+      isAvailable: available,
+    );
+  }
+
+  // ================= ADMIN DASHBOARD =================
+
+  static const AdminUser adminUser = AdminUser(
+    id: '#1',
+    name: 'MeAdmin',
+    email: 'admin@gmail.com',
+  );
+
+  static final AdminDashboardData _adminDashboardData = AdminDashboardData(
+    admin: adminUser,
+    totalDoctors: allDoctors.length,
+    totalPatients: 34,
+    todaysAppointments: _appointments().where((appointment) {
+      final date = appointment.dateTime;
+      final now = DateTime.now();
+
+      return date.year == now.year &&
+          date.month == now.month &&
+          date.day == now.day;
+    }).length,
+    pendingApprovals: 0,
+    appointments: _appointments(),
+    totalAppointments: _appointments().length,
+    completedAppointments: _appointments()
+        .where((e) => e.appointmentStatus == 'COMPLETED')
+        .length,
+    cancelledAppointments: _appointments()
+        .where((e) => e.appointmentStatus == 'CANCELLED')
+        .length,
+    pendingAppointments: _appointments()
+        .where((e) => e.appointmentStatus == 'PENDING')
+        .length,
+  );
+
+  static Future<AdminDashboardData> getAdminDashboardData() async {
+    await Future<void>.delayed(const Duration(milliseconds: 180));
+    return _adminDashboardData;
+  }
+
+  // ================= Enquiry =================
+  static final List<EnquiryModel> enquiries = [
+    EnquiryModel(
+      id: 1,
+      name: 'AMIT KUMAR MISHRA',
+      mobile: '9770483883',
+      email: 'akagnihotri797473@gmail.com',
+      concern: 'Lab',
+      subConcern: 'Order',
+      message: 'Looks better services',
+      status: 'Resolved',
+      date: '30-05-2026',
+    ),
+
+    EnquiryModel(
+      id: 2,
+      name: 'RAHUL SHARMA',
+      mobile: '9876543210',
+      email: 'rahul@gmail.com',
+      concern: 'Doctor',
+      subConcern: 'Appointment',
+      message: 'Unable to book appointment',
+      status: 'Pending',
+      date: '15-06-2026',
+    ),
+  ];
+
+  static Future<List<EnquiryModel>> getEnquiries() async {
+    await Future<void>.delayed(const Duration(milliseconds: 180));
+
+    return List<EnquiryModel>.from(enquiries);
   }
 }

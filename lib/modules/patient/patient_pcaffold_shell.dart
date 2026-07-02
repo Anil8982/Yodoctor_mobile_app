@@ -83,7 +83,11 @@ class _PatientScaffoldShellState extends State<PatientScaffoldShell> {
           child: const Center(
             child: Text(
               'QR Scanner Camera Open Here',
-              style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         );
@@ -110,7 +114,9 @@ class _PatientScaffoldShellState extends State<PatientScaffoldShell> {
         colorBehindNavBar: Theme.of(context).scaffoldBackgroundColor,
         border: Border(
           top: BorderSide(
-            color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.4),
+            color: Theme.of(
+              context,
+            ).colorScheme.outlineVariant.withValues(alpha: 0.4),
           ),
         ),
       ),
