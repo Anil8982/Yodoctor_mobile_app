@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
+import 'package:yodoctor/core/providers/app_role_provider.dart';
 
 import '../../../core/routes/app_routes.dart';
-import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/app_theme.dart' hide AppRole;
 import '../../../core/utils/app_spacing.dart';
 import '../../../core/models/doctor/doctor_dashboard_profile.dart';
 
-class DoctorDrawer extends StatelessWidget {
+
+class DoctorDrawer extends ConsumerWidget {
   const DoctorDrawer({super.key, required this.doctor});
 
   final DoctorDashboardProfile doctor;
 
   @override
-  Widget build(BuildContext context) {
+
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final String currentRoute = GoRouterState.of(context).uri.toString();
@@ -165,7 +168,9 @@ class DoctorDrawer extends StatelessWidget {
                     foregroundColor: colorScheme.error,
                     onTap: () {
                       Navigator.pop(context);
-                      Provider.of<AppRoleProvider>(context, listen: false).setRole(AppRole.patient);
+
+                      ref.read(appRoleProvider.notifier).setRole(AppRole.patient);
+
                       context.go(AppRoutes.landing);
                     },
                   ),
@@ -194,6 +199,7 @@ class DoctorDrawer extends StatelessWidget {
     );
   }
 }
+
 
 class _DoctorDrawerItem extends StatelessWidget {
   const _DoctorDrawerItem({
