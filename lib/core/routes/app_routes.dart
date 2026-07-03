@@ -23,10 +23,10 @@ class AppRoutes {
   static const String history = '/history';
   static const String services = '/services';
   static const String labTest = '/lab-test';
-  static const String labTestDetails = '/lab-test-details';
-  static const String labCart = '/lab-cart';
-  static const String allLabTests = '/all-lab-tests';
-  static const String labSlotBooking = '/lab-slot-booking';
+  static const String labTestDetails = '/lab-test/lab-test-details';
+  static const String labCart = '/lab-test/lab-cart';
+  static const String allLabTests = '/lab-test/all-lab-tests';
+  static const String labSlotBooking = '/lab-test/lab-cart/lab-slot-booking';
 
   static const String homeServiceBooking = '/home-service-booking';
 
