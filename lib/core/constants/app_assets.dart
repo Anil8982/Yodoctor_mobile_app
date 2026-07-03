@@ -14,6 +14,8 @@ abstract final class AppAssets {
   static const logoLightV = 'assets/logos/yo_light_v.png';
   static const logoDarkV = 'assets/logos/yo_dark_v.png';
 
+  static const google = 'assets/logos/google.png';
+
   static String logo(BuildContext context) {
     return Theme.of(context).brightness == Brightness.dark
         ? logoDark
