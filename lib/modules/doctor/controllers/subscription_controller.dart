@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/models/doctor/subscription_model.dart';
+import 'package:yodoctor/core/models/doctor/available_plan_model.dart';
+import 'package:yodoctor/core/utils/dummy_data.dart';
 
 class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
   @override
@@ -41,10 +43,15 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
         ),
       ];
 
+      final bool hasNoActivePlan = !mockPlan.isActive;
+
       state = DoctorSubscriptionState(
         isLoading: false,
         currentPlan: mockPlan,
         billingHistory: mockHistory,
+        showPlans: hasNoActivePlan,
+        isYearly: false,
+        selectedNewPlan: null,
       );
     } catch (_) {
       state = state.copyWith(
@@ -54,9 +61,34 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
     }
   }
 
-  Future<void> upgradePlan() async {
+  void toggleDuration(bool isYearly) {
+    state = state.copyWith(isYearly: isYearly, clearSelectedPlan: true);
+  }
 
-    //TODO fun upgradePlan
+  void selectNewPlan(AvailablePlan plan) {
+    state = state.copyWith(selectedNewPlan: plan);
+  }
+
+  void showUpgradePlans() {
+    state = state.copyWith(showPlans: true);
+  }
+
+  List<AvailablePlan> getAvailablePlans() {
+    return state.isYearly ? DummyData.yearlyAvailablePlans : DummyData.monthlyAvailablePlans;
+  }
+
+  Future<void> upgradePlan() async {
+    if (state.selectedNewPlan == null) return;
+    state = state.copyWith(isLoading: true);
+    try {
+      await Future.delayed(const Duration(milliseconds: 800));
+      await loadSubscriptionDetails();
+    } catch (_) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Payment initialization failed.',
+      );
+    }
   }
 }
 

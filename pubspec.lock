@@ -61,10 +61,10 @@ packages:
     dependency: "direct main"
     description:
       name: chroma_kit
-      sha256: "3bed3bbe04239e8eeb02e867c842974cfb1db86a8178dd80c48674702ce5e1fe"
+      sha256: dc1b6a0c486921a7a80bea5c8b701d926373bcafabbc4a02b75093ba517f7535
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.0"
+    version: "1.2.0"
   chroma_theme:
     dependency: "direct main"
     description:

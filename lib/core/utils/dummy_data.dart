@@ -6,6 +6,7 @@ export '../models/patient/patient_dashboard_data.dart';
 export '../models/patient/patient_token.dart';
 export '../models/patient/patient_user.dart';
 import 'package:flutter/material.dart';
+import 'package:yodoctor/core/models/doctor/available_plan_model.dart';
 import 'package:yodoctor/core/models/doctor/review_item.dart';
 import 'package:yodoctor/core/models/notification_item.dart';
 import 'package:yodoctor/core/models/patient/lab_test_model.dart';
@@ -729,5 +730,71 @@ class DummyData {
       categoryId: 'diabetes',
     ),
   ];
+
+
+  static const List<AvailablePlan> monthlyAvailablePlans = <AvailablePlan>[
+    AvailablePlan(
+      id: 'free_trial_mo',
+      title: '45 Days Free Trial',
+      originalPrice: 0.0,
+      currentPrice: 0.0,
+      durationText: '1.5 Months Subscription',
+      description: 'Experience all premium features free for 45 days with no setup cost.',
+      badgeText: 'FREE',
+      discountPercentage: '0%',
+    ),
+    AvailablePlan(
+      id: '3_month_mo',
+      title: '3 Month Plan',
+      originalPrice: 2397.0,
+      currentPrice: 1199.0,
+      durationText: '3 Months Subscription',
+      description: 'Pay for only 45 days and use Yo Doctor for 3 full months.',
+      badgeText: '45 DAYS FREE',
+      discountPercentage: '50% OFF',
+    ),
+    AvailablePlan(
+      id: '6_month_mo',
+      title: '6 Month Plan',
+      originalPrice: 4794.0,
+      currentPrice: 2397.0,
+      durationText: '6 Months Subscription',
+      description: 'Pay for only 3 months and get additional 3 months absolutely free.',
+      badgeText: '3 MONTHS FREE',
+      discountPercentage: '50% OFF',
+      isBestValue: true,
+    ),
+  ];
+
+  static const List<AvailablePlan> yearlyAvailablePlans = <AvailablePlan>[
+    AvailablePlan(
+      id: 'free_trial_yr',
+      title: '45 Days Free Trial',
+      originalPrice: 0.0,
+      currentPrice: 0.0,
+      durationText: '1.5 Months Subscription',
+      description: 'Experience all premium features free for 45 days with no setup cost.',
+      badgeText: 'FREE',
+      discountPercentage: '0%',
+    ),
+    AvailablePlan(
+      id: '12_month_yr',
+      title: '1 Year Plan',
+      originalPrice: 9588.0,
+      currentPrice: 7670.0,
+      durationText: '12 Months Subscription',
+      description: 'Best choice for continuous practices with full year coverage.',
+      badgeText: 'SAVE 20%',
+      discountPercentage: '20% OFF',
+      isBestValue: true,
+    ),
+  ];
+
+  static Future<List<AvailablePlan>> fetchAvailableSubscriptionPlans({
+    required bool isYearly,
+  }) async {
+    await Future<void>.delayed(const Duration(milliseconds: 150));
+    return isYearly ? yearlyAvailablePlans : monthlyAvailablePlans;
+  }
 
 }
