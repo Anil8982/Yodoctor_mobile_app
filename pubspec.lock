@@ -65,14 +65,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.0"
-  chroma_theme:
-    dependency: "direct main"
-    description:
-      name: chroma_theme
-      sha256: a7ef8fd4c94d063aabf99bbcb6dadf5c49d4748b4aa3da80c97c718e2127acb5
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.0+3"
   cli_config:
     dependency: transitive
     description:
@@ -369,7 +361,7 @@ packages:
     source: hosted
     version: "2.2.0"
   riverpod:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: riverpod
       sha256: "17100416c51db7810c71a7bb2c34d1f881faa0074fd452afb0c4db6f8f126c76"

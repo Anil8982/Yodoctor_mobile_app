@@ -42,4 +42,15 @@ class AppRoutes {
   static const String doctorAddPrescription = '/doctor/add-prescription/:id';
   static const String doctorNotifications = '/doctor/notifications';
   static const String doctorReviews = '/doctor/reviews';
+
+
+  // Admin
+
+  static const String adminDashboard = '/admin/dashboard';
+  static const String doctorsManagement =
+      '/doctorsmanagement';
+  static const String enquiry = '/enquiry';
+  static const String homeCareBooking = '/homecarebookings';
+
+
 }

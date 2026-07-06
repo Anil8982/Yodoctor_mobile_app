@@ -1,6 +1,7 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:yodoctor/core/theme/app_theme.dart' hide AppRole;
 import 'package:yodoctor/core/providers/app_role_provider.dart';
@@ -81,11 +82,9 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
 
     if (!mounted) return;
 
-    // 🎯 FIX: Update the global role state to patient using the manual notifier configuration channel
     ref.read(appRoleProvider.notifier).setRole(AppRole.patient);
 
-    // Context flow router pipeline transitions immediately following profile setup parameters boundary
-    // context.go(AppRoutes.dashboard);
+    context.go('/patient-dashboard');
   }
 
   Future<void> _pickDateOfBirth() async {
@@ -158,10 +157,7 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                               color: colorScheme.onPrimary.transparency(0.25),
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: Icon(
-                              Icons.arrow_back_rounded,
-                              color: colorScheme.onPrimary,
-                            ),
+                            child: Icon(Icons.arrow_back_rounded, color: colorScheme.onPrimary),
                           ),
                         ),
                         const Spacer(),
@@ -207,11 +203,7 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                                       shape: BoxShape.circle,
                                       color: AppTheme.yoGreenLight,
                                     ),
-                                    child: Icon(
-                                      Icons.person_rounded,
-                                      color: AppTheme.yoGreen,
-                                      size: 24,
-                                    ),
+                                    child: Icon(Icons.person_rounded, color: AppTheme.yoGreen, size: 24),
                                   ),
                                   const SizedBox(width: 14),
                                   Column(
@@ -250,12 +242,8 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                                 prefixIcon: Icons.email_rounded,
                                 keyboardType: TextInputType.emailAddress,
                                 validator: (v) {
-                                  if (v == null || v.isEmpty) {
-                                    return 'Enter email';
-                                  }
-                                  if (!RegExp(r'\S+@\S+\.\S+').hasMatch(v)) {
-                                    return 'Enter valid email';
-                                  }
+                                  if (v == null || v.isEmpty) return 'Enter email';
+                                  if (!RegExp(r'\S+@\S+\.\S+').hasMatch(v)) return 'Enter valid email';
                                   return null;
                                 },
                               ),
@@ -282,25 +270,15 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                                   GestureDetector(
                                     onTap: _pickDateOfBirth,
                                     child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 16,
-                                        vertical: 16,
-                                      ),
+                                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                                       decoration: BoxDecoration(
                                         color: colorScheme.surfaceContainerLow,
                                         borderRadius: BorderRadius.circular(14),
-                                        border: Border.all(
-                                          color: colorScheme.outlineVariant,
-                                          width: 1.2,
-                                        ),
+                                        border: Border.all(color: colorScheme.outlineVariant, width: 1.2),
                                       ),
                                       child: Row(
                                         children: [
-                                          Icon(
-                                            Icons.calendar_today_rounded,
-                                            color: AppTheme.secondary,
-                                            size: 20,
-                                          ),
+                                          Icon(Icons.calendar_today_rounded, color: AppTheme.secondary, size: 20),
                                           const SizedBox(width: 12),
                                           Text(
                                             _selectedDOB != null
@@ -309,15 +287,11 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                                             style: textTheme.bodyMedium?.copyWith(
                                               color: _selectedDOB != null
                                                   ? colorScheme.onSurface
-                                                  : colorScheme.onSurfaceVariant
-                                                  .transparency(0.65),
+                                                  : colorScheme.onSurfaceVariant.transparency(0.65),
                                             ),
                                           ),
                                           const Spacer(),
-                                          Icon(
-                                            Icons.keyboard_arrow_down_rounded,
-                                            color: colorScheme.onSurfaceVariant,
-                                          ),
+                                          Icon(Icons.keyboard_arrow_down_rounded, color: colorScheme.onSurfaceVariant),
                                         ],
                                       ),
                                     ),
@@ -325,12 +299,7 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                                   if (_dobError != null)
                                     Padding(
                                       padding: const EdgeInsets.only(top: 6),
-                                      child: Text(
-                                        _dobError!,
-                                        style: textTheme.bodySmall?.copyWith(
-                                          color: colorScheme.error,
-                                        ),
-                                      ),
+                                      child: Text(_dobError!, style: textTheme.bodySmall?.copyWith(color: colorScheme.error)),
                                     ),
                                 ],
                               ),
@@ -356,12 +325,7 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                                   if (_genderError != null)
                                     Padding(
                                       padding: const EdgeInsets.only(top: 6),
-                                      child: Text(
-                                        _genderError!,
-                                        style: textTheme.bodySmall?.copyWith(
-                                          color: colorScheme.error,
-                                        ),
-                                      ),
+                                      child: Text(_genderError!, style: textTheme.bodySmall?.copyWith(color: colorScheme.error)),
                                     ),
                                 ],
                               ),
@@ -375,12 +339,8 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                                 prefixIcon: Icons.lock_rounded,
                                 isPassword: true,
                                 validator: (v) {
-                                  if (v == null || v.isEmpty) {
-                                    return 'Enter password';
-                                  }
-                                  if (v.length < 8) {
-                                    return 'Password must be 8 characters';
-                                  }
+                                  if (v == null || v.isEmpty) return 'Enter password';
+                                  if (v.length < 8) return 'Password must be 8 characters';
                                   return null;
                                 },
                               ),
@@ -392,12 +352,8 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                                 prefixIcon: Icons.lock_outline_rounded,
                                 isPassword: true,
                                 validator: (v) {
-                                  if (v == null || v.isEmpty) {
-                                    return 'Confirm password';
-                                  }
-                                  if (v != _passwordController.text) {
-                                    return 'Passwords do not match';
-                                  }
+                                  if (v == null || v.isEmpty) return 'Confirm password';
+                                  if (v != _passwordController.text) return 'Passwords do not match';
                                   return null;
                                 },
                               ),
@@ -410,32 +366,22 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                                       width: 22,
                                       height: 22,
                                       decoration: BoxDecoration(
-                                        color: _agreedToTerms
-                                            ? AppTheme.secondary
-                                            : colorScheme.surface.transparency(0),
+                                        color: _agreedToTerms ? AppTheme.secondary : colorScheme.surface.transparency(0),
                                         border: Border.all(
-                                          color: _agreedToTerms
-                                              ? AppTheme.secondary
-                                              : colorScheme.outlineVariant,
+                                          color: _agreedToTerms ? AppTheme.secondary : colorScheme.outlineVariant,
                                           width: 2,
                                         ),
                                         borderRadius: BorderRadius.circular(6),
                                       ),
                                       child: _agreedToTerms
-                                          ? Icon(
-                                        Icons.check,
-                                        color: colorScheme.onPrimary,
-                                        size: 14,
-                                      )
+                                          ? Icon(Icons.check, color: colorScheme.onPrimary, size: 14)
                                           : null,
                                     ),
                                     const SizedBox(width: 10),
                                     Expanded(
                                       child: RichText(
                                         text: TextSpan(
-                                          style: textTheme.labelMedium?.copyWith(
-                                            color: colorScheme.onSurfaceVariant,
-                                          ),
+                                          style: textTheme.labelMedium?.copyWith(color: colorScheme.onSurfaceVariant),
                                           children: [
                                             const TextSpan(text: 'I agree to the '),
                                             TextSpan(
@@ -479,9 +425,7 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                                   children: [
                                     Text(
                                       'Already have an account? ',
-                                      style: textTheme.labelMedium?.copyWith(
-                                        color: colorScheme.onSurfaceVariant,
-                                      ),
+                                      style: textTheme.labelMedium?.copyWith(color: colorScheme.onSurfaceVariant),
                                     ),
                                     GestureDetector(
                                       onTap: () => Navigator.pop(context),

@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/models/patient/lab_test_model.dart';
 import 'package:yodoctor/core/utils/dummy_data.dart';
+import 'package:yodoctor/modules/admin/admin_scaffold_shell.dart';
+import 'package:yodoctor/modules/admin/screens/doctors_management/doctor_management_screen.dart';
+import 'package:yodoctor/modules/admin/screens/enquiries/enquiry_screen.dart';
+import 'package:yodoctor/modules/admin/screens/home_care_bookings/home_care_bookings_screen.dart';
 import 'package:yodoctor/modules/patient/screens/home_care/home_service_booking_screen.dart';
 
 import 'app_routes.dart';
@@ -231,6 +235,30 @@ class AppRouter {
         parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.homeServiceBooking,
         builder: (context, state) => const HomeServiceBookingScreen(),
+      ),
+
+
+      // Admin
+
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: AppRoutes.adminDashboard,
+        builder: (context, state) => const AdminScaffoldShell(),
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: AppRoutes.enquiry,
+        builder: (context, state) => EnquiryScreen(),
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: AppRoutes.homeCareBooking,
+        builder: (context, state) => HomeCareBookingsScreen(),
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: AppRoutes.doctorsManagement,
+        builder: (context, state) => DoctorsManagementScreen(),
       ),
 
       StatefulShellRoute.indexedStack(

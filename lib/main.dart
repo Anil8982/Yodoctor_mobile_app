@@ -8,20 +8,14 @@ import 'core/providers/app_role_provider.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
-  runApp(
-    const ProviderScope(
-      child: YoDoctorApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: YoDoctorApp()));
 }
-
 
 class YoDoctorApp extends ConsumerWidget {
   const YoDoctorApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Reactively watch role changes safely from its dedicated file channel
     final currentRole = ref.watch(appRoleProvider);
 
     return MaterialApp.router(
@@ -29,11 +23,20 @@ class YoDoctorApp extends ConsumerWidget {
       debugShowCheckedModeBanner: false,
       routerConfig: AppRouter.router,
 
-      theme: currentRole == AppRole.doctor
-          ? AppTheme.doctorTheme
-          : AppTheme.patientTheme,
+      theme: _getThemeForRole(currentRole),
 
       themeMode: ThemeMode.light,
     );
+  }
+
+  ThemeData _getThemeForRole(AppRole role) {
+    switch (role) {
+      case AppRole.doctor:
+        return AppTheme.doctorTheme;
+      case AppRole.admin:
+        return AppTheme.adminTheme;
+      case AppRole.patient:
+        return AppTheme.patientTheme;
+    }
   }
 }
