@@ -226,6 +226,7 @@ class _YoLoginTextFieldState extends State<YoLoginTextField> {
     final colorScheme = Theme.of(context).colorScheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
         Container(
           height: 50,
@@ -236,7 +237,7 @@ class _YoLoginTextFieldState extends State<YoLoginTextField> {
               color: _errorText != null
                   ? colorScheme.error
                   : (_isFocused ? widget.color : colorScheme.outlineVariant),
-              width: _isFocused || _errorText != null ? 2 : 1.2,
+              width: _isFocused || _errorText != null ? 2 : 1,
             ),
           ),
           child: Row(
@@ -247,8 +248,8 @@ class _YoLoginTextFieldState extends State<YoLoginTextField> {
                 decoration: BoxDecoration(
                   color: _errorText != null ? colorScheme.error : widget.color,
                   borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(11),
-                    bottomLeft: Radius.circular(11),
+                    topLeft: Radius.circular(10),
+                    bottomLeft: Radius.circular(10),
                   ),
                 ),
                 child: Icon(widget.prefixIcon, color: Colors.white, size: 22),
@@ -262,7 +263,7 @@ class _YoLoginTextFieldState extends State<YoLoginTextField> {
                   child: TextFormField(
                     focusNode: _focusNode,
                     controller: widget.controller,
-                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    autovalidateMode: AutovalidateMode.disabled,
                     validator: (value) {
                       final error = widget.validator?.call(value);
                       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -323,14 +324,18 @@ class _YoLoginTextFieldState extends State<YoLoginTextField> {
             ],
           ),
         ),
-        if (_errorText != null && _errorText!.isNotEmpty)
-          Padding(
+        SizedBox(
+          height: 20,
+          child: _errorText != null && _errorText!.isNotEmpty
+              ? Padding(
             padding: const EdgeInsets.only(left: 12, top: 4),
             child: Text(
               _errorText!,
               style: TextStyle(color: colorScheme.error, fontSize: 12, fontWeight: FontWeight.w500),
             ),
-          ),
+          )
+              : const SizedBox.shrink(),
+        ),
       ],
     );
   }
@@ -424,7 +429,7 @@ class YoLogoBar extends StatelessWidget {
           text: TextSpan(
             children: [
               TextSpan(
-                text: 'yo',
+                text: 'Yo',
                 style: textTheme.headlineSmall?.copyWith(
                   color: colorScheme.primary,
                   fontWeight: FontWeight.w800,
