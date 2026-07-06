@@ -1,5 +1,6 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/doctor_login_screen.dart';
 import 'package:yodoctor/modules/auth/screens/patient/patient_login_screen.dart';
@@ -27,9 +28,7 @@ class _LandingScreenState extends State<LandingScreen> {
               return SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: constraints.maxHeight,
-                  ),
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
                   child: IntrinsicHeight(
                     child: Column(
                       children: [
@@ -45,7 +44,9 @@ class _LandingScreenState extends State<LandingScreen> {
                                 colorScheme.secondary.transparency(.2),
                               ],
                             ),
-                            borderRadius: const BorderRadius.vertical(bottom: Radius.circular(36)),
+                            borderRadius: const BorderRadius.vertical(
+                              bottom: Radius.circular(36),
+                            ),
                             boxShadow: [
                               BoxShadow(
                                 color: colorScheme.primary.transparency(0.12),
@@ -64,7 +65,9 @@ class _LandingScreenState extends State<LandingScreen> {
                                   height: 160,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
-                                    color: colorScheme.onPrimary.transparency(0.08),
+                                    color: colorScheme.onPrimary.transparency(
+                                      0.08,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -76,10 +79,12 @@ class _LandingScreenState extends State<LandingScreen> {
                                     Container(
                                       padding: const EdgeInsets.all(16),
                                       decoration: BoxDecoration(
-                                        color: colorScheme.onPrimary.transparency(0.12),
+                                        color: colorScheme.onPrimary
+                                            .transparency(0.12),
                                         shape: BoxShape.circle,
                                         border: Border.all(
-                                          color: colorScheme.onPrimary.transparency(0.2),
+                                          color: colorScheme.onPrimary
+                                              .transparency(0.2),
                                           width: 1.5,
                                         ),
                                       ),
@@ -99,7 +104,8 @@ class _LandingScreenState extends State<LandingScreen> {
                                     Text(
                                       'Your health, connected.',
                                       style: textTheme.bodyMedium?.copyWith(
-                                        color: colorScheme.onPrimary.transparency(0.85),
+                                        color: colorScheme.onPrimary
+                                            .transparency(0.85),
                                         fontWeight: FontWeight.w500,
                                         letterSpacing: 0.6,
                                       ),
@@ -147,7 +153,7 @@ class _LandingScreenState extends State<LandingScreen> {
                             style: textTheme.titleSmall?.copyWith(
                               color: colorScheme.onSurfaceVariant,
                               fontWeight: FontWeight.w600,
-                              letterSpacing: 1.5
+                              letterSpacing: 1.5,
                             ),
                           ),
                         ),
@@ -163,7 +169,9 @@ class _LandingScreenState extends State<LandingScreen> {
                           onTap: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (_) => const DoctorLoginScreen()),
+                              MaterialPageRoute(
+                                builder: (_) => const DoctorLoginScreen(),
+                              ),
                             );
                           },
                         ),
@@ -176,9 +184,15 @@ class _LandingScreenState extends State<LandingScreen> {
                           subtitle: 'Book appointments & track health',
                           gradient: AppTheme.patientGradient,
                           onTap: () {
+                            Provider.of<AppRoleProvider>(
+                              context,
+                              listen: false,
+                            ).setRole(AppRole.patient);
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (_) => const PatientLoginScreen()),
+                              MaterialPageRoute(
+                                builder: (_) => const PatientLoginScreen(),
+                              ),
                             );
                           },
                         ),
