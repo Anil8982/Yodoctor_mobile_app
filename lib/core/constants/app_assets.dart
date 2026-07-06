@@ -16,6 +16,14 @@ abstract final class AppAssets {
 
   static const google = 'assets/logos/google.png';
 
+  static const doctorIcon = 'assets/icons/doctor.png';
+  static const patientIcon = 'assets/icons/patient.png';
+  static const protectionIcon = 'assets/icons/protection.png';
+  static const healthcareIcon = 'assets/icons/healthcare.png';
+
+
+
+
   static String logo(BuildContext context) {
     return Theme.of(context).brightness == Brightness.dark
         ? logoDark

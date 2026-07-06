@@ -1,8 +1,10 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:yodoctor/core/constants/app_assets.dart';
+import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
-import 'package:yodoctor/modules/auth/screens/doctor/doctor_login_screen.dart';
-import 'package:yodoctor/modules/auth/screens/patient/patient_login_screen.dart';
+import 'package:yodoctor/modules/auth/screens/landing/widgets/yo_role_btn.dart';
 
 class LandingScreen extends StatefulWidget {
   const LandingScreen({super.key});
@@ -27,83 +29,111 @@ class _LandingScreenState extends State<LandingScreen> {
               return SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: constraints.maxHeight,
-                  ),
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
                   child: IntrinsicHeight(
                     child: Column(
                       children: [
                         Container(
-                          height: 260,
+                          height: 240,
                           width: double.infinity,
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                               colors: [
-                                colorScheme.secondary.transparency(.8),
-                                colorScheme.secondary.transparency(.2),
+                                colorScheme.secondary,
+                                colorScheme.primary
+                                    .blendWith(colorScheme.secondary, 0.5)
+                                    .transparency(0.5),
+                                colorScheme.primary,
                               ],
                             ),
-                            borderRadius: const BorderRadius.vertical(bottom: Radius.circular(36)),
-                            boxShadow: [
-                              BoxShadow(
-                                color: colorScheme.primary.transparency(0.12),
-                                blurRadius: 24,
-                                offset: const Offset(0, 10),
-                              ),
-                            ],
+                            borderRadius: BorderRadius.only(
+                              bottomLeft: Radius.circular(70),
+                              bottomRight: Radius.circular(70),
+                            ),
                           ),
                           child: Stack(
                             children: [
                               Positioned(
-                                top: -40,
-                                right: -40,
+                                left: -40,
+                                bottom: 20,
+                                child: Container(
+                                  width: 120,
+                                  height: 120,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.white.transparency(0.15),
+                                  ),
+                                ),
+                              ),
+                              Positioned(
+                                top: -30,
+                                right: -30,
                                 child: Container(
                                   width: 160,
                                   height: 160,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
-                                    color: colorScheme.onPrimary.transparency(0.08),
+                                    color: Colors.white.transparency(0.1),
                                   ),
                                 ),
                               ),
                               Center(
                                 child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
-                                    const SizedBox(height: 28),
+                                    const SizedBox(height: 16),
                                     Container(
-                                      padding: const EdgeInsets.all(16),
+                                      width: 130,
+                                      height: 130,
                                       decoration: BoxDecoration(
-                                        color: colorScheme.onPrimary.transparency(0.12),
+                                        color: colorScheme.surfaceContainer,
                                         shape: BoxShape.circle,
-                                        border: Border.all(
-                                          color: colorScheme.onPrimary.transparency(0.2),
-                                          width: 1.5,
+                                        boxShadow: const [
+                                          BoxShadow(
+                                            color: Colors.black12,
+                                            blurRadius: 12,
+                                            offset: Offset(0, 4),
+                                          ),
+                                        ],
+                                      ),
+                                      padding: const EdgeInsets.all(4),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(55),
+                                        child: Image.asset(
+                                          AppAssets.logoV(context),
+                                          fit: BoxFit.contain,
                                         ),
                                       ),
-                                      child: Icon(
-                                        Icons.medical_services_rounded,
-                                        size: 44,
-                                        color: colorScheme.onPrimary,
-                                      ),
                                     ),
-                                    const SizedBox(height: 16),
-                                    Image.asset(
-                                      'assets/images/Logo.jpg',
-                                      height: 52,
-                                      fit: BoxFit.contain,
+                                    const SizedBox(height: 15),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.security_rounded,
+                                          color: colorScheme.surfaceContainer,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          'Your health, connected.',
+                                          style: textTheme.bodyLarge?.copyWith(
+                                            color: colorScheme.onPrimary,
+                                            fontWeight: FontWeight.w600,
+                                            letterSpacing: 0.5,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Icon(
+                                          Icons.favorite_rounded,
+                                          color: Colors.white.transparency(0.8),
+                                          size: 18,
+                                        ),
+                                      ],
                                     ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      'Your health, connected.',
-                                      style: textTheme.bodyMedium?.copyWith(
-                                        color: colorScheme.onPrimary.transparency(0.85),
-                                        fontWeight: FontWeight.w500,
-                                        letterSpacing: 0.6,
-                                      ),
-                                    ),
+                                    const SizedBox(height: 8,)
                                   ],
                                 ),
                               ),
@@ -116,20 +146,38 @@ class _LandingScreenState extends State<LandingScreen> {
                           padding: const EdgeInsets.symmetric(horizontal: 24),
                           child: Column(
                             children: [
-                              Text(
-                                'Healthcare simplified for everyone',
-                                textAlign: TextAlign.center,
-                                style: textTheme.headlineSmall?.copyWith(
-                                  fontWeight: FontWeight.w800,
-                                  color: colorScheme.onSurface,
+                              Text.rich(
+                                TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: 'Healthcare simplified\n',
+                                      style: textTheme.headlineMedium?.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        color: colorScheme.onSurface,
+                                        letterSpacing: 0.5,
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: 'for everyone',
+                                      style: textTheme.headlineMedium?.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        color: colorScheme.primary,
+                                        letterSpacing: 0.5,
+                                      ),
+                                    ),
+                                  ],
                                 ),
+                                textAlign: TextAlign.center,
                               ),
                               const SizedBox(height: 16),
                               SizedBox(
                                 width: double.infinity,
                                 child: Image.asset(
-                                  'assets/images/doctor_team.jpg',
-                                  height: 160,
+                                  AppAssets.protectionIcon,
+                                  height: 50,
+                                  color: colorScheme.secondary.transparency(
+                                    0.9,
+                                  ),
                                   fit: BoxFit.contain,
                                 ),
                               ),
@@ -137,7 +185,7 @@ class _LandingScreenState extends State<LandingScreen> {
                           ),
                         ),
 
-                        const Spacer(flex: 2),
+                        const SizedBox(height: 16),
 
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 26),
@@ -147,43 +195,92 @@ class _LandingScreenState extends State<LandingScreen> {
                             style: textTheme.titleSmall?.copyWith(
                               color: colorScheme.onSurfaceVariant,
                               fontWeight: FontWeight.w600,
-                              letterSpacing: 1.5
+                              letterSpacing: 1,
                             ),
                           ),
                         ),
                         const SizedBox(height: 20),
 
-                        _GradientButton(
-                          height: 78,
-                          imageSize: 36,
-                          imagePath: 'assets/images/doctorLogo.jpg',
-                          title: 'I am a Doctor',
-                          subtitle: 'Manage patients & schedules',
-                          gradient: AppTheme.doctorGradient,
+                        const Spacer(flex: 1),
+
+                        YoRoleButton(
+                          isDoctor: true,
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (_) => const DoctorLoginScreen()),
-                            );
+                            context.push(AppRoutes.doctorLogin);
                           },
                         ),
                         const SizedBox(height: 14),
-                        _GradientButton(
-                          height: 78,
-                          imageSize: 36,
-                          imagePath: 'assets/images/patientlogo.png',
-                          title: 'I am a Patient',
-                          subtitle: 'Book appointments & track health',
-                          gradient: AppTheme.patientGradient,
+                        YoRoleButton(
+                          isDoctor: false,
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (_) => const PatientLoginScreen()),
-                            );
+                            context.push(AppRoutes.patientLogin);
                           },
                         ),
 
                         const Spacer(flex: 1),
+
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 20,
+                          ),
+                          child: IntrinsicHeight(
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: _buildFeatureItem(
+                                    context,
+                                    icon: Icons.verified_user_rounded,
+                                    title: 'Secure & Private',
+                                    subtitle: 'Your data is safe',
+                                    iconColor: colorScheme.secondary,
+                                    bgColor: colorScheme.secondary.transparency(
+                                      0.08,
+                                    ),
+                                  ),
+                                ),
+                                VerticalDivider(
+                                  color: colorScheme.outlineVariant
+                                      .transparency(0.6),
+                                  thickness: 1,
+                                  indent: 6,
+                                  endIndent: 6,
+                                ),
+                                Expanded(
+                                  child: _buildFeatureItem(
+                                    context,
+                                    icon: Icons.access_time_filled_rounded,
+                                    title: 'Quick Access',
+                                    subtitle: 'Healthcare at your fingertips',
+                                    iconColor: colorScheme.primary,
+                                    bgColor: colorScheme.primary.transparency(
+                                      0.08,
+                                    ),
+                                  ),
+                                ),
+                                VerticalDivider(
+                                  color: colorScheme.outlineVariant
+                                      .transparency(0.6),
+                                  thickness: 1,
+                                  indent: 6,
+                                  endIndent: 6,
+                                ),
+                                Expanded(
+                                  child: _buildFeatureItem(
+                                    context,
+                                    icon: Icons.favorite_rounded,
+                                    title: 'Trusted Care',
+                                    subtitle: 'Quality doctors you can trust',
+                                    iconColor: colorScheme.tertiary,
+                                    bgColor: colorScheme.tertiary.transparency(
+                                      0.08,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                         const SizedBox(height: 16),
                       ],
                     ),
@@ -196,110 +293,53 @@ class _LandingScreenState extends State<LandingScreen> {
       ),
     );
   }
-}
 
-class _GradientButton extends StatelessWidget {
-  final String imagePath;
-  final String title;
-  final String subtitle;
-  final Gradient gradient;
-  final VoidCallback onTap;
-  final double height;
-  final double imageSize;
-
-  const _GradientButton({
-    required this.imagePath,
-    required this.title,
-    required this.subtitle,
-    required this.gradient,
-    required this.onTap,
-    required this.height,
-    required this.imageSize,
-  });
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildFeatureItem(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required Color iconColor,
+    required Color bgColor,
+  }) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: gradient,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: gradient.colors.first.transparency(0.25),
-              blurRadius: 14,
-              offset: const Offset(0, 5),
-            ),
-          ],
-        ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: onTap,
-            borderRadius: BorderRadius.circular(20),
-            splashColor: colorScheme.onPrimary.transparency(0.15),
-            highlightColor: Colors.transparent,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 18),
-              child: SizedBox(
-                height: height,
-                child: Row(
-                  children: [
-                    Container(
-                      width: imageSize + 12,
-                      height: imageSize + 12,
-                      decoration: BoxDecoration(
-                        color: colorScheme.onPrimary.transparency(0.2),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Center(
-                        child: Image.asset(
-                          imagePath,
-                          width: imageSize,
-                          height: imageSize,
-                          fit: BoxFit.contain,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            title,
-                            style: textTheme.titleMedium?.copyWith(
-                              color: colorScheme.onPrimary,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 0.2,
-                            ),
-                          ),
-                          const SizedBox(height: 1),
-                          Text(
-                            subtitle,
-                            style: textTheme.bodySmall?.copyWith(
-                              color: colorScheme.onPrimary.transparency(0.75),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Icon(
-                      Icons.arrow_forward_ios_rounded,
-                      color: colorScheme.onPrimary,
-                      size: 18,
-                    ),
-                  ],
-                ),
-              ),
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(color: bgColor, shape: BoxShape.circle),
+            child: Icon(icon, color: iconColor, size: 18),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            title,
+            maxLines: 2,
+            textAlign: TextAlign.center,
+            overflow: TextOverflow.ellipsis,
+            style: textTheme.labelSmall?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: colorScheme.onSurface,
+              fontSize: 11,
             ),
           ),
-        ),
+          const SizedBox(height: 1),
+          Text(
+            subtitle,
+            maxLines: 3,
+            textAlign: TextAlign.center,
+            overflow: TextOverflow.ellipsis,
+            style: textTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurfaceVariant.transparency(0.7),
+              fontSize: 9,
+            ),
+          ),
+        ],
       ),
     );
   }
