@@ -1,17 +1,16 @@
-import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 
 class DoctorAvatar extends StatelessWidget {
   final Color color;
-  final IconData icon;
+  final Widget icon;
 
   const DoctorAvatar({super.key, required this.color, required this.icon});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 80,
-      height: 80,
+      width: 110,
+      height: 110,
       decoration: BoxDecoration(
         color: Colors.white,
         shape: BoxShape.circle,
@@ -25,13 +24,13 @@ class DoctorAvatar extends StatelessWidget {
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(5),
+        padding: const EdgeInsets.all(1),
         child: Container(
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: color.withValues(alpha: .10),
           ),
-          child: Icon(icon, size: 34, color: color),
+          child: Center(child: icon),
         ),
       ),
     );
@@ -42,105 +41,70 @@ class TopBackground extends StatelessWidget {
   final Color color;
 
   const TopBackground({super.key, required this.color});
+
+  static const double headerHeight = 200;
+
   @override
   Widget build(BuildContext context) {
-    final scale = MediaQuery.of(context).size.width / 393;
-
     return SizedBox(
-      height: 220 * scale,
+      height: headerHeight,
       width: double.infinity,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          /// Back Circle
-          Positioned(
-            top: -230 * scale,
-            left: -170 * scale,
-            right: -170 * scale,
-            child: Container(
-              height: 450 * scale,
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: .80),
-                shape: BoxShape.circle,
-              ),
-            ),
-          ),
-
-          /// Front Circle
-          Positioned(
-            top: -255 * scale,
-            left: -70 * scale,
-            right: -70 * scale,
-            child: Container(
-              height: 440 * scale,
-              decoration: BoxDecoration(
-                color: color,
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: .08),
-                    blurRadius: 18 * scale,
-                    offset: Offset(0, 6 * scale),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
+      child: CustomPaint(painter: _TopBackgroundPainter(color)),
     );
   }
 }
-// class TopBackground extends StatelessWidget {
-//   const TopBackground({super.key});
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return SizedBox(
-//       height: 200,
-//       width: double.infinity,
-//       child: Stack(
-//         clipBehavior: Clip.none,
-//         children: [
-//           /// Back Circle (light green)
-//           Positioned(
-//             top: -240,
-//             left: -170,
-//             right: -170,
-//             child: Container(
-//               height: 440,
-//               decoration: BoxDecoration(
-//                 color: AppTheme.secondary.transparency(.80),
-//                 shape: BoxShape.circle,
-//               ),
-//             ),
-//           ),
+class _TopBackgroundPainter extends CustomPainter {
+  final Color color;
 
-//           /// Front Circle (dark green)
-//           Positioned(
-//             top: -265,
-//             left: -70,
-//             right: -70,
-//             child: Container(
-//               height: 430,
-//               decoration: BoxDecoration(
-//                 color: AppTheme.secondary,
-//                 shape: BoxShape.circle,
-//                 boxShadow: [
-//                   BoxShadow(
-//                     color: Colors.black.transparency(.08),
-//                     blurRadius: 18,
-//                     offset: const Offset(0, 6),
-//                   ),
-//                 ],
-//               ),
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
+  _TopBackgroundPainter(this.color);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final backPaint = Paint()
+      ..color = color.withValues(alpha: .80)
+      ..style = PaintingStyle.fill;
+
+    final frontPaint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+
+    final shadowPaint = Paint()
+      ..color = Colors.black.withValues(alpha: .08)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 18);
+
+    // Fixed header height
+    const double headerHeight = 200;
+
+    // Bigger circles so the curve reaches both edges
+    final double backRadius = size.width * 1.08;
+    final double frontRadius = size.width * 1.03;
+
+    // Move circles higher to match Image 2
+    final Offset backCenter = Offset(
+      size.width / 2,
+      -backRadius + headerHeight - 6,
+    );
+
+    final Offset frontCenter = Offset(
+      size.width / 2,
+      -frontRadius + headerHeight - 30,
+    );
+
+    // Shadow
+    canvas.drawCircle(frontCenter.translate(0, 8), frontRadius, shadowPaint);
+
+    // Back circle
+    canvas.drawCircle(backCenter, backRadius, backPaint);
+
+    // Front circle
+    canvas.drawCircle(frontCenter, frontRadius, frontPaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
 class BottomLeftCircle extends StatelessWidget {
   final Color color;
 
@@ -148,71 +112,47 @@ class BottomLeftCircle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final w = MediaQuery.of(context).size.width;
-
-    final bigSize = w * 0.48;
-    final smallSize = w * 0.05;
-
-    final bigLeft = -bigSize * 0.45;
-    final bigBottom = -bigSize * 0.45;
-
-    return Stack(
-      children: [
-        /// Big Circle
-        Positioned(
-          left: bigLeft,
-          bottom: bigBottom,
-          child: Container(
-            width: bigSize,
-            height: bigSize,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: color.transparency(.08),
-            ),
-          ),
+    return Positioned(
+      left: -85,
+      bottom: -85,
+      child: IgnorePointer(
+        child: SizedBox(
+          width: 220,
+          height: 220,
+          child: CustomPaint(painter: _BottomLeftCirclePainter(color)),
         ),
-
-        /// Small Circle (with space)
-        Positioned(
-          left: bigLeft + bigSize + w * 0.04, // gap after big circle
-          bottom: bigBottom + bigSize * 0.75, // move upward
-          child: Container(
-            width: smallSize,
-            height: smallSize,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: color.transparency(.18),
-            ),
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
 
-// class BottomLeftCircle extends StatelessWidget {
-//   const BottomLeftCircle({super.key});
+class _BottomLeftCirclePainter extends CustomPainter {
+  final Color color;
 
-//   @override
-//   Widget build(BuildContext context) {
-//     final screenWidth = MediaQuery.of(context).size.width;
+  const _BottomLeftCirclePainter(this.color);
 
-//     final circleSize = screenWidth * 0.48;
+  @override
+  void paint(Canvas canvas, Size size) {
+    final bigPaint = Paint()
+      ..color = color.withValues(alpha: .08)
+      ..style = PaintingStyle.fill;
 
-//     return Positioned(
-//       left: -circleSize * 0.45,
-//       bottom: -circleSize * 0.45,
-//       child: Container(
-//         width: circleSize,
-//         height: circleSize,
-//         decoration: BoxDecoration(
-//           shape: BoxShape.circle,
-//           color: AppTheme.secondary.transparency(.08),
-//         ),
-//       ),
-//     );
-//   }
-// }
+    final smallPaint = Paint()
+      ..color = color.withValues(alpha: .18)
+      ..style = PaintingStyle.fill;
+
+    // Big Circle (188 diameter)
+    canvas.drawCircle(const Offset(94, 126), 94, bigPaint);
+
+    // Small Circle (20 diameter)
+    canvas.drawCircle(const Offset(214, 78), 10, smallPaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _BottomLeftCirclePainter oldDelegate) {
+    return oldDelegate.color != color;
+  }
+}
 
 class BottomRightCircle extends StatelessWidget {
   final Color color;
@@ -221,21 +161,40 @@ class BottomRightCircle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scale = MediaQuery.of(context).size.width / 393;
-
     return Positioned(
-      right: -35 * scale,
-      bottom: 55 * scale,
+      right: -35,
+      bottom: 55,
       child: IgnorePointer(
-        child: Container(
-          width: 85 * scale,
-          height: 85 * scale,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(color: color.transparency(.18), width: 3 * scale),
-          ),
+        child: CustomPaint(
+          size: const Size(85, 85),
+          painter: _BottomRightCirclePainter(color),
         ),
       ),
     );
+  }
+}
+
+class _BottomRightCirclePainter extends CustomPainter {
+  final Color color;
+
+  const _BottomRightCirclePainter(this.color);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color.withValues(alpha: 0.18)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3;
+
+    canvas.drawCircle(
+      Offset(size.width / 2, size.height / 2),
+      (size.width / 2) - (paint.strokeWidth / 2),
+      paint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _BottomRightCirclePainter oldDelegate) {
+    return oldDelegate.color != color;
   }
 }
