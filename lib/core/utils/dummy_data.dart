@@ -6,10 +6,14 @@ export '../models/patient/patient_dashboard_data.dart';
 export '../models/patient/patient_token.dart';
 export '../models/patient/patient_user.dart';
 import 'package:flutter/material.dart';
+import 'package:yodoctor/core/models/admin/admin_dashboard_data.dart';
+import 'package:yodoctor/core/models/admin/admin_user.dart';
+import 'package:yodoctor/core/models/admin/home_care_booking_model.dart';
 import 'package:yodoctor/core/models/doctor/available_plan_model.dart';
 import 'package:yodoctor/core/models/doctor/review_item.dart';
 import 'package:yodoctor/core/models/notification_item.dart';
 import 'package:yodoctor/core/models/patient/lab_test_model.dart';
+import 'package:yodoctor/core/models/admin/enquiry_model.dart';
 
 import '../models/doctor/doctor_dashboard_profile.dart';
 import '../models/doctor/doctor_dashboard_data.dart';
@@ -796,5 +800,127 @@ class DummyData {
     await Future<void>.delayed(const Duration(milliseconds: 150));
     return isYearly ? yearlyAvailablePlans : monthlyAvailablePlans;
   }
+
+
+  // ================= ADMIN DASHBOARD =================
+
+  static const AdminUser adminUser = AdminUser(
+    id: '#1',
+    name: 'MeAdmin',
+    email: 'admin@gmail.com',
+  );
+
+  static final AdminDashboardData _adminDashboardData = AdminDashboardData(
+    admin: adminUser,
+    totalDoctors: allDoctors.length,
+    totalPatients: 34,
+    todaysAppointments: _appointments().where((appointment) {
+      final date = appointment.dateTime;
+      final now = DateTime.now();
+
+      return date.year == now.year &&
+          date.month == now.month &&
+          date.day == now.day;
+    }).length,
+    pendingApprovals: 0,
+    appointments: _appointments(),
+    totalAppointments: _appointments().length,
+    completedAppointments: _appointments()
+        .where((e) => e.appointmentStatus == 'COMPLETED')
+        .length,
+    cancelledAppointments: _appointments()
+        .where((e) => e.appointmentStatus == 'CANCELLED')
+        .length,
+    pendingAppointments: _appointments()
+        .where((e) => e.appointmentStatus == 'PENDING')
+        .length,
+  );
+
+  static Future<AdminDashboardData> getAdminDashboardData() async {
+    await Future<void>.delayed(const Duration(milliseconds: 180));
+    return _adminDashboardData;
+  }
+
+  // ================= Enquiry =================
+  static final List<EnquiryModel> enquiries = [
+    EnquiryModel(
+      id: 1,
+      name: 'AMIT KUMAR MISHRA',
+      mobile: '9770483883',
+      email: 'akagnihotri797473@gmail.com',
+      concern: 'Lab',
+      subConcern: 'Order',
+      message: 'Looks better services',
+      status: 'Resolved',
+      date: '30-05-2026',
+    ),
+
+    EnquiryModel(
+      id: 2,
+      name: 'RAHUL SHARMA',
+      mobile: '9876543210',
+      email: 'rahul@gmail.com',
+      concern: 'Doctor',
+      subConcern: 'Appointment',
+      message: 'Unable to book appointment',
+      status: 'Pending',
+      date: '15-06-2026',
+    ),
+  ];
+
+  static Future<List<EnquiryModel>> getEnquiries() async {
+    await Future<void>.delayed(const Duration(milliseconds: 180));
+
+    return List<EnquiryModel>.from(enquiries);
+  }
+
+
+  // ================= HOME CARE BOOKINGS DATA =================
+  static final List<HomeCareBookingModel> homeCareBookings = [
+    HomeCareBookingModel(
+      id: 1,
+      patientName: "Ajay Singh",
+      contact: "7879518155",
+      address: "Bhopal",
+      healthIssue: "I am suffering from fever",
+      service: "Nurse",
+      date: "13/06/2026",
+      days: "1 day",
+      time: "Evening",
+    ),
+    HomeCareBookingModel(
+      id: 2,
+      patientName: "Chandan Kumar",
+      contact: "6261715701",
+      address: "Jhansi",
+      healthIssue: "Bukhar he",
+      service: "Nurse",
+      date: "29/05/2026",
+      days: "1 day",
+      time: "Evening",
+    ),
+    HomeCareBookingModel(
+      id: 3,
+      patientName: "Sabita Kumari",
+      contact: "6260708470",
+      address: "Jhansi",
+      healthIssue: "General Medicine",
+      service: "Nurse",
+      date: "16/05/2026",
+      days: "1 day",
+      time: "Afternoon",
+    ),
+  ];
+
+  static Future<List<HomeCareBookingModel>> getHomeCareBookings() async {
+    await Future<void>.delayed(const Duration(seconds: 1));
+    return List<HomeCareBookingModel>.from(homeCareBookings);
+  }
+
+  static Future<List<HomeCareBookingModel>> refreshHomeCareBookings() async {
+    await Future<void>.delayed(const Duration(milliseconds: 800));
+    return List<HomeCareBookingModel>.from(homeCareBookings);
+  }
+
 
 }

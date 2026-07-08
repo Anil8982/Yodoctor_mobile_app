@@ -1,0 +1,62 @@
+{
+  "project_info": {
+    "project_number": "563822930417",
+    "project_id": "yodoctor-bf82e",
+    "storage_bucket": "yodoctor-bf82e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:563822930417:android:d50a1107a00e52152cfc50",
+        "android_client_info": {
+          "package_name": "com.yodoctor.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "563822930417-ffkki8m85h27edg7oadt9o6abv8l1eos.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.yodoctor.app",
+            "certificate_hash": "4944c6c676b3bcdce0e113aa063403aa257d624b"
+          }
+        },
+        {
+          "client_id": "563822930417-qe2nq2t2e90s9dlu1ju85o334h5fcecq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.yodoctor.app",
+            "certificate_hash": "e43a06f1cc38e5f0333751c3ce17f8bcf7b937cf"
+          }
+        },
+        {
+          "client_id": "563822930417-ufpc6vehko15a5lgunrt3ndksvvaipbp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAHvWde_VbdhLWwZQzhEEBhWA0F6QgfzUI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "563822930417-ufpc6vehko15a5lgunrt3ndksvvaipbp.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "563822930417-1j3mlgqr0m5u6fsa44t59j6ib71sgkch.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.yodoctor.app"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

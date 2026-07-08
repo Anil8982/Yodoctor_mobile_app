@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-enum AppRole { patient, doctor }
+enum AppRole { patient, doctor, admin }
 
 class AppRoleNotifier extends Notifier<AppRole> {
   @override

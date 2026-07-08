@@ -12,6 +12,10 @@ class AppColors {
   static const Color yoGreenDark = Color(0xFF1B5E20);
   static const Color yoGreenLight = Color(0xFFE8F5E9);
 
+  static const Color yoPurple = Color(0xFF8A63B5);
+  static const Color yoPurpleDark = Color(0xFF6F42A6);
+  static const Color yoPurpleLight = Color(0xFFEDE3F8);
+
   // Statuses & Typography Tokens
   static const Color success = Color(0xFF2E7D32);
   static const Color error = Color(0xFFD32F2F);
@@ -40,6 +44,12 @@ class AppColors {
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
     colors: [Color(0xFF2E7D32), Color(0xFF43A047)],
+  );
+
+  static const LinearGradient adminGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFF6F42A6), Color(0xFF9C74C9)],
   );
 
   static const LinearGradient brandGradient = LinearGradient(
@@ -140,6 +150,55 @@ class AppColors {
     surfaceContainerHigh: Color(0xFFE8F5E9),
     surfaceContainerHighest: Color(0xFFC8E6C9),
     surfaceTint: yoGreen,
+    error: error,
+    onError: Colors.white,
+    errorContainer: Color(0xFFFFEBEE),
+    onErrorContainer: Color(0xFFC62828),
+    outline: divider,
+    outlineVariant: Color(0xFFB0BEC5),
+    shadow: Colors.black,
+    scrim: Colors.black,
+    inverseSurface: Color(0xFF263238),
+    inversePrimary: Color(0xFFA5D6A7),
+  );
+
+  // ── 👤 3. ADMIN SCHEME (45 Color Roles) ─────────────────
+  static const ColorScheme adminColorScheme = ColorScheme.light(
+    primary: yoPurple,
+    onPrimary: Colors.white,
+    primaryContainer: yoPurpleLight,
+    onPrimaryContainer: yoPurpleDark,
+    primaryFixed: yoPurpleLight,
+    primaryFixedDim: Color(0xFFA5D6A7),
+    onPrimaryFixed: yoPurpleDark,
+    onPrimaryFixedVariant: Color(0xFF388E3C),
+    secondary: yoBlue,
+    onSecondary: Colors.white,
+    secondaryContainer: yoPurpleLight,
+    onSecondaryContainer: yoPurpleDark,
+    secondaryFixed: yoPurpleLight,
+    secondaryFixedDim: Color(0xFF90CAF9),
+    onSecondaryFixed: yoPurpleDark,
+    onSecondaryFixedVariant: Color(0xFF1976D2),
+    tertiary: Color(0xFF8E24AA),
+    onTertiary: Colors.white,
+    tertiaryContainer: Color(0xFFF3E5F5),
+    onTertiaryContainer: Color(0xFF4A148C),
+    tertiaryFixed: Color(0xFFF3E5F5),
+    tertiaryFixedDim: Color(0xFFCE93D8),
+    onTertiaryFixed: Color(0xFF4A148C),
+    onTertiaryFixedVariant: Color(0xFF6A1B9A),
+    surface: surface,
+    onSurface: textPrimary,
+    onSurfaceVariant: textSecondary,
+    surfaceDim: Color(0xFFE8F5E9),
+    surfaceBright: Color(0xFFF1F8F1),
+    surfaceContainerLowest: Colors.white,
+    surfaceContainerLow: Color(0xFFF5FBF5),
+    surfaceContainer: background,
+    surfaceContainerHigh: Color(0xFFE8F5E9),
+    surfaceContainerHighest: Color(0xFFC8E6C9),
+    surfaceTint: yoPurple,
     error: error,
     onError: Colors.white,
     errorContainer: Color(0xFFFFEBEE),

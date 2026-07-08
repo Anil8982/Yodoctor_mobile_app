@@ -2,26 +2,13 @@ import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
 
-enum AppRole { doctor, patient }
-
-class AppRoleProvider extends ChangeNotifier {
-  AppRole _role = AppRole.doctor;
-
-  AppRole get role => _role;
-
-  void setRole(AppRole role) {
-    if (_role == role) return;
-    _role = role;
-    notifyListeners();
-  }
-}
-
 class AppTheme {
   AppTheme._();
 
   // Gradients Forwarding
   static LinearGradient get doctorGradient => AppColors.doctorGradient;
   static LinearGradient get patientGradient => AppColors.patientGradient;
+  static LinearGradient get adminGradient => AppColors.adminGradient;
   static LinearGradient get brandGradient => AppColors.brandGradient;
   static LinearGradient get backgroundGradient => AppColors.backgroundGradient;
 
@@ -29,9 +16,14 @@ class AppTheme {
   static Color get yoBlue => AppColors.yoBlue;
   static Color get yoBlueDark => AppColors.yoBlueDark;
   static Color get yoBlueLight => AppColors.yoBlueLight;
+
   static Color get yoGreen => AppColors.yoGreen;
   static Color get yoGreenDark => AppColors.yoGreenDark;
   static Color get yoGreenLight => AppColors.yoGreenLight;
+
+  static Color get yoPurple => AppColors.yoPurple;
+  static Color get yoPurpleDark => AppColors.yoPurpleDark;
+  static Color get yoPurpleLight => AppColors.yoPurpleLight;
 
   // Primary & Secondary Aliases
   static Color get primary => AppColors.yoBlue;
@@ -81,6 +73,14 @@ class AppTheme {
     return _buildTheme(
       colorScheme: AppColors.patientColorScheme,
       gradient: AppColors.patientGradient,
+    );
+  }
+
+  // ── 🛠️  3. Admin Production ThemeData ─────────────────────
+  static ThemeData get adminTheme {
+    return _buildTheme(
+      colorScheme: AppColors.adminColorScheme,
+      gradient: AppColors.adminGradient,
     );
   }
 

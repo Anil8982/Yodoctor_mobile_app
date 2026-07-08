@@ -127,16 +127,22 @@ class _YoTextFieldState extends State<YoTextField> {
             ),
             filled: true,
             fillColor: colorScheme.surfaceContainerLow,
-            prefixIcon: Icon(widget.prefixIcon, color: colorScheme.primary, size: 20),
+            prefixIcon: Icon(
+              widget.prefixIcon,
+              color: colorScheme.primary,
+              size: 20,
+            ),
             suffixIcon: widget.isPassword
                 ? IconButton(
-                    icon: Icon(
-                      _obscure ? Icons.visibility_off_rounded : Icons.visibility_rounded,
-                      color: colorScheme.onSurfaceVariant,
-                      size: 20,
-                    ),
-                    onPressed: () => setState(() => _obscure = !_obscure),
-                  )
+              icon: Icon(
+                _obscure
+                    ? Icons.visibility_off_rounded
+                    : Icons.visibility_rounded,
+                color: colorScheme.onSurfaceVariant,
+                size: 20,
+              ),
+              onPressed: () => setState(() => _obscure = !_obscure),
+            )
                 : null,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
@@ -144,7 +150,10 @@ class _YoTextFieldState extends State<YoTextField> {
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide: BorderSide(color: colorScheme.outlineVariant, width: 1.2),
+              borderSide: BorderSide(
+                color: colorScheme.outlineVariant,
+                width: 1.2,
+              ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
@@ -154,7 +163,10 @@ class _YoTextFieldState extends State<YoTextField> {
               borderRadius: BorderRadius.circular(14),
               borderSide: BorderSide(color: colorScheme.error, width: 1.5),
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 16,
+            ),
           ),
         ),
       ],
@@ -162,9 +174,10 @@ class _YoTextFieldState extends State<YoTextField> {
   }
 }
 
+
 class YoPrimaryButton extends StatelessWidget {
   final String label;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
   final Color? color;
   final bool isLoading;
 
@@ -181,45 +194,43 @@ class YoPrimaryButton extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final btnColor = color ?? colorScheme.primary;
-    final onButtonColor =
-        ThemeData.estimateBrightnessForColor(btnColor) == Brightness.dark
-        ? colorScheme.onPrimary
-        : colorScheme.onSurface;
+    final onButtonColor = colorScheme.onPrimary;
 
     return SizedBox(
       width: double.infinity,
       height: 54,
       child: ElevatedButton(
+
         onPressed: isLoading ? null : onTap,
         style: ElevatedButton.styleFrom(
           backgroundColor: btnColor,
           foregroundColor: onButtonColor,
           elevation: 0,
-          shadowColor: btnColor.transparency(0.4),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
           ),
         ),
         child: isLoading
             ? SizedBox(
-                width: 22,
-                height: 22,
-                child: CircularProgressIndicator(
-                  color: onButtonColor,
-                  strokeWidth: 2.5,
-                ),
-              )
+          width: 22,
+          height: 22,
+          child: CircularProgressIndicator(
+            color: onButtonColor,
+            strokeWidth: 2.5,
+          ),
+        )
             : Text(
-                label,
-                style: textTheme.labelLarge?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: onButtonColor,
-                ),
-              ),
+          label,
+          style: textTheme.labelLarge?.copyWith(
+            fontWeight: FontWeight.w700,
+            color: onButtonColor,
+          ),
+        ),
       ),
     );
   }
 }
+
 
 class YoLogoBar extends StatelessWidget {
   const YoLogoBar({super.key});
@@ -230,7 +241,8 @@ class YoLogoBar extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     return Row(
       children: [
-        GestureDetector(
+        Navigator.canPop(context)
+            ? GestureDetector(
           onTap: () => Navigator.pop(context),
           child: Container(
             width: 40,
@@ -240,15 +252,20 @@ class YoLogoBar extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: colorScheme.outlineVariant),
             ),
-            child: Icon(Icons.arrow_back_rounded, color: colorScheme.onSurface, size: 20),
+            child: Icon(
+              Icons.arrow_back_rounded,
+              color: colorScheme.onSurface,
+              size: 20,
+            ),
           ),
-        ),
+        )
+            : const SizedBox(width: 40, height: 40),
         const Spacer(),
         RichText(
           text: TextSpan(
             children: [
               TextSpan(
-                text: 'yo',
+                text: 'Yo',
                 style: textTheme.headlineSmall?.copyWith(
                   color: colorScheme.primary,
                   fontWeight: FontWeight.w800,
@@ -276,7 +293,9 @@ Widget buildDividerWithText(BuildContext context, String text) {
   final textTheme = Theme.of(context).textTheme;
   return Row(
     children: [
-      Expanded(child: Divider(color: colorScheme.outlineVariant, thickness: 1.2)),
+      Expanded(
+        child: Divider(color: colorScheme.outlineVariant, thickness: 1.2),
+      ),
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 14),
         child: Text(
@@ -287,7 +306,9 @@ Widget buildDividerWithText(BuildContext context, String text) {
           ),
         ),
       ),
-      Expanded(child: Divider(color: colorScheme.outlineVariant, thickness: 1.2)),
+      Expanded(
+        child: Divider(color: colorScheme.outlineVariant, thickness: 1.2),
+      ),
     ],
   );
 }

@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:yodoctor/core/constants/log_tags.dart';
+import 'package:yodoctor/core/debug/app_logger.dart';
 import '../../../../core/utils/dummy_data.dart';
 
 enum DoctorAppointmentFilter { today, lastSevenDays, all }
@@ -29,23 +31,27 @@ class AppointmentHistoryState {
 }
 
 class AppointmentHistoryNotifier extends Notifier<AppointmentHistoryState> {
+  // Single source of truth for the subTag in this doctor panel domain
+  static const String _subTag = 'AppointmentHistoryNotifier';
+
   @override
   AppointmentHistoryState build() {
-    // 🎯 डमी डेटा मधून फ्रेश लिस्ट इनिशिअलाईज केली भाऊ
+    AppLogger.info('Initializing appointment history matrix with dummy records', tag: LogTags.doctor, subTag: _subTag);
     return AppointmentHistoryState(
       allAppointments: List.from(DummyData.appointmentHistory),
     );
   }
 
   void setFilter(DoctorAppointmentFilter filter) {
+    AppLogger.debug('Filter scope updated to: ${filter.name}', tag: LogTags.doctor, subTag: _subTag);
     state = state.copyWith(selectedFilter: filter);
   }
 
   void setSearchQuery(String query) {
+    AppLogger.debug('Executing patient search parameters query: "$query"', tag: LogTags.doctor, subTag: _subTag);
     state = state.copyWith(searchQuery: query);
   }
 
-  // 🎯 कडक आणि एरर-फ्री लाईव्ह क्यू फिल्टर भाऊ
   List<AppointmentHistoryItem> getTodayLiveQueue() {
     final now = DateTime.now();
     final todayStr = DateFormat('yyyy-MM-dd').format(now);
@@ -85,6 +91,7 @@ class AppointmentHistoryNotifier extends Notifier<AppointmentHistoryState> {
   }
 
   void completePatient(String tokenNumber) {
+    AppLogger.success('Patient status updated to COMPLETED. Token: $tokenNumber', tag: LogTags.doctor, subTag: _subTag);
     state = state.copyWith(
       allAppointments: [
         for (final app in state.allAppointments)
@@ -94,6 +101,7 @@ class AppointmentHistoryNotifier extends Notifier<AppointmentHistoryState> {
   }
 
   void skipPatient(String tokenNumber) {
+    AppLogger.warning('Patient token: $tokenNumber has been marked as SKIPPED', tag: LogTags.doctor, subTag: _subTag);
     state = state.copyWith(
       allAppointments: [
         for (final app in state.allAppointments)
@@ -103,6 +111,7 @@ class AppointmentHistoryNotifier extends Notifier<AppointmentHistoryState> {
   }
 
   void cancelPatient(String tokenNumber) {
+    AppLogger.warning('Appointment token: $tokenNumber has been officially CANCELLED', tag: LogTags.doctor, subTag: _subTag);
     state = state.copyWith(
       allAppointments: [
         for (final app in state.allAppointments)
