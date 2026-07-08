@@ -1,16 +1,23 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/utils/dummy_data.dart';
-import '../../../../core/models/medical_certificate.dart';
+
+import '../../../core/models/doctor/doctor_certificate_request_model.dart';
+import '../../../services/doctor_certificate_service.dart';
 
 class CertificateState {
-  final List<MedicalCertificate> allCertificates;
+  final bool loading;
+
+  final List<DoctorCertificateRequestModel> pendingCertificates;
+  final List<DoctorCertificateRequestModel> issuedCertificates;
+
   final int activeTabIndex;
   final String searchQuery;
   final String selectedStatusFilter;
   final String selectedTypeFilter;
 
-  CertificateState({
-    required this.allCertificates,
+  const CertificateState({
+    this.loading = false,
+    this.pendingCertificates = const [],
+    this.issuedCertificates = const [],
     this.activeTabIndex = 0,
     this.searchQuery = '',
     this.selectedStatusFilter = 'All Status',
@@ -18,14 +25,18 @@ class CertificateState {
   });
 
   CertificateState copyWith({
-    List<MedicalCertificate>? allCertificates,
+    bool? loading,
+    List<DoctorCertificateRequestModel>? pendingCertificates,
+    List<DoctorCertificateRequestModel>? issuedCertificates,
     int? activeTabIndex,
     String? searchQuery,
     String? selectedStatusFilter,
     String? selectedTypeFilter,
   }) {
     return CertificateState(
-      allCertificates: allCertificates ?? this.allCertificates,
+      loading: loading ?? this.loading,
+      pendingCertificates: pendingCertificates ?? this.pendingCertificates,
+      issuedCertificates: issuedCertificates ?? this.issuedCertificates,
       activeTabIndex: activeTabIndex ?? this.activeTabIndex,
       searchQuery: searchQuery ?? this.searchQuery,
       selectedStatusFilter: selectedStatusFilter ?? this.selectedStatusFilter,
@@ -35,23 +46,57 @@ class CertificateState {
 }
 
 class DoctorCertificateNotifier extends Notifier<CertificateState> {
+  final DoctorCertificateService _service = DoctorCertificateService();
+
   @override
   CertificateState build() {
-    return CertificateState(
-      allCertificates: List.from(DummyData.dummyCertificates),
-    );
+    Future.microtask(() async {
+      await loadRequests();
+      await loadIssuedCertificates();
+    });
+
+    return const CertificateState();
   }
 
-  int get pendingCount => state.allCertificates.where((c) => c.status.toUpperCase() == 'PENDING' || c.status.toUpperCase() == 'VERIFICATION').length;
-  int get totalCount => state.allCertificates.length;
-  int get totalIssuedCount => state.allCertificates.where((c) => c.status.toUpperCase() == 'APPROVED').length;
-  int get thisMonthIssuedCount => state.allCertificates.where((c) => c.status.toUpperCase() == 'APPROVED' && c.requestDate.month == DateTime.now().month).length;
+  Future<void> loadRequests() async {
+    state = state.copyWith(loading: true);
+
+    try {
+      final response = await _service.getRequests();
+
+      final list = (response.data as List)
+          .map((e) => DoctorCertificateRequestModel.fromJson(e))
+          .toList();
+
+      state = state.copyWith(loading: false, pendingCertificates: list);
+    } catch (_) {
+      state = state.copyWith(loading: false);
+    }
+  }
+
+  Future<void> loadIssuedCertificates() async {
+    try {
+      final response = await _service.getIssuedCertificates();
+
+      final list = (response.data as List)
+          .map((e) => DoctorCertificateRequestModel.fromJson(e))
+          .toList();
+
+      state = state.copyWith(issuedCertificates: list);
+    } catch (_) {}
+  }
+
+  int get pendingCount => state.pendingCertificates.length;
+
+  int get issuedCount => state.issuedCertificates.length;
+
+  int get totalCount => pendingCount + issuedCount;
 
   void setTabIndex(int index) {
     state = state.copyWith(
       activeTabIndex: index,
-      selectedStatusFilter: 'All Status',
-      selectedTypeFilter: 'All Types',
+      selectedStatusFilter: "All Status",
+      selectedTypeFilter: "All Types",
     );
   }
 
@@ -67,45 +112,60 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
     state = state.copyWith(selectedTypeFilter: type);
   }
 
-  List<MedicalCertificate> get filteredCertificates {
-    final isIssuedTab = state.activeTabIndex == 1;
+  List<DoctorCertificateRequestModel> get filteredCertificates {
+    final source = state.activeTabIndex == 0
+        ? state.pendingCertificates
+        : state.issuedCertificates;
 
-    return state.allCertificates.where((cert) {
-      final matchesTab = isIssuedTab
-          ? cert.status.toUpperCase() == 'APPROVED'
-          : cert.status.toUpperCase() != 'APPROVED';
-
-      final matchesStatus = state.selectedStatusFilter == 'All Status' ||
+    return source.where((cert) {
+      final matchesStatus =
+          state.selectedStatusFilter == "All Status" ||
           cert.status.toLowerCase() == state.selectedStatusFilter.toLowerCase();
 
-      final matchesType = state.selectedTypeFilter == 'All Types' ||
-          cert.type.toLowerCase() == state.selectedTypeFilter.toLowerCase();
+      final matchesType =
+          state.selectedTypeFilter == "All Types" ||
+          cert.certificateType.toLowerCase() ==
+              state.selectedTypeFilter.toLowerCase();
 
-      final matchesSearch = state.searchQuery.isEmpty ||
-          cert.patientName.toLowerCase().contains(state.searchQuery) ||
-          cert.id.toLowerCase().contains(state.searchQuery);
+      final matchesSearch =
+          state.searchQuery.isEmpty ||
+          cert.fullName.toLowerCase().contains(state.searchQuery) ||
+          cert.id.toString().contains(state.searchQuery);
 
-      return matchesTab && matchesStatus && matchesType && matchesSearch;
+      return matchesStatus && matchesType && matchesSearch;
     }).toList();
   }
 
-  void approveCertificate(String id) {
-    state = state.copyWith(
-      allCertificates: state.allCertificates.map((c) {
-        return c.id == id ? c.copyWith(status: 'APPROVED', issuedDate: DateTime.now()) : c;
-      }).toList(),
+  Future<void> approveCertificate({
+    required int id,
+    required String notes,
+    required String fitnessStatus,
+    required int validity,
+  }) async {
+    await _service.approve(
+      id: id,
+      doctorNotes: notes,
+      fitnessStatus: fitnessStatus,
+      validity: validity,
     );
+
+    await loadRequests();
+    await loadIssuedCertificates();
   }
 
-  void rejectCertificate(String id) {
-    state = state.copyWith(
-      allCertificates: state.allCertificates.map((c) {
-        return c.id == id ? c.copyWith(status: 'REJECTED') : c;
-      }).toList(),
-    );
+  Future<void> rejectCertificate(int id) async {
+    await _service.reject(id);
+
+    await loadRequests();
+  }
+
+  Future<void> refresh() async {
+    await loadRequests();
+    await loadIssuedCertificates();
   }
 }
 
-final doctorCertificateProvider = NotifierProvider.autoDispose<DoctorCertificateNotifier, CertificateState>(
-  DoctorCertificateNotifier.new,
-);
+final doctorCertificateProvider =
+    NotifierProvider<DoctorCertificateNotifier, CertificateState>(
+      DoctorCertificateNotifier.new,
+    );

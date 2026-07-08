@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/auth/models/doctor_register_model.dart';
 import 'shared_widgets.dart';
+import 'package:provider/provider.dart';
+import 'package:yodoctor/modules/auth/controllers/doctor_register_controller.dart';
 
 class Step7Declaration extends StatefulWidget {
   final DoctorFormData data;
@@ -24,7 +26,10 @@ class _Step7DeclarationState extends State<Step7Declaration> {
   bool _loading = false;
 
   final _declarations = const [
-    {'key': 'accurate', 'text': 'I declare that all information provided is accurate.'},
+    {
+      'key': 'accurate',
+      'text': 'I declare that all information provided is accurate.',
+    },
     {
       'key': 'display',
       'text':
@@ -32,11 +37,13 @@ class _Step7DeclarationState extends State<Step7Declaration> {
     },
     {
       'key': 'privacy',
-      'text': 'I consent to processing and storage of my personal data as per Privacy Policy.',
+      'text':
+          'I consent to processing and storage of my personal data as per Privacy Policy.',
     },
     {
       'key': 'terms',
-      'text': "I agree to the platform's Terms, Cancellation and Refund policies.",
+      'text':
+          "I agree to the platform's Terms, Cancellation and Refund policies.",
     },
   ];
 
@@ -122,15 +129,23 @@ class _Step7DeclarationState extends State<Step7Declaration> {
                     width: 24,
                     height: 24,
                     decoration: BoxDecoration(
-                      color: checked ? AppTheme.yoBlue : colorScheme.surface.transparency(0),
+                      color: checked
+                          ? AppTheme.yoBlue
+                          : colorScheme.surface.transparency(0),
                       borderRadius: BorderRadius.circular(6),
                       border: Border.all(
-                        color: checked ? AppTheme.yoBlue : colorScheme.onSurfaceVariant,
+                        color: checked
+                            ? AppTheme.yoBlue
+                            : colorScheme.onSurfaceVariant,
                         width: 2,
                       ),
                     ),
                     child: checked
-                        ? Icon(Icons.check, color: colorScheme.onPrimary, size: 15)
+                        ? Icon(
+                            Icons.check,
+                            color: colorScheme.onPrimary,
+                            size: 15,
+                          )
                         : null,
                   ),
                   const SizedBox(width: 14),
@@ -139,7 +154,9 @@ class _Step7DeclarationState extends State<Step7Declaration> {
                       decl['text']!,
                       style: textTheme.bodyMedium?.copyWith(
                         height: 1.5,
-                        color: checked ? colorScheme.onSurface : colorScheme.onSurfaceVariant,
+                        color: checked
+                            ? colorScheme.onSurface
+                            : colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ),
@@ -156,15 +173,23 @@ class _Step7DeclarationState extends State<Step7Declaration> {
             onPressed: (_allChecked && !_loading)
                 ? () async {
                     setState(() => _loading = true);
+
                     await widget.onSubmit();
-                    setState(() => _loading = false);
+
+                    if (mounted) {
+                      setState(() => _loading = false);
+                    }
                   }
                 : null,
             style: ElevatedButton.styleFrom(
-              backgroundColor: _allChecked ? AppTheme.yoBlue : colorScheme.outlineVariant,
+              backgroundColor: _allChecked
+                  ? AppTheme.yoBlue
+                  : colorScheme.outlineVariant,
               foregroundColor: colorScheme.onPrimary,
               elevation: 0,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
             ),
             child: _loading
                 ? SizedBox(
@@ -192,7 +217,9 @@ class _Step7DeclarationState extends State<Step7Declaration> {
             onPressed: widget.onBack,
             style: OutlinedButton.styleFrom(
               side: BorderSide(color: colorScheme.outlineVariant, width: 1.5),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
             ),
             child: Text(
               '← Back',
@@ -214,7 +241,7 @@ class _Step7DeclarationState extends State<Step7Declaration> {
             ),
             child: Row(
               children: [
-                 Icon(Icons.info_rounded, color: AppTheme.error, size: 16),
+                Icon(Icons.info_rounded, color: AppTheme.error, size: 16),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(

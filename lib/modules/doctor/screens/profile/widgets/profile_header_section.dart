@@ -36,7 +36,9 @@ class ProfileHeaderSection extends StatelessWidget {
                 ),
                 child: CircleAvatar(
                   radius: 36,
-                  backgroundColor: colorScheme.onPrimary.withValues(alpha: 0.12),
+                  backgroundColor: colorScheme.onPrimary.withValues(
+                    alpha: 0.12,
+                  ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(36),
                     child: Image.asset(
@@ -79,9 +81,10 @@ class ProfileHeaderSection extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  controller.nameController.text.isNotEmpty
-                      ? controller.nameController.text
-                      : 'Doctor Name',
+                  formState.profile != null
+                      ? formState.profile!.doctorName
+                      : "Doctor Name",
+
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.titleMedium?.copyWith(
@@ -91,10 +94,11 @@ class ProfileHeaderSection extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 2),
+
                 Text(
-                  controller.specializationController.text.isNotEmpty
-                      ? controller.specializationController.text
-                      : 'Specialization',
+                  formState.profile != null
+                      ? formState.profile!.specialization
+                      : "Specialization",
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.bodySmall?.copyWith(

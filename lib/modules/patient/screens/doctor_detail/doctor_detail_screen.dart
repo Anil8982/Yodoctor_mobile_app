@@ -5,16 +5,32 @@ import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
 import '../../../../core/utils/app_spacing.dart';
 import '../../../../core/utils/responsive.dart';
-import '../../../../core/models/patient/doctor_profile.dart';
 import 'widgets/doctor_header_card.dart';
 import 'widgets/doctor_info_grid.dart';
+import '../../models/search/doctor_detail_model.dart';
+import 'package:provider/provider.dart';
+import '../../controllers/DoctorDetailController.dart';
 
-class DoctorDetailScreen extends StatelessWidget {
-  const DoctorDetailScreen({super.key, required this.doctor});
+class DoctorDetailScreen extends StatefulWidget {
+  const DoctorDetailScreen({super.key, required this.doctorId});
 
-  final DoctorProfile doctor;
+  final int doctorId;
 
-  void _openBookAppointment(BuildContext context, DoctorProfile doctor) {
+  @override
+  State<DoctorDetailScreen> createState() => _DoctorDetailScreenState();
+}
+
+class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<DoctorDetailController>().loadDoctor(widget.doctorId);
+    });
+  }
+
+  void _openBookAppointment(BuildContext context, DoctorDetailModel doctor) {
     context.push(AppRoutes.bookAppointment, extra: doctor);
   }
 
@@ -43,38 +59,75 @@ class DoctorDetailScreen extends StatelessWidget {
         centerTitle: false,
         titleSpacing: 0,
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          padding: EdgeInsets.symmetric(
-            horizontal: Responsive.horizontalPadding(context),
-            vertical: AppSpacing.lg,
-          ),
-          child: ResponsiveContainer(
-            child: _buildContent(context, isMobile, isTablet, isDesktop),
-          ),
-        ),
+      body: Consumer<DoctorDetailController>(
+        builder: (context, controller, child) {
+          if (controller.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (controller.errorMessage != null) {
+            return Center(child: Text(controller.errorMessage!));
+          }
+
+          if (controller.doctor == null) {
+            return const SizedBox();
+          }
+
+          final doctor = controller.doctor!;
+
+          return SafeArea(
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              padding: EdgeInsets.symmetric(
+                horizontal: Responsive.horizontalPadding(context),
+                vertical: AppSpacing.lg,
+              ),
+              child: ResponsiveContainer(
+                child: _buildContent(
+                  context,
+                  Responsive.isMobile(context),
+                  Responsive.isTablet(context),
+                  Responsive.isDesktop(context),
+                  doctor,
+                ),
+              ),
+            ),
+          );
+        },
       ),
       bottomNavigationBar: isMobile
-          ? Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: colorScheme.surface,
-          border: Border(
-            top: BorderSide(
-              color: colorScheme.outlineVariant.transparency(0.3),
-              width: 1,
-            ),
-          ),
-        ),
-        child: _buildBookingButton(context),
-      )
+          ? Consumer<DoctorDetailController>(
+              builder: (context, controller, child) {
+                if (controller.doctor == null) {
+                  return const SizedBox();
+                }
+
+                return Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: colorScheme.surface,
+                    border: Border(
+                      top: BorderSide(
+                        color: colorScheme.outlineVariant.transparency(0.3),
+                        width: 1,
+                      ),
+                    ),
+                  ),
+                  child: _buildBookingButton(context, controller.doctor!),
+                );
+              },
+            )
           : null,
     );
   }
 
   Widget _buildContent(
-      BuildContext context, bool isMobile, bool isTablet, bool isDesktop) {
+    BuildContext context,
+    bool isMobile,
+    bool isTablet,
+    bool isDesktop,
+    DoctorDetailModel doctor,
+  ) {
     if (isDesktop || isTablet) {
       return Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -99,7 +152,9 @@ class DoctorDetailScreen extends StatelessWidget {
                 color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(24),
                 border: Border.all(
-                  color: Theme.of(context).colorScheme.outlineVariant.transparency(0.3),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.outlineVariant.transparency(0.3),
                   width: 1.2,
                 ),
               ),
@@ -119,19 +174,20 @@ class DoctorDetailScreen extends StatelessWidget {
                       ),
                       Text(
                         '₹${doctor.consultationFee.toStringAsFixed(0)}',
-                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          color: Theme.of(context).colorScheme.primary,
-                          fontWeight: FontWeight.w900,
-                        ),
+                        style: Theme.of(context).textTheme.headlineSmall
+                            ?.copyWith(
+                              color: Theme.of(context).colorScheme.primary,
+                              fontWeight: FontWeight.w900,
+                            ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 20),
-                  _buildBookingButton(context),
+                  _buildBookingButton(context, doctor),
                 ],
               ),
             ),
-          )
+          ),
         ],
       );
     }
@@ -147,7 +203,7 @@ class DoctorDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBookingButton(BuildContext context) {
+  Widget _buildBookingButton(BuildContext context, DoctorDetailModel doctor) {
     return SizedBox(
       width: double.infinity,
       child: FilledButton.icon(

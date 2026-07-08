@@ -237,7 +237,31 @@ class _HomeServiceBookingScreenState
                 height: 50,
                 width: double.infinity,
                 child: ElevatedButton.icon(
-                  onPressed: () {},
+                  onPressed: () async {
+                    if (!(_formKey.currentState?.validate() ?? false)) {
+                      return;
+                    }
+
+                    final success = await ref
+                        .read(homeServiceBookingProvider.notifier)
+                        .createBooking();
+
+                    if (!mounted) return;
+
+                    if (success) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Booking submitted successfully"),
+                        ),
+                      );
+
+                      Navigator.pop(context);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Booking failed")),
+                      );
+                    }
+                  },
                   icon: const Icon(Icons.send_rounded, size: 16),
                   label: const Text(
                     'Submit Booking Request',

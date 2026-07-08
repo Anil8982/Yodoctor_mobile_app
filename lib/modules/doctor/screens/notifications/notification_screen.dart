@@ -16,21 +16,42 @@ class NotificationScreen extends ConsumerWidget {
     final notifier = ref.read(notificationProvider.notifier);
 
     final todayNotifications = state.notifications
-        .where((n) => n.timestamp.isAfter(DateTime.now().subtract(const Duration(days: 1))))
+        .where(
+          (n) => n.createdAt.isAfter(
+            DateTime.now().subtract(const Duration(days: 1)),
+          ),
+        )
         .toList();
     final olderNotifications = state.notifications
-        .where((n) => n.timestamp.isBefore(DateTime.now().subtract(const Duration(days: 1))))
+        .where(
+          (n) => n.createdAt.isBefore(
+            DateTime.now().subtract(const Duration(days: 1)),
+          ),
+        )
         .toList();
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
       appBar: AppBar(
-        title: Text(
-          "Notifications",
-          style: theme.textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.w700,
-            color: colorScheme.onPrimary,
-          ),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              "Notifications",
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: colorScheme.onPrimary,
+              ),
+            ),
+            if (state.unreadCount > 0)
+              Text(
+                "${state.unreadCount} unread",
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onPrimary.withValues(alpha: 0.85),
+                ),
+              ),
+          ],
         ),
         centerTitle: false,
         backgroundColor: colorScheme.primary,
@@ -40,7 +61,11 @@ class NotificationScreen extends ConsumerWidget {
         actions: [
           IconButton(
             icon: Icon(Icons.done_all_rounded, color: colorScheme.onPrimary),
-            onPressed: () => notifier.markAllAsRead(),
+            onPressed: state.unreadCount == 0
+                ? null
+                : () async {
+                    await notifier.markAllAsRead();
+                  },
           ),
         ],
       ),
@@ -51,52 +76,74 @@ class NotificationScreen extends ConsumerWidget {
             constraints: const BoxConstraints(maxWidth: 720),
             child: state.notifications.isEmpty
                 ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.notifications_none_rounded, size: 64, color: colorScheme.onSurfaceVariant.transparency(0.4)),
-                  const SizedBox(height: AppSpacing.md),
-                  Text(
-                    "All caught up!",
-                    style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
-                  ),
-                  Text(
-                    "You don't have any notifications right now.",
-                    style: theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
-                  ),
-                ],
-              ),
-            )
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.notifications_none_rounded,
+                          size: 64,
+                          color: colorScheme.onSurfaceVariant.transparency(0.4),
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        Text(
+                          "All caught up!",
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        Text(
+                          "You don't have any notifications right now.",
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
                 : ListView(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              children: [
-                if (todayNotifications.isNotEmpty) ...[
-                  Text(
-                    "Today",
-                    style: theme.textTheme.labelLarge?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: colorScheme.primary,
-                      letterSpacing: 0.5,
-                    ),
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    children: [
+                      if (todayNotifications.isNotEmpty) ...[
+                        Text(
+                          "Today",
+                          style: theme.textTheme.labelLarge?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: colorScheme.primary,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        ...todayNotifications.map(
+                          (n) => NotificationCard(
+                            notification: n,
+                            onTap: () async {
+                              await notifier.markAsRead(n.id);
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.lg),
+                      ],
+                      if (olderNotifications.isNotEmpty) ...[
+                        Text(
+                          "Older",
+                          style: theme.textTheme.labelLarge?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: colorScheme.primary,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        ...olderNotifications.map(
+                          (n) => NotificationCard(
+                            notification: n,
+                            onTap: () async {
+                              await notifier.markAsRead(n.id);
+                            },
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
-                  const SizedBox(height: AppSpacing.sm),
-                  ...todayNotifications.map((n) => NotificationCard(notification: n, onTap: () => notifier.markAsRead(n.id))),
-                  const SizedBox(height: AppSpacing.lg),
-                ],
-                if (olderNotifications.isNotEmpty) ...[
-                  Text(
-                    "Older",
-                    style: theme.textTheme.labelLarge?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: colorScheme.primary,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  ...olderNotifications.map((n) => NotificationCard(notification: n, onTap: () => notifier.markAsRead(n.id))),
-                ],
-              ],
-            ),
           ),
         ),
       ),

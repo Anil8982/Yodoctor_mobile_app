@@ -7,22 +7,26 @@ import '../../../../core/utils/dummy_data.dart';
 enum DoctorAppointmentFilter { today, lastSevenDays, all }
 
 class AppointmentHistoryState {
+  final bool isLoading;
   final List<AppointmentHistoryItem> allAppointments;
   final DoctorAppointmentFilter selectedFilter;
   final String searchQuery;
 
-  AppointmentHistoryState({
-    required this.allAppointments,
+  const AppointmentHistoryState({
+    this.isLoading = false,
+    this.allAppointments = const [],
     this.selectedFilter = DoctorAppointmentFilter.all,
     this.searchQuery = '',
   });
 
   AppointmentHistoryState copyWith({
+    bool? isLoading,
     List<AppointmentHistoryItem>? allAppointments,
     DoctorAppointmentFilter? selectedFilter,
     String? searchQuery,
   }) {
     return AppointmentHistoryState(
+      isLoading: isLoading ?? this.isLoading,
       allAppointments: allAppointments ?? this.allAppointments,
       selectedFilter: selectedFilter ?? this.selectedFilter,
       searchQuery: searchQuery ?? this.searchQuery,
@@ -31,8 +35,7 @@ class AppointmentHistoryState {
 }
 
 class AppointmentHistoryNotifier extends Notifier<AppointmentHistoryState> {
-  // Single source of truth for the subTag in this doctor panel domain
-  static const String _subTag = 'AppointmentHistoryNotifier';
+  final AppointmentService _service = AppointmentService();
 
   @override
   AppointmentHistoryState build() {
@@ -42,98 +45,29 @@ class AppointmentHistoryNotifier extends Notifier<AppointmentHistoryState> {
     );
   }
 
-  void setFilter(DoctorAppointmentFilter filter) {
-    AppLogger.debug('Filter scope updated to: ${filter.name}', tag: LogTags.doctor, subTag: _subTag);
+  Future<void> setFilter(DoctorAppointmentFilter filter) async {
     state = state.copyWith(selectedFilter: filter);
+
+    await loadHistory();
   }
 
   void setSearchQuery(String query) {
-    AppLogger.debug('Executing patient search parameters query: "$query"', tag: LogTags.doctor, subTag: _subTag);
     state = state.copyWith(searchQuery: query);
   }
 
-  List<AppointmentHistoryItem> getTodayLiveQueue() {
-    final now = DateTime.now();
-    final todayStr = DateFormat('yyyy-MM-dd').format(now);
-
-    return state.allAppointments.where((appointment) {
-      final appDateStr = DateFormat('yyyy-MM-dd').format(appointment.date);
-      return appDateStr == todayStr;
-    }).toList();
-  }
-
   List<AppointmentHistoryItem> getFilteredHistory() {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final query = state.searchQuery.trim().toLowerCase();
+    final query = state.searchQuery.toLowerCase();
 
-    return state.allAppointments.where((appointment) {
-      final appointmentDay = DateTime(
-        appointment.date.year,
-        appointment.date.month,
-        appointment.date.day,
-      );
-
-      final matchesDate = switch (state.selectedFilter) {
-        DoctorAppointmentFilter.today => appointmentDay == today,
-        DoctorAppointmentFilter.lastSevenDays =>
-        !appointmentDay.isBefore(today.subtract(const Duration(days: 7))) && !appointmentDay.isAfter(today),
-        DoctorAppointmentFilter.all => true,
-      };
-
-      final matchesSearch = query.isEmpty ||
-          appointment.patientLabel.toLowerCase().contains(query) ||
-          appointment.tokenNumber.toLowerCase().contains(query) ||
-          appointment.status.toLowerCase().contains(query);
-
-      return matchesDate && matchesSearch;
+    return state.allAppointments.where((item) {
+      return query.isEmpty ||
+          item.patientLabel.toLowerCase().contains(query) ||
+          item.tokenNumber.toLowerCase().contains(query) ||
+          item.status.toLowerCase().contains(query);
     }).toList();
-  }
-
-  void completePatient(String tokenNumber) {
-    AppLogger.success('Patient status updated to COMPLETED. Token: $tokenNumber', tag: LogTags.doctor, subTag: _subTag);
-    state = state.copyWith(
-      allAppointments: [
-        for (final app in state.allAppointments)
-          if (app.tokenNumber == tokenNumber) _updateStatus(app, 'COMPLETED') else app
-      ],
-    );
-  }
-
-  void skipPatient(String tokenNumber) {
-    AppLogger.warning('Patient token: $tokenNumber has been marked as SKIPPED', tag: LogTags.doctor, subTag: _subTag);
-    state = state.copyWith(
-      allAppointments: [
-        for (final app in state.allAppointments)
-          if (app.tokenNumber == tokenNumber) _updateStatus(app, 'SKIPPED') else app
-      ],
-    );
-  }
-
-  void cancelPatient(String tokenNumber) {
-    AppLogger.warning('Appointment token: $tokenNumber has been officially CANCELLED', tag: LogTags.doctor, subTag: _subTag);
-    state = state.copyWith(
-      allAppointments: [
-        for (final app in state.allAppointments)
-          if (app.tokenNumber == tokenNumber) _updateStatus(app, 'CANCELLED') else app
-      ],
-    );
-  }
-
-  AppointmentHistoryItem _updateStatus(AppointmentHistoryItem item, String newStatus) {
-    return AppointmentHistoryItem(
-      id: item.id,
-      doctorName: item.doctorName,
-      specialty: item.specialty,
-      patientLabel: item.patientLabel,
-      date: item.date,
-      shift: item.shift,
-      status: newStatus,
-      tokenNumber: item.tokenNumber,
-    );
   }
 }
 
-final appointmentHistoryProvider = NotifierProvider<AppointmentHistoryNotifier, AppointmentHistoryState>(
-  AppointmentHistoryNotifier.new,
-);
+final appointmentHistoryProvider =
+    NotifierProvider<AppointmentHistoryNotifier, AppointmentHistoryState>(
+      AppointmentHistoryNotifier.new,
+    );

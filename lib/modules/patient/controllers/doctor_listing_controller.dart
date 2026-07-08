@@ -1,97 +1,102 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/utils/dummy_data.dart';
+import 'package:flutter/foundation.dart';
 
-// 🎯 Unified immutable state structure holding raw data list, filtered results, and criteria keys
-class DoctorListingState {
-  final List<DoctorProfile> allDoctors;
-  final List<DoctorProfile> filteredDoctors;
-  final String selectedSpecialty;
-  final String activeQuery;
+import '../../../services/patient_search_service.dart';
+import '../models/search/doctor_search_model.dart';
 
-  DoctorListingState({
-    this.allDoctors = const [],
-    this.filteredDoctors = const [],
-    this.selectedSpecialty = 'All',
-    this.activeQuery = '',
-  });
+class DoctorListingController extends ChangeNotifier {
+  final PatientSearchService _service = PatientSearchService();
 
-  DoctorListingState copyWith({
-    List<DoctorProfile>? allDoctors,
-    List<DoctorProfile>? filteredDoctors,
-    String? selectedSpecialty,
-    String? activeQuery,
-  }) {
-    return DoctorListingState(
-      allDoctors: allDoctors ?? this.allDoctors,
-      filteredDoctors: filteredDoctors ?? this.filteredDoctors,
-      selectedSpecialty: selectedSpecialty ?? this.selectedSpecialty,
-      activeQuery: activeQuery ?? this.activeQuery,
-    );
-  }
-}
+  bool _isLoading = false;
+  String? _errorMessage;
 
-// 🎯 FIX: Extended manual AsyncNotifier base class to resolve inheritance bounds and undefined state errors
-class DoctorListingNotifier extends AsyncNotifier<DoctorListingState> {
+  final List<DoctorSearchModel> _allDoctors = [];
+  final List<DoctorSearchModel> _doctors = [];
 
-  @override
-  Future<DoctorListingState> build() async {
-    // Automatically triggers initial listing fetch query on setup initialization
-    final results = await DummyData.searchDoctors(query: '');
-    return DoctorListingState(
-      allDoctors: results,
-      filteredDoctors: results,
-    );
-  }
+  String _selectedSpecialty = "All";
+  String _activeQuery = "";
 
-  // Fetch or query repository dataset based on dynamic user search inputs
-  Future<void> loadDoctors({String query = ''}) async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final results = await DummyData.searchDoctors(query: query);
+  bool get isLoading => _isLoading;
 
-      return DoctorListingState(
-        allDoctors: results,
-        activeQuery: query,
-        selectedSpecialty: 'All', // Reset filter category on fresh search operations
-        filteredDoctors: results,
-      );
-    });
-  }
+  String? get errorMessage => _errorMessage;
 
-  // Set selected specialty channel criteria seamlessly
-  void setSpecialty(String specialty) {
-    final currentState = state.value;
-    if (currentState == null || currentState.selectedSpecialty == specialty) return;
+  List<DoctorSearchModel> get doctors => _doctors;
 
-    List<DoctorProfile> computedResults;
-    if (specialty == 'All') {
-      computedResults = List.from(currentState.allDoctors);
-    } else {
-      computedResults = currentState.allDoctors
-          .where((item) => item.specialty == specialty)
-          .toList();
-    }
+  String get selectedSpecialty => _selectedSpecialty;
 
-    state = AsyncValue.data(currentState.copyWith(
-      selectedSpecialty: specialty,
-      filteredDoctors: computedResults,
-    ));
-  }
+  String get activeQuery => _activeQuery;
 
-  // Dynamic utility mapping sync array options array cleanly
-  List<String> getSpecialtiesList() {
-    final currentState = state.value;
-    if (currentState == null) return ['All'];
+  int get foundCount => _doctors.length;
 
-    final Set<String> values = {
-      'All',
-      ...currentState.allDoctors.map((item) => item.specialty),
-    };
+  List<String> get specialties {
+    final values = <String>{"All", ..._allDoctors.map((e) => e.specialty)};
+
     return values.toList();
   }
-}
 
-// 🎯 FIX: Provider registration utilizing autoDispose modifier to safely track lifecycle bounds
-final doctorListingProvider = AsyncNotifierProvider.autoDispose<DoctorListingNotifier, DoctorListingState>(
-  DoctorListingNotifier.new,
-);
+  Future<void> loadDoctors({
+    String query = "",
+    String city = "",
+    int page = 1,
+  }) async {
+    _isLoading = true;
+    _errorMessage = null;
+    _activeQuery = query;
+
+    notifyListeners();
+
+    try {
+      final response = await _service.searchDoctors(
+        search: query,
+        city: city,
+        page: page,
+      );
+
+      if (response.statusCode == 200) {
+        _allDoctors.clear();
+
+        _allDoctors.addAll(
+          (response.data["data"]["doctors"] as List).map(
+            (e) => DoctorSearchModel.fromJson(e),
+          ),
+        );
+
+        _applySpecialtyFilter();
+      } else {
+        _errorMessage = response.data["message"];
+        _allDoctors.clear();
+        _doctors.clear();
+      }
+    } catch (e) {
+      _errorMessage = e.toString();
+      _allDoctors.clear();
+      _doctors.clear();
+    }
+
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  void setSpecialty(String specialty) {
+    if (_selectedSpecialty == specialty) return;
+
+    _selectedSpecialty = specialty;
+
+    _applySpecialtyFilter();
+
+    notifyListeners();
+  }
+
+  void _applySpecialtyFilter() {
+    if (_selectedSpecialty == "All") {
+      _doctors
+        ..clear()
+        ..addAll(_allDoctors);
+
+      return;
+    }
+
+    _doctors
+      ..clear()
+      ..addAll(_allDoctors.where((e) => e.specialty == _selectedSpecialty));
+  }
+}

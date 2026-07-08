@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-
+import 'package:provider/provider.dart';
+import '../../models/search/doctor_detail_model.dart';
 import '../../../../core/routes/app_routes.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/utils/dummy_data.dart';
 import '../../controllers/family_controller.dart';
 import 'widgets/appointment_queue_dialog.dart';
 import 'models/appointment_queue_info.dart';
@@ -13,19 +12,26 @@ import 'widgets/date_timeline_picker.dart';
 import 'widgets/doctor_info_card.dart';
 import 'widgets/patient_selection_section.dart';
 import 'widgets/session_selection_section.dart';
+import 'package:intl/intl.dart';
 
-class BookAppointmentScreen extends ConsumerStatefulWidget {
+import '../../controllers/book_appointment_controller.dart';
+import '../../models/appointment/book_appointment_request.dart';
+import '../../models/family/family_member_model.dart';
+
+class BookAppointmentScreen extends StatefulWidget {
   const BookAppointmentScreen({super.key, required this.doctor});
 
-  final DoctorProfile doctor;
+  final DoctorDetailModel doctor;
+
+  Widget build(BuildContext context) => const SizedBox();
 
   @override
-  ConsumerState<BookAppointmentScreen> createState() => _BookAppointmentScreenState();
+  State<BookAppointmentScreen> createState() => _BookAppointmentScreenState();
 }
 
-class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
+class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
   bool _isSelf = true;
-  FamilyMember? _selectedFamilyMember;
+  FamilyMemberModel? _selectedFamilyMember;
   DateTime _selectedDate = DateTime.now();
   String _selectedSession = 'Morning';
 
@@ -46,20 +52,42 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
     context.push(AppRoutes.addFamilyMember);
   }
 
-  void _confirmAppointment() {
-    final int tokenValue = (DateTime.now().millisecond % 12) + 1;
-    final int waitMinutes = (tokenValue - 1) * 5;
+  Future<void> _confirmAppointment() async {
+    print("Confirm Clicked");
+    final controller = context.read<BookAppointmentController>();
 
-    final AppointmentQueueInfo queueInfo = AppointmentQueueInfo(
-      doctorName: widget.doctor.name,
-      specialty: widget.doctor.specialty,
-      patientLabel: _isSelf ? 'Self' : _selectedFamilyMember!.name,
-      tokenNumber: '#$tokenValue',
-      nowServing: tokenValue > 1 ? '#${tokenValue - 1}' : '-',
-      estimatedWait: '$waitMinutes mins',
+    final request = BookAppointmentRequest(
+      doctorId: widget.doctor.doctorId,
+      appointmentType: "CLINIC",
+      appointmentDate: DateFormat("yyyy-MM-dd").format(_selectedDate),
+      slot: _selectedSession == "Morning" ? "MORNING" : "EVENING",
+      familyMemberIds: _isSelf ? [] : [_selectedFamilyMember!.id],
     );
 
-    showAppointmentQueueDialog(context: context, queueInfo: queueInfo);
+    final success = await controller.book(request);
+
+    if (!mounted) return;
+
+    if (!success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(controller.error ?? "Booking Failed")),
+      );
+      return;
+    }
+
+    final result = controller.response!;
+
+    showAppointmentQueueDialog(
+      context: context,
+      queueInfo: AppointmentQueueInfo(
+        doctorName: widget.doctor.doctorName,
+        specialty: widget.doctor.specialization,
+        patientLabel: _isSelf ? "Self" : _selectedFamilyMember!.fullName,
+        tokenNumber: "#${result.token}",
+        nowServing: "-",
+        estimatedWait: "Not Available",
+      ),
+    );
   }
 
   bool get _canConfirm {
@@ -73,8 +101,17 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
 
-    // Watch dynamic sync updates from the manual family provider loop
-    final familyMembers = ref.watch(familyProvider);
+    final familyController = context.watch<FamilyController>();
+
+    print("========== FAMILY ==========");
+    print(familyController.members.length);
+
+    for (final m in familyController.members) {
+      print("${m.id} ${m.fullName}");
+    }
+    final List<FamilyMemberModel> familyMembers = context
+        .watch<FamilyController>()
+        .members;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -108,32 +145,51 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
                         DoctorInfoCard(doctor: widget.doctor),
                         const SizedBox(height: 28),
 
-                        _buildSectionHeader(textTheme, colorScheme, '1. Patient Profile'),
+                        _buildSectionHeader(
+                          textTheme,
+                          colorScheme,
+                          '1. Patient Profile',
+                        ),
                         const SizedBox(height: 12),
                         PatientSelectionSection(
                           isSelf: _isSelf,
                           familyMembers: familyMembers,
                           selectedFamilyMember: _selectedFamilyMember,
-                          onProfileTypeChanged: (value) => setState(() => _isSelf = value),
-                          onMemberChanged: (value) => setState(() => _selectedFamilyMember = value),
+                          onProfileTypeChanged: (value) =>
+                              setState(() => _isSelf = value),
+                          onMemberChanged: (value) =>
+                              setState(() => _selectedFamilyMember = value),
                           onAddFamilyPressed: _openAddFamily,
                         ),
                         const SizedBox(height: 28),
 
-                        _buildSectionHeader(textTheme, colorScheme, '2. Select Date'),
+                        _buildSectionHeader(
+                          textTheme,
+                          colorScheme,
+                          '2. Select Date',
+                        ),
                         const SizedBox(height: 12),
                         DateTimelinePicker(
                           selectedDate: _selectedDate,
-                          onDateSelected: (date) => setState(() => _selectedDate = date),
+                          onDateSelected: (date) =>
+                              setState(() => _selectedDate = date),
                           onCustomDatePick: _pickCustomDate,
                         ),
                         const SizedBox(height: 28),
 
-                        _buildSectionHeader(textTheme, colorScheme, '3. Time Session'),
+                        _buildSectionHeader(
+                          textTheme,
+                          colorScheme,
+                          '3. Time Session',
+                        ),
                         const SizedBox(height: 12),
                         SessionSelectionSection(
                           selectedSession: _selectedSession,
-                          onSessionChanged: (session) => setState(() => _selectedSession = session),
+                          onSessionChanged: (session) {
+                            setState(() => _selectedSession = session);
+                          },
+                          morningTime: widget.doctor.sessionTimings.morning,
+                          eveningTime: widget.doctor.sessionTimings.evening,
                         ),
                         const SizedBox(height: 32),
                       ],
@@ -153,7 +209,11 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
     );
   }
 
-  Widget _buildSectionHeader(TextTheme textTheme, ColorScheme colorScheme, String title) {
+  Widget _buildSectionHeader(
+    TextTheme textTheme,
+    ColorScheme colorScheme,
+    String title,
+  ) {
     return Text(
       title,
       style: textTheme.titleMedium?.copyWith(

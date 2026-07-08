@@ -2,31 +2,22 @@ import 'package:flutter/material.dart';
 import '../../../../core/utils/app_spacing.dart';
 import 'widgets/booking_header.dart';
 import 'widgets/manual_booking_form.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../controllers/manual_booking_controller.dart';
 
-class ManualBookingScreen extends StatefulWidget {
+class ManualBookingScreen extends ConsumerStatefulWidget {
   const ManualBookingScreen({super.key});
 
   @override
-  State<ManualBookingScreen> createState() => _ManualBookingScreenState();
+  ConsumerState<ManualBookingScreen> createState() =>
+      _ManualBookingScreenState();
 }
 
-class _ManualBookingScreenState extends State<ManualBookingScreen> {
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final TextEditingController _patientNameController = TextEditingController();
-  final TextEditingController _mobileController = TextEditingController();
-  final TextEditingController _ageController = TextEditingController();
-  String _selectedShift = 'Evening Shift';
-
-  @override
-  void dispose() {
-    _patientNameController.dispose();
-    _mobileController.dispose();
-    _ageController.dispose();
-    super.dispose();
-  }
-
+class _ManualBookingScreenState extends ConsumerState<ManualBookingScreen> {
   @override
   Widget build(BuildContext context) {
+    final state = ref.watch(manualBookingProvider);
+    final notifier = ref.read(manualBookingProvider.notifier);
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
@@ -44,7 +35,10 @@ class _ManualBookingScreenState extends State<ManualBookingScreen> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.lg),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.xl,
+            vertical: AppSpacing.lg,
+          ),
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 460),
             child: Column(
@@ -53,16 +47,38 @@ class _ManualBookingScreenState extends State<ManualBookingScreen> {
                 const BookingHeader(),
                 const SizedBox(height: AppSpacing.xxl),
                 ManualBookingForm(
-                  formKey: _formKey,
-                  patientNameController: _patientNameController,
-                  mobileController: _mobileController,
-                  ageController: _ageController,
-                  selectedShift: _selectedShift,
+                  formKey: notifier.formKey,
+                  patientNameController: notifier.patientNameController,
+                  mobileController: notifier.mobileController,
+                  ageController: notifier.ageController,
+                  selectedShift: notifier.selectedShift,
+                  loading: state.loading,
                   onShiftChanged: (value) {
-                    if (value == null) return;
-                    setState(() => _selectedShift = value);
+                    if (value != null) {
+                      notifier.changeShift(value);
+                    }
                   },
-                  onSubmit: _bookAppointment,
+                  onSubmit: () async {
+                    try {
+                      final success = await notifier.submit();
+
+                      if (!mounted) return;
+
+                      if (success) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Patient booked successfully"),
+                          ),
+                        );
+                      }
+                    } catch (e) {
+                      if (!mounted) return;
+
+                      ScaffoldMessenger.of(
+                        context,
+                      ).showSnackBar(SnackBar(content: Text(e.toString())));
+                    }
+                  },
                 ),
               ],
             ),
@@ -70,36 +86,5 @@ class _ManualBookingScreenState extends State<ManualBookingScreen> {
         ),
       ),
     );
-  }
-
-  void _bookAppointment() {
-    if (!_formKey.currentState!.validate()) return;
-
-    final primaryColor = Theme.of(context).colorScheme.primary;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                'Booked successfully for ${_patientNameController.text.trim()}',
-                style: const TextStyle(fontWeight: FontWeight.w700),
-              ),
-            ),
-          ],
-        ),
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: primaryColor,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-      ),
-    );
-
-    _patientNameController.clear();
-    _mobileController.clear();
-    _ageController.clear();
-    setState(() => _selectedShift = 'Evening Shift');
   }
 }

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/models/doctor/doctor_dashboard_profile.dart';
+import '../../../../core/models/doctor/doctor_profile_model.dart';
+import '../../../../services/doctor_profile_service.dart';
 
 // 🎯 State structure for mutable fields only
 class ProfileFormState {
   final bool isLoading;
-  final DoctorDashboardProfile? profile;
+  final DoctorProfileModel? profile;
   final String selectedGender;
   final String selectedPracticeType;
   final int avgDuration;
@@ -26,7 +27,7 @@ class ProfileFormState {
 
   ProfileFormState copyWith({
     bool? isLoading,
-    DoctorDashboardProfile? profile,
+    DoctorProfileModel? profile,
     String? selectedGender,
     String? selectedPracticeType,
     int? avgDuration,
@@ -49,6 +50,7 @@ class ProfileFormState {
 
 // 🎯 Manual Riverpod Notifier implementation
 class DoctorProfileNotifier extends Notifier<ProfileFormState> {
+  final DoctorProfileService _service = DoctorProfileService();
 
   // Form Keys
   final personalFormKey = GlobalKey<FormState>();
@@ -106,38 +108,54 @@ class DoctorProfileNotifier extends Notifier<ProfileFormState> {
     return ProfileFormState();
   }
 
+  Future<void> loadProfile() async {
+    state = state.copyWith(isLoading: true);
+
+    final response = await _service.getProfile();
+
+    if (response.statusCode != 200) {
+      state = state.copyWith(isLoading: false);
+      return;
+    }
+
+    final profile = DoctorProfileModel.fromJson(response.data["doctor"]);
+
+    initProfile(profile);
+  }
+
   // Initialize form fields with current data payload
-  void initProfile(DoctorDashboardProfile currentProfile) {
-    nameController.text = currentProfile.fullName;
+  void initProfile(DoctorProfileModel currentProfile) {
+    nameController.text = currentProfile.doctorName;
     emailController.text = currentProfile.email;
     mobileController.text = currentProfile.mobile;
-    aboutController.text = currentProfile.aboutYou;
+    aboutController.text = currentProfile.bio;
 
-    qualificationController.text = currentProfile.primaryQualification;
+    qualificationController.text = currentProfile.degree;
     specializationController.text = currentProfile.specialization;
     expController.text = currentProfile.experienceYears.toString();
-    regNoController.text = currentProfile.registrationNumber;
+    regNoController.text = currentProfile.licenseNumber;
     councilController.text = currentProfile.stateCouncil;
-    regValidTillController.text = currentProfile.registrationValidTill;
+    regValidTillController.text = currentProfile.validTill;
+    clinicNameController.text = currentProfile.clinicName;
 
     clinicNameController.text = currentProfile.clinicName;
     cityController.text = currentProfile.city;
     stateController.text = currentProfile.state;
     pincodeController.text = currentProfile.pincode;
     landmarkController.text = currentProfile.landmark;
-    mapsLinkController.text = currentProfile.googleMapsLink;
-    addressController.text = currentProfile.fullAddress;
-    hospitalNameController.text = currentProfile.affiliatedHospitalName ?? '';
+    mapsLinkController.text = currentProfile.mapsLink;
+    addressController.text = currentProfile.address;
+    hospitalNameController.text = currentProfile.hospitalName ?? '';
     feeController.text = currentProfile.consultationFee.toString();
 
     state = ProfileFormState(
       profile: currentProfile,
       selectedGender: currentProfile.gender,
       selectedPracticeType: currentProfile.practiceType,
-      avgDuration: currentProfile.avgDurationMinutes,
+      avgDuration: currentProfile.consultationDuration,
       activeDays: List.from(currentProfile.availableDays),
-      timings: Map.from(currentProfile.shiftTimings),
-      uploadedDocs: List.from(currentProfile.documents),
+      timings: {},
+      uploadedDocs: [],
     );
   }
 
@@ -149,51 +167,77 @@ class DoctorProfileNotifier extends Notifier<ProfileFormState> {
     state = state.copyWith(selectedPracticeType: type);
   }
 
+  void updateDuration(int value) {
+    state = state.copyWith(avgDuration: value);
+  }
+
+  void toggleDay(String day) {
+    final days = List<String>.from(state.activeDays);
+
+    if (days.contains(day)) {
+      days.remove(day);
+    } else {
+      days.add(day);
+    }
+
+    state = state.copyWith(activeDays: days);
+  }
+
   // Save updates and return status response
   Future<bool> saveProfileChanges() async {
     state = state.copyWith(isLoading: true);
 
-    await Future.delayed(const Duration(milliseconds: 800));
+    try {
+      final response = await _service.updateProfile({
+        "doctorName": nameController.text,
+        "email": emailController.text,
+        "mobile": mobileController.text,
+        "gender": state.selectedGender,
+        "bio": aboutController.text,
 
-    final updatedProfile = DoctorDashboardProfile(
-      id: state.profile?.id ?? '',
-      fullName: nameController.text,
-      email: emailController.text,
-      mobile: mobileController.text,
-      gender: state.selectedGender,
-      aboutYou: aboutController.text,
-      profilePictureUrl: state.profile?.profilePictureUrl,
-      primaryQualification: qualificationController.text,
-      specialization: specializationController.text,
-      experienceYears: int.tryParse(expController.text) ?? 0,
-      registrationNumber: regNoController.text,
-      stateCouncil: councilController.text,
-      registrationValidTill: regValidTillController.text,
-      clinicName: clinicNameController.text,
-      city: cityController.text,
-      state: stateController.text,
-      pincode: pincodeController.text,
-      landmark: landmarkController.text,
-      googleMapsLink: mapsLinkController.text,
-      fullAddress: addressController.text,
-      practiceType: state.selectedPracticeType,
-      affiliatedHospitalName: hospitalNameController.text.isEmpty ? null : hospitalNameController.text,
-      consultationFee: int.tryParse(feeController.text) ?? 0,
-      avgDurationMinutes: state.avgDuration,
-      availableDays: state.activeDays,
-      shiftTimings: state.timings,
-      documents: state.uploadedDocs,
-    );
+        "degree": qualificationController.text,
+        "specialization": specializationController.text,
 
-    state = state.copyWith(
-      isLoading: false,
-      profile: updatedProfile,
-    );
-    return true;
+        "experience_years": int.tryParse(expController.text) ?? 0,
+        "licenseNumber": regNoController.text,
+        "state_council": councilController.text,
+        "valid_till": regValidTillController.text,
+
+        "clinic_name": clinicNameController.text,
+        "city": cityController.text,
+        "state": stateController.text,
+        "pincode": pincodeController.text,
+        "landmark": landmarkController.text,
+        "mapsLink": mapsLinkController.text,
+        "address": addressController.text,
+
+        "practice_type": state.selectedPracticeType,
+        "hospital_name": hospitalNameController.text,
+
+        "consultationFee": int.tryParse(feeController.text) ?? 0,
+        "consultation_duration": state.avgDuration,
+
+        "availableDays": state.activeDays,
+      });
+
+      if (response.statusCode != 200) {
+        state = state.copyWith(isLoading: false);
+        return false;
+      }
+
+      await loadProfile();
+
+      state = state.copyWith(isLoading: false);
+
+      return true;
+    } catch (e) {
+      state = state.copyWith(isLoading: false);
+      return false;
+    }
   }
 }
 
-// 🎯 Auto-dispose provider declaration to prevent context overhead
-final doctorProfileProvider = NotifierProvider.autoDispose<DoctorProfileNotifier, ProfileFormState>(
-  DoctorProfileNotifier.new,
-);
+final doctorProfileProvider =
+    NotifierProvider<DoctorProfileNotifier, ProfileFormState>(
+      DoctorProfileNotifier.new,
+    );

@@ -1,6 +1,5 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/modules/auth/models/doctor_register_model.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/register_steps/step1_personal.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/register_steps/step2_professional.dart';
@@ -9,19 +8,24 @@ import 'package:yodoctor/modules/auth/screens/doctor/register_steps/step4_practi
 import 'package:yodoctor/modules/auth/screens/doctor/register_steps/step5_consultation.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/register_steps/step6_documents.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/register_steps/step7_declaration.dart';
-import 'package:yodoctor/core/theme/app_theme.dart' hide AppRole;
-import 'package:yodoctor/core/providers/app_role_provider.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:provider/provider.dart';
+import '../../controllers/doctor_register_controller.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../core/routes/app_routes.dart';
 
-class DoctorRegisterScreen extends ConsumerStatefulWidget {
-  const DoctorRegisterScreen({super.key});
+class DoctorRegisterScreen extends StatefulWidget {
+  final int initialStep;
+
+  const DoctorRegisterScreen({super.key, this.initialStep = 1});
 
   @override
-  ConsumerState<DoctorRegisterScreen> createState() => _DoctorRegisterScreenState();
+  State<DoctorRegisterScreen> createState() => _DoctorRegisterScreenState();
 }
 
-class _DoctorRegisterScreenState extends ConsumerState<DoctorRegisterScreen>
+class _DoctorRegisterScreenState extends State<DoctorRegisterScreen>
     with SingleTickerProviderStateMixin {
-  int _currentStep = 0;
+  int _currentStep = 1;
   final DoctorFormData _formData = DoctorFormData();
   late final PageController _pageController;
   late AnimationController _animController;
@@ -38,14 +42,33 @@ class _DoctorRegisterScreenState extends ConsumerState<DoctorRegisterScreen>
   ];
 
   @override
+  @override
   void initState() {
     super.initState();
-    _pageController = PageController(initialPage: 0);
+
+    _currentStep = widget.initialStep - 1;
+
+    _pageController = PageController(initialPage: _currentStep);
+
+    if (widget.initialStep > 1) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              "Welcome back! Continue your registration from Step ${widget.initialStep}.",
+            ),
+          ),
+        );
+      });
+    }
+
     _animController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 350),
     );
+
     _fadeAnim = CurvedAnimation(parent: _animController, curve: Curves.easeIn);
+
     _animController.forward();
   }
 
@@ -79,29 +102,25 @@ class _DoctorRegisterScreenState extends ConsumerState<DoctorRegisterScreen>
   }
 
   Future<void> _handleSubmit() async {
-    setState(() => _isLoading = true);
-    await Future.delayed(const Duration(seconds: 2));
-    setState(() => _isLoading = false);
+    final controller = context.read<DoctorRegisterController>();
+
+    final success = await controller.submitRegistration(_formData);
 
     if (!mounted) return;
-    final colorScheme = Theme.of(context).colorScheme;
 
-    ref.read(appRoleProvider.notifier).setRole(AppRole.doctor);
+    if (!success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(controller.error ?? "Registration Failed")),
+      );
+      return;
+    }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Registration submitted successfully!'),
-        backgroundColor: colorScheme.primary,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-    );
+    await controller.logoutRegistration();
 
-    // Context router pipeline transitions to doctor dashboard channel smoothly
-    // context.go(AppRoutes.doctorDashboard);
+    _formData.reset();
+
+    context.go(AppRoutes.waitingApproval);
   }
-
-  bool _isLoading = false; // Shared private variable for state submit loading trackers
 
   @override
   Widget build(BuildContext context) {
@@ -131,8 +150,9 @@ class _DoctorRegisterScreenState extends ConsumerState<DoctorRegisterScreen>
                       child: Row(
                         children: [
                           GestureDetector(
-                            onTap: () =>
-                            _currentStep == 0 ? Navigator.pop(context) : _prevStep(),
+                            onTap: () => _currentStep == 0
+                                ? Navigator.pop(context)
+                                : _prevStep(),
                             child: Container(
                               width: 38,
                               height: 38,
@@ -162,7 +182,9 @@ class _DoctorRegisterScreenState extends ConsumerState<DoctorRegisterScreen>
                                   text: 'Doctor',
                                   style: textTheme.titleLarge?.copyWith(
                                     fontWeight: FontWeight.w800,
-                                    color: colorScheme.onPrimary.transparency(0.75),
+                                    color: colorScheme.onPrimary.transparency(
+                                      0.75,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -170,7 +192,10 @@ class _DoctorRegisterScreenState extends ConsumerState<DoctorRegisterScreen>
                           ),
                           const Spacer(),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
                               color: colorScheme.onPrimary.transparency(0.2),
                               borderRadius: BorderRadius.circular(20),
@@ -210,27 +235,172 @@ class _DoctorRegisterScreenState extends ConsumerState<DoctorRegisterScreen>
                 controller: _pageController,
                 physics: const NeverScrollableScrollPhysics(),
                 children: [
-                  _scrollable(Step1Personal(data: _formData, onNext: _nextStep)),
                   _scrollable(
-                    Step2Professional(data: _formData, onNext: _nextStep, onBack: _prevStep),
+                    Step1Personal(
+                      data: _formData,
+                      onNext: () async {
+                        final controller = context
+                            .read<DoctorRegisterController>();
+
+                        final success = await controller.registerStep1(
+                          _formData,
+                        );
+
+                        if (!mounted) return;
+
+                        if (success) {
+                          _nextStep();
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                controller.error ?? "Step 1 Failed",
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                    ),
                   ),
                   _scrollable(
-                    Step3Clinic(data: _formData, onNext: _nextStep, onBack: _prevStep),
+                    Step2Professional(
+                      data: _formData,
+                      onBack: _prevStep,
+                      onNext: () async {
+                        final controller = context
+                            .read<DoctorRegisterController>();
+
+                        final success = await controller.registerStep2(
+                          _formData,
+                        );
+
+                        if (!mounted) return;
+
+                        if (success) {
+                          _nextStep();
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                controller.error ?? "Step 2 Failed",
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                    ),
                   ),
                   _scrollable(
-                    Step4Practice(data: _formData, onNext: _nextStep, onBack: _prevStep),
+                    Step3Clinic(
+                      data: _formData,
+                      onBack: _prevStep,
+                      onNext: () async {
+                        final controller = context
+                            .read<DoctorRegisterController>();
+
+                        final success = await controller.registerStep3(
+                          _formData,
+                        );
+
+                        if (!mounted) return;
+
+                        if (success) {
+                          _nextStep();
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                controller.error ?? "Step 3 Failed",
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                    ),
                   ),
                   _scrollable(
-                    Step5Consultation(data: _formData, onNext: _nextStep, onBack: _prevStep),
+                    Step4Practice(
+                      data: _formData,
+                      onBack: _prevStep,
+                      onNext: () async {
+                        final controller = context
+                            .read<DoctorRegisterController>();
+
+                        final success = await controller.saveStep4(_formData);
+
+                        if (!mounted) return;
+
+                        if (success) {
+                          _nextStep();
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                controller.error ?? "Step 4 Failed",
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                    ),
                   ),
                   _scrollable(
-                    Step6Documents(data: _formData, onNext: _nextStep, onBack: _prevStep),
+                    Step5Consultation(
+                      data: _formData,
+                      onBack: _prevStep,
+                      onNext: () async {
+                        final controller = context
+                            .read<DoctorRegisterController>();
+
+                        final success = await controller.saveStep5(_formData);
+
+                        if (!mounted) return;
+
+                        if (success) {
+                          _nextStep();
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                controller.error ?? "Step 5 Failed",
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                  ),
+                  _scrollable(
+                    Step6Documents(
+                      data: _formData,
+                      onBack: _prevStep,
+                      onNext: () async {
+                        final controller = context
+                            .read<DoctorRegisterController>();
+
+                        final success = await controller.saveStep6(_formData);
+
+                        if (!mounted) return;
+
+                        if (success) {
+                          _nextStep();
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                controller.error ?? "Step 6 Failed",
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                    ),
                   ),
                   _scrollable(
                     Step7Declaration(
                       data: _formData,
                       onBack: _prevStep,
-                      onSubmit: _isLoading ? () async {} : _handleSubmit,
+                      onSubmit: _handleSubmit,
                     ),
                   ),
                 ],
@@ -271,16 +441,20 @@ class _DoctorRegisterScreenState extends ConsumerState<DoctorRegisterScreen>
                   ),
                   child: Center(
                     child: done
-                        ? Icon(Icons.check, size: 12, color: colorScheme.primary)
+                        ? Icon(
+                            Icons.check,
+                            size: 12,
+                            color: colorScheme.primary,
+                          )
                         : Text(
-                      '${i + 1}',
-                      style: textTheme.labelSmall?.copyWith(
-                        color: active
-                            ? colorScheme.primary
-                            : colorScheme.onPrimary.transparency(0.7),
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
+                            '${i + 1}',
+                            style: textTheme.labelSmall?.copyWith(
+                              color: active
+                                  ? colorScheme.primary
+                                  : colorScheme.onPrimary.transparency(0.7),
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
                   ),
                 ),
                 if (i < _stepLabels.length - 1)

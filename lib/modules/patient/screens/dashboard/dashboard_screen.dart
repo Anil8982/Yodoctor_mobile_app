@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:provider/provider.dart';
 import 'package:yodoctor/modules/patient/screens/dashboard/widgets/patient_header.dart';
 import 'package:yodoctor/modules/patient/widgets/custom_sliver_app_bar.dart';
 import 'package:yodoctor/modules/patient/widgets/patient_drawer.dart';
@@ -14,59 +14,64 @@ import 'widgets/appointment_filter_chips.dart';
 import 'widgets/token_card.dart';
 import 'widgets/search_doctor_card.dart';
 
-class DashboardScreen extends ConsumerWidget {
+class DashboardScreen extends StatelessWidget {
   DashboardScreen({super.key});
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final bool mobile = Responsive.isMobile(context);
-    final double horizontal = Responsive.horizontalPadding(context);
 
-    // Watch dynamic asynchronous state wrappers directly from dashboard provider
-    final dashboardAsync = ref.watch(patientDashboardProvider);
-    final notifier = ref.read(patientDashboardProvider.notifier);
+    return Consumer<PatientDashboardController>(
+      builder: (context, controller, child) {
+        final loading = controller.isLoading;
+        final data = controller.dashboardData;
 
-    return dashboardAsync.when(
-      loading: () => Scaffold(
-        backgroundColor: theme.scaffoldBackgroundColor,
-        body: const Center(child: CircularProgressIndicator()),
-      ),
-      error: (error, stackTrace) => Scaffold(
-        body: Center(child: Text('Error: $error', style: theme.textTheme.bodyMedium)),
-      ),
-      // 🎯 Process matching payload structures directly from immutable state wrapper
-      data: (dashboardState) {
-        final data = dashboardState.dashboardData;
-        if (data == null) return const SizedBox.shrink();
-
-        final bool isRefreshing = dashboardAsync.isRefreshing;
+        if (loading && data == null) {
+          return Scaffold(
+            backgroundColor: theme.scaffoldBackgroundColor,
+            body: const Center(child: CircularProgressIndicator()),
+          );
+        }
+        if (data == null) {
+          return Scaffold(
+            body: Center(
+              child: Text(controller.errorMessage ?? "Dashboard Data is NULL"),
+            ),
+          );
+        }
+        final bool mobile = Responsive.isMobile(context);
+        final double horizontal = Responsive.horizontalPadding(context);
 
         return Scaffold(
           key: _scaffoldKey,
           extendBodyBehindAppBar: true,
           backgroundColor: theme.scaffoldBackgroundColor,
-          drawer: PatientDrawer(user: data.user),
+          drawer: PatientDrawer(dashboard: data),
           body: NestedScrollView(
             headerSliverBuilder: (context, innerBoxIsScrolled) {
               return [
                 CustomSliverAppBar(
                   expandedHeight: 190.0,
                   scaffoldKey: _scaffoldKey,
-                  background: PatientHeader(user: data.user),
+                  background: PatientHeader(dashboard: data),
                 ),
               ];
             },
             body: RefreshIndicator(
-              onRefresh: () => notifier.loadDashboard(),
+              onRefresh: controller.loadDashboard,
               color: colorScheme.primary,
               backgroundColor: colorScheme.surface,
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
-                padding: EdgeInsets.fromLTRB(horizontal, AppSpacing.lg, horizontal, AppSpacing.xl),
+                padding: EdgeInsets.fromLTRB(
+                  horizontal,
+                  AppSpacing.lg,
+                  horizontal,
+                  AppSpacing.xl,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -74,18 +79,22 @@ class DashboardScreen extends ConsumerWidget {
                     const SizedBox(height: AppSpacing.xl),
                     TokenCard(token: data.todayToken),
                     const SizedBox(height: AppSpacing.xl),
-                    _buildSectionHeader(context, colorScheme, 'Upcoming Appointments'),
+                    _buildSectionHeader(
+                      context,
+                      colorScheme,
+                      'Upcoming Appointments',
+                    ),
                     const SizedBox(height: AppSpacing.sm),
                     AppointmentFilterChips(
-                      filters: PatientDashboardNotifier.availableFilters,
-                      selectedFilter: dashboardState.selectedFilter,
+                      filters: PatientDashboardController.availableFilters,
+                      selectedFilter: controller.selectedFilter,
                       onFilterSelected: (filter) {
                         HapticFeedback.selectionClick();
-                        notifier.setFilter(filter);
+                        controller.setFilter(filter);
                       },
                     ),
                     const SizedBox(height: AppSpacing.md),
-                    if (isRefreshing)
+                    if (loading)
                       LinearProgressIndicator(
                         color: colorScheme.primary,
                         backgroundColor: colorScheme.primaryContainer,
@@ -101,44 +110,72 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSectionHeader(BuildContext context, ColorScheme colorScheme, String title) {
-    return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      Text(
-        title,
-        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-          fontWeight: FontWeight.w800,
-          letterSpacing: -0.5,
-          color: colorScheme.onSurface,
+  Widget _buildSectionHeader(
+    BuildContext context,
+    ColorScheme colorScheme,
+    String title,
+  ) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          title,
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.w800,
+            letterSpacing: -0.5,
+            color: colorScheme.onSurface,
+          ),
         ),
-      ),
-      TextButton.icon(
-        onPressed: () {},
-        icon: Text('View All', style: TextStyle(color: colorScheme.primary, fontWeight: FontWeight.w700)),
-        label: Icon(Icons.arrow_forward_rounded, size: 16, color: colorScheme.primary),
-      ),
-    ]);
+        TextButton.icon(
+          onPressed: () {},
+          icon: Text(
+            'View All',
+            style: TextStyle(
+              color: colorScheme.primary,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          label: Icon(
+            Icons.arrow_forward_rounded,
+            size: 16,
+            color: colorScheme.primary,
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _buildAppointmentsContent(dynamic data, bool mobile) {
     if (data.appointments.isEmpty) return const _EmptyAppointments();
     if (mobile) {
       return Column(
-          children: data.appointments
-              .map<Widget>((appointment) => Padding(
-            padding: const EdgeInsets.only(bottom: AppSpacing.md),
-            child: AppointmentCard(appointment: appointment),
-          ))
-              .toList());
+        children: data.appointments
+            .map<Widget>(
+              (appointment) => Padding(
+                padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                child: AppointmentCard(appointment: appointment),
+              ),
+            )
+            .toList(),
+      );
     }
-    return LayoutBuilder(builder: (context, c) {
-      final double itemWidth = (c.maxWidth - AppSpacing.md) / 3;
-      return Wrap(
+    return LayoutBuilder(
+      builder: (context, c) {
+        final double itemWidth = (c.maxWidth - AppSpacing.md) / 3;
+        return Wrap(
           spacing: AppSpacing.md,
           runSpacing: AppSpacing.md,
           children: data.appointments
-              .map<Widget>((appointment) => SizedBox(width: itemWidth, child: AppointmentCard(appointment: appointment)))
-              .toList());
-    });
+              .map<Widget>(
+                (appointment) => SizedBox(
+                  width: itemWidth,
+                  child: AppointmentCard(appointment: appointment),
+                ),
+              )
+              .toList(),
+        );
+      },
+    );
   }
 }
 
@@ -153,17 +190,22 @@ class _EmptyAppointments extends StatelessWidget {
     return Center(
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: AppSpacing.xxl, horizontal: AppSpacing.xl),
+        padding: const EdgeInsets.symmetric(
+          vertical: AppSpacing.xxl,
+          horizontal: AppSpacing.xl,
+        ),
         decoration: BoxDecoration(
           color: colorScheme.surfaceContainerLow,
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.5)),
+          border: Border.all(
+            color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+          ),
           boxShadow: [
             BoxShadow(
               color: colorScheme.shadow.withValues(alpha: 0.03),
               blurRadius: 20,
               offset: const Offset(0, 10),
-            )
+            ),
           ],
         ),
         child: Column(
@@ -175,7 +217,11 @@ class _EmptyAppointments extends StatelessWidget {
                 color: colorScheme.secondaryContainer.withValues(alpha: 0.4),
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.event_busy_rounded, size: 40, color: colorScheme.secondary),
+              child: Icon(
+                Icons.event_busy_rounded,
+                size: 40,
+                color: colorScheme.secondary,
+              ),
             ),
             const SizedBox(height: AppSpacing.lg),
             Text(
@@ -201,7 +247,9 @@ class _EmptyAppointments extends StatelessWidget {
               style: FilledButton.styleFrom(
                 backgroundColor: colorScheme.primary,
                 foregroundColor: colorScheme.onPrimary,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
             ),
           ],

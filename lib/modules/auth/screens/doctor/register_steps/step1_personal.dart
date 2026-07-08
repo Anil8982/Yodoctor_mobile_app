@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/auth/models/doctor_register_model.dart';
 import 'shared_widgets.dart';
+import 'package:provider/provider.dart';
+import '../../../controllers/doctor_register_controller.dart';
 
 class Step1Personal extends StatefulWidget {
   final DoctorFormData data;
@@ -120,7 +122,7 @@ class _Step1PersonalState extends State<Step1Personal> {
             controller: _mobileCtrl,
             keyboardType: TextInputType.phone,
             maxLength: 10,
-            inputFormatters:  [FilteringTextInputFormatter.digitsOnly],
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             validator: (v) {
               if (v == null || v.isEmpty) {
                 return 'Mobile required';
@@ -190,12 +192,17 @@ class _Step1PersonalState extends State<Step1Personal> {
                 ),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
+                  ),
                   decoration: BoxDecoration(
                     color: selected ? AppTheme.yoBlue : colorScheme.surface,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: selected ? AppTheme.yoBlue : colorScheme.outlineVariant,
+                      color: selected
+                          ? AppTheme.yoBlue
+                          : colorScheme.outlineVariant,
                       width: 1.5,
                     ),
                   ),
@@ -203,7 +210,9 @@ class _Step1PersonalState extends State<Step1Personal> {
                     lang,
                     style: textTheme.labelLarge?.copyWith(
                       fontWeight: FontWeight.w600,
-                      color: selected ? colorScheme.onPrimary : colorScheme.onSurfaceVariant,
+                      color: selected
+                          ? colorScheme.onPrimary
+                          : colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ),
@@ -222,7 +231,8 @@ class _Step1PersonalState extends State<Step1Personal> {
               'Share a brief overview of your expertise...',
               Icons.description_rounded,
             ),
-            validator: (v) => _wordCount < 30 ? 'Minimum 30 words required' : null,
+            validator: (v) =>
+                _wordCount < 30 ? 'Minimum 30 words required' : null,
           ),
           Padding(
             padding: const EdgeInsets.only(top: 6),
@@ -231,11 +241,15 @@ class _Step1PersonalState extends State<Step1Personal> {
               children: [
                 Text(
                   'Minimum 30 words required',
-                  style: textTheme.labelSmall?.copyWith(color: colorScheme.onSurfaceVariant),
+                  style: textTheme.labelSmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
                 ),
                 Text(
                   '$_wordCount/100',
-                  style: textTheme.labelSmall?.copyWith(color: colorScheme.onSurfaceVariant),
+                  style: textTheme.labelSmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
                 ),
               ],
             ),
@@ -244,10 +258,25 @@ class _Step1PersonalState extends State<Step1Personal> {
           NextButton(
             label: 'Next →',
             color: AppTheme.yoBlue,
-            onTap: () {
-              if (_formKey.currentState!.validate()) {
-                _save();
+            onTap: () async {
+              if (!_formKey.currentState!.validate()) return;
+
+              _save();
+
+              final controller = context.read<DoctorRegisterController>();
+
+              final success = await controller.registerStep1(widget.data);
+
+              if (!mounted) return;
+
+              if (success) {
                 widget.onNext();
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(controller.error ?? "Registration Failed"),
+                  ),
+                );
               }
             },
           ),

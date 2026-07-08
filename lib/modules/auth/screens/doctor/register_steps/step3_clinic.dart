@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/auth/models/doctor_register_model.dart';
 import 'shared_widgets.dart';
+import 'package:provider/provider.dart';
+import '../../../controllers/doctor_register_controller.dart';
 
 class Step3Clinic extends StatefulWidget {
   final DoctorFormData data;
@@ -114,7 +116,11 @@ class _Step3ClinicState extends State<Step3Clinic> {
             controller: _addrCtrl,
             maxLines: 3,
             style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface),
-            decoration: inputDeco(context, 'Street, Area, District...', Icons.home_rounded),
+            decoration: inputDeco(
+              context,
+              'Street, Area, District...',
+              Icons.home_rounded,
+            ),
             validator: (v) => v!.isEmpty ? 'Address required' : null,
           ),
           const SizedBox(height: 16),
@@ -134,8 +140,9 @@ class _Step3ClinicState extends State<Step3Clinic> {
             controller: _pincodeCtrl,
             keyboardType: TextInputType.number,
             maxLength: 6,
-            inputFormatters:  [FilteringTextInputFormatter.digitsOnly],
-            validator: (v) => v!.length != 6 ? 'Enter valid 6-digit pincode' : null,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            validator: (v) =>
+                v!.length != 6 ? 'Enter valid 6-digit pincode' : null,
           ),
           const SizedBox(height: 16),
           YoField(
@@ -190,10 +197,23 @@ class _Step3ClinicState extends State<Step3Clinic> {
           const SizedBox(height: 28),
           NavButtons(
             onBack: widget.onBack,
-            onNext: () {
-              if (_formKey.currentState!.validate()) {
-                _save();
+            onNext: () async {
+              if (!_formKey.currentState!.validate()) return;
+
+              _save();
+
+              final controller = context.read<DoctorRegisterController>();
+
+              final success = await controller.registerStep3(widget.data);
+
+              if (!mounted) return;
+
+              if (success) {
                 widget.onNext();
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(controller.error ?? "Step 3 Failed")),
+                );
               }
             },
           ),

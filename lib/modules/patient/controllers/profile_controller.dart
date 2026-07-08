@@ -1,131 +1,109 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/utils/dummy_data.dart';
 
-// 🎯 Unified immutable state structure holding current profile payload and async status flags
-class ProfileState {
-  final bool isLoading;
-  final String? errorMessage;
-  final PatientUser? user;
+import '../../../services/patient_profile_service.dart';
+import '../screens/profile/models/profile_model.dart';
+import '../screens/profile/models/patient_model.dart';
 
-  ProfileState({
-    this.isLoading = false,
-    this.errorMessage,
-    this.user,
-  });
+class ProfileController extends ChangeNotifier {
+  final PatientProfileService _service = PatientProfileService();
 
-  ProfileState copyWith({
-    bool? isLoading,
-    String? errorMessage,
-    PatientUser? user,
-  }) {
-    return ProfileState(
-      isLoading: isLoading ?? this.isLoading,
-      errorMessage: errorMessage ?? this.errorMessage,
-      user: user ?? this.user,
-    );
-  }
-}
+  bool _isLoading = false;
+  String? _errorMessage;
+  PatientModel? _user;
 
-// 🎯 Manual Riverpod Notifier implementation managing dynamic form updates smoothly
-class ProfileNotifier extends Notifier<ProfileState> {
+  bool get isLoading => _isLoading;
+  String? get errorMessage => _errorMessage;
+  PatientModel? get user => _user;
 
-  // Permanent text editing controllers mapped out inside the class boundary
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController mobileController = TextEditingController();
   final TextEditingController dobController = TextEditingController();
   final TextEditingController genderController = TextEditingController();
 
-  @override
-  ProfileState build() {
-    // Register automated structural listener cleanups via ref lifecycle hooks
-    ref.onDispose(() {
-      nameController.dispose();
-      emailController.dispose();
-      mobileController.dispose();
-      dobController.dispose();
-      genderController.dispose();
-    });
-
-    // 🎯 FIX Step 1: Initialize fields BEFORE adding listeners to block early trigger loops
-    final mockUser = DummyData.currentUser;
-    _prefillFormFields(mockUser);
-
-    // 🎯 FIX Step 2: Safe initialization wire-up once form text caches are fully mounted
-    nameController.addListener(_onFieldChanged);
-    emailController.addListener(_onFieldChanged);
-    mobileController.addListener(_onFieldChanged);
-    dobController.addListener(_onFieldChanged);
-
-    return ProfileState(user: mockUser);
-  }
-
-  // Pure logical computed property checking dirty states against stored core entity values
   bool get hasChanges {
-    final cachedUser = state.user;
-    if (cachedUser == null) return false;
-    return nameController.text != cachedUser.name ||
-        emailController.text != cachedUser.email ||
-        mobileController.text != cachedUser.mobileNumber ||
-        dobController.text != cachedUser.dateOfBirth;
+    if (_user == null) return false;
+
+    return nameController.text != _user!.fullName ||
+        mobileController.text != _user!.phone ||
+        dobController.text != _user!.dob ||
+        genderController.text != _user!.gender;
   }
 
-  void _onFieldChanged() {
-    // 🎯 FIX Step 3: Guard state updates until the notifier initialization handshake finishes completely
-    if (state.user == null) return;
+  ProfileController() {
+    loadProfile();
 
-    // Re-assign identical states cleanly to force active consumer watchers trigger recalculations
-    state = state.copyWith();
+    nameController.addListener(notifyListeners);
+    emailController.addListener(notifyListeners);
+    mobileController.addListener(notifyListeners);
+    dobController.addListener(notifyListeners);
+    genderController.addListener(notifyListeners);
   }
 
-  void _prefillFormFields(PatientUser? targetUser) {
-    nameController.text = targetUser?.name ?? '';
-    emailController.text = targetUser?.email ?? '';
-    mobileController.text = targetUser?.mobileNumber ?? '';
-    dobController.text = targetUser?.dateOfBirth ?? '';
-    genderController.text = targetUser?.gender ?? '';
-  }
+  Future<void> loadProfile() async {
+    _isLoading = true;
+    notifyListeners();
 
-  void loadProfile() {
-    final activeUser = DummyData.currentUser;
-    _prefillFormFields(activeUser);
-    state = state.copyWith(user: activeUser, errorMessage: null);
-  }
+    try {
+      final response = await _service.getProfile();
 
-  // Trigger transactional remote update queries over repository channels
-  Future<void> updateProfile() async {
-    state = state.copyWith(isLoading: true);
+      if (response.statusCode == 200) {
+        final profile = ProfileModel.fromJson(response.data);
 
-    // Simulate standard asynchronous processing timeouts delay loop
-    await Future.delayed(const Duration(seconds: 1));
+        _user = profile.data;
 
-    // Update active cache references layout cleanly on operational finish boundary
-    if (state.user != null) {
-      final freshUserData = PatientUser(
-        id: state.user!.id,
-        age: state.user!.age,
-        location: state.user!.location,
-        name: nameController.text.trim(),
-        email: emailController.text.trim(),
-        mobileNumber: mobileController.text.trim(),
-        dateOfBirth: dobController.text.trim(),
-        gender: genderController.text,
-        bloodGroup: state.user!.bloodGroup, // Retain underlying profile properties
-      );
-      state = state.copyWith(isLoading: false, user: freshUserData);
-      return;
+        nameController.text = _user!.fullName;
+        emailController.text = _user!.email;
+        mobileController.text = _user!.phone;
+        dobController.text = _user!.dob;
+        genderController.text = _user!.gender;
+      } else {
+        _errorMessage = response.data["message"];
+      }
+    } catch (e) {
+      _errorMessage = e.toString();
     }
 
-    state = state.copyWith(isLoading: false);
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  Future<void> updateProfile() async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final response = await _service.updateProfile(
+        fullName: nameController.text.trim(),
+        phone: mobileController.text.trim(),
+        gender: genderController.text.trim(),
+        dob: dobController.text.trim(),
+      );
+
+      if (response.statusCode == 200) {
+        await loadProfile();
+      } else {
+        _errorMessage = response.data["message"];
+      }
+    } catch (e) {
+      _errorMessage = e.toString();
+    }
+
+    _isLoading = false;
+    notifyListeners();
   }
 
   void discardChanges() {
     loadProfile();
   }
-}
 
-// 🎯 Provider declaration mapped with an autoDispose tag setup
-final profileProvider = NotifierProvider.autoDispose<ProfileNotifier, ProfileState>(
-  ProfileNotifier.new,
-);
+  @override
+  void dispose() {
+    nameController.dispose();
+    emailController.dispose();
+    mobileController.dispose();
+    dobController.dispose();
+    genderController.dispose();
+    super.dispose();
+  }
+}

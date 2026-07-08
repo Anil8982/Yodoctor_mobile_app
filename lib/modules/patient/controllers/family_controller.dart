@@ -1,34 +1,113 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/utils/dummy_data.dart';
+import 'package:flutter/foundation.dart';
 
-class FamilyNotifier extends Notifier<List<FamilyMember>> {
+import '../../../services/patient_family_service.dart';
+import '../models/family/family_member_model.dart';
 
-  @override
-  List<FamilyMember> build() {
-    return List<FamilyMember>.from(DummyData.familyMembers);
+class FamilyController extends ChangeNotifier {
+  final PatientFamilyService _service = PatientFamilyService();
+
+  bool _isLoading = false;
+  String? _errorMessage;
+
+  List<FamilyMemberModel> _members = [];
+
+  bool get isLoading => _isLoading;
+
+  String? get errorMessage => _errorMessage;
+
+  List<FamilyMemberModel> get members => _members;
+
+  FamilyController() {
+    loadFamilyMembers();
   }
 
-  void addMember(FamilyMember member) {
-    state = [member, ...state];
+  Future<void> loadFamilyMembers() async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final response = await _service.getFamilyMembers();
+
+      if (response.statusCode == 200) {
+        final List list = response.data["members"] ?? [];
+
+        _members = list.map((e) => FamilyMemberModel.fromJson(e)).toList();
+      } else {
+        _errorMessage = response.data["message"];
+      }
+    } catch (e) {
+      _errorMessage = e.toString();
+    }
+
+    _isLoading = false;
+    notifyListeners();
   }
 
-  void removeMember(FamilyMember member) {
-    state = state.where((item) => item != member).toList();
+  Future<void> addMember({
+    required String fullName,
+    required String gender,
+    required String dob,
+    required String bloodGroup,
+    required String heightCm,
+    required String weightKg,
+    required String relation,
+  }) async {
+    final response = await _service.addFamilyMember(
+      fullName: fullName,
+      gender: gender,
+      dob: dob,
+      bloodGroup: bloodGroup,
+      heightCm: heightCm,
+      weightKg: weightKg,
+      relation: relation,
+    );
+
+    if (response.statusCode == 201) {
+      await loadFamilyMembers();
+    } else {
+      _errorMessage = response.data["message"];
+      notifyListeners();
+    }
   }
 
-  void updateMember({
-    required FamilyMember oldMember,
-    required FamilyMember updatedMember,
-  }) {
-    final int index = state.indexOf(oldMember);
-    if (index == -1) return;
+  Future<void> updateMember({
+    required int id,
+    required String fullName,
+    required String gender,
+    required String dob,
+    required String bloodGroup,
+    required String heightCm,
+    required String weightKg,
+    required String relation,
+  }) async {
+    final response = await _service.updateFamilyMember(
+      id: id,
+      fullName: fullName,
+      gender: gender,
+      dob: dob,
+      bloodGroup: bloodGroup,
+      heightCm: heightCm,
+      weightKg: weightKg,
+      relation: relation,
+    );
 
-    final updatedList = List<FamilyMember>.from(state);
-    updatedList[index] = updatedMember;
-    state = updatedList;
+    if (response.statusCode == 200) {
+      await loadFamilyMembers();
+    } else {
+      _errorMessage = response.data["message"];
+      notifyListeners();
+    }
+  }
+
+  Future<void> deleteMember(int id) async {
+    final response = await _service.deleteFamilyMember(id);
+
+    if (response.statusCode == 200) {
+      await loadFamilyMembers();
+    } else {
+      _errorMessage = response.data["message"];
+      notifyListeners();
+    }
   }
 }
-
-final familyProvider = NotifierProvider.autoDispose<FamilyNotifier, List<FamilyMember>>(
-  FamilyNotifier.new,
-);

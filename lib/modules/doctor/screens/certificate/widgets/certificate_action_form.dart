@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
-import 'package:yodoctor/core/models/medical_certificate.dart';
+import '../../../../../core/models/doctor/doctor_certificate_detail_model.dart';
 import 'status_chip_selector.dart';
 
 class CertificateActionForm extends StatelessWidget {
@@ -16,7 +16,7 @@ class CertificateActionForm extends StatelessWidget {
     required this.onReject,
   });
 
-  final MedicalCertificate certificate;
+  final DoctorCertificateDetailModel certificate;
   final TextEditingController notesController;
   final String selectedFitnessStatus;
   final String validityPeriod;
@@ -40,7 +40,9 @@ class CertificateActionForm extends StatelessWidget {
             color: colorScheme.surfaceContainer, // 👈 सिंक केला बॅकग्राउंड रंग
             borderRadius: BorderRadius.circular(24), // 👈 सिंक कॉर्नर्स
             border: Border.all(
-              color: colorScheme.outlineVariant.withValues(alpha: 0.35), // 👈 सिंक बॉर्डर अल्फा
+              color: colorScheme.outlineVariant.withValues(
+                alpha: 0.35,
+              ), // 👈 सिंक बॉर्डर अल्फा
               width: 1.2,
             ),
           ),
@@ -56,12 +58,23 @@ class CertificateActionForm extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: AppSpacing.xl),
-              _buildStaticField(context, 'Certificate Type', certificate.type),
+              _buildStaticField(
+                context,
+                'Certificate Type',
+                certificate.certificateType,
+              ),
               const SizedBox(height: AppSpacing.lg),
-              _buildStaticField(context, "Patient's Request Notes", certificate.additionalNotes),
+              _buildStaticField(
+                context,
+                "Patient's Request Notes",
+                certificate.notes.isEmpty ? "N/A" : certificate.notes,
+              ),
 
               const SizedBox(height: 20),
-              Divider(color: colorScheme.outlineVariant.withValues(alpha: 0.25), height: 1),
+              Divider(
+                color: colorScheme.outlineVariant.withValues(alpha: 0.25),
+                height: 1,
+              ),
               const SizedBox(height: 20),
 
               _buildDropdownField(context),
@@ -112,9 +125,21 @@ class CertificateActionForm extends StatelessWidget {
                     fontWeight: FontWeight.w500,
                   ),
                   children: [
-                    TextSpan(text: '* ', style: TextStyle(color: colorScheme.error, fontWeight: FontWeight.bold)),
-                    const TextSpan(text: 'are required. Approval digitally signs the certificate with registration number '),
-                    TextSpan(text: 'MCI-78234.', style: TextStyle(fontWeight: FontWeight.bold)),
+                    TextSpan(
+                      text: '* ',
+                      style: TextStyle(
+                        color: colorScheme.error,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const TextSpan(
+                      text:
+                          'are required. Approval digitally signs the certificate with registration number ',
+                    ),
+                    TextSpan(
+                      text: 'MCI-78234.',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   ],
                 ),
               ),
@@ -192,7 +217,10 @@ class CertificateActionForm extends StatelessWidget {
           decoration: InputDecoration(
             filled: true,
             fillColor: colorScheme.surfaceContainerHigh,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 12,
+            ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide.none,
@@ -207,9 +235,9 @@ class CertificateActionForm extends StatelessWidget {
             ),
           ),
           items: const [
-            DropdownMenuItem(value: '1 week', child: Text('1 week')),
-            DropdownMenuItem(value: '1 month', child: Text('1 month')),
-            DropdownMenuItem(value: '3 months', child: Text('3 months')),
+            DropdownMenuItem(value: "7 days", child: Text("7 Days")),
+            DropdownMenuItem(value: "30 days", child: Text("30 Days")),
+            DropdownMenuItem(value: "90 days", child: Text("90 Days")),
           ],
           onChanged: onValidityChanged,
         ),
@@ -253,9 +281,12 @@ class CertificateActionForm extends StatelessWidget {
             fontWeight: FontWeight.w700,
             color: colorScheme.onSurface,
           ),
-          validator: (val) => val == null || val.trim().isEmpty ? 'Clinical findings required' : null,
+          validator: (val) => val == null || val.trim().isEmpty
+              ? 'Clinical findings required'
+              : null,
           decoration: InputDecoration(
-            hintText: 'Add your clinical findings, observations and recommendations...',
+            hintText:
+                'Add your clinical findings, observations and recommendations...',
             hintStyle: theme.textTheme.bodyMedium?.copyWith(
               color: colorScheme.onSurfaceVariant.withValues(alpha: 0.45),
               fontWeight: FontWeight.w500,
@@ -333,7 +364,9 @@ class CertificateActionForm extends StatelessWidget {
               onPressed: onReject,
               style: OutlinedButton.styleFrom(
                 foregroundColor: colorScheme.error,
-                backgroundColor: colorScheme.errorContainer.withValues(alpha: 0.2),
+                backgroundColor: colorScheme.errorContainer.withValues(
+                  alpha: 0.2,
+                ),
                 elevation: 0,
                 side: BorderSide(
                   color: colorScheme.error.withValues(alpha: 0.25),
@@ -359,5 +392,4 @@ class CertificateActionForm extends StatelessWidget {
       ],
     );
   }
-
 }

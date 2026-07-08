@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:yodoctor/core/models/medical_certificate.dart';
+import 'package:yodoctor/core/models/doctor/doctor_certificate_request_model.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
 import 'package:yodoctor/core/utils/responsive.dart';
@@ -13,7 +13,7 @@ class CertificateListCards extends StatelessWidget {
     required this.isIssuedTab,
   });
 
-  final List<MedicalCertificate> certificates;
+  final List<DoctorCertificateRequestModel> certificates;
   final bool isIssuedTab;
 
   @override
@@ -29,11 +29,11 @@ class CertificateListCards extends StatelessWidget {
       itemBuilder: (context, index) {
         final cert = certificates[index];
         final formattedDate = DateFormat('dd MMM yyyy').format(
-          isIssuedTab ? cert.issuedDate ?? cert.requestDate : cert.requestDate,
+          isIssuedTab ? cert.issuedAt ?? cert.createdAt : cert.createdAt,
         );
-        final expiryDate = DateFormat('dd MMM yyyy').format(
-          cert.issuedDate?.add(const Duration(days: 30)) ?? DateTime.now(),
-        );
+        final expiryDate = DateFormat(
+          'dd MMM yyyy',
+        ).format(cert.expiryDate ?? DateTime.now());
 
         if (isMobile) {
           return Container(
@@ -53,7 +53,7 @@ class CertificateListCards extends StatelessWidget {
                       radius: 18,
                       backgroundColor: colorScheme.primary,
                       child: Text(
-                        cert.patientName.substring(0, 1).toUpperCase(),
+                        cert.fullName.substring(0, 1).toUpperCase(),
                         style: theme.textTheme.labelLarge?.copyWith(
                           color: colorScheme.onPrimary,
                           fontWeight: FontWeight.bold,
@@ -66,14 +66,14 @@ class CertificateListCards extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            cert.patientName,
+                            cert.fullName,
                             style: theme.textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.w800,
                               color: colorScheme.onSurface,
                             ),
                           ),
                           Text(
-                            cert.id,
+                            cert.id.toString(),
                             style: theme.textTheme.labelSmall?.copyWith(
                               color: colorScheme.onSurfaceVariant.withValues(
                                 alpha: 0.7,
@@ -92,7 +92,7 @@ class CertificateListCards extends StatelessWidget {
                   spacing: AppSpacing.xs,
                   runSpacing: AppSpacing.xs,
                   children: [
-                    _buildTypeChip(context, cert.type),
+                    _buildTypeChip(context, cert.certificateType),
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 10,
@@ -155,7 +155,12 @@ class CertificateListCards extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: AppSpacing.lg),
-                _buildActionButton(context, theme, width: double.infinity),
+                _buildActionButton(
+                  context,
+                  theme,
+                  cert,
+                  width: double.infinity,
+                ),
               ],
             ),
           );
@@ -179,7 +184,7 @@ class CertificateListCards extends StatelessWidget {
                       radius: 22,
                       backgroundColor: colorScheme.primary,
                       child: Text(
-                        cert.patientName.substring(0, 1).toUpperCase(),
+                        cert.fullName.substring(0, 1).toUpperCase(),
                         style: theme.textTheme.titleMedium?.copyWith(
                           color: colorScheme.onPrimary,
                           fontWeight: FontWeight.bold,
@@ -192,14 +197,14 @@ class CertificateListCards extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            cert.patientName,
+                            cert.fullName,
                             style: theme.textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.w900,
                             ),
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            cert.id,
+                            cert.id.toString(),
                             style: theme.textTheme.labelMedium?.copyWith(
                               color: colorScheme.onSurfaceVariant.withValues(
                                 alpha: 0.7,
@@ -228,7 +233,7 @@ class CertificateListCards extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 6),
-                    _buildTypeChip(context, cert.type),
+                    _buildTypeChip(context, cert.certificateType),
                   ],
                 ),
               ),
@@ -268,7 +273,7 @@ class CertificateListCards extends StatelessWidget {
                   ],
                 ),
               ),
-              _buildActionButton(context, theme),
+              _buildActionButton(context, theme, cert),
             ],
           ),
         );
@@ -305,7 +310,8 @@ class CertificateListCards extends StatelessWidget {
 
   Widget _buildActionButton(
     BuildContext context,
-    ThemeData theme, {
+    ThemeData theme,
+    DoctorCertificateRequestModel certificate, {
     double? width,
   }) {
     final colorScheme = theme.colorScheme;
@@ -316,7 +322,7 @@ class CertificateListCards extends StatelessWidget {
       child: FilledButton(
         onPressed: () => isIssuedTab
             ? null
-            : context.push(AppRoutes.doctorCertificateReview),
+            : context.push("${AppRoutes.certificateReview}/${certificate.id}"),
         style: FilledButton.styleFrom(
           backgroundColor: isIssuedTab
               ? colorScheme.secondaryContainer

@@ -13,7 +13,7 @@ class SearchDoctorCard extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     return InkWell(
-      onTap: () => context.push(AppRoutes.search),
+      onTap: () => context.go(AppRoutes.search),
       borderRadius: BorderRadius.circular(24),
       child: Container(
         width: double.infinity,

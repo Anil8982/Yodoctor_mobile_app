@@ -4,12 +4,15 @@ import 'package:yodoctor/core/models/patient/booking_state_model.dart';
 class LabBookingNotifier extends Notifier<BookingStateModel> {
   @override
   BookingStateModel build() {
-    return BookingStateModel(
-      selectedDate: DateTime.now(),
-    );
+    return BookingStateModel(selectedDate: DateTime.now());
   }
 
-  void updatePatientDetails({String? name, String? age, String? phone, String? gender}) {
+  void updatePatientDetails({
+    String? name,
+    String? age,
+    String? phone,
+    String? gender,
+  }) {
     state = state.copyWith(
       fullName: name,
       age: age,
@@ -18,8 +21,12 @@ class LabBookingNotifier extends Notifier<BookingStateModel> {
     );
   }
 
-  void updateAddress(String address) {
-    state = state.copyWith(fullAddress: address);
+  void updateAddress(String address, {double? latitude, double? longitude}) {
+    state = state.copyWith(
+      address: address,
+      latitude: latitude,
+      longitude: longitude,
+    );
   }
 
   void selectDate(DateTime date) {
@@ -31,6 +38,7 @@ class LabBookingNotifier extends Notifier<BookingStateModel> {
   }
 }
 
-final labBookingProvider = NotifierProvider<LabBookingNotifier, BookingStateModel>(
-  LabBookingNotifier.new,
-);
+final labBookingProvider =
+    NotifierProvider<LabBookingNotifier, BookingStateModel>(
+      LabBookingNotifier.new,
+    );

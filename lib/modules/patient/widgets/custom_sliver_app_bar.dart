@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:yodoctor/core/routes/app_routes.dart';
 
 class CustomSliverAppBar extends StatelessWidget {
   const CustomSliverAppBar({
@@ -9,11 +10,13 @@ class CustomSliverAppBar extends StatelessWidget {
     required this.expandedHeight,
     required this.background,
     this.scaffoldKey,
+    this.onNotificationTap,
   });
 
   final double expandedHeight;
   final Widget background;
   final GlobalKey<ScaffoldState>? scaffoldKey;
+  final VoidCallback? onNotificationTap;
 
   @override
   Widget build(BuildContext context) {
@@ -45,13 +48,14 @@ class CustomSliverAppBar extends StatelessWidget {
           ),
           const Spacer(),
 
-          // 2. Global Notification Button
           _buildActionButton(
             icon: Icons.notifications_outlined,
-            onTap: () {
-              context.push('/notifications');
-            },
             colorScheme: colorScheme,
+            onTap:
+                onNotificationTap ??
+                () {
+                  context.push(AppRoutes.notifications);
+                },
           ),
           const SizedBox(width: 12),
 
@@ -97,12 +101,18 @@ class CustomSliverAppBar extends StatelessWidget {
         padding: const EdgeInsets.all(2),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          border: Border.all(color: colorScheme.onPrimary.withValues(alpha: 0.3)),
+          border: Border.all(
+            color: colorScheme.onPrimary.withValues(alpha: 0.3),
+          ),
         ),
         child: CircleAvatar(
           radius: 18,
           backgroundColor: colorScheme.onPrimary.withValues(alpha: 0.2),
-          child: Icon(Icons.person_rounded, color: colorScheme.onPrimary, size: 20),
+          child: Icon(
+            Icons.person_rounded,
+            color: colorScheme.onPrimary,
+            size: 20,
+          ),
         ),
       ),
     );

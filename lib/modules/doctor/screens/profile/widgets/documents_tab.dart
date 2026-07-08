@@ -20,16 +20,31 @@ class DocumentsTab extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Uploaded Documents', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+          Text(
+            'Uploaded Documents',
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w800,
+            ),
+          ),
           const SizedBox(height: AppSpacing.xxs),
-          Text('Manage your official medical certifications and identity proofs required for compliance checks.', style: theme.textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant)),
+          Text(
+            'Manage your official medical certifications and identity proofs required for compliance checks.',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
           const SizedBox(height: AppSpacing.xl),
 
           if (formState.uploadedDocs.isEmpty)
             Center(
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: AppSpacing.xl),
-                child: Text('No documents uploaded yet.', style: theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant)),
+                child: Text(
+                  'No documents uploaded yet.',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
               ),
             )
           else
@@ -37,7 +52,8 @@ class DocumentsTab extends ConsumerWidget {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: formState.uploadedDocs.length,
-              separatorBuilder: (context, index) => const SizedBox(height: AppSpacing.md),
+              separatorBuilder: (context, index) =>
+                  const SizedBox(height: AppSpacing.md),
               itemBuilder: (context, index) {
                 final doc = formState.uploadedDocs[index];
                 final String docName = doc['name'] ?? 'Document';
@@ -47,25 +63,45 @@ class DocumentsTab extends ConsumerWidget {
                 return Card(
                   elevation: 0,
                   color: colorScheme.surfaceContainerHigh,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                   child: ListTile(
                     leading: CircleAvatar(
-                      backgroundColor: colorScheme.primary.withValues(alpha: 0.1),
-                      child: Icon(Icons.picture_as_pdf_outlined, color: colorScheme.primary, size: 22),
+                      backgroundColor: colorScheme.primary.withValues(
+                        alpha: 0.1,
+                      ),
+                      child: Icon(
+                        Icons.picture_as_pdf_outlined,
+                        color: colorScheme.primary,
+                        size: 22,
+                      ),
                     ),
-                    title: Text(docName, style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700)),
+                    title: Text(
+                      docName,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                     trailing: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.sm,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: isVerified
-                            ? colorScheme.primaryContainer.withValues(alpha: 0.5)
+                            ? colorScheme.primaryContainer.withValues(
+                                alpha: 0.5,
+                              )
                             : colorScheme.errorContainer.withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
                         status,
                         style: theme.textTheme.labelSmall?.copyWith(
-                          color: isVerified ? colorScheme.onPrimaryContainer : colorScheme.onErrorContainer,
+                          color: isVerified
+                              ? colorScheme.onPrimaryContainer
+                              : colorScheme.onErrorContainer,
                           fontWeight: FontWeight.w800,
                         ),
                       ),
@@ -98,11 +134,27 @@ class DocumentsTab extends ConsumerWidget {
               ),
               child: Column(
                 children: [
-                  Icon(Icons.cloud_upload_outlined, color: colorScheme.primary, size: 28),
+                  Icon(
+                    Icons.cloud_upload_outlined,
+                    color: colorScheme.primary,
+                    size: 28,
+                  ),
                   const SizedBox(height: AppSpacing.xs),
-                  Text('Upload New Document', style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w800, color: colorScheme.primary)),
+                  Text(
+                    'Upload New Document',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: colorScheme.primary,
+                    ),
+                  ),
                   const SizedBox(height: 2),
-                  Text('Supports PDF, PNG or JPG (Max 5MB)', style: theme.textTheme.bodySmall?.copyWith(fontSize: 10, color: colorScheme.onSurfaceVariant)),
+                  Text(
+                    'Supports PDF, PNG or JPG (Max 5MB)',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      fontSize: 10,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
                 ],
               ),
             ),

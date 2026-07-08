@@ -66,8 +66,11 @@ class StatusChipSelector extends StatelessWidget {
 
         Row(
           children: statusOptions.map((option) {
-            final isSelected = selectedStatus.toUpperCase() == option['label'] ||
-                (option['label'] == 'TEMP UNFIT' && selectedStatus.toUpperCase().contains('TEMPORARILY'));
+            final selected = selectedStatus.toUpperCase();
+
+            final isSelected = option['label'] == 'TEMP UNFIT'
+                ? selected == 'TEMPORARILY UNFIT'
+                : selected == option['label'];
 
             return Expanded(
               child: Container(
@@ -76,7 +79,11 @@ class StatusChipSelector extends StatelessWidget {
                 ),
                 height: 46,
                 child: InkWell(
-                  onTap: () => onChanged(option['label'] == 'TEMP UNFIT' ? 'TEMPORARILY UNFIT' : option['label']),
+                  onTap: () => onChanged(
+                    option['label'] == 'TEMP UNFIT'
+                        ? 'TEMPORARILY UNFIT'
+                        : option['label'],
+                  ),
                   borderRadius: BorderRadius.circular(14),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 180),
@@ -99,14 +106,22 @@ class StatusChipSelector extends StatelessWidget {
                         Icon(
                           isSelected ? option['selectedIcon'] : option['icon'],
                           size: 16,
-                          color: isSelected ? option['color'] : colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
+                          color: isSelected
+                              ? option['color']
+                              : colorScheme.onSurfaceVariant.withValues(
+                                  alpha: 0.8,
+                                ),
                         ),
                         const SizedBox(width: 6),
                         Text(
                           option['label'],
                           style: theme.textTheme.labelMedium?.copyWith(
-                            fontWeight: isSelected ? FontWeight.w900 : FontWeight.w800,
-                            color: isSelected ? colorScheme.onSurface : colorScheme.onSurfaceVariant,
+                            fontWeight: isSelected
+                                ? FontWeight.w900
+                                : FontWeight.w800,
+                            color: isSelected
+                                ? colorScheme.onSurface
+                                : colorScheme.onSurfaceVariant,
                             fontSize: 11,
                             letterSpacing: 0.2,
                           ),

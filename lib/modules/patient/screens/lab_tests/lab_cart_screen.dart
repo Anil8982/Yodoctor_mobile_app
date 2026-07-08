@@ -11,7 +11,10 @@ class LabCartScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final cartItems = ref.watch(labCartProvider);
+
+    final labState = ref.watch(labProvider);
+
+    final cartItems = labState.cart;
 
     final double totalMRP = cartItems.fold(
       0,
@@ -155,7 +158,7 @@ class LabCartScreen extends ConsumerWidget {
                                   ),
                                   onPressed: () {
                                     ref
-                                        .read(labCartProvider.notifier)
+                                        .read(labProvider.notifier)
                                         .toggleCartItem(item);
                                   },
                                 ),
@@ -419,9 +422,9 @@ class LabCartScreen extends ConsumerWidget {
             const SizedBox(height: 24),
             Text(
               'Your cart is empty',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(

@@ -1,11 +1,17 @@
-
 class BookingStateModel {
   final String fullName;
   final String age;
   final String phoneNumber;
   final String gender;
-  final String fullAddress;
+
+  final String address;
+
+  final double? latitude;
+
+  final double? longitude;
+
   final DateTime selectedDate;
+
   final String selectedTimeSlot;
 
   const BookingStateModel({
@@ -13,7 +19,9 @@ class BookingStateModel {
     this.age = '',
     this.phoneNumber = '',
     this.gender = 'Male',
-    this.fullAddress = '',
+    this.address = '',
+    this.latitude,
+    this.longitude,
     required this.selectedDate,
     this.selectedTimeSlot = '',
   });
@@ -23,7 +31,9 @@ class BookingStateModel {
     String? age,
     String? phoneNumber,
     String? gender,
-    String? fullAddress,
+    String? address,
+    double? latitude,
+    double? longitude,
     DateTime? selectedDate,
     String? selectedTimeSlot,
   }) {
@@ -32,7 +42,9 @@ class BookingStateModel {
       age: age ?? this.age,
       phoneNumber: phoneNumber ?? this.phoneNumber,
       gender: gender ?? this.gender,
-      fullAddress: fullAddress ?? this.fullAddress,
+      address: address ?? this.address,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
       selectedDate: selectedDate ?? this.selectedDate,
       selectedTimeSlot: selectedTimeSlot ?? this.selectedTimeSlot,
     );

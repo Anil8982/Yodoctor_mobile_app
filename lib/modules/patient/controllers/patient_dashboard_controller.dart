@@ -1,65 +1,129 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/utils/dummy_data.dart';
+import 'package:flutter/foundation.dart';
 
-// 🎯 Unified immutable state structure holding dashboard data payload and dynamic criteria keys
-class PatientDashboardState {
-  final PatientDashboardData? dashboardData;
-  final String selectedFilter;
+import '../models/dashboard/dashboard_model.dart';
+import '../../../services/patient_dashboard_service.dart';
 
-  PatientDashboardState({
-    this.dashboardData,
-    this.selectedFilter = 'All',
-  });
+class PatientDashboardController extends ChangeNotifier {
+  static const List<String> availableFilters = ["All", "Today", "Next 7 Days"];
 
-  PatientDashboardState copyWith({
-    PatientDashboardData? dashboardData,
-    String? selectedFilter,
-  }) {
-    return PatientDashboardState(
-      dashboardData: dashboardData ?? this.dashboardData,
-      selectedFilter: selectedFilter ?? this.selectedFilter,
-    );
-  }
-}
+  final PatientDashboardService _service = PatientDashboardService();
 
-// 🎯 FIX: Extended manual AsyncNotifier base class to handle asynchronous state pipelines safely
-class PatientDashboardNotifier extends AsyncNotifier<PatientDashboardState> {
+  bool _isLoading = false;
+  String? _errorMessage;
+  DashboardModel? _dashboardData;
 
-  static const List<String> availableFilters = <String>[
-    'All',
-    'Today',
-    'Next 7 Days',
-  ];
+  String _selectedFilter = "All";
 
-  @override
-  Future<PatientDashboardState> build() async {
-    // Automatically triggers initial dashboard data query on build cycle setup
-    final data = await DummyData.getDashboardData(filter: 'All');
-    return PatientDashboardState(dashboardData: data, selectedFilter: 'All');
+  bool get isLoading => _isLoading;
+
+  String? get errorMessage => _errorMessage;
+
+  DashboardModel? get dashboardData => _dashboardData;
+
+  String get selectedFilter => _selectedFilter;
+
+  PatientDashboardController() {
+    loadDashboard();
   }
 
-  // Explicitly fetch or reload repository dashboard data items
   Future<void> loadDashboard({String? filter}) async {
-    final currentFilter = filter ?? state.value?.selectedFilter ?? 'All';
+    _isLoading = true;
+    _errorMessage = null;
 
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final data = await DummyData.getDashboardData(filter: currentFilter);
-      return PatientDashboardState(
-        dashboardData: data,
-        selectedFilter: currentFilter,
-      );
-    });
+    notifyListeners();
+
+    if (filter != null) {
+      _selectedFilter = filter;
+    }
+
+    try {
+      final response = await _service.getDashboard();
+      print("========== DASHBOARD ==========");
+      print(response.statusCode);
+      print(response.data);
+
+      if (response.statusCode == 200) {
+        _dashboardData = DashboardModel.fromJson(response.data);
+        print("Patient Name : ${_dashboardData?.patientName}");
+        print("Appointments : ${_dashboardData?.appointments.length}");
+      } else {
+        _errorMessage = response.data["message"] ?? "Unable to load dashboard";
+      }
+    } catch (e, stackTrace) {
+      debugPrint(e.toString());
+      debugPrintStack(stackTrace: stackTrace);
+
+      _errorMessage = "Unable to load dashboard";
+    }
+
+    _isLoading = false;
+    notifyListeners();
   }
 
-  // Set active filter criteria and trigger background reload loop
+  Future<bool> cancelAppointment(int appointmentId) async {
+    try {
+      final response = await _service.cancelAppointment(appointmentId);
+
+      if (response.statusCode == 200 && response.data["success"] == true) {
+        // Dashboard Refresh
+        await loadDashboard(filter: _selectedFilter);
+
+        return true;
+      }
+
+      _errorMessage =
+          response.data["message"] ?? "Unable to cancel appointment";
+
+      notifyListeners();
+
+      return false;
+    } catch (e, stackTrace) {
+      debugPrint(e.toString());
+      debugPrintStack(stackTrace: stackTrace);
+
+      _errorMessage = "Unable to cancel appointment";
+
+      notifyListeners();
+
+      return false;
+    }
+  }
+
+  Future<void> refreshTokenStatus() async {
+    if (_dashboardData?.todayToken == null) return;
+
+    try {
+      final response = await _service.getTokenStatus(
+        _dashboardData!.todayToken!.appointmentId,
+      );
+
+      if (response.statusCode == 200) {
+        final token = _dashboardData!.todayToken!;
+
+        _dashboardData = DashboardModel(
+          patient: _dashboardData!.patient,
+          patientName: _dashboardData!.patientName,
+          upcomingCount: _dashboardData!.upcomingCount,
+          appointments: _dashboardData!.appointments,
+          todayToken: token.copyWith(
+            nowServing: response.data["nowServing"],
+            patientsAhead: response.data["patientsAhead"],
+            estimatedTime:
+                response.data["estimatedTime"] ??
+                "${response.data["estimatedWaitMinutes"]} mins",
+          ),
+        );
+
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
   Future<void> setFilter(String filter) async {
-    if (state.value?.selectedFilter == filter) return;
+    if (_selectedFilter == filter) return;
+
     await loadDashboard(filter: filter);
   }
 }
-
-// 🎯 Provider registration mapping clean manual notifier architecture setup
-final patientDashboardProvider = AsyncNotifierProvider.autoDispose<PatientDashboardNotifier, PatientDashboardState>(
-  PatientDashboardNotifier.new,
-);

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../../../../core/utils/dummy_data.dart';
+import '../../../models/history/appointment_history_model.dart';
 
 Future<void> showAppointmentDetailsDialog({
   required BuildContext context,
-  required AppointmentHistoryItem appointment,
+  required AppointmentHistoryModel appointment,
   required int initialRating,
   required String initialFeedback,
   required Future<void> Function(int rating, String feedback) onSubmitRating,
@@ -32,14 +32,15 @@ class _AppointmentDetailsSheet extends StatefulWidget {
     required this.onDownloadPrescription,
   });
 
-  final AppointmentHistoryItem appointment;
+  final AppointmentHistoryModel appointment;
   final int initialRating;
   final String initialFeedback;
   final Future<void> Function(int rating, String feedback) onSubmitRating;
   final VoidCallback onDownloadPrescription;
 
   @override
-  State<_AppointmentDetailsSheet> createState() => _AppointmentDetailsSheetState();
+  State<_AppointmentDetailsSheet> createState() =>
+      _AppointmentDetailsSheetState();
 }
 
 class _AppointmentDetailsSheetState extends State<_AppointmentDetailsSheet> {
@@ -70,7 +71,12 @@ class _AppointmentDetailsSheetState extends State<_AppointmentDetailsSheet> {
         color: colorScheme.surface,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
       ),
-      padding: EdgeInsets.fromLTRB(24, 12, 24, MediaQuery.of(context).viewInsets.bottom + 90),
+      padding: EdgeInsets.fromLTRB(
+        24,
+        12,
+        24,
+        MediaQuery.of(context).viewInsets.bottom + 90,
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -93,12 +99,17 @@ class _AppointmentDetailsSheetState extends State<_AppointmentDetailsSheet> {
                   children: [
                     Text(
                       widget.appointment.doctorName,
-                      style: textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w900),
+                      style: textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.w900,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${_formatDate(widget.appointment.date)}  •  Token ${widget.appointment.tokenNumber}',
-                      style: textTheme.bodyMedium?.copyWith(color: colorScheme.outline, fontWeight: FontWeight.w600),
+                      '${widget.appointment.appointmentDate} • Token ${widget.appointment.tokenNumber}',
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.outline,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ],
                 ),
@@ -112,7 +123,10 @@ class _AppointmentDetailsSheetState extends State<_AppointmentDetailsSheet> {
           ),
 
           const SizedBox(height: 32),
-          Text("Rate your experience", style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)),
+          Text(
+            "Rate your experience",
+            style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+          ),
           const SizedBox(height: 16),
 
           // Minimal Stars
@@ -125,7 +139,9 @@ class _AppointmentDetailsSheetState extends State<_AppointmentDetailsSheet> {
                 onPressed: () => setState(() => _selectedRating = ratingValue),
                 icon: Icon(
                   isSelected ? Icons.star_rounded : Icons.star_outline_rounded,
-                  color: isSelected ? colorScheme.secondary : colorScheme.outlineVariant,
+                  color: isSelected
+                      ? colorScheme.secondary
+                      : colorScheme.outlineVariant,
                   size: 36,
                 ),
               );
@@ -139,7 +155,9 @@ class _AppointmentDetailsSheetState extends State<_AppointmentDetailsSheet> {
             decoration: InputDecoration(
               hintText: 'Share your thoughts (optional)',
               filled: true,
-              fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.2),
+              fillColor: colorScheme.surfaceContainerHighest.withValues(
+                alpha: 0.2,
+              ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(20),
                 borderSide: BorderSide.none,
@@ -161,38 +179,49 @@ class _AppointmentDetailsSheetState extends State<_AppointmentDetailsSheet> {
                   onPressed: _selectedRating == 0 || _isSubmitting
                       ? null
                       : () async {
-                    final nav = Navigator.of(context);
-                    setState(() => _isSubmitting = true);
-                    await widget.onSubmitRating(_selectedRating, _feedbackController.text.trim());
-                    if (mounted) nav.pop();
-                  },
+                          final nav = Navigator.of(context);
+                          setState(() => _isSubmitting = true);
+                          await widget.onSubmitRating(
+                            _selectedRating,
+                            _feedbackController.text.trim(),
+                          );
+                          if (mounted) nav.pop();
+                        },
                   style: FilledButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 18),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18),
+                    ),
                     elevation: 0,
                   ),
                   child: AnimatedSwitcher(
                     duration: const Duration(milliseconds: 200),
                     child: _isSubmitting
                         ? SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2.5,
-                        color: colorScheme.onPrimary,
-                      ),
-                    )
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.5,
+                              color: colorScheme.onPrimary,
+                            ),
+                          )
                         : const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.check_circle_outline_rounded, size: 20),
-                        SizedBox(width: 10),
-                        Text(
-                          'Save Feedback',
-                          style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
-                        ),
-                      ],
-                    ),
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.check_circle_outline_rounded,
+                                size: 20,
+                              ),
+                              SizedBox(width: 10),
+                              Text(
+                                'Save Feedback',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
+                          ),
                   ),
                 ),
               ),
@@ -205,7 +234,9 @@ class _AppointmentDetailsSheetState extends State<_AppointmentDetailsSheet> {
                   onPressed: () => Navigator.pop(context),
                   style: TextButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18),
+                    ),
                   ),
                   child: Text(
                     'Maybe Later',
@@ -218,14 +249,9 @@ class _AppointmentDetailsSheetState extends State<_AppointmentDetailsSheet> {
                 ),
               ),
             ],
-          )
+          ),
         ],
       ),
     );
-  }
-
-  String _formatDate(DateTime date) {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return '${date.day} ${months[date.month - 1]} ${date.year}';
   }
 }

@@ -11,6 +11,7 @@ class ManualBookingForm extends StatelessWidget {
     required this.selectedShift,
     required this.onShiftChanged,
     required this.onSubmit,
+    required this.loading,
   });
 
   final GlobalKey<FormState> formKey;
@@ -20,7 +21,7 @@ class ManualBookingForm extends StatelessWidget {
   final String selectedShift;
   final ValueChanged<String?> onShiftChanged;
   final VoidCallback onSubmit;
-
+  final bool loading;
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -38,7 +39,8 @@ class ManualBookingForm extends StatelessWidget {
             icon: Icons.person_rounded,
             requiredField: true,
             validator: (value) {
-              if (value == null || value.trim().isEmpty) return 'Patient name is required';
+              if (value == null || value.trim().isEmpty)
+                return 'Patient name is required';
               return null;
             },
           ),
@@ -55,7 +57,8 @@ class ManualBookingForm extends StatelessWidget {
             validator: (value) {
               final normalized = value?.trim() ?? '';
               if (normalized.isEmpty) return 'Mobile number is required';
-              if (!RegExp(r'^[0-9]{10}$').hasMatch(normalized)) return 'Enter a valid 10-digit number';
+              if (!RegExp(r'^[0-9]{10}$').hasMatch(normalized))
+                return 'Enter a valid 10-digit number';
               return null;
             },
           ),
@@ -71,7 +74,8 @@ class ManualBookingForm extends StatelessWidget {
               final normalized = value?.trim() ?? '';
               if (normalized.isEmpty) return null;
               final age = int.tryParse(normalized);
-              if (age == null || age < 1 || age > 120) return 'Enter age between 1 and 120';
+              if (age == null || age < 1 || age > 120)
+                return 'Enter age between 1 and 120';
               return null;
             },
           ),
@@ -82,17 +86,31 @@ class ManualBookingForm extends StatelessWidget {
             width: double.infinity,
             height: 54,
             child: FilledButton(
-              onPressed: onSubmit,
+              onPressed: loading ? null : onSubmit,
               style: FilledButton.styleFrom(
                 backgroundColor: colorScheme.primary,
                 foregroundColor: colorScheme.onPrimary,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
                 elevation: 0,
               ),
-              child: const Text(
-                'Confirm Booking',
-                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
-              ),
+              child: loading
+                  ? const SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Text(
+                      "Confirm Booking",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w900,
+                        fontSize: 16,
+                      ),
+                    ),
             ),
           ),
         ],
@@ -101,16 +119,16 @@ class ManualBookingForm extends StatelessWidget {
   }
 
   Widget _buildInputField(
-      BuildContext context, {
-        required TextEditingController controller,
-        required String label,
-        required String hint,
-        required IconData icon,
-        bool requiredField = false,
-        TextInputType? keyboardType,
-        String? Function(String?)? validator,
-        int? maxLength,
-      }) {
+    BuildContext context, {
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    required IconData icon,
+    bool requiredField = false,
+    TextInputType? keyboardType,
+    String? Function(String?)? validator,
+    int? maxLength,
+  }) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -124,14 +142,24 @@ class ManualBookingForm extends StatelessWidget {
           keyboardType: keyboardType,
           validator: validator,
           maxLength: maxLength,
-          style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700, color: colorScheme.onSurface),
+          style: theme.textTheme.bodyMedium?.copyWith(
+            fontWeight: FontWeight.w700,
+            color: colorScheme.onSurface,
+          ),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant.withValues(alpha: 0.45)),
+            hintStyle: theme.textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.45),
+            ),
             prefixIcon: Icon(icon, size: 20, color: colorScheme.primary),
             filled: true,
-            fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
-            contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 16),
+            fillColor: colorScheme.surfaceContainerHighest.withValues(
+              alpha: 0.3,
+            ),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: 16,
+            ),
             counterText: '',
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
@@ -147,13 +175,19 @@ class ManualBookingForm extends StatelessWidget {
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide: BorderSide(color: colorScheme.error.withValues(alpha: 0.5), width: 1),
+              borderSide: BorderSide(
+                color: colorScheme.error.withValues(alpha: 0.5),
+                width: 1,
+              ),
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
               borderSide: BorderSide(color: colorScheme.error, width: 1.5),
             ),
-            errorStyle: theme.textTheme.labelSmall?.copyWith(color: colorScheme.error, fontWeight: FontWeight.w700),
+            errorStyle: theme.textTheme.labelSmall?.copyWith(
+              color: colorScheme.error,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ),
       ],
@@ -188,10 +222,16 @@ class ManualBookingForm extends StatelessWidget {
                     duration: const Duration(milliseconds: 180),
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     decoration: BoxDecoration(
-                      color: isSelected ? colorScheme.primaryContainer.withValues(alpha: 0.6) : colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+                      color: isSelected
+                          ? colorScheme.primaryContainer.withValues(alpha: 0.6)
+                          : colorScheme.surfaceContainerHighest.withValues(
+                              alpha: 0.3,
+                            ),
                       borderRadius: BorderRadius.circular(14),
                       border: Border.all(
-                        color: isSelected ? colorScheme.primary : Colors.transparent,
+                        color: isSelected
+                            ? colorScheme.primary
+                            : Colors.transparent,
                         width: isSelected ? 1.5 : 0,
                       ),
                     ),
@@ -199,16 +239,22 @@ class ManualBookingForm extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
-                          isMorning ? Icons.wb_sunny_rounded : Icons.nights_stay_rounded,
+                          isMorning
+                              ? Icons.wb_sunny_rounded
+                              : Icons.nights_stay_rounded,
                           size: 16,
-                          color: isSelected ? colorScheme.primary : colorScheme.onSurfaceVariant,
+                          color: isSelected
+                              ? colorScheme.primary
+                              : colorScheme.onSurfaceVariant,
                         ),
                         const SizedBox(width: 8),
                         Text(
                           isMorning ? 'Morning' : 'Evening',
                           style: theme.textTheme.labelLarge?.copyWith(
                             fontWeight: FontWeight.w900,
-                            color: isSelected ? colorScheme.primary : colorScheme.onSurfaceVariant,
+                            color: isSelected
+                                ? colorScheme.primary
+                                : colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ],
@@ -223,7 +269,11 @@ class ManualBookingForm extends StatelessWidget {
     );
   }
 
-  Widget _buildFieldLabel(BuildContext context, String label, bool requiredField) {
+  Widget _buildFieldLabel(
+    BuildContext context,
+    String label,
+    bool requiredField,
+  ) {
     final colorScheme = Theme.of(context).colorScheme;
 
     return RichText(
@@ -239,7 +289,10 @@ class ManualBookingForm extends StatelessWidget {
           if (requiredField)
             TextSpan(
               text: ' *',
-              style: TextStyle(color: colorScheme.error, fontWeight: FontWeight.w900),
+              style: TextStyle(
+                color: colorScheme.error,
+                fontWeight: FontWeight.w900,
+              ),
             )
           else
             TextSpan(
