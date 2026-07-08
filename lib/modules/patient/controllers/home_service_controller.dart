@@ -1,6 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/models/patient/home_service_booking_model.dart';
 import 'package:yodoctor/services/patient_homecare_service.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:flutter/material.dart';
 
 class HomeServiceBookingNotifier extends Notifier<HomeServiceBookingModel> {
   final PatientHomeCareService _service = PatientHomeCareService();
@@ -80,6 +83,62 @@ class HomeServiceBookingNotifier extends Notifier<HomeServiceBookingModel> {
     } catch (e) {
       print(e.toString());
       return false;
+    }
+  }
+
+  Future<void> fetchCurrentLocation(
+    TextEditingController addressController,
+  ) async {
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+
+      if (!serviceEnabled) {
+        throw Exception("Location services are disabled.");
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+
+        if (permission == LocationPermission.denied) {
+          throw Exception("Location permission denied.");
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        throw Exception("Location permission permanently denied.");
+      }
+
+      final Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      final placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+
+      String address = "";
+
+      if (placemarks.isNotEmpty) {
+        final place = placemarks.first;
+
+        address =
+            "${place.street}, ${place.subLocality}, ${place.locality}, ${place.administrativeArea}, ${place.postalCode}";
+      }
+
+      // TextField Update
+      addressController.text = address;
+
+      // Riverpod State Update
+      updateField(
+        address: address,
+        latitude: position.latitude,
+        longitude: position.longitude,
+      );
+    } catch (e) {
+      print("Location Error: $e");
     }
   }
 }

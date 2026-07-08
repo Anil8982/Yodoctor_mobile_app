@@ -64,13 +64,17 @@ class BookingPersonalDetails extends ConsumerWidget {
             const SizedBox(width: 12),
             Expanded(
               child: DropdownButtonFormField<String>(
-                initialValue: bookingState.patientGender == 'Select Gender' ? null : bookingState.patientGender,
+                initialValue: bookingState.patientGender == 'Select Gender'
+                    ? null
+                    : bookingState.patientGender,
                 decoration: AppInputDecoration.build(
                   context,
                   label: 'Patient Gender *',
                   prefixIcon: Icons.wc_rounded,
                 ),
-                items: ['Male', 'Female', 'Other'].map((g) => DropdownMenuItem(value: g, child: Text(g))).toList(),
+                items: ['Male', 'Female', 'Other']
+                    .map((g) => DropdownMenuItem(value: g, child: Text(g)))
+                    .toList(),
                 onChanged: (val) => notifier.updateField(patientGender: val),
               ),
             ),
@@ -86,6 +90,19 @@ class BookingPersonalDetails extends ConsumerWidget {
             prefixIcon: Icons.location_on_rounded,
           ),
           onChanged: (val) => notifier.updateField(address: val),
+        ),
+
+        const SizedBox(height: 10),
+
+        Align(
+          alignment: Alignment.centerLeft,
+          child: FilledButton.icon(
+            onPressed: () {
+              notifier.fetchCurrentLocation(addressController);
+            },
+            icon: const Icon(Icons.my_location),
+            label: const Text("Use Current Location"),
+          ),
         ),
       ],
     );

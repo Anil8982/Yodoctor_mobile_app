@@ -6,14 +6,14 @@ import 'api_service.dart';
 class PatientCertificateService {
   Future<String?> _token() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString("patient_token");
+    return prefs.getString("token");
   }
 
   Future<Response> createRequest(Map<String, dynamic> data) async {
     final token = await _token();
 
     return ApiService.dio.post(
-      "/patient/certificate/create",
+      "/certificate/create",
       data: data,
       options: Options(headers: {"Authorization": "Bearer $token"}),
     );
@@ -44,7 +44,7 @@ class PatientCertificateService {
     });
 
     return ApiService.dio.post(
-      "/patient/certificate/upload",
+      "/certificate/upload",
       data: formData,
       options: Options(
         headers: {
@@ -68,7 +68,7 @@ class PatientCertificateService {
     final token = await _token();
 
     return ApiService.dio.get(
-      "/patient/certificate/$id",
+      "/certificate/$id",
       options: Options(headers: {"Authorization": "Bearer $token"}),
     );
   }
@@ -77,7 +77,7 @@ class PatientCertificateService {
     final token = await _token();
 
     return ApiService.dio.get(
-      "/patient/certificate/download/$id",
+      "/certificate/download/$id",
       options: Options(
         headers: {"Authorization": "Bearer $token"},
         responseType: ResponseType.bytes,
@@ -86,11 +86,6 @@ class PatientCertificateService {
   }
 
   Future<Response> getDoctors() async {
-    final token = await _token();
-
-    return ApiService.dio.get(
-      "/patient/certificate/doctors",
-      options: Options(headers: {"Authorization": "Bearer $token"}),
-    );
+    return ApiService.dio.get("/doctor/alldoctors");
   }
 }

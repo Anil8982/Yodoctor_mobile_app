@@ -5,7 +5,7 @@ import 'package:yodoctor/modules/patient/controllers/certificate_request.dart';
 import 'certificate_type_card.dart';
 import 'step_header_helper.dart';
 import 'custom_text_field.dart';
-import '../../../../../core/models/doctor/doctor_profile_model.dart';
+import '../../../../patient/models/certificate/patient_doctor_model.dart';
 
 class Step1TypeSelection extends ConsumerWidget {
   final GlobalKey<FormState> formKey;
@@ -85,12 +85,19 @@ class Step1TypeSelection extends ConsumerWidget {
             },
           ),
           const SizedBox(height: 28),
-          DropdownButtonFormField<DoctorProfileModel>(
+
+          DropdownButtonFormField<PatientDoctorModel>(
             initialValue: formState.assignedDoctor,
+            decoration: const InputDecoration(
+              labelText: "Assigned Doctor *",
+              hintText: "Select Doctor",
+              border: OutlineInputBorder(),
+              prefixIcon: Icon(Icons.person),
+            ),
             items: formState.doctors.map((doc) {
-              return DropdownMenuItem<DoctorProfileModel>(
+              return DropdownMenuItem(
                 value: doc,
-                child: Text('${doc.doctorName} (${doc.specialization})'),
+                child: Text("${doc.name} (${doc.specialty})"),
               );
             }).toList(),
             onChanged: (value) {

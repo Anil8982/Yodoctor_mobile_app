@@ -26,7 +26,7 @@ class DoctorQrService {
     final token = await _token();
 
     return ApiService.dio.post(
-      "/doctor/download-qr",
+      "/download-qr",
       data: {
         "doctorName": doctorName,
         "specialization": specialization,

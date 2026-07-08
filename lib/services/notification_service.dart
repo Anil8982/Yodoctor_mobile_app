@@ -6,7 +6,9 @@ import 'api_service.dart';
 class NotificationService {
   Future<String?> _token() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString("access_token");
+    return prefs.getString("token") ??
+        prefs.getString("doctor_token") ??
+        prefs.getString("admin_token");
   }
 
   Future<Response> getNotifications({int page = 1}) async {

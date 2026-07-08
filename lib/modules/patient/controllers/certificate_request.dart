@@ -5,10 +5,10 @@ import '../../../core/models/patient/doctor_profile.dart';
 import '../../../modules/patient/models/certificate/patient_certificate_request_model.dart';
 import '../../../modules/patient/models/certificate/patient_certificate_detail_model.dart';
 import '../../../modules/patient/models/certificate/patient_certificate_timeline_model.dart';
-import '../../../core/models/doctor/doctor_profile_model.dart';
 import 'dart:io';
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
+import '../../patient/models/certificate/patient_doctor_model.dart';
 
 // 🎯 Immutable state structure for tracking certificates data and dynamic form fields
 class CertificateFormState {
@@ -17,14 +17,14 @@ class CertificateFormState {
   final String selectedFilter;
   final String searchQuery;
   final String? selectedType;
-  final DoctorProfileModel? assignedDoctor;
+  final PatientDoctorModel? assignedDoctor;
   final String? purpose;
   final String? gender;
   final String bloodGroup;
   final bool showValidationError;
   final Map<String, String?> uploadedDocs;
   final Map<String, double?> uploadProgress;
-  final List<DoctorProfileModel> doctors;
+  final List<PatientDoctorModel> doctors;
   final PatientCertificateDetailModel? selectedCertificate;
 
   final List<PatientCertificateTimelineModel> timeline;
@@ -63,7 +63,7 @@ class CertificateFormState {
     String? selectedFilter,
     String? searchQuery,
     String? selectedType,
-    DoctorProfileModel? assignedDoctor,
+    PatientDoctorModel? assignedDoctor,
     String? purpose,
     String? gender,
     String? bloodGroup,
@@ -71,7 +71,7 @@ class CertificateFormState {
     Map<String, String?>? uploadedDocs,
     Map<String, double?>? uploadProgress,
     PatientCertificateDetailModel? selectedCertificate,
-    List<DoctorProfileModel>? doctors,
+    List<PatientDoctorModel>? doctors,
     List<PatientCertificateTimelineModel>? timeline,
   }) {
     return CertificateFormState(
@@ -155,15 +155,18 @@ class CertificateNotifier extends Notifier<CertificateFormState> {
     try {
       final response = await _service.getDoctors();
 
-      debugPrint(response.data.toString());
+      debugPrint("STATUS => ${response.statusCode}");
+      debugPrint("BODY => ${response.data}");
 
-      final list = (response.data["doctors"] as List)
-          .map((e) => DoctorProfileModel.fromJson(e))
-          .toList();
+      if (response.statusCode == 200 && response.data["success"] == true) {
+        final list = (response.data["doctors"] as List)
+            .map((e) => PatientDoctorModel.fromJson(e))
+            .toList();
 
-      debugPrint("Doctors = ${list.length}");
+        debugPrint("Doctors Count => ${list.length}");
 
-      state = state.copyWith(doctors: list);
+        state = state.copyWith(doctors: list);
+      }
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -225,7 +228,7 @@ class CertificateNotifier extends Notifier<CertificateFormState> {
       state = state.copyWith(searchQuery: query);
   void setSelectedType(String type) =>
       state = state.copyWith(selectedType: type);
-  void setAssignedDoctor(DoctorProfileModel doctor) {
+  void setAssignedDoctor(PatientDoctorModel doctor) {
     state = state.copyWith(assignedDoctor: doctor);
   }
 
@@ -376,6 +379,6 @@ class CertificateNotifier extends Notifier<CertificateFormState> {
 
 // 🎯 Provider declaration mapped with an autoDispose tag setup
 final certificateProvider =
-    NotifierProvider.autoDispose<CertificateNotifier, CertificateFormState>(
+    NotifierProvider<CertificateNotifier, CertificateFormState>(
       CertificateNotifier.new,
     );

@@ -27,6 +27,11 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UIApplicationSceneManifest</key>
+	<key>NSLocationWhenInUseUsageDescription</key>
+    <string>Yo Doctor uses your location to automatically fill your address for home care booking.</string>
+
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>Yo Doctor uses your location to improve home care booking services.</string>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
 		<false/>

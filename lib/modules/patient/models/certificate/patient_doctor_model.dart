@@ -17,7 +17,7 @@ class PatientDoctorModel {
 
   factory PatientDoctorModel.fromJson(Map<String, dynamic> json) {
     return PatientDoctorModel(
-      id: json["_id"],
+      id: json["id"],
       name: json["doctorName"] ?? "",
       specialty: json["specialization"] ?? "",
       experience: json["experience_years"] ?? 0,

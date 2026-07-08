@@ -42,11 +42,11 @@ class Step4ReviewSubmit extends ConsumerWidget {
             },
             {
               'label': 'Assigned Medical Doctor',
-              'value': formState.assignedDoctor?.doctorName ?? 'N/A',
+              'value': formState.assignedDoctor?.name ?? 'N/A',
             },
             {
               'label': 'Medical Specialty',
-              'value': formState.assignedDoctor?.specialization ?? 'N/A',
+              'value': formState.assignedDoctor?.specialty ?? 'N/A',
             },
             {'label': 'Intended Purpose', 'value': formState.purpose ?? 'N/A'},
             {

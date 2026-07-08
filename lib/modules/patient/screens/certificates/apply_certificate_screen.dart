@@ -38,7 +38,7 @@ class _ApplyCertificateScreenState
     final notifier = ref.read(certificateProvider.notifier);
 
     final subtitleText = formState.assignedDoctor != null
-        ? 'Requesting from ${formState.assignedDoctor!.doctorName} — ${formState.assignedDoctor!.specialization}'
+        ? 'Requesting from ${formState.assignedDoctor!.name} — ${formState.assignedDoctor!.specialty}'
         : 'Choose certificate type and details';
 
     return Scaffold(
