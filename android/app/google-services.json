@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "563822930417-qe2nq2t2e90s9dlu1ju85o334h5fcecq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.yodoctor.app",
+            "certificate_hash": "e43a06f1cc38e5f0333751c3ce17f8bcf7b937cf"
+          }
+        },
+        {
           "client_id": "563822930417-ufpc6vehko15a5lgunrt3ndksvvaipbp.apps.googleusercontent.com",
           "client_type": 3
         }
