@@ -3,8 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/modules/patient/controllers/lab_test_controller.dart';
-
-import '../../../../core/utils/dummy_data.dart';
 import 'widgets/lab_hero_section.dart';
 import 'widgets/lab_categories_list.dart';
 import 'widgets/lab_package_card.dart';
@@ -32,9 +30,15 @@ class _LabTestsScreenState extends ConsumerState<LabTestsScreen> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    final selectedCategory = ref.watch(labCategoryProvider);
-    final filteredPackages = ref.watch(filteredLabPackagesProvider);
-    final cartItems = ref.watch(labCartProvider);
+    final labState = ref.watch(labProvider);
+
+    final notifier = ref.read(labProvider.notifier);
+
+    final selectedCategory = labState.selectedCategory;
+
+    final filteredPackages = notifier.filteredPackages;
+    final popularTests = labState.popularTests;
+    final cartItems = labState.cart;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -82,10 +86,10 @@ class _LabTestsScreenState extends ConsumerState<LabTestsScreen> {
             LabHeroSection(controller: _searchController, onSearch: (value) {}),
             const SizedBox(height: 5),
             LabCategoriesList(
-              categories: DummyData.labCategories,
+              categories: labState.categories,
               selectedCategoryId: selectedCategory,
               onCategorySelected: (catId) {
-                ref.read(labCategoryProvider.notifier).selectCategory(catId);
+                notifier.selectCategory(catId);
               },
             ),
             const SizedBox(height: 6),
@@ -112,7 +116,7 @@ class _LabTestsScreenState extends ConsumerState<LabTestsScreen> {
             const SizedBox(height: 8),
             SizedBox(
               height: 283,
-              child: filteredPackages.isEmpty
+              child: popularTests.isEmpty
                   ? const Center(
                       child: Text('No tests available in this category'),
                     )
@@ -120,9 +124,9 @@ class _LabTestsScreenState extends ConsumerState<LabTestsScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       scrollDirection: Axis.horizontal,
                       physics: const BouncingScrollPhysics(),
-                      itemCount: filteredPackages.length,
+                      itemCount: popularTests.length,
                       itemBuilder: (context, index) {
-                        final package = filteredPackages[index];
+                        final package = popularTests[index];
                         final isInCart = cartItems.any(
                           (item) => item.id == package.id,
                         );
@@ -133,15 +137,14 @@ class _LabTestsScreenState extends ConsumerState<LabTestsScreen> {
                             package: package,
                             isInCart: isInCart,
                             onAddToCart: () {
-                              ref
-                                  .read(labCartProvider.notifier)
-                                  .toggleCartItem(package);
+                              notifier.toggleCartItem(package);
                             },
-                            onViewDetails: () {
-                              context.push(
-                                AppRoutes.labTestDetails,
-                                extra: package,
-                              );
+                            onViewDetails: () async {
+                              await notifier.loadTestDetails(package.id);
+
+                              if (context.mounted) {
+                                context.push(AppRoutes.labTestDetails);
+                              }
                             },
                           ),
                         );

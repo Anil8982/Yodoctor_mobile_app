@@ -1,129 +1,182 @@
 import 'dart:async';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/utils/dummy_data.dart';
+import 'package:flutter/foundation.dart';
 
-class PatientSearchState {
-  final bool isLoading;
-  final String? errorMessage;
-  final List<String> trendingSpecialties;
-  final List<DoctorProfile> doctorSuggestions;
-  final String selectedTrending;
-  final String location;
-  final String query;
+import '../../../services/patient_search_service.dart';
+import '../models/search/city_model.dart';
+import '../models/search/doctor_name_model.dart';
+import '../models/search/doctor_search_model.dart';
+import '../models/search/specialty_model.dart';
 
-  PatientSearchState({
-    this.isLoading = false,
-    this.errorMessage,
-    this.trendingSpecialties = const [],
-    this.doctorSuggestions = const [],
-    this.selectedTrending = '',
-    this.location = 'Chhatrapati Sambhajinagar',
-    this.query = '',
-  });
+class PatientSearchController extends ChangeNotifier {
+  final PatientSearchService _service = PatientSearchService();
 
-  PatientSearchState copyWith({
-    bool? isLoading,
-    String? errorMessage,
-    List<String>? trendingSpecialties,
-    List<DoctorProfile>? doctorSuggestions,
-    String? selectedTrending,
-    String? location,
-    String? query,
-  }) {
-    return PatientSearchState(
-      isLoading: isLoading ?? this.isLoading,
-      errorMessage: errorMessage ?? this.errorMessage,
-      trendingSpecialties: trendingSpecialties ?? this.trendingSpecialties,
-      doctorSuggestions: doctorSuggestions ?? this.doctorSuggestions,
-      selectedTrending: selectedTrending ?? this.selectedTrending,
-      location: location ?? this.location,
-      query: query ?? this.query,
-    );
-  }
-}
+  bool _isLoading = false;
+  String? _errorMessage;
 
-class PatientSearchNotifier extends Notifier<PatientSearchState> {
-  Timer? _hideTimer;
+  final List<SpecialtyModel> _trendingSpecialties = [];
+  final List<DoctorSearchModel> _doctorSuggestions = [];
+  final List<CityModel> _cities = [];
+  final List<DoctorNameModel> _doctorNames = [];
 
-  @override
-  PatientSearchState build() {
-    // Register structural background listener cleanup callbacks on lifecycle end
-    ref.onDispose(() {
-      _hideTimer?.cancel();
-    });
+  String _selectedTrending = "";
+  String _location = "";
+  String _query = "";
 
-    Future.microtask(() => loadTrendingSpecialties());
+  Timer? _debounce;
 
-    // Secure baseline initialization boundary cleanly without raising uninitialized lookup exceptions
-    return PatientSearchState(isLoading: true);
+  bool get isLoading => _isLoading;
+  String? get errorMessage => _errorMessage;
+
+  List<String> get trendingSpecialties =>
+      _trendingSpecialties.map((e) => e.name).toList();
+
+  List<DoctorSearchModel> get doctorSuggestions => _doctorSuggestions;
+
+  List<CityModel> get cities => _cities;
+
+  String get selectedTrending => _selectedTrending;
+
+  String get location => _location;
+
+  String get query => _query;
+
+  PatientSearchController() {
+    loadTrendingSpecialties();
   }
 
-  void _resetHideTimer() {
-    _hideTimer?.cancel();
-    _hideTimer = Timer(const Duration(seconds: 7), () {
-      state = state.copyWith(doctorSuggestions: const []);
-    });
-  }
-
+  // -------------------------------
+  // Trending Specialties
+  // -------------------------------
   Future<void> loadTrendingSpecialties() async {
-    state = state.copyWith(isLoading: true, errorMessage: null);
+    _isLoading = true;
+    notifyListeners();
+
     try {
-      final List<String> results = await DummyData.getTrendingSpecialties();
-      state = state.copyWith(
-        trendingSpecialties: results,
-        isLoading: false,
-      );
-    } catch (_) {
-      state = state.copyWith(
-        errorMessage: 'Unable to load specialties. Please try again.',
-        isLoading: false,
-      );
+      final response = await _service.getSpecialties();
+
+      if (response.statusCode == 200) {
+        _trendingSpecialties.clear();
+
+        _trendingSpecialties.addAll(
+          (response.data["data"] as List).map(
+            (e) => SpecialtyModel.fromJson(e),
+          ),
+        );
+      } else {
+        _errorMessage = response.data["message"];
+      }
+    } catch (e) {
+      _errorMessage = e.toString();
     }
+
+    _isLoading = false;
+    notifyListeners();
   }
 
-  // Evaluate query strings over mock collections reactively
+  // -------------------------------
+  // Search Suggestions
+  // -------------------------------
   void updateQuery(String value) {
+    _query = value;
+
+    _debounce?.cancel();
+
     if (value.isEmpty) {
-      _hideTimer?.cancel();
-      state = state.copyWith(query: value, doctorSuggestions: const []);
+      _doctorSuggestions.clear();
+      notifyListeners();
       return;
     }
 
-    final input = value.toLowerCase();
-    final suggestions = DummyData.allDoctors.where((doc) {
-      return doc.name.toLowerCase().contains(input) ||
-          doc.specialty.toLowerCase().contains(input) ||
-          doc.hospital.toLowerCase().contains(input);
-    }).toList();
-
-    state = state.copyWith(query: value, doctorSuggestions: suggestions);
-
-    if (suggestions.isNotEmpty) {
-      _resetHideTimer();
-    } else {
-      _hideTimer?.cancel();
-    }
+    _debounce = Timer(const Duration(milliseconds: 400), () {
+      _loadDoctorSuggestions();
+    });
   }
 
-  void updateLocation(String value) {
-    state = state.copyWith(location: value);
+  Future<void> _loadDoctorSuggestions() async {
+    try {
+      final response = await _service.searchDoctors(
+        search: _query,
+        city: _location,
+      );
+
+      if (response.statusCode == 200) {
+        _doctorSuggestions.clear();
+
+        _doctorSuggestions.addAll(
+          (response.data["data"]["doctors"] as List).map(
+            (e) => DoctorSearchModel.fromJson(e),
+          ),
+        );
+      }
+
+      notifyListeners();
+    } catch (_) {}
   }
 
+  // -------------------------------
+  // Location
+  // -------------------------------
+  Future<void> updateLocation(String value) async {
+    _location = value;
+    notifyListeners();
+
+    try {
+      final response = await _service.getCities(search: value);
+
+      if (response.statusCode == 200) {
+        _cities.clear();
+
+        _cities.addAll(
+          (response.data["data"] as List).map((e) => CityModel.fromJson(e)),
+        );
+      }
+
+      notifyListeners();
+    } catch (_) {}
+  }
+
+  // -------------------------------
+  // Doctor Names
+  // -------------------------------
+  Future<void> loadDoctorNames() async {
+    try {
+      final response = await _service.getDoctorNames();
+
+      if (response.statusCode == 200) {
+        _doctorNames.clear();
+
+        _doctorNames.addAll(
+          (response.data["data"] as List).map(
+            (e) => DoctorNameModel.fromJson(e),
+          ),
+        );
+      }
+    } catch (_) {}
+  }
+
+  // -------------------------------
+  // Trending Click
+  // -------------------------------
   void selectTrending(String specialty) {
-    _hideTimer?.cancel();
-    state = state.copyWith(
-      selectedTrending: specialty,
-      query: specialty,
-      doctorSuggestions: const [],
-    );
+    _selectedTrending = specialty;
+    _query = specialty;
+
+    _loadDoctorSuggestions();
+
+    notifyListeners();
   }
 
+  // -------------------------------
+  // Clear
+  // -------------------------------
   void clearSuggestions() {
-    _hideTimer?.cancel();
-    state = state.copyWith(doctorSuggestions: const []);
+    _doctorSuggestions.clear();
+    notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    super.dispose();
   }
 }
-
-final patientSearchProvider = NotifierProvider.autoDispose<PatientSearchNotifier, PatientSearchState>(
-  PatientSearchNotifier.new,
-);

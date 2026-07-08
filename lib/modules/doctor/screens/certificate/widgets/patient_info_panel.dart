@@ -1,14 +1,21 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
-import 'package:yodoctor/core/models/medical_certificate.dart';
 import 'document_preview_tile.dart';
+import '../../../../../core/models/doctor/doctor_certificate_detail_model.dart';
+import '../../../../../core/models/doctor/doctor_document_model.dart';
 
 class PatientInfoPanel extends StatelessWidget {
-  const PatientInfoPanel({super.key, required this.certificate});
+  const PatientInfoPanel({
+    super.key,
 
-  final MedicalCertificate certificate;
+    required this.certificate,
 
+    required this.documents,
+  });
+  final DoctorCertificateDetailModel certificate;
+
+  final List<DoctorDocumentModel> documents;
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -42,7 +49,7 @@ class PatientInfoPanel extends StatelessWidget {
                     ),
                     alignment: Alignment.center,
                     child: Text(
-                      certificate.patientName.substring(0, 1).toUpperCase(),
+                      certificate.fullName.substring(0, 1).toUpperCase(),
                       style: theme.textTheme.titleLarge?.copyWith(
                         color: colorScheme.primary,
                         fontWeight: FontWeight.w900,
@@ -55,7 +62,7 @@ class PatientInfoPanel extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          certificate.patientName,
+                          certificate.fullName,
                           style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w900,
                             color: colorScheme.onSurface,
@@ -64,9 +71,11 @@ class PatientInfoPanel extends StatelessWidget {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          'ID: ${certificate.id.toUpperCase()}',
+                          'ID : ${certificate.id}',
                           style: theme.textTheme.labelSmall?.copyWith(
-                            color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                            color: colorScheme.onSurfaceVariant.withValues(
+                              alpha: 0.7,
+                            ),
                             fontFamily: 'Courier',
                             fontWeight: FontWeight.w700,
                           ),
@@ -78,7 +87,10 @@ class PatientInfoPanel extends StatelessWidget {
               ),
 
               const SizedBox(height: 20),
-              Divider(color: colorScheme.outlineVariant.withValues(alpha: 0.25), height: 1),
+              Divider(
+                color: colorScheme.outlineVariant.withValues(alpha: 0.25),
+                height: 1,
+              ),
               const SizedBox(height: 20),
 
               GridView.count(
@@ -89,15 +101,40 @@ class PatientInfoPanel extends StatelessWidget {
                 crossAxisSpacing: AppSpacing.md,
                 mainAxisSpacing: AppSpacing.md,
                 children: [
-                  _buildInternalRow(context, Icons.calendar_today_rounded, 'DOB', certificate.dateOfBirth),
-                  _buildInternalRow(context, Icons.wc_rounded, 'GENDER', certificate.gender),
-                  _buildInternalRow(context, Icons.bloodtype_rounded, 'BLOOD GROUP', certificate.bloodGroup),
-                  _buildInternalRow(context, Icons.straighten_rounded, 'HEIGHT / WEIGHT', '${certificate.heightCm}cm / ${certificate.weightKg}kg'),
+                  _buildInternalRow(
+                    context,
+                    Icons.calendar_today_rounded,
+                    'DOB',
+                    certificate.dob != null
+                        ? "${certificate.dob!.day}/${certificate.dob!.month}/${certificate.dob!.year}"
+                        : "N/A",
+                  ),
+                  _buildInternalRow(
+                    context,
+                    Icons.wc_rounded,
+                    'GENDER',
+                    certificate.gender,
+                  ),
+                  _buildInternalRow(
+                    context,
+                    Icons.assignment_rounded,
+                    'CERTIFICATE',
+                    certificate.certificateType,
+                  ),
+                  _buildInternalRow(
+                    context,
+                    Icons.flag_rounded,
+                    'PURPOSE',
+                    certificate.purpose,
+                  ),
                 ],
               ),
 
               const SizedBox(height: 20),
-              Divider(color: colorScheme.outlineVariant.withValues(alpha: 0.25), height: 1),
+              Divider(
+                color: colorScheme.outlineVariant.withValues(alpha: 0.25),
+                height: 1,
+              ),
               const SizedBox(height: 20),
 
               Text(
@@ -126,7 +163,7 @@ class PatientInfoPanel extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
           child: Text(
-            'UPLOADED DOCUMENTS (${certificate.documents.length})',
+            'UPLOADED DOCUMENTS (${documents.length})',
             style: theme.textTheme.labelSmall?.copyWith(
               color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
               fontWeight: FontWeight.w800,
@@ -135,12 +172,59 @@ class PatientInfoPanel extends StatelessWidget {
           ),
         ),
         const SizedBox(height: AppSpacing.sm),
-        ...certificate.documents.map((doc) => DocumentPreviewTile(fileName: doc)),
+        ...documents.map((doc) {
+          return DocumentPreviewTile(fileName: doc.fileName);
+        }),
+
+        const SizedBox(height: 20),
+
+        Text(
+          'CURRENT MEDICATIONS',
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: colorScheme.onSurfaceVariant,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 0.8,
+          ),
+        ),
+
+        const SizedBox(height: 8),
+
+        Text(
+          certificate.medications.isEmpty ? "N/A" : certificate.medications,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+
+        const SizedBox(height: 20),
+
+        Text(
+          'PATIENT NOTES',
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: colorScheme.onSurfaceVariant,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 0.8,
+          ),
+        ),
+
+        const SizedBox(height: 8),
+
+        Text(
+          certificate.notes.isEmpty ? "N/A" : certificate.notes,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       ],
     );
   }
 
-  Widget _buildInternalRow(BuildContext context, IconData icon, String label, String value) {
+  Widget _buildInternalRow(
+    BuildContext context,
+    IconData icon,
+    String label,
+    String value,
+  ) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 

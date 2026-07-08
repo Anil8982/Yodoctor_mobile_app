@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../../../../../core/utils/dummy_data.dart';
+import '../../../models/history/appointment_history_model.dart';
 
 class HistoryAppointmentCard extends StatelessWidget {
   const HistoryAppointmentCard({
@@ -9,7 +8,7 @@ class HistoryAppointmentCard extends StatelessWidget {
     required this.onViewDetails,
   });
 
-  final AppointmentHistoryItem appointment;
+  final AppointmentHistoryModel appointment;
   final VoidCallback onViewDetails;
 
   @override
@@ -23,7 +22,9 @@ class HistoryAppointmentCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.35)),
+        border: Border.all(
+          color: colorScheme.outlineVariant.withValues(alpha: 0.35),
+        ),
         boxShadow: <BoxShadow>[
           BoxShadow(
             color: colorScheme.shadow.withValues(alpha: 0.05),
@@ -45,10 +46,22 @@ class HistoryAppointmentCard extends StatelessWidget {
   ) {
     return Row(
       children: <Widget>[
-        Expanded(flex: 4, child: _buildDoctorInfo(context, textTheme, colorScheme)),
-        Expanded(flex: 3, child: _buildDateShiftInfo(context, textTheme, colorScheme)),
-        Expanded(flex: 2, child: _buildTokenChip(context, textTheme, colorScheme)),
-        Expanded(flex: 3, child: _buildStatusChip(context, textTheme, colorScheme)),
+        Expanded(
+          flex: 4,
+          child: _buildDoctorInfo(context, textTheme, colorScheme),
+        ),
+        Expanded(
+          flex: 3,
+          child: _buildDateShiftInfo(context, textTheme, colorScheme),
+        ),
+        Expanded(
+          flex: 2,
+          child: _buildTokenChip(context, textTheme, colorScheme),
+        ),
+        Expanded(
+          flex: 3,
+          child: _buildStatusChip(context, textTheme, colorScheme),
+        ),
         Expanded(
           flex: 2,
           child: Align(
@@ -72,7 +85,9 @@ class HistoryAppointmentCard extends StatelessWidget {
         const SizedBox(height: 14),
         Row(
           children: <Widget>[
-            Expanded(child: _buildDateShiftInfo(context, textTheme, colorScheme)),
+            Expanded(
+              child: _buildDateShiftInfo(context, textTheme, colorScheme),
+            ),
             const SizedBox(width: 10),
             Expanded(child: _buildTokenChip(context, textTheme, colorScheme)),
           ],
@@ -99,10 +114,7 @@ class HistoryAppointmentCard extends StatelessWidget {
         CircleAvatar(
           radius: 22,
           backgroundColor: colorScheme.primaryContainer,
-          child: Icon(
-            Icons.person_rounded,
-            color: colorScheme.primary,
-          ),
+          child: Icon(Icons.person_rounded, color: colorScheme.primary),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -111,17 +123,19 @@ class HistoryAppointmentCard extends StatelessWidget {
             children: <Widget>[
               Text(
                 appointment.doctorName,
-                style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
+                style: textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
               ),
               Text(
-                appointment.specialty,
+                appointment.specialization,
                 style: textTheme.bodyMedium?.copyWith(
                   color: colorScheme.primary,
                   fontWeight: FontWeight.w700,
                 ),
               ),
               Text(
-                'Patient: ${appointment.patientLabel}',
+                'Patient: ${appointment.patientName}',
                 style: textTheme.bodySmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),
@@ -150,7 +164,7 @@ class HistoryAppointmentCard extends StatelessWidget {
             ),
             const SizedBox(width: 6),
             Text(
-              _formatDate(appointment.date),
+              appointment.appointmentDate,
               style: textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
               ),
@@ -174,7 +188,7 @@ class HistoryAppointmentCard extends StatelessWidget {
               ),
               const SizedBox(width: 4),
               Text(
-                appointment.shift,
+                appointment.appointmentSlot,
                 style: textTheme.labelMedium?.copyWith(
                   color: colorScheme.primary,
                   fontWeight: FontWeight.w700,
@@ -201,7 +215,7 @@ class HistoryAppointmentCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(14),
         ),
         child: Text(
-          appointment.tokenNumber,
+          appointment.tokenNumber.toString(),
           style: textTheme.titleMedium?.copyWith(
             color: colorScheme.primary,
             fontWeight: FontWeight.w800,
@@ -228,16 +242,13 @@ class HistoryAppointmentCard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             CircleAvatar(
-              radius: 3,
-              backgroundColor: colorScheme.secondary,
-            ),
-            const SizedBox(width: 6),
-            Text(
-              appointment.status,
-              style: textTheme.labelLarge?.copyWith(
-                color: colorScheme.onSecondaryContainer,
-                fontWeight: FontWeight.w800,
-              ),
+              radius: 22,
+              backgroundImage: appointment.profileImage != null
+                  ? NetworkImage(appointment.profileImage!)
+                  : null,
+              child: appointment.profileImage == null
+                  ? Icon(Icons.person_rounded, color: colorScheme.primary)
+                  : null,
             ),
           ],
         ),
@@ -257,24 +268,5 @@ class HistoryAppointmentCard extends StatelessWidget {
         style: TextStyle(fontWeight: FontWeight.w700),
       ),
     );
-  }
-
-  String _formatDate(DateTime date) {
-    const List<String> months = <String>[
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    final String day = date.day.toString().padLeft(2, '0');
-    return '$day ${months[date.month - 1]} ${date.year}';
   }
 }

@@ -1,34 +1,54 @@
-import 'doctor_dashboard_profile.dart';
+import 'doctor_profile_model.dart';
 
 class DoctorDashboardData {
+  final DoctorProfileModel doctor;
+
+  final int pendingRequests;
+  final int todayQueue;
+  final int tomorrow;
+  final int nextDay;
+  final int completedToday;
+  final int totalPatients;
+
   const DoctorDashboardData({
     required this.doctor,
     required this.pendingRequests,
-    required this.todayQueueCount,
-    required this.completedTodayCount,
-    required this.isAvailable,
+    required this.todayQueue,
+    required this.tomorrow,
+    required this.nextDay,
+    required this.completedToday,
+    required this.totalPatients,
   });
 
-  final DoctorDashboardProfile doctor;
-
-  final int pendingRequests;
-  final int todayQueueCount;
-  final int completedTodayCount;
-  final bool isAvailable;
+  factory DoctorDashboardData.fromJson(Map<String, dynamic> json) {
+    return DoctorDashboardData(
+      doctor: DoctorProfileModel.fromJson(json["doctor"] ?? {}),
+      pendingRequests: json["pendingRequests"] ?? 0,
+      todayQueue: json["todayQueue"] ?? 0,
+      tomorrow: json["tomorrow"] ?? 0,
+      nextDay: json["nextDay"] ?? 0,
+      completedToday: json["completedToday"] ?? 0,
+      totalPatients: json["totalPatients"] ?? 0,
+    );
+  }
 
   DoctorDashboardData copyWith({
-    DoctorDashboardProfile? doctor,
+    DoctorProfileModel? doctor,
     int? pendingRequests,
-    int? todayQueueCount,
-    int? completedTodayCount,
-    bool? isAvailable,
+    int? todayQueue,
+    int? tomorrow,
+    int? nextDay,
+    int? completedToday,
+    int? totalPatients,
   }) {
     return DoctorDashboardData(
       doctor: doctor ?? this.doctor,
       pendingRequests: pendingRequests ?? this.pendingRequests,
-      todayQueueCount: todayQueueCount ?? this.todayQueueCount,
-      completedTodayCount: completedTodayCount ?? this.completedTodayCount,
-      isAvailable: isAvailable ?? this.isAvailable,
+      todayQueue: todayQueue ?? this.todayQueue,
+      tomorrow: tomorrow ?? this.tomorrow,
+      nextDay: nextDay ?? this.nextDay,
+      completedToday: completedToday ?? this.completedToday,
+      totalPatients: totalPatients ?? this.totalPatients,
     );
   }
 }

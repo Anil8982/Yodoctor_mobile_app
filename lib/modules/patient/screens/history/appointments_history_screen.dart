@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/utils/dummy_data.dart';
+import 'package:provider/provider.dart';
+
 import '../../../../core/utils/responsive.dart';
 import '../../controllers/appointment_history_controller.dart';
 import '../../widgets/custom_sliver_app_bar.dart';
@@ -10,43 +10,35 @@ import 'widgets/history_appointment_card.dart';
 import 'widgets/history_header.dart';
 import 'widgets/history_table_header.dart';
 
-class AppointmentsHistoryScreen extends ConsumerStatefulWidget {
+class AppointmentsHistoryScreen extends StatefulWidget {
   const AppointmentsHistoryScreen({super.key});
 
   @override
-  ConsumerState<AppointmentsHistoryScreen> createState() => _AppointmentsHistoryScreenState();
+  State<AppointmentsHistoryScreen> createState() =>
+      _AppointmentsHistoryScreenState();
 }
 
-class _AppointmentsHistoryScreenState extends ConsumerState<AppointmentsHistoryScreen> {
+class _AppointmentsHistoryScreenState extends State<AppointmentsHistoryScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final double horizontal = Responsive.horizontalPadding(context);
+    return Consumer<AppointmentHistoryController>(
+      builder: (BuildContext context, AppointmentHistoryController controller, _) {
+        final bool isLoadingInitial =
+            controller.isLoading && controller.appointments.isEmpty;
 
-    // Watch unified history state structure from manual notifier provider
-    final appointmentsAsync = ref.watch(appointmentHistoryProvider);
-    final notifier = ref.read(appointmentHistoryProvider.notifier);
+        if (isLoadingInitial) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
 
-    return appointmentsAsync.when(
-      loading: () => Scaffold(
-        backgroundColor: colorScheme.surfaceContainerLow,
-        body: const Center(child: CircularProgressIndicator()),
-      ),
-      error: (error, stackTrace) => Scaffold(
-        backgroundColor: colorScheme.surfaceContainerLow,
-        body: Center(child: Text('Error: $error', style: theme.textTheme.bodyMedium)),
-      ),
-      // 🎯 FIX: Destructured the wrapper state payload to safely extract structural appointments array
-      data: (historyState) {
-        final appointments = historyState.appointments;
-        final bool isRefreshing = appointmentsAsync.isRefreshing;
+        final double horizontal = Responsive.horizontalPadding(context);
 
         return Scaffold(
           key: _scaffoldKey,
-          drawer: const PatientDrawer(user: DummyData.currentUser),
+          drawer: const PatientDrawer(),
           body: NestedScrollView(
             headerSliverBuilder: (context, innerBoxIsScrolled) {
               return <Widget>[
@@ -54,7 +46,7 @@ class _AppointmentsHistoryScreenState extends ConsumerState<AppointmentsHistoryS
                   expandedHeight: 220,
                   scaffoldKey: _scaffoldKey,
                   background: HistoryHeader(
-                    appointmentCount: appointments.length,
+                    appointmentCount: controller.appointments.length,
                   ),
                 ),
               ];
@@ -63,61 +55,141 @@ class _AppointmentsHistoryScreenState extends ConsumerState<AppointmentsHistoryS
               padding: EdgeInsets.fromLTRB(horizontal, 0, horizontal, 20),
               child: Column(
                 children: <Widget>[
-                  if (isRefreshing) const LinearProgressIndicator(),
+                  if (controller.isLoading) const LinearProgressIndicator(),
                   if (MediaQuery.sizeOf(context).width >= 980) ...<Widget>[
                     const HistoryTableHeader(),
                     const SizedBox(height: 12),
                   ],
                   Expanded(
-                    child: appointments.isEmpty
-                        ? _buildEmptyState(context)
-                        : ListView.separated(
-                      physics: const BouncingScrollPhysics(),
-                      itemCount: appointments.length,
-                      separatorBuilder: (_, _) => const SizedBox(height: 12),
-                      itemBuilder: (BuildContext context, int index) {
-                        final appointment = appointments[index];
+                    child: RefreshIndicator(
+                      onRefresh: controller.refresh,
+                      child: controller.appointments.isEmpty
+                          ? _buildEmptyState(context)
+                          : ListView.separated(
+                              physics: const BouncingScrollPhysics(),
 
-                        return HistoryAppointmentCard(
-                          appointment: appointment,
-                          onViewDetails: () {
-                            showAppointmentDetailsDialog(
-                              context: context,
-                              appointment: appointment,
-                              initialRating: notifier.ratingFor(appointment.id),
-                              initialFeedback: notifier.feedbackFor(appointment.id),
-                              onSubmitRating: (int rating, String feedback) async {
-                                await notifier.submitRating(
-                                  appointmentId: appointment.id,
-                                  rating: rating,
-                                  feedback: feedback,
-                                );
+                              itemCount: controller.appointments.length,
+                              separatorBuilder: (_, _) =>
+                                  const SizedBox(height: 12),
+                              itemBuilder: (BuildContext context, int index) {
+                                final appointment =
+                                    controller.appointments[index];
 
-                                if (!context.mounted) return;
+                                return HistoryAppointmentCard(
+                                  appointment: appointment,
+                                  onViewDetails: () {
+                                    showAppointmentDetailsDialog(
+                                      context: context,
+                                      appointment: appointment,
+                                      initialRating: controller.ratingFor(
+                                        appointment.id,
+                                      ),
+                                      initialFeedback: controller.feedbackFor(
+                                        appointment.id,
+                                      ),
+                                      onSubmitRating:
+                                          (int rating, String feedback) async {
+                                            await controller.submitRating(
+                                              appointmentId: appointment.id,
+                                              rating: rating,
+                                              feedback: feedback,
+                                            );
 
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      'Thanks! You rated ${appointment.doctorName} $rating stars.',
-                                    ),
-                                    behavior: SnackBarBehavior.floating,
-                                  ),
+                                            if (!context.mounted) {
+                                              return;
+                                            }
+
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                  'Thanks! You rated ${appointment.doctorName} $rating stars.',
+                                                ),
+                                                behavior:
+                                                    SnackBarBehavior.floating,
+                                              ),
+                                            );
+                                          },
+                                      onDownloadPrescription: () async {
+                                        try {
+                                          final prescription = await controller
+                                              .getPrescription(appointment.id);
+
+                                          if (!context.mounted) return;
+
+                                          showDialog(
+                                            context: context,
+                                            builder: (_) => AlertDialog(
+                                              title: const Text("Prescription"),
+                                              content: SingleChildScrollView(
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    const Text(
+                                                      "Medicines",
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 8),
+                                                    Text(
+                                                      prescription["medicines"] ??
+                                                          "",
+                                                    ),
+
+                                                    const SizedBox(height: 20),
+
+                                                    const Text(
+                                                      "Instructions",
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 8),
+                                                    Text(
+                                                      prescription["instructions"] ??
+                                                          "",
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () =>
+                                                      Navigator.pop(context),
+                                                  child: const Text("Close"),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        } catch (e) {
+                                          if (!context.mounted) return;
+
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                e.toString().replaceFirst(
+                                                  "Exception: ",
+                                                  "",
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      },
+                                    );
+                                  },
                                 );
                               },
-                              onDownloadPrescription: () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      'Prescription download started for ${appointment.tokenNumber}.',
-                                    ),
-                                    behavior: SnackBarBehavior.floating,
-                                  ),
-                                );
-                              },
-                            );
-                          },
-                        );
-                      },
+                            ),
                     ),
                   ),
                 ],

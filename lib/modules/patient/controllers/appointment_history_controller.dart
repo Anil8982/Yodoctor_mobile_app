@@ -1,79 +1,134 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/utils/dummy_data.dart';
+import 'package:flutter/foundation.dart';
 
-// 🎯 Unified immutable state structure holding both data items and sync updates
-class AppointmentHistoryState {
-  final List<AppointmentHistoryItem> appointments;
-  final Map<String, int> ratings;
-  final Map<String, String> feedbacks;
+import '../../../services/patient_appointment_history_service.dart';
+import '../models/history/appointment_history_model.dart';
 
-  AppointmentHistoryState({
-    this.appointments = const [],
-    this.ratings = const {},
-    this.feedbacks = const {},
-  });
-
-  AppointmentHistoryState copyWith({
-    List<AppointmentHistoryItem>? appointments,
-    Map<String, int>? ratings,
-    Map<String, String>? feedbacks,
-  }) {
-    return AppointmentHistoryState(
-      appointments: appointments ?? this.appointments,
-      ratings: ratings ?? this.ratings,
-      feedbacks: feedbacks ?? this.feedbacks,
-    );
-  }
-}
-
-// 🎯 FIX: Extended manual AsyncNotifier base class to resolve inheritance bounds
-class AppointmentHistoryNotifier extends AsyncNotifier<AppointmentHistoryState> {
-
-  @override
-  Future<AppointmentHistoryState> build() async {
-    // Triggers initial data fetch session on build setup
-    final data = await DummyData.getAppointmentHistory();
-    return AppointmentHistoryState(appointments: data);
+class AppointmentHistoryController extends ChangeNotifier {
+  AppointmentHistoryController() {
+    loadHistory();
   }
 
-  // Pull-to-refresh or explicit data reload channel
+  final PatientAppointmentHistoryService _service =
+      PatientAppointmentHistoryService();
+
+  bool _isLoading = false;
+  bool _isLoadingMore = false;
+
+  String? _errorMessage;
+
+  List<AppointmentHistoryModel> _appointments = [];
+
+  String? _nextCursor;
+
+  final Map<int, int> _ratings = {};
+  final Map<int, String> _feedbacks = {};
+
+  bool get isLoading => _isLoading;
+
+  bool get isLoadingMore => _isLoadingMore;
+
+  String? get errorMessage => _errorMessage;
+
+  List<AppointmentHistoryModel> get appointments => _appointments;
+
+  bool get hasMore => _nextCursor != null;
+
   Future<void> loadHistory() async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final data = await DummyData.getAppointmentHistory();
-      return AppointmentHistoryState(
-        appointments: data,
-        ratings: state.value?.ratings ?? const {},
-        feedbacks: state.value?.feedbacks ?? const {},
-      );
-    });
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final response = await _service.getAppointmentHistory();
+
+      if (response.statusCode == 200) {
+        final data = response.data;
+
+        _nextCursor = data["nextCursor"];
+
+        _appointments = (data["data"] as List)
+            .map((e) => AppointmentHistoryModel.fromJson(e))
+            .toList();
+      } else {
+        _errorMessage = response.data["message"];
+      }
+    } catch (e) {
+      _errorMessage = e.toString();
+    }
+
+    _isLoading = false;
+    notifyListeners();
   }
 
-  int ratingFor(String appointmentId) => state.value?.ratings[appointmentId] ?? 0;
+  Future<void> loadMore() async {
+    if (_isLoadingMore || _nextCursor == null) return;
 
-  String feedbackFor(String appointmentId) => state.value?.feedbacks[appointmentId] ?? '';
+    _isLoadingMore = true;
+    notifyListeners();
 
-  // Process synchronous update blocks cleanly without manual notifier triggers
+    try {
+      final response = await _service.getAppointmentHistory(
+        cursor: _nextCursor,
+      );
+
+      if (response.statusCode == 200) {
+        final data = response.data;
+
+        _nextCursor = data["nextCursor"];
+
+        final List<AppointmentHistoryModel> more = (data["data"] as List)
+            .map((e) => AppointmentHistoryModel.fromJson(e))
+            .toList();
+
+        _appointments.addAll(more);
+      }
+    } catch (_) {}
+
+    _isLoadingMore = false;
+    notifyListeners();
+  }
+
+  Future<void> refresh() async {
+    _appointments.clear();
+    _nextCursor = null;
+    await loadHistory();
+  }
+
+  int ratingFor(int appointmentId) => _ratings[appointmentId] ?? 0;
+
+  String feedbackFor(int appointmentId) => _feedbacks[appointmentId] ?? "";
+
   Future<void> submitRating({
-    required String appointmentId,
+    required int appointmentId,
     required int rating,
     required String feedback,
   }) async {
-    final currentState = state.value;
-    if (currentState == null) return;
+    try {
+      final response = await _service.submitDoctorReview(
+        appointmentId: appointmentId,
+        rating: rating,
+        comment: feedback,
+      );
 
-    final updatedRatings = Map<String, int>.from(currentState.ratings)..[appointmentId] = rating;
-    final updatedFeedbacks = Map<String, String>.from(currentState.feedbacks)..[appointmentId] = feedback.trim();
+      if (response.statusCode == 200) {
+        _ratings[appointmentId] = rating;
+        _feedbacks[appointmentId] = feedback.trim();
+        notifyListeners();
+      } else {
+        throw Exception(response.data["message"]);
+      }
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
 
-    // Assignment triggers state mutation stream cleanly to consumers
-    state = AsyncValue.data(currentState.copyWith(
-      ratings: updatedRatings,
-      feedbacks: updatedFeedbacks,
-    ));
+  Future<Map<String, dynamic>> getPrescription(int appointmentId) async {
+    final response = await _service.getPrescription(appointmentId);
+
+    if (response.statusCode! >= 200 && response.statusCode! < 300) {
+      return Map<String, dynamic>.from(response.data);
+    }
+
+    throw Exception(response.data["message"] ?? "Prescription not found");
   }
 }
-
-// 🎯 FIX: Provider registration utilizing autoDispose modifier to safely track lifecycle
-final appointmentHistoryProvider = AsyncNotifierProvider.autoDispose<AppointmentHistoryNotifier, AppointmentHistoryState>(
-  AppointmentHistoryNotifier.new,
-);

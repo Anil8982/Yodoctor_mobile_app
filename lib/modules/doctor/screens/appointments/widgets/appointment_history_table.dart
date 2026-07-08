@@ -29,7 +29,9 @@ class AppointmentHistoryTable extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.2)),
+        border: Border.all(
+          color: colorScheme.outlineVariant.withValues(alpha: 0.2),
+        ),
         boxShadow: [
           BoxShadow(
             color: colorScheme.shadow.withValues(alpha: 0.05),
@@ -67,15 +69,19 @@ class AppointmentHistoryTable extends StatelessWidget {
                 DataCell(patientIdentityBuilder(appointment)),
                 const DataCell(Text('Consultation')),
                 DataCell(tokenChipBuilder(appointment.tokenNumber)),
-                DataCell(Text(DateFormat('dd MMM yyyy, 05:30 a').format(appointment.date))),
+                DataCell(
+                  Text(
+                    DateFormat('dd MMM yyyy, hh:mm a').format(appointment.date),
+                  ),
+                ),
                 DataCell(statusChipBuilder(appointment.status)),
                 DataCell(
                   completed
                       ? FilledButton.icon(
-                    onPressed: () => onPrescriptionTap(appointment),
-                    icon: const Icon(Icons.add_rounded, size: 17),
-                    label: const Text('Prescription'),
-                  )
+                          onPressed: () => onPrescriptionTap(appointment),
+                          icon: const Icon(Icons.add_rounded, size: 17),
+                          label: const Text('Prescription'),
+                        )
                       : const SizedBox(width: 120),
                 ),
               ],

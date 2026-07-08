@@ -1,26 +1,31 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
-import '../../../../core/utils/dummy_data.dart';
+
+import '../../../core/models/appointment_history_item.dart';
+import '../../../services/appointment_service.dart';
 
 enum DoctorAppointmentFilter { today, lastSevenDays, all }
 
 class AppointmentHistoryState {
+  final bool isLoading;
   final List<AppointmentHistoryItem> allAppointments;
   final DoctorAppointmentFilter selectedFilter;
   final String searchQuery;
 
-  AppointmentHistoryState({
-    required this.allAppointments,
+  const AppointmentHistoryState({
+    this.isLoading = false,
+    this.allAppointments = const [],
     this.selectedFilter = DoctorAppointmentFilter.all,
     this.searchQuery = '',
   });
 
   AppointmentHistoryState copyWith({
+    bool? isLoading,
     List<AppointmentHistoryItem>? allAppointments,
     DoctorAppointmentFilter? selectedFilter,
     String? searchQuery,
   }) {
     return AppointmentHistoryState(
+      isLoading: isLoading ?? this.isLoading,
       allAppointments: allAppointments ?? this.allAppointments,
       selectedFilter: selectedFilter ?? this.selectedFilter,
       searchQuery: searchQuery ?? this.searchQuery,
@@ -29,102 +34,85 @@ class AppointmentHistoryState {
 }
 
 class AppointmentHistoryNotifier extends Notifier<AppointmentHistoryState> {
+  final AppointmentService _service = AppointmentService();
+
   @override
   AppointmentHistoryState build() {
-    // 🎯 डमी डेटा मधून फ्रेश लिस्ट इनिशिअलाईज केली भाऊ
-    return AppointmentHistoryState(
-      allAppointments: List.from(DummyData.appointmentHistory),
-    );
+    return const AppointmentHistoryState();
   }
 
-  void setFilter(DoctorAppointmentFilter filter) {
+  Future<void> loadHistory() async {
+    state = state.copyWith(isLoading: true);
+
+    try {
+      String? filter;
+
+      switch (state.selectedFilter) {
+        case DoctorAppointmentFilter.today:
+          filter = "today";
+          break;
+
+        case DoctorAppointmentFilter.lastSevenDays:
+          filter = "last7";
+          break;
+
+        case DoctorAppointmentFilter.all:
+          filter = null;
+          break;
+      }
+
+      final response = await _service.getHistory(filter: filter);
+
+      final List data = response.data["appointments"];
+
+      final appointments = data.map((e) {
+        final patient =
+            e["patientName"] ??
+            e["familyMemberName"] ??
+            e["walk_in_patient_name"] ??
+            "Unknown";
+
+        return AppointmentHistoryItem(
+          id: e["id"].toString(),
+          doctorName: "",
+          specialty: "",
+          patientLabel: patient,
+          date: DateTime.parse(e["appointment_date"]),
+          shift: e["appointment_slot"] ?? "",
+          tokenNumber: e["token_number"] ?? "",
+          status: e["status"] ?? "",
+        );
+      }).toList();
+
+      state = state.copyWith(isLoading: false, allAppointments: appointments);
+    } catch (e) {
+      state = state.copyWith(isLoading: false);
+    }
+  }
+
+  Future<void> setFilter(DoctorAppointmentFilter filter) async {
     state = state.copyWith(selectedFilter: filter);
+
+    await loadHistory();
   }
 
   void setSearchQuery(String query) {
     state = state.copyWith(searchQuery: query);
   }
 
-  // 🎯 कडक आणि एरर-फ्री लाईव्ह क्यू फिल्टर भाऊ
-  List<AppointmentHistoryItem> getTodayLiveQueue() {
-    final now = DateTime.now();
-    final todayStr = DateFormat('yyyy-MM-dd').format(now);
-
-    return state.allAppointments.where((appointment) {
-      final appDateStr = DateFormat('yyyy-MM-dd').format(appointment.date);
-      return appDateStr == todayStr;
-    }).toList();
-  }
-
   List<AppointmentHistoryItem> getFilteredHistory() {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final query = state.searchQuery.trim().toLowerCase();
+    final query = state.searchQuery.toLowerCase();
 
-    return state.allAppointments.where((appointment) {
-      final appointmentDay = DateTime(
-        appointment.date.year,
-        appointment.date.month,
-        appointment.date.day,
-      );
-
-      final matchesDate = switch (state.selectedFilter) {
-        DoctorAppointmentFilter.today => appointmentDay == today,
-        DoctorAppointmentFilter.lastSevenDays =>
-        !appointmentDay.isBefore(today.subtract(const Duration(days: 7))) && !appointmentDay.isAfter(today),
-        DoctorAppointmentFilter.all => true,
-      };
-
-      final matchesSearch = query.isEmpty ||
-          appointment.patientLabel.toLowerCase().contains(query) ||
-          appointment.tokenNumber.toLowerCase().contains(query) ||
-          appointment.status.toLowerCase().contains(query);
-
-      return matchesDate && matchesSearch;
+    return state.allAppointments.where((item) {
+      return query.isEmpty ||
+          item.patientLabel.toLowerCase().contains(query) ||
+          item.tokenNumber.toLowerCase().contains(query) ||
+          item.status.toLowerCase().contains(query);
     }).toList();
-  }
-
-  void completePatient(String tokenNumber) {
-    state = state.copyWith(
-      allAppointments: [
-        for (final app in state.allAppointments)
-          if (app.tokenNumber == tokenNumber) _updateStatus(app, 'COMPLETED') else app
-      ],
-    );
-  }
-
-  void skipPatient(String tokenNumber) {
-    state = state.copyWith(
-      allAppointments: [
-        for (final app in state.allAppointments)
-          if (app.tokenNumber == tokenNumber) _updateStatus(app, 'SKIPPED') else app
-      ],
-    );
-  }
-
-  void cancelPatient(String tokenNumber) {
-    state = state.copyWith(
-      allAppointments: [
-        for (final app in state.allAppointments)
-          if (app.tokenNumber == tokenNumber) _updateStatus(app, 'CANCELLED') else app
-      ],
-    );
-  }
-
-  AppointmentHistoryItem _updateStatus(AppointmentHistoryItem item, String newStatus) {
-    return AppointmentHistoryItem(
-      id: item.id,
-      doctorName: item.doctorName,
-      specialty: item.specialty,
-      patientLabel: item.patientLabel,
-      date: item.date,
-      shift: item.shift,
-      status: newStatus,
-      tokenNumber: item.tokenNumber,
-    );
   }
 }
 
-final appointmentHistoryProvider = NotifierProvider<AppointmentHistoryNotifier, AppointmentHistoryState>(
-  AppointmentHistoryNotifier.new,
-);
+final appointmentHistoryProvider =
+    NotifierProvider<AppointmentHistoryNotifier, AppointmentHistoryState>(
+      AppointmentHistoryNotifier.new,
+    );

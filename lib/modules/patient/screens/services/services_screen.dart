@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-
-import '../../../../core/utils/dummy_data.dart';
 import '../../widgets/custom_sliver_app_bar.dart';
 import '../../widgets/patient_drawer.dart';
 import 'models/services_model.dart';
 import 'widgets/service_card.dart';
 import 'widgets/services_header.dart';
+import 'package:provider/provider.dart' as provider;
+import '../../controllers/patient_dashboard_controller.dart';
 
 class ServicesScreen extends ConsumerStatefulWidget {
   const ServicesScreen({super.key});
@@ -33,7 +33,11 @@ class _ServicesScreenState extends ConsumerState<ServicesScreen> {
           child: const Center(
             child: Text(
               'QR Scanner Camera Open Here',
-              style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         );
@@ -44,10 +48,11 @@ class _ServicesScreenState extends ConsumerState<ServicesScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
+    final dashboardController =
+        provider.Provider.of<PatientDashboardController>(context);
     return Scaffold(
       key: _scaffoldKey,
-      drawer: const PatientDrawer(user: DummyData.currentUser),
+      drawer: PatientDrawer(dashboard: dashboardController.dashboardData),
       backgroundColor: theme.scaffoldBackgroundColor,
       body: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) {
@@ -70,10 +75,7 @@ class _ServicesScreenState extends ConsumerState<ServicesScreen> {
           mainAxisSpacing: 16,
           itemBuilder: (context, index) {
             final service = medicalServicesList[index];
-            return ServiceCard(
-              service: service,
-              onQrTap: _openQRScanner,
-            );
+            return ServiceCard(service: service, onQrTap: _openQRScanner);
           },
         ),
       ),

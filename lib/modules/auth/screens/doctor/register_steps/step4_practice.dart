@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/auth/models/doctor_register_model.dart';
 import 'shared_widgets.dart';
+import 'package:provider/provider.dart';
+import 'package:yodoctor/modules/auth/controllers/doctor_register_controller.dart';
 
 class Step4Practice extends StatefulWidget {
   final DoctorFormData data;
@@ -24,10 +26,19 @@ class _Step4PracticeState extends State<Step4Practice> {
 
   final _options = const [
     {'title': 'Solo Practice', 'desc': 'Private clinic owned by you'},
-    {'title': 'Multi-Speciality Clinic', 'desc': 'Shared practice with multiple doctors'},
-    {'title': 'Hospital Attached', 'desc': 'Located within a hospital premises'},
+    {
+      'title': 'Multi-Speciality Clinic',
+      'desc': 'Shared practice with multiple doctors',
+    },
+    {
+      'title': 'Hospital Attached',
+      'desc': 'Located within a hospital premises',
+    },
     {'title': 'Visiting Consultant', 'desc': 'Consulting at various locations'},
-    {'title': 'Government Hospital', 'desc': 'Practicing in a public health facility'},
+    {
+      'title': 'Government Hospital',
+      'desc': 'Practicing in a public health facility',
+    },
   ];
 
   @override
@@ -61,7 +72,8 @@ class _Step4PracticeState extends State<Step4Practice> {
         ..._options.map((opt) {
           final selected = widget.data.practiceType == opt['title'];
           return GestureDetector(
-            onTap: () => setState(() => widget.data.practiceType = opt['title']!),
+            onTap: () =>
+                setState(() => widget.data.practiceType = opt['title']!),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               margin: const EdgeInsets.only(bottom: 12),
@@ -70,7 +82,9 @@ class _Step4PracticeState extends State<Step4Practice> {
                 color: selected ? AppTheme.yoBlueLight : colorScheme.surface,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: selected ? AppTheme.yoBlue : colorScheme.outlineVariant,
+                  color: selected
+                      ? AppTheme.yoBlue
+                      : colorScheme.outlineVariant,
                   width: selected ? 2 : 1.2,
                 ),
               ),
@@ -82,7 +96,9 @@ class _Step4PracticeState extends State<Step4Practice> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: selected ? AppTheme.yoBlue : colorScheme.onSurfaceVariant,
+                        color: selected
+                            ? AppTheme.yoBlue
+                            : colorScheme.onSurfaceVariant,
                         width: 2,
                       ),
                     ),
@@ -110,7 +126,9 @@ class _Step4PracticeState extends State<Step4Practice> {
                           opt['title']!,
                           style: textTheme.titleSmall?.copyWith(
                             fontWeight: FontWeight.w700,
-                            color: selected ? AppTheme.yoBlue : colorScheme.onSurface,
+                            color: selected
+                                ? AppTheme.yoBlue
+                                : colorScheme.onSurface,
                           ),
                         ),
                         const SizedBox(height: 2),
@@ -142,14 +160,29 @@ class _Step4PracticeState extends State<Step4Practice> {
           hint: 'e.g. City General Hospital',
           icon: Icons.apartment_rounded,
           controller: _hospCtrl,
-          validator: _hospRequired ? (v) => v!.isEmpty ? 'Hospital name required' : null : null,
+          validator: _hospRequired
+              ? (v) => v!.isEmpty ? 'Hospital name required' : null
+              : null,
         ),
         const SizedBox(height: 28),
         NavButtons(
           onBack: widget.onBack,
-          onNext: () {
+          onNext: () async {
             widget.data.hospitalName = _hospCtrl.text;
-            widget.onNext();
+
+            final controller = context.read<DoctorRegisterController>();
+
+            final ok = await controller.saveStep4(widget.data);
+
+            if (!mounted) return;
+
+            if (ok) {
+              widget.onNext();
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(controller.error ?? "Step 4 Failed")),
+              );
+            }
           },
         ),
       ],

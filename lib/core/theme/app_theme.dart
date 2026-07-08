@@ -1,20 +1,8 @@
-import 'package:chroma_kit/chroma_kit.dart';
+﻿import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
 
 enum AppRole { doctor, patient }
-
-class AppRoleProvider extends ChangeNotifier {
-  AppRole _role = AppRole.doctor;
-
-  AppRole get role => _role;
-
-  void setRole(AppRole role) {
-    if (_role == role) return;
-    _role = role;
-    notifyListeners();
-  }
-}
 
 class AppTheme {
   AppTheme._();
@@ -93,7 +81,7 @@ class AppTheme {
       useMaterial3: true,
       brightness: Brightness.light,
       colorScheme: colorScheme,
-      scaffoldBackgroundColor: colorScheme.surfaceContainer,
+      scaffoldBackgroundColor: colorScheme.surface,
       textTheme: _textTheme,
 
       appBarTheme: AppBarTheme(

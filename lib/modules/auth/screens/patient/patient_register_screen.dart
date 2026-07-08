@@ -1,21 +1,22 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:yodoctor/core/theme/app_theme.dart' hide AppRole;
-import 'package:yodoctor/core/providers/app_role_provider.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/auth/widgets/auth_widgets.dart';
+import 'package:yodoctor/services/auth_service.dart';
+import 'package:dio/dio.dart';
 
-class PatientRegisterScreen extends ConsumerStatefulWidget {
+class PatientRegisterScreen extends StatefulWidget {
   const PatientRegisterScreen({super.key});
 
   @override
-  ConsumerState<PatientRegisterScreen> createState() => _PatientRegisterScreenState();
+  State<PatientRegisterScreen> createState() => _PatientRegisterScreenState();
 }
 
-class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
+class _PatientRegisterScreenState extends State<PatientRegisterScreen>
     with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
+  final AuthService _authService = AuthService();
 
   bool _isLoading = false;
   bool _agreedToTerms = false;
@@ -24,6 +25,9 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
   String? _dobError;
   String? _genderError;
 
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
@@ -44,6 +48,9 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
   @override
   void dispose() {
     _animController.dispose();
+    _nameController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
@@ -76,16 +83,36 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
     }
 
     setState(() => _isLoading = true);
-    await Future.delayed(const Duration(seconds: 2));
-    setState(() => _isLoading = false);
 
-    if (!mounted) return;
+    try {
+      final response = await _authService.register(
+        fullName: _nameController.text.trim(),
+        phone: _phoneController.text.trim(),
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+        confirmPassword: _confirmPasswordController.text,
+        gender: _selectedGender!,
+        dob: DateFormat("yyyy-MM-dd").format(_selectedDOB!),
+      );
 
-    // 🎯 FIX: Update the global role state to patient using the manual notifier configuration channel
-    ref.read(appRoleProvider.notifier).setRole(AppRole.patient);
+      print(response.statusCode);
+      print(response.data);
 
-    // Context flow router pipeline transitions immediately following profile setup parameters boundary
-    // context.go(AppRoutes.dashboard);
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(response.data["message"].toString())),
+      );
+    } catch (e) {
+      print(e);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 
   Future<void> _pickDateOfBirth() async {
@@ -96,7 +123,9 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
       lastDate: DateTime.now(),
       builder: (context, child) => Theme(
         data: Theme.of(context).copyWith(
-          colorScheme: Theme.of(context).colorScheme.copyWith(primary: AppTheme.secondary),
+          colorScheme: Theme.of(
+            context,
+          ).colorScheme.copyWith(primary: AppTheme.secondary),
         ),
         child: child!,
       ),
@@ -146,7 +175,10 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
               child: Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 16,
+                    ),
                     child: Row(
                       children: [
                         GestureDetector(
@@ -215,7 +247,8 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                                   ),
                                   const SizedBox(width: 14),
                                   Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         'Create Account',
@@ -238,13 +271,16 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                               _sectionLabel(context, 'Personal Information'),
                               const SizedBox(height: 14),
                               YoTextField(
+                                controller: _nameController,
                                 label: 'Full Name',
                                 hint: 'Enter your full name',
                                 prefixIcon: Icons.person_rounded,
-                                validator: (v) => v!.isEmpty ? 'Enter name' : null,
+                                validator: (v) =>
+                                    v!.isEmpty ? 'Enter name' : null,
                               ),
                               const SizedBox(height: 16),
                               YoTextField(
+                                controller: _emailController,
                                 label: 'Email Address',
                                 hint: 'patient@example.com',
                                 prefixIcon: Icons.email_rounded,
@@ -261,11 +297,13 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                               ),
                               const SizedBox(height: 16),
                               YoTextField(
+                                controller: _phoneController,
                                 label: 'Phone Number',
                                 hint: '+91 9876543210',
                                 prefixIcon: Icons.phone_rounded,
                                 keyboardType: TextInputType.phone,
-                                validator: (v) => v!.isEmpty ? 'Enter phone' : null,
+                                validator: (v) =>
+                                    v!.isEmpty ? 'Enter phone' : null,
                               ),
                               const SizedBox(height: 16),
                               Column(
@@ -304,14 +342,18 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                                           const SizedBox(width: 12),
                                           Text(
                                             _selectedDOB != null
-                                                ? DateFormat('dd/MM/yyyy').format(_selectedDOB!)
+                                                ? DateFormat(
+                                                    'dd/MM/yyyy',
+                                                  ).format(_selectedDOB!)
                                                 : 'Select date of birth',
-                                            style: textTheme.bodyMedium?.copyWith(
-                                              color: _selectedDOB != null
-                                                  ? colorScheme.onSurface
-                                                  : colorScheme.onSurfaceVariant
-                                                  .transparency(0.65),
-                                            ),
+                                            style: textTheme.bodyMedium
+                                                ?.copyWith(
+                                                  color: _selectedDOB != null
+                                                      ? colorScheme.onSurface
+                                                      : colorScheme
+                                                            .onSurfaceVariant
+                                                            .transparency(0.65),
+                                                ),
                                           ),
                                           const Spacer(),
                                           Icon(
@@ -403,7 +445,9 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                               ),
                               const SizedBox(height: 20),
                               GestureDetector(
-                                onTap: () => setState(() => _agreedToTerms = !_agreedToTerms),
+                                onTap: () => setState(
+                                  () => _agreedToTerms = !_agreedToTerms,
+                                ),
                                 child: Row(
                                   children: [
                                     Container(
@@ -412,7 +456,9 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                                       decoration: BoxDecoration(
                                         color: _agreedToTerms
                                             ? AppTheme.secondary
-                                            : colorScheme.surface.transparency(0),
+                                            : colorScheme.surface.transparency(
+                                                0,
+                                              ),
                                         border: Border.all(
                                           color: _agreedToTerms
                                               ? AppTheme.secondary
@@ -423,35 +469,41 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                                       ),
                                       child: _agreedToTerms
                                           ? Icon(
-                                        Icons.check,
-                                        color: colorScheme.onPrimary,
-                                        size: 14,
-                                      )
+                                              Icons.check,
+                                              color: colorScheme.onPrimary,
+                                              size: 14,
+                                            )
                                           : null,
                                     ),
                                     const SizedBox(width: 10),
                                     Expanded(
                                       child: RichText(
                                         text: TextSpan(
-                                          style: textTheme.labelMedium?.copyWith(
-                                            color: colorScheme.onSurfaceVariant,
-                                          ),
+                                          style: textTheme.labelMedium
+                                              ?.copyWith(
+                                                color: colorScheme
+                                                    .onSurfaceVariant,
+                                              ),
                                           children: [
-                                            const TextSpan(text: 'I agree to the '),
+                                            const TextSpan(
+                                              text: 'I agree to the ',
+                                            ),
                                             TextSpan(
                                               text: 'Terms & Conditions',
-                                              style: textTheme.labelMedium?.copyWith(
-                                                color: AppTheme.secondary,
-                                                fontWeight: FontWeight.w600,
-                                              ),
+                                              style: textTheme.labelMedium
+                                                  ?.copyWith(
+                                                    color: AppTheme.secondary,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
                                             ),
                                             const TextSpan(text: ' and '),
                                             TextSpan(
                                               text: 'Privacy Policy',
-                                              style: textTheme.labelMedium?.copyWith(
-                                                color: AppTheme.secondary,
-                                                fontWeight: FontWeight.w600,
-                                              ),
+                                              style: textTheme.labelMedium
+                                                  ?.copyWith(
+                                                    color: AppTheme.secondary,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
                                             ),
                                           ],
                                         ),
@@ -530,7 +582,9 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
           margin: EdgeInsets.only(right: gender != 'Other' ? 10 : 0),
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
-            color: selected ? AppTheme.secondary : colorScheme.surfaceContainerLow,
+            color: selected
+                ? AppTheme.secondary
+                : colorScheme.surfaceContainerLow,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: selected ? AppTheme.secondary : colorScheme.outlineVariant,
@@ -542,7 +596,9 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
             textAlign: TextAlign.center,
             style: textTheme.labelLarge?.copyWith(
               fontWeight: FontWeight.w600,
-              color: selected ? colorScheme.onPrimary : colorScheme.onSurfaceVariant,
+              color: selected
+                  ? colorScheme.onPrimary
+                  : colorScheme.onSurfaceVariant,
             ),
           ),
         ),

@@ -1,15 +1,16 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
-import 'package:yodoctor/core/models/notification_item.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
+import '../../../../../core/models/doctor/notification_model.dart';
 
 class NotificationCard extends StatelessWidget {
-  const NotificationCard({super.key,
+  const NotificationCard({
+    super.key,
     required this.notification,
     required this.onTap,
   });
 
-  final NotificationItem notification;
+  final NotificationModel notification;
   final VoidCallback onTap;
 
   @override
@@ -39,8 +40,12 @@ class NotificationCard extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 20,
-              backgroundColor: notification.iconColor.transparency(0.12),
-              child: Icon(notification.icon, color: notification.iconColor, size: 20),
+              backgroundColor: colorScheme.primaryContainer,
+              child: Icon(
+                Icons.notifications_rounded,
+                color: colorScheme.primary,
+                size: 20,
+              ),
             ),
             const SizedBox(width: AppSpacing.md),
             Expanded(
@@ -55,18 +60,19 @@ class NotificationCard extends StatelessWidget {
                         child: Text(
                           notification.title,
                           style: theme.textTheme.bodyLarge?.copyWith(
-                            fontWeight: notification.isRead ? FontWeight.w500 : FontWeight.w700,
+                            fontWeight: notification.isRead
+                                ? FontWeight.w500
+                                : FontWeight.w700,
                             color: colorScheme.onSurface,
                           ),
                         ),
                       ),
                       if (!notification.isRead)
                         Container(
-                          width: 8,
-                          height: 8,
-                          margin: const EdgeInsets.only(top: 6, left: 8),
+                          width: 10,
+                          height: 10,
                           decoration: BoxDecoration(
-                            color: colorScheme.primary,
+                            color: Colors.red,
                             shape: BoxShape.circle,
                           ),
                         ),
@@ -74,7 +80,7 @@ class NotificationCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    notification.description,
+                    notification.message,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: colorScheme.onSurfaceVariant,
                     ),

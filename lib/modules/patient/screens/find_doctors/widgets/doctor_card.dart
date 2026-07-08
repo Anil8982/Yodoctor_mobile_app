@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../core/utils/app_spacing.dart';
-import '../../../../../core/utils/dummy_data.dart';
+import '../../../models/search/doctor_search_model.dart';
 
 class DoctorCard extends StatelessWidget {
   const DoctorCard({
@@ -12,7 +12,7 @@ class DoctorCard extends StatelessWidget {
     this.onContactTap,
   });
 
-  final DoctorProfile doctor;
+  final DoctorSearchModel doctor;
   final VoidCallback? onProfileTap;
   final VoidCallback? onBookTap;
   final VoidCallback? onContactTap;
@@ -27,7 +27,9 @@ class DoctorCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: AppSpacing.md),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
-        side: BorderSide(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
+        side: BorderSide(
+          color: colorScheme.outlineVariant.withValues(alpha: 0.4),
+        ),
       ),
       color: colorScheme.surface,
       child: InkWell(
@@ -87,7 +89,9 @@ class DoctorCard extends StatelessWidget {
                   vertical: 10,
                 ),
                 decoration: BoxDecoration(
-                  color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+                  color: colorScheme.surfaceContainerHighest.withValues(
+                    alpha: 0.3,
+                  ),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
@@ -171,15 +175,36 @@ class DoctorCard extends StatelessWidget {
         color: colorScheme.primaryContainer.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: Center(
-        child: Text(
-          doctor.name.substring(0, 1),
-          style: theme.textTheme.headlineSmall?.copyWith(
-            color: colorScheme.onPrimaryContainer,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
+      child: doctor.profileImage.isNotEmpty
+          ? ClipRRect(
+              borderRadius: BorderRadius.circular(14),
+              child: Image.network(
+                doctor.profileImage,
+                width: 60,
+                height: 60,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) {
+                  return Center(
+                    child: Text(
+                      doctor.name.substring(0, 1),
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        color: colorScheme.onPrimaryContainer,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            )
+          : Center(
+              child: Text(
+                doctor.name.substring(0, 1),
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  color: colorScheme.onPrimaryContainer,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
     );
   }
 
@@ -195,7 +220,9 @@ class DoctorCard extends StatelessWidget {
         Icon(
           icon,
           size: 14,
-          color: isRating ? colorScheme.secondary : colorScheme.onSurfaceVariant,
+          color: isRating
+              ? colorScheme.secondary
+              : colorScheme.onSurfaceVariant,
         ),
         const SizedBox(width: 4),
         Text(

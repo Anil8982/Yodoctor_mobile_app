@@ -2,17 +2,39 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import '../../../../core/utils/app_spacing.dart';
-import '../../../../core/utils/dummy_data.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../controllers/doctor_profile_controller.dart';
 import '../../widgets/doctor_sliver_app_bar.dart';
 
-class DoctorProfileScreen extends StatelessWidget {
+class DoctorProfileScreen extends ConsumerStatefulWidget {
   const DoctorProfileScreen({super.key});
+
+  @override
+  ConsumerState<DoctorProfileScreen> createState() =>
+      _DoctorProfileScreenState();
+}
+
+class _DoctorProfileScreenState extends ConsumerState<DoctorProfileScreen> {
+  @override
+  void initState() {
+    super.initState();
+
+    Future.microtask(() {
+      ref.read(doctorProfileProvider.notifier).loadProfile();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final doctor = DummyData.currentDoctorProfile;
+
+    final profileState = ref.watch(doctorProfileProvider);
+    final doctor = profileState.profile;
+
+    if (profileState.isLoading || doctor == null) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
 
     return Scaffold(
       backgroundColor: colorScheme.surfaceContainerLow,
@@ -45,17 +67,31 @@ class DoctorProfileScreen extends StatelessWidget {
               const SizedBox(height: AppSpacing.xl),
 
               // 🎯 About / Bio Section (If available)
-              if (doctor.aboutYou.isNotEmpty) ...[
-                Text('About Doctor', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+              if (doctor.bio.isNotEmpty) ...[
+                Text(
+                  'About Doctor',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
                 const SizedBox(height: AppSpacing.sm),
                 Text(
-                  doctor.aboutYou,
-                  style: theme.textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant, height: 1.4, fontWeight: FontWeight.w600),
+                  doctor.bio,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                    height: 1.4,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 const SizedBox(height: AppSpacing.xl),
               ],
 
-              Text('Profile Overview', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+              Text(
+                'Profile Overview',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
               const SizedBox(height: AppSpacing.md),
 
               // 🎯 Quick Stats Row
@@ -90,9 +126,9 @@ class DoctorProfileScreen extends StatelessWidget {
                 title: 'Professional Registration',
                 icon: Icons.gavel_rounded,
                 children: [
-                  _buildInfoRow(context, 'Reg. No', doctor.registrationNumber),
+                  _buildInfoRow(context, 'Reg. No', doctor.licenseNumber),
                   _buildInfoRow(context, 'Council', doctor.stateCouncil),
-                  _buildInfoRow(context, 'Valid Till', doctor.registrationValidTill),
+                  _buildInfoRow(context, 'Valid Till', doctor.validTill),
                 ],
               ),
               const SizedBox(height: AppSpacing.sm),
@@ -106,7 +142,12 @@ class DoctorProfileScreen extends StatelessWidget {
                   _buildInfoRow(context, 'Name', doctor.clinicName),
                   _buildInfoRow(context, 'Type', doctor.practiceType),
                   _buildInfoRow(context, 'City', doctor.city),
-                  _buildInfoRow(context, 'Address', doctor.fullAddress, maxLines: 3),
+                  _buildInfoRow(
+                    context,
+                    'Address',
+                    doctor.address,
+                    maxLines: 3,
+                  ),
                 ],
               ),
               const SizedBox(height: AppSpacing.sm),
@@ -117,11 +158,17 @@ class DoctorProfileScreen extends StatelessWidget {
                 title: 'Consultation & Timings',
                 icon: Icons.access_time_rounded,
                 children: [
-                  _buildInfoRow(context, 'Slot Time', '${doctor.avgDurationMinutes} Mins'),
+                  _buildInfoRow(
+                    context,
+                    'Slot Time',
+                    '${doctor.consultationDuration} Mins',
+                  ),
                   _buildInfoRow(
                     context,
                     'Days',
-                    doctor.availableDays.isNotEmpty ? doctor.availableDays.join(', ') : 'Not Configured',
+                    doctor.availableDays.isNotEmpty
+                        ? doctor.availableDays.join(', ')
+                        : 'Not Configured',
                     maxLines: 2,
                   ),
                 ],
@@ -134,40 +181,43 @@ class DoctorProfileScreen extends StatelessWidget {
                 title: 'KXC / Documents Status',
                 icon: Icons.folder_shared_outlined,
                 children: doctor.documents.isEmpty
-                    ? [Text('No documents uploaded.', style: theme.textTheme.bodySmall)]
-                    : (doctor.documents as List).map<Widget>((doc) {
-                  final bool isVerified = (doc['status'] ?? '').toString().toLowerCase() == 'verified';
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                    child: Row(
-                      children: [
-                        Icon(Icons.description_outlined, size: 16, color: colorScheme.onSurfaceVariant),
-                        const SizedBox(width: AppSpacing.xs),
-                        Expanded(
-                          child: Text(
-                            doc['name'] ?? 'Document',
-                            style: theme.textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w700),
-                          ),
+                    ? [
+                        Text(
+                          'No documents uploaded.',
+                          style: theme.textTheme.bodySmall,
                         ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: isVerified ? colorScheme.primaryContainer.withValues(alpha: 0.4) : colorScheme.errorContainer.withValues(alpha: 0.3),
-                            borderRadius: BorderRadius.circular(6),
+                      ]
+                    : doctor.documents.entries.map<Widget>((entry) {
+                        final key = entry.key;
+                        final value = entry.value;
+
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.description_outlined,
+                                size: 16,
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                              const SizedBox(width: AppSpacing.xs),
+                              Expanded(
+                                child: Text(
+                                  key,
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                              Icon(
+                                Icons.check_circle,
+                                color: Colors.green,
+                                size: 18,
+                              ),
+                            ],
                           ),
-                          child: Text(
-                            doc['status'] ?? 'Pending',
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: isVerified ? colorScheme.onPrimaryContainer : colorScheme.onErrorContainer,
-                              fontSize: 9,
-                              fontWeight: FontWeight.w900,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }).toList(),
+                        );
+                      }).toList(),
               ),
               // const SizedBox(height: AppSpacing.sm),
             ],
@@ -182,13 +232,21 @@ class DoctorProfileScreen extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(AppSpacing.xl, kToolbarHeight + AppSpacing.lg, AppSpacing.xl, AppSpacing.sm),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.xl,
+        kToolbarHeight + AppSpacing.lg,
+        AppSpacing.xl,
+        AppSpacing.sm,
+      ),
       child: Row(
         children: [
           Container(
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(color: colorScheme.onPrimary.withValues(alpha: 0.25), width: 2.5),
+              border: Border.all(
+                color: colorScheme.onPrimary.withValues(alpha: 0.25),
+                width: 2.5,
+              ),
             ),
             child: CircleAvatar(
               radius: 36,
@@ -198,7 +256,11 @@ class DoctorProfileScreen extends StatelessWidget {
                 child: Image.asset(
                   'assets/images/doctorLogo.jpg',
                   fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => Icon(Icons.medical_services_rounded, color: colorScheme.onPrimary, size: 28),
+                  errorBuilder: (context, error, stackTrace) => Icon(
+                    Icons.medical_services_rounded,
+                    color: colorScheme.onPrimary,
+                    size: 28,
+                  ),
                 ),
               ),
             ),
@@ -210,29 +272,46 @@ class DoctorProfileScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  doctor.fullName,
+                  doctor.doctorName,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.titleMedium?.copyWith(color: colorScheme.onPrimary, fontWeight: FontWeight.w900, letterSpacing: 0.3),
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: colorScheme.onPrimary,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0.3,
+                  ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   doctor.specialization,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.bodySmall?.copyWith(color: colorScheme.onPrimary.withValues(alpha: 0.8), fontWeight: FontWeight.w600),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onPrimary.withValues(alpha: 0.8),
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 3),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.sm,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
                     color: colorScheme.onPrimary.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: colorScheme.onPrimary.withValues(alpha: 0.1)),
+                    border: Border.all(
+                      color: colorScheme.onPrimary.withValues(alpha: 0.1),
+                    ),
                   ),
                   child: Text(
-                    doctor.primaryQualification,
-                    style: theme.textTheme.labelSmall?.copyWith(color: colorScheme.onPrimary, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.5),
+                    doctor.degree,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: colorScheme.onPrimary,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.5,
+                    ),
                   ),
                 ),
               ],
@@ -243,8 +322,12 @@ class DoctorProfileScreen extends StatelessWidget {
     );
   }
 
-  // 🎯 री-युझेबल मास्टर सेक्शन कार्ड विजेट भाऊ
-  Widget _buildSectionCard(BuildContext context, {required String title, required IconData icon, required List<Widget> children}) {
+  Widget _buildSectionCard(
+    BuildContext context, {
+    required String title,
+    required IconData icon,
+    required List<Widget> children,
+  }) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -253,7 +336,9 @@ class DoctorProfileScreen extends StatelessWidget {
       color: colorScheme.surface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(24),
-        side: BorderSide(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
+        side: BorderSide(
+          color: colorScheme.outlineVariant.withValues(alpha: 0.4),
+        ),
       ),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.xl),
@@ -271,7 +356,13 @@ class DoctorProfileScreen extends StatelessWidget {
                   child: Icon(icon, color: colorScheme.primary, size: 20),
                 ),
                 const SizedBox(width: AppSpacing.sm),
-                Text(title, style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w800, color: colorScheme.onSurface)),
+                Text(
+                  title,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w800,
+                    color: colorScheme.onSurface,
+                  ),
+                ),
               ],
             ),
             const Divider(height: AppSpacing.xxl, thickness: 0.8),
@@ -282,34 +373,77 @@ class DoctorProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildActionCard(BuildContext context, {required String title, required String subtitle, required IconData icon, required VoidCallback onTap}) {
+  Widget _buildActionCard(
+    BuildContext context, {
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
     return Card(
       elevation: 0,
       color: colorScheme.primaryContainer.withValues(alpha: 0.2),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24), side: BorderSide(color: colorScheme.primary.withValues(alpha: 0.12))),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(24),
+        side: BorderSide(color: colorScheme.primary.withValues(alpha: 0.12)),
+      ),
       child: ListTile(
         onTap: onTap,
-        contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 4),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: 4,
+        ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        leading: CircleAvatar(backgroundColor: colorScheme.primary, foregroundColor: colorScheme.onPrimary, radius: 20, child: Icon(icon, size: 20)),
-        title: Text(title, style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w800, color: colorScheme.primary)),
-        subtitle: Text(subtitle, style: theme.textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant.withValues(alpha: 0.8))),
-        trailing: Icon(Icons.arrow_forward_ios_rounded, color: colorScheme.primary, size: 14),
+        leading: CircleAvatar(
+          backgroundColor: colorScheme.primary,
+          foregroundColor: colorScheme.onPrimary,
+          radius: 20,
+          child: Icon(icon, size: 20),
+        ),
+        title: Text(
+          title,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            fontWeight: FontWeight.w800,
+            color: colorScheme.primary,
+          ),
+        ),
+        subtitle: Text(
+          subtitle,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
+          ),
+        ),
+        trailing: Icon(
+          Icons.arrow_forward_ios_rounded,
+          color: colorScheme.primary,
+          size: 14,
+        ),
       ),
     );
   }
 
-  Widget _buildStatCard(BuildContext context, {required String label, required String value, required IconData icon, required Color cardColor}) {
+  Widget _buildStatCard(
+    BuildContext context, {
+    required String label,
+    required String value,
+    required IconData icon,
+    required Color cardColor,
+  }) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
     return Card(
       elevation: 0,
       color: cardColor,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20), side: BorderSide(color: colorScheme.outlineVariant.withValues(alpha: 0.4))),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(
+          color: colorScheme.outlineVariant.withValues(alpha: 0.4),
+        ),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.lg),
         child: Column(
@@ -317,16 +451,34 @@ class DoctorProfileScreen extends StatelessWidget {
           children: [
             Icon(icon, color: colorScheme.secondary, size: 20),
             const SizedBox(height: AppSpacing.md),
-            Text(value, style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w900, color: colorScheme.onSurface)),
+            Text(
+              value,
+              style: theme.textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w900,
+                color: colorScheme.onSurface,
+              ),
+            ),
             const SizedBox(height: 2),
-            Text(label, style: theme.textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant, fontSize: 11, fontWeight: FontWeight.w600)),
+            Text(
+              label,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildInfoRow(BuildContext context, String label, String value, {int maxLines = 1}) {
+  Widget _buildInfoRow(
+    BuildContext context,
+    String label,
+    String value, {
+    int maxLines = 1,
+  }) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -337,7 +489,13 @@ class DoctorProfileScreen extends StatelessWidget {
         children: [
           SizedBox(
             width: 80,
-            child: Text(label, style: theme.textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant, fontWeight: FontWeight.w700)),
+            child: Text(
+              label,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
           ),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
@@ -345,7 +503,10 @@ class DoctorProfileScreen extends StatelessWidget {
               value,
               maxLines: maxLines,
               overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w700, color: colorScheme.onSurface),
+              style: theme.textTheme.bodySmall?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: colorScheme.onSurface,
+              ),
             ),
           ),
         ],

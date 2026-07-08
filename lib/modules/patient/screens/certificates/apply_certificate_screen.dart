@@ -14,10 +14,12 @@ class ApplyCertificateScreen extends ConsumerStatefulWidget {
   const ApplyCertificateScreen({super.key});
 
   @override
-  ConsumerState<ApplyCertificateScreen> createState() => _ApplyCertificateScreenState();
+  ConsumerState<ApplyCertificateScreen> createState() =>
+      _ApplyCertificateScreenState();
 }
 
-class _ApplyCertificateScreenState extends ConsumerState<ApplyCertificateScreen> {
+class _ApplyCertificateScreenState
+    extends ConsumerState<ApplyCertificateScreen> {
   int _currentStep = 1;
   final _step1Key = GlobalKey<FormState>();
   final _step2Key = GlobalKey<FormState>();
@@ -36,13 +38,16 @@ class _ApplyCertificateScreenState extends ConsumerState<ApplyCertificateScreen>
     final notifier = ref.read(certificateProvider.notifier);
 
     final subtitleText = formState.assignedDoctor != null
-        ? 'Requesting from ${formState.assignedDoctor!.name} — ${formState.assignedDoctor!.specialty}'
+        ? 'Requesting from ${formState.assignedDoctor!.doctorName} — ${formState.assignedDoctor!.specialization}'
         : 'Choose certificate type and details';
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('Apply for Certificate', style: TextStyle(fontWeight: FontWeight.w600)),
+        title: const Text(
+          'Apply for Certificate',
+          style: TextStyle(fontWeight: FontWeight.w600),
+        ),
         centerTitle: false,
         elevation: 0,
         scrolledUnderElevation: 1,
@@ -54,10 +59,18 @@ class _ApplyCertificateScreenState extends ConsumerState<ApplyCertificateScreen>
             decoration: BoxDecoration(
               color: colorScheme.surface,
               border: Border(
-                bottom: BorderSide(color: colorScheme.outlineVariant.withValues(alpha: 0.4), width: 1),
+                bottom: BorderSide(
+                  color: colorScheme.outlineVariant.withValues(alpha: 0.4),
+                  width: 1,
+                ),
               ),
             ),
-            padding: EdgeInsets.fromLTRB(horizontalPadding, 8, horizontalPadding, 20),
+            padding: EdgeInsets.fromLTRB(
+              horizontalPadding,
+              8,
+              horizontalPadding,
+              20,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -73,17 +86,19 @@ class _ApplyCertificateScreenState extends ConsumerState<ApplyCertificateScreen>
                   ),
                 ),
                 const SizedBox(height: 12),
-                StepProgressIndicator(
-                  currentStep: _currentStep,
-                  steps: _steps,
-                ),
+                StepProgressIndicator(currentStep: _currentStep, steps: _steps),
               ],
             ),
           ),
           Expanded(
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
-              padding: EdgeInsets.fromLTRB(horizontalPadding, 24, horizontalPadding, 100),
+              padding: EdgeInsets.fromLTRB(
+                horizontalPadding,
+                24,
+                horizontalPadding,
+                100,
+              ),
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 250),
                 switchInCurve: Curves.easeOutCubic,
@@ -102,13 +117,20 @@ class _ApplyCertificateScreenState extends ConsumerState<ApplyCertificateScreen>
               color: Colors.black.withValues(alpha: 0.04),
               blurRadius: 10,
               offset: const Offset(0, -4),
-            )
+            ),
           ],
           border: Border(
-            top: BorderSide(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
+            top: BorderSide(
+              color: colorScheme.outlineVariant.withValues(alpha: 0.4),
+            ),
           ),
         ),
-        padding: EdgeInsets.fromLTRB(horizontalPadding, 16, horizontalPadding, MediaQuery.paddingOf(context).bottom + 16),
+        padding: EdgeInsets.fromLTRB(
+          horizontalPadding,
+          16,
+          horizontalPadding,
+          MediaQuery.paddingOf(context).bottom + 16,
+        ),
         child: Row(
           children: [
             Expanded(
@@ -116,7 +138,9 @@ class _ApplyCertificateScreenState extends ConsumerState<ApplyCertificateScreen>
                 onPressed: () => _handleBackNavigation(notifier),
                 style: OutlinedButton.styleFrom(
                   minimumSize: const Size.fromHeight(52),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
                 ),
                 child: Text(_currentStep == 1 ? 'Cancel' : 'Back'),
               ),
@@ -125,17 +149,24 @@ class _ApplyCertificateScreenState extends ConsumerState<ApplyCertificateScreen>
             Expanded(
               flex: 2,
               child: FilledButton(
-                onPressed: formState.isLoading ? null : () => _handleNextStep(formState, notifier),
+                onPressed: formState.isLoading
+                    ? null
+                    : () => _handleNextStep(formState, notifier),
                 style: FilledButton.styleFrom(
                   minimumSize: const Size.fromHeight(52),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
                 ),
                 child: formState.isLoading
                     ? const SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
-                )
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.5,
+                          color: Colors.white,
+                        ),
+                      )
                     : Text(_currentStep == 4 ? 'Submit Request' : 'Continue'),
               ),
             ),
@@ -157,7 +188,8 @@ class _ApplyCertificateScreenState extends ConsumerState<ApplyCertificateScreen>
         return Step4ReviewSubmit(
           controller: notifier,
           confirmDisclaimer: _confirmDisclaimer,
-          onDisclaimerChanged: (val) => setState(() => _confirmDisclaimer = val!),
+          onDisclaimerChanged: (val) =>
+              setState(() => _confirmDisclaimer = val!),
         );
       default:
         return const SizedBox.shrink();
@@ -175,11 +207,17 @@ class _ApplyCertificateScreenState extends ConsumerState<ApplyCertificateScreen>
     }
   }
 
-  void _handleNextStep(CertificateFormState formState, CertificateNotifier notifier) async {
+  void _handleNextStep(
+    CertificateFormState formState,
+    CertificateNotifier notifier,
+  ) async {
     if (_currentStep == 1) {
       if (formState.selectedType == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select a certificate type'), behavior: SnackBarBehavior.floating),
+          const SnackBar(
+            content: Text('Please select a certificate type'),
+            behavior: SnackBarBehavior.floating,
+          ),
         );
         return;
       }
@@ -195,13 +233,19 @@ class _ApplyCertificateScreenState extends ConsumerState<ApplyCertificateScreen>
         setState(() => _currentStep = 4);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please upload required verification files.'), behavior: SnackBarBehavior.floating),
+          const SnackBar(
+            content: Text('Please upload required verification files.'),
+            behavior: SnackBarBehavior.floating,
+          ),
         );
       }
     } else if (_currentStep == 4) {
       if (!_confirmDisclaimer) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please confirm accuracy verification to proceed.'), behavior: SnackBarBehavior.floating),
+          const SnackBar(
+            content: Text('Please confirm accuracy verification to proceed.'),
+            behavior: SnackBarBehavior.floating,
+          ),
         );
         return;
       }

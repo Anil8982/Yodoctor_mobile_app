@@ -1,22 +1,24 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
-import 'package:yodoctor/core/theme/app_theme.dart' hide AppRole;
-import 'package:yodoctor/core/providers/app_role_provider.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/auth/screens/patient/patient_register_screen.dart';
 import 'package:yodoctor/modules/auth/widgets/auth_widgets.dart';
+import 'package:yodoctor/services/auth_service.dart';
+import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class PatientLoginScreen extends ConsumerStatefulWidget {
+class PatientLoginScreen extends StatefulWidget {
   const PatientLoginScreen({super.key});
 
   @override
-  ConsumerState<PatientLoginScreen> createState() => _PatientLoginScreenState();
+  State<PatientLoginScreen> createState() => _PatientLoginScreenState();
 }
 
-class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
+class _PatientLoginScreenState extends State<PatientLoginScreen>
     with SingleTickerProviderStateMixin {
+  final AuthService _authService = AuthService();
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -48,25 +50,59 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final email = _emailController.text.trim();
-    final password = _passwordController.text.trim();
-
     setState(() => _isLoading = true);
-    await Future.delayed(const Duration(seconds: 2));
-    setState(() => _isLoading = false);
 
-    if (email.isEmpty || password.isEmpty) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Email or password cannot be empty')),
+    try {
+      final response = await _authService.login(
+        identifier: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
       );
-      return;
+
+      setState(() => _isLoading = false);
+
+      if (response.statusCode == 200 && response.data["success"] == true) {
+        // Get Token
+        final token = response.data["data"]["token"];
+
+        // Save Token
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString("token", token);
+
+        print("Saved Token: $token");
+
+        if (!mounted) return;
+
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(response.data["message"])));
+
+        context.go(AppRoutes.dashboard);
+      } else {
+        if (!mounted) return;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(response.data["message"] ?? "Login Failed")),
+        );
+      }
+    } on DioException catch (e) {
+      setState(() => _isLoading = false);
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.response?.data?["message"] ?? "Login Failed")),
+      );
+    } catch (e) {
+      setState(() => _isLoading = false);
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Something went wrong")));
+
+      print(e);
     }
-
-    if (!mounted) return;
-
-    ref.read(appRoleProvider.notifier).setRole(AppRole.patient);
-    context.go(AppRoutes.dashboard);
   }
 
   @override
@@ -105,7 +141,10 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
               child: Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 16,
+                    ),
                     child: Row(
                       children: [
                         GestureDetector(
@@ -195,7 +234,8 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
                               AuthHeader(
                                 role: 'Patient Portal',
                                 title: 'Welcome Back!',
-                                subtitle: 'Login to book appointments and consult doctors.',
+                                subtitle:
+                                    'Login to book appointments and consult doctors.',
                                 color: AppTheme.secondary,
                                 icon: Icons.person_rounded,
                               ),
@@ -240,7 +280,8 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
                                     scale: 0.9,
                                     child: Checkbox(
                                       value: _rememberMe,
-                                      onChanged: (v) => setState(() => _rememberMe = v!),
+                                      onChanged: (v) =>
+                                          setState(() => _rememberMe = v!),
                                       activeColor: AppTheme.secondary,
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(4),
@@ -256,9 +297,13 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
                                   const Spacer(),
                                   TextButton(
                                     onPressed: () {
-                                      ScaffoldMessenger.of(context).showSnackBar(
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
                                         const SnackBar(
-                                          content: Text('Forgot password feature coming soon'),
+                                          content: Text(
+                                            'Forgot password feature coming soon',
+                                          ),
                                         ),
                                       );
                                     },
@@ -310,7 +355,8 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
                                       onTap: () => Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (_) => const PatientRegisterScreen(),
+                                          builder: (_) =>
+                                              const PatientRegisterScreen(),
                                         ),
                                       ),
                                       child: Text(

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:yodoctor/core/models/patient/family_member.dart';
+import '../../../models/family/family_member_model.dart';
 
 class PatientSelectionSection extends StatelessWidget {
   const PatientSelectionSection({
@@ -13,10 +13,10 @@ class PatientSelectionSection extends StatelessWidget {
   });
 
   final bool isSelf;
-  final List<FamilyMember> familyMembers;
-  final FamilyMember? selectedFamilyMember;
+  final List<FamilyMemberModel> familyMembers;
+  final FamilyMemberModel? selectedFamilyMember;
   final ValueChanged<bool> onProfileTypeChanged;
-  final ValueChanged<FamilyMember?> onMemberChanged;
+  final ValueChanged<FamilyMemberModel?> onMemberChanged;
   final VoidCallback onAddFamilyPressed;
 
   @override
@@ -54,45 +54,49 @@ class PatientSelectionSection extends StatelessWidget {
         ),
         if (!isSelf) ...[
           const SizedBox(height: 14),
-          Row(
-            children: [
-              Expanded(
-                child: DropdownButtonFormField<FamilyMember>(
-                  initialValue: selectedFamilyMember,
-                  hint: const Text('Choose Member'),
-                  decoration: InputDecoration(
-                    fillColor: colorScheme.surfaceContainerLow,
-                    filled: true,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide(color: colorScheme.outlineVariant),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide(color: colorScheme.outlineVariant.withValues(alpha: 0.6)),
-                    ),
-                  ),
-                  items: familyMembers.map((member) {
-                    return DropdownMenuItem<FamilyMember>(
-                      value: member,
-                      child: Text(member.name, style: textTheme.bodyLarge),
-                    );
-                  }).toList(),
-                  onChanged: onMemberChanged,
-                ),
-              ),
-              const SizedBox(width: 12),
-              IconButton.filledTonal(
+
+          if (familyMembers.isEmpty)
+            Center(
+              child: FilledButton.icon(
                 onPressed: onAddFamilyPressed,
-                style: IconButton.styleFrom(
-                  padding: const EdgeInsets.all(14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                ),
-                icon: const Icon(Icons.person_add_alt_1_rounded),
+                icon: const Icon(Icons.person_add),
+                label: const Text("Add Family Member"),
               ),
-            ],
-          ),
+            )
+          else
+            Row(
+              children: [
+                Expanded(
+                  child: DropdownButtonFormField<FamilyMemberModel>(
+                    value: selectedFamilyMember,
+                    hint: const Text("Choose Member"),
+                    decoration: InputDecoration(
+                      fillColor: colorScheme.surfaceContainerLow,
+                      filled: true,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    items: familyMembers.map((member) {
+                      return DropdownMenuItem<FamilyMemberModel>(
+                        value: member,
+                        child: Text(member.fullName),
+                      );
+                    }).toList(),
+                    onChanged: onMemberChanged,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                IconButton.filledTonal(
+                  onPressed: onAddFamilyPressed,
+                  icon: const Icon(Icons.person_add_alt_1_rounded),
+                ),
+              ],
+            ),
         ],
       ],
     );
@@ -113,10 +117,14 @@ class PatientSelectionSection extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
         decoration: BoxDecoration(
-          color: isSelected ? colorScheme.primaryContainer : colorScheme.surfaceContainerLow,
+          color: isSelected
+              ? colorScheme.primaryContainer
+              : colorScheme.surfaceContainerLow,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? colorScheme.primary : colorScheme.outlineVariant.withValues(alpha: 0),
+            color: isSelected
+                ? colorScheme.primary
+                : colorScheme.outlineVariant.withValues(alpha: 0),
             width: 1.5,
           ),
         ),
@@ -126,7 +134,9 @@ class PatientSelectionSection extends StatelessWidget {
             Icon(
               icon,
               size: 18,
-              color: isSelected ? colorScheme.primary : colorScheme.onSurfaceVariant,
+              color: isSelected
+                  ? colorScheme.primary
+                  : colorScheme.onSurfaceVariant,
             ),
             const SizedBox(width: 8),
             Flexible(
@@ -135,7 +145,9 @@ class PatientSelectionSection extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: textTheme.labelLarge?.copyWith(
                   fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
-                  color: isSelected ? colorScheme.primary : colorScheme.onSurfaceVariant,
+                  color: isSelected
+                      ? colorScheme.primary
+                      : colorScheme.onSurfaceVariant,
                 ),
               ),
             ),

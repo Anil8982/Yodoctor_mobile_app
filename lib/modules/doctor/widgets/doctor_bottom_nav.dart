@@ -1,37 +1,37 @@
 import 'package:flutter/material.dart';
-import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 
-class DoctorBottomNav {
-  const DoctorBottomNav._();
+class DoctorBottomNav extends StatelessWidget {
+  const DoctorBottomNav({
+    super.key,
+    required this.currentIndex,
+    required this.onTap,
+  });
 
-  static List<PersistentBottomNavBarItem> navBarItems(BuildContext context) {
+  final int currentIndex;
+  final ValueChanged<int> onTap;
+
+  @override
+  Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    return [
-      PersistentBottomNavBarItem(
-        icon: const Icon(Icons.home_rounded),
-        title: "Home",
-        activeColorPrimary: colorScheme.primary,
-        inactiveColorPrimary: colorScheme.onSurfaceVariant,
-      ),
-      PersistentBottomNavBarItem(
-        icon: const Icon(Icons.calendar_month_rounded),
-        title: "History",
-        activeColorPrimary: colorScheme.primary,
-        inactiveColorPrimary: colorScheme.onSurfaceVariant,
-      ),
-      PersistentBottomNavBarItem(
-        icon: const Icon(Icons.wallet_membership_rounded),
-        title: "Certificates",
-        activeColorPrimary: colorScheme.primary,
-        inactiveColorPrimary: colorScheme.onSurfaceVariant,
-      ),
-      PersistentBottomNavBarItem(
-        icon: const Icon(Icons.star_rounded),
-        title: "Reviews",
-        activeColorPrimary: colorScheme.primary,
-        inactiveColorPrimary: colorScheme.onSurfaceVariant,
-      ),
-    ];
+    return NavigationBar(
+      selectedIndex: currentIndex,
+      onDestinationSelected: onTap,
+      backgroundColor: colorScheme.surface,
+      indicatorColor: colorScheme.primaryContainer,
+      height: 72,
+      destinations: const [
+        NavigationDestination(icon: Icon(Icons.home_rounded), label: "Home"),
+        NavigationDestination(
+          icon: Icon(Icons.calendar_month_rounded),
+          label: "History",
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.workspace_premium_rounded),
+          label: "Certificates",
+        ),
+        NavigationDestination(icon: Icon(Icons.star_rounded), label: "Reviews"),
+      ],
+    );
   }
 }

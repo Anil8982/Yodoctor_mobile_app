@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/auth/models/doctor_register_model.dart';
 import 'shared_widgets.dart';
+import 'package:provider/provider.dart';
+import 'package:yodoctor/modules/auth/controllers/doctor_register_controller.dart';
 
 class Step5Consultation extends StatefulWidget {
   final DoctorFormData data;
@@ -24,13 +26,13 @@ class Step5Consultation extends StatefulWidget {
 class _Step5ConsultationState extends State<Step5Consultation> {
   final _feeCtrl = TextEditingController();
   final _days = const [
-    {'label': 'M', 'value': 'M'},
-    {'label': 'T', 'value': 'T'},
-    {'label': 'W', 'value': 'W'},
-    {'label': 'T', 'value': 'T2'},
-    {'label': 'F', 'value': 'F'},
-    {'label': 'S', 'value': 'S'},
-    {'label': 'Su', 'value': 'SU'},
+    {"label": "M", "value": "Mon"},
+    {"label": "T", "value": "Tue"},
+    {"label": "W", "value": "Wed"},
+    {"label": "T", "value": "Thu"},
+    {"label": "F", "value": "Fri"},
+    {"label": "S", "value": "Sat"},
+    {"label": "Su", "value": "Sun"},
   ];
 
   @override
@@ -51,7 +53,9 @@ class _Step5ConsultationState extends State<Step5Consultation> {
       initialTime: TimeOfDay.now(),
       builder: (ctx, child) => Theme(
         data: Theme.of(ctx).copyWith(
-          colorScheme: Theme.of(ctx).colorScheme.copyWith(primary: AppTheme.yoBlue),
+          colorScheme: Theme.of(
+            ctx,
+          ).colorScheme.copyWith(primary: AppTheme.yoBlue),
         ),
         child: child!,
       ),
@@ -85,7 +89,7 @@ class _Step5ConsultationState extends State<Step5Consultation> {
 
     return StepCard(
       children: [
-         StepTitle(
+        StepTitle(
           icon: Icons.schedule_rounded,
           title: 'Consultation Settings',
           color: AppTheme.yoBlue,
@@ -96,11 +100,13 @@ class _Step5ConsultationState extends State<Step5Consultation> {
         TextFormField(
           controller: _feeCtrl,
           keyboardType: TextInputType.number,
-          inputFormatters:  [FilteringTextInputFormatter.digitsOnly],
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           style: textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface),
           decoration: InputDecoration(
             hintText: 'e.g. 500',
-            hintStyle: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
+            hintStyle: textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
             prefixIcon: Padding(
               padding: const EdgeInsets.only(left: 16, right: 4, top: 2),
               child: Text(
@@ -111,7 +117,10 @@ class _Step5ConsultationState extends State<Step5Consultation> {
                 ),
               ),
             ),
-            prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
+            prefixIconConstraints: const BoxConstraints(
+              minWidth: 0,
+              minHeight: 0,
+            ),
             filled: true,
             fillColor: colorScheme.surfaceContainerLow,
             border: OutlineInputBorder(
@@ -120,13 +129,19 @@ class _Step5ConsultationState extends State<Step5Consultation> {
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide: BorderSide(color: colorScheme.outlineVariant, width: 1.2),
+              borderSide: BorderSide(
+                color: colorScheme.outlineVariant,
+                width: 1.2,
+              ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide:  BorderSide(color: AppTheme.yoBlue, width: 2),
+              borderSide: BorderSide(color: AppTheme.yoBlue, width: 2),
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 16,
+            ),
           ),
           onChanged: (v) => widget.data.fee = v,
         ),
@@ -136,18 +151,25 @@ class _Step5ConsultationState extends State<Step5Consultation> {
         Wrap(
           spacing: 10,
           runSpacing: 10,
-          children: ['10 mins', '15 mins', '20 mins', '30 mins'].map((duration) {
+          children: ['10 mins', '15 mins', '20 mins', '30 mins'].map((
+            duration,
+          ) {
             final selected = widget.data.duration == duration;
             return GestureDetector(
               onTap: () => setState(() => widget.data.duration = duration),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
                 decoration: BoxDecoration(
                   color: selected ? AppTheme.yoBlue : colorScheme.surface,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: selected ? AppTheme.yoBlue : colorScheme.outlineVariant,
+                    color: selected
+                        ? AppTheme.yoBlue
+                        : colorScheme.outlineVariant,
                     width: 1.5,
                   ),
                 ),
@@ -155,7 +177,9 @@ class _Step5ConsultationState extends State<Step5Consultation> {
                   duration,
                   style: textTheme.labelLarge?.copyWith(
                     fontWeight: FontWeight.w700,
-                    color: selected ? colorScheme.onPrimary : colorScheme.onSurfaceVariant,
+                    color: selected
+                        ? colorScheme.onPrimary
+                        : colorScheme.onSurfaceVariant,
                   ),
                 ),
               ),
@@ -183,7 +207,9 @@ class _Step5ConsultationState extends State<Step5Consultation> {
                   shape: BoxShape.circle,
                   color: selected ? AppTheme.yoBlue : colorScheme.surface,
                   border: Border.all(
-                    color: selected ? AppTheme.yoBlue : colorScheme.outlineVariant,
+                    color: selected
+                        ? AppTheme.yoBlue
+                        : colorScheme.outlineVariant,
                     width: 1.5,
                   ),
                 ),
@@ -192,7 +218,9 @@ class _Step5ConsultationState extends State<Step5Consultation> {
                     day['label']!,
                     style: textTheme.labelMedium?.copyWith(
                       fontWeight: FontWeight.w700,
-                      color: selected ? colorScheme.onPrimary : colorScheme.onSurfaceVariant,
+                      color: selected
+                          ? colorScheme.onPrimary
+                          : colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ),
@@ -213,7 +241,11 @@ class _Step5ConsultationState extends State<Step5Consultation> {
             children: [
               Row(
                 children: [
-                   Icon(Icons.wb_sunny_rounded, color: AppTheme.warning, size: 20),
+                  Icon(
+                    Icons.wb_sunny_rounded,
+                    color: AppTheme.warning,
+                    size: 20,
+                  ),
                   const SizedBox(width: 8),
                   Text(
                     'Morning Slot Timing',
@@ -255,7 +287,11 @@ class _Step5ConsultationState extends State<Step5Consultation> {
             children: [
               Row(
                 children: [
-                   Icon(Icons.nightlight_round, color: AppTheme.yoBlue, size: 20),
+                  Icon(
+                    Icons.nightlight_round,
+                    color: AppTheme.yoBlue,
+                    size: 20,
+                  ),
                   const SizedBox(width: 8),
                   Text(
                     'Evening Slot Timing',
@@ -267,7 +303,9 @@ class _Step5ConsultationState extends State<Step5Consultation> {
                   const Spacer(),
                   Text(
                     'Optional',
-                    style: textTheme.labelSmall?.copyWith(color: colorScheme.onSurfaceVariant),
+                    style: textTheme.labelSmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 ],
               ),
@@ -276,13 +314,17 @@ class _Step5ConsultationState extends State<Step5Consultation> {
                 children: [
                   TimePickerTile(
                     label: 'Start',
-                    time: widget.data.eveningStart.isEmpty ? '--:--' : widget.data.eveningStart,
+                    time: widget.data.eveningStart.isEmpty
+                        ? '--:--'
+                        : widget.data.eveningStart,
                     onTap: () => _pickTime('eveningStart'),
                   ),
                   const SizedBox(width: 12),
                   TimePickerTile(
                     label: 'End',
-                    time: widget.data.eveningEnd.isEmpty ? '--:--' : widget.data.eveningEnd,
+                    time: widget.data.eveningEnd.isEmpty
+                        ? '--:--'
+                        : widget.data.eveningEnd,
                     onTap: () => _pickTime('eveningEnd'),
                   ),
                 ],
@@ -293,9 +335,30 @@ class _Step5ConsultationState extends State<Step5Consultation> {
         const SizedBox(height: 28),
         NavButtons(
           onBack: widget.onBack,
-          onNext: () {
+          onNext: () async {
             widget.data.fee = _feeCtrl.text;
-            widget.onNext();
+
+            widget.data.morningEnabled =
+                widget.data.morningStart.isNotEmpty &&
+                widget.data.morningEnd.isNotEmpty;
+
+            widget.data.eveningEnabled =
+                widget.data.eveningStart.isNotEmpty &&
+                widget.data.eveningEnd.isNotEmpty;
+
+            final controller = context.read<DoctorRegisterController>();
+
+            final ok = await controller.saveStep5(widget.data);
+
+            if (!mounted) return;
+
+            if (ok) {
+              widget.onNext();
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(controller.error ?? "Step 5 Failed")),
+              );
+            }
           },
         ),
       ],

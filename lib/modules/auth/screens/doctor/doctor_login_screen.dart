@@ -1,23 +1,21 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
-import 'package:yodoctor/core/theme/app_theme.dart' hide AppRole;
-import 'package:yodoctor/core/providers/app_role_provider.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/doctor_register_screen.dart';
 import 'package:yodoctor/modules/auth/widgets/auth_widgets.dart';
+import 'package:provider/provider.dart';
+import '../../controllers/doctor_login_controller.dart';
 
-// 🎯 FIX: Converted to ConsumerStatefulWidget to link Riverpod's reactive capabilities natively
-class DoctorLoginScreen extends ConsumerStatefulWidget {
+class DoctorLoginScreen extends StatefulWidget {
   const DoctorLoginScreen({super.key});
 
   @override
-  ConsumerState<DoctorLoginScreen> createState() => _DoctorLoginScreenState();
+  State<DoctorLoginScreen> createState() => _DoctorLoginScreenState();
 }
 
-// 🎯 FIX: Inherited from ConsumerState to support contextual ref updates within the animation lifecycle
-class _DoctorLoginScreenState extends ConsumerState<DoctorLoginScreen>
+class _DoctorLoginScreenState extends State<DoctorLoginScreen>
     with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
@@ -50,25 +48,40 @@ class _DoctorLoginScreenState extends ConsumerState<DoctorLoginScreen>
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final emailOrId = _emailController.text.trim();
-    final password = _passwordController.text.trim();
+    final controller = context.read<DoctorLoginController>();
 
-    setState(() => _isLoading = true);
-    await Future.delayed(const Duration(seconds: 2));
-    setState(() => _isLoading = false);
+    final result = await controller.login(
+      identifier: _emailController.text.trim(),
+      password: _passwordController.text.trim(),
+    );
 
-    if (emailOrId.isEmpty || password.isEmpty) {
-      if (!mounted) return;
+    if (!mounted) return;
+
+    if (result == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Invalid credentials')),
+        SnackBar(content: Text(controller.error ?? "Login Failed")),
       );
       return;
     }
 
-    if (!mounted) return;
+    switch (result["redirect"]) {
+      case "resume":
+        context.go(AppRoutes.doctorRegister, extra: result["nextStep"]);
+        break;
 
-    ref.read(appRoleProvider.notifier).setRole(AppRole.doctor);
-    context.go(AppRoutes.doctorDashboard);
+      case "waiting-approval":
+        context.go(AppRoutes.waitingApproval);
+        break;
+
+      case "dashboard":
+        context.go(AppRoutes.doctorDashboard);
+        break;
+
+      default:
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text("Unknown login response")));
+    }
   }
 
   @override
@@ -89,7 +102,10 @@ class _DoctorLoginScreenState extends ConsumerState<DoctorLoginScreen>
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [AppTheme.primary, AppTheme.primary.transparency(0.7)],
+                  colors: [
+                    AppTheme.primary,
+                    AppTheme.primary.transparency(0.7),
+                  ],
                 ),
                 borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(40),
@@ -104,7 +120,10 @@ class _DoctorLoginScreenState extends ConsumerState<DoctorLoginScreen>
               child: Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 16,
+                    ),
                     child: Row(
                       children: [
                         GestureDetector(
@@ -195,7 +214,8 @@ class _DoctorLoginScreenState extends ConsumerState<DoctorLoginScreen>
                               AuthHeader(
                                 role: 'Doctor Portal',
                                 title: 'Welcome Back,\nDoctor!',
-                                subtitle: 'Login to manage your appointments and patients.',
+                                subtitle:
+                                    'Login to manage your appointments and patients.',
                                 color: AppTheme.primary,
                                 icon: Icons.medical_services_rounded,
                               ),
@@ -210,7 +230,8 @@ class _DoctorLoginScreenState extends ConsumerState<DoctorLoginScreen>
                                   if (v == null || v.trim().isEmpty) {
                                     return 'Enter email or medical ID';
                                   }
-                                  if (v.contains('@') && !RegExp(r'\S+@\S+\.\S+').hasMatch(v)) {
+                                  if (v.contains('@') &&
+                                      !RegExp(r'\S+@\S+\.\S+').hasMatch(v)) {
                                     return 'Enter valid email';
                                   }
                                   return null;
@@ -240,7 +261,8 @@ class _DoctorLoginScreenState extends ConsumerState<DoctorLoginScreen>
                                     scale: 0.9,
                                     child: Checkbox(
                                       value: _rememberMe,
-                                      onChanged: (v) => setState(() => _rememberMe = v!),
+                                      onChanged: (v) =>
+                                          setState(() => _rememberMe = v!),
                                       activeColor: AppTheme.primary,
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(4),
@@ -256,9 +278,13 @@ class _DoctorLoginScreenState extends ConsumerState<DoctorLoginScreen>
                                   const Spacer(),
                                   TextButton(
                                     onPressed: () {
-                                      ScaffoldMessenger.of(context).showSnackBar(
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
                                         const SnackBar(
-                                          content: Text('Forgot password feature coming soon'),
+                                          content: Text(
+                                            'Forgot password feature coming soon',
+                                          ),
                                         ),
                                       );
                                     },
@@ -273,11 +299,15 @@ class _DoctorLoginScreenState extends ConsumerState<DoctorLoginScreen>
                                 ],
                               ),
                               const SizedBox(height: 20),
-                              YoPrimaryButton(
-                                label: 'Login as Doctor',
-                                onTap: _handleLogin,
-                                color: AppTheme.primary,
-                                isLoading: _isLoading,
+                              Consumer<DoctorLoginController>(
+                                builder: (_, controller, __) {
+                                  return YoPrimaryButton(
+                                    label: 'Login as Doctor',
+                                    onTap: _handleLogin,
+                                    color: AppTheme.primary,
+                                    isLoading: controller.isLoading,
+                                  );
+                                },
                               ),
                               const SizedBox(height: 28),
                               Container(
@@ -296,12 +326,8 @@ class _DoctorLoginScreenState extends ConsumerState<DoctorLoginScreen>
                                       ),
                                     ),
                                     GestureDetector(
-                                      onTap: () => Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (_) => const DoctorRegisterScreen(),
-                                        ),
-                                      ),
+                                      onTap: () =>
+                                          context.go(AppRoutes.doctorRegister),
                                       child: Text(
                                         'Register here',
                                         style: textTheme.labelMedium?.copyWith(

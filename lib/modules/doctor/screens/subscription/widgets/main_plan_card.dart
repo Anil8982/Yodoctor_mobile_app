@@ -19,10 +19,7 @@ class MainPlanCard extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            const Color(0xFF1A52CD),
-            const Color(0xFF0EA790),
-          ],
+          colors: [const Color(0xFF1A52CD), const Color(0xFF0EA791)],
         ),
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
@@ -62,7 +59,10 @@ class MainPlanCard extends StatelessWidget {
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 6,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white.withValues(alpha: 0.18),
                           borderRadius: BorderRadius.circular(30),
@@ -74,7 +74,10 @@ class MainPlanCard extends StatelessWidget {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const CircleAvatar(radius: 3, backgroundColor: Color(0xFF39FF14)),
+                            const CircleAvatar(
+                              radius: 3,
+                              backgroundColor: Color(0xFF39FF14),
+                            ),
                             const SizedBox(width: 8),
                             Text(
                               'Active',
@@ -152,7 +155,9 @@ class MainPlanCard extends StatelessWidget {
                               Text(
                                 'UPCOMING PLAN',
                                 style: textTheme.labelSmall?.copyWith(
-                                  color: colorScheme.onPrimary.transparency(0.7),
+                                  color: colorScheme.onPrimary.transparency(
+                                    0.7,
+                                  ),
                                   fontWeight: FontWeight.w800,
                                   letterSpacing: 1.1,
                                 ),

@@ -23,9 +23,19 @@ class ClinicDetailsTab extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Clinic Details', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+            Text(
+              'Clinic Details',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w800,
+              ),
+            ),
             const SizedBox(height: AppSpacing.xxs),
-            Text('Provide precise location and contact details for your physical clinic setup.', style: theme.textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant)),
+            Text(
+              'Provide precise location and contact details for your physical clinic setup.',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
             const SizedBox(height: AppSpacing.xl),
 
             ProfileInputField(
@@ -75,6 +85,15 @@ class ClinicDetailsTab extends ConsumerWidget {
               hint: 'e.g. Near City Center Mall',
               icon: Icons.my_location_rounded,
             ),
+            const SizedBox(height: AppSpacing.lg),
+
+            ProfileInputField(
+              controller: controller.stateController,
+              label: 'State',
+              hint: 'e.g. Madhya Pradesh',
+              icon: Icons.location_on_outlined,
+            ),
+
             const SizedBox(height: AppSpacing.lg),
 
             ProfileInputField(

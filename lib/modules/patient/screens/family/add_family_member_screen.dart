@@ -1,32 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/utils/dummy_data.dart';
 import '../../../../core/widgets/app_button.dart';
 import '../../controllers/family_controller.dart';
 import 'widgets/member_form_dropdown_field.dart';
 import 'widgets/member_form_text_field.dart';
+import '../../models/family/family_member_model.dart';
 
-class AddFamilyMemberScreen extends ConsumerStatefulWidget {
-  const AddFamilyMemberScreen({
-    super.key,
-    this.initialMember,
-  });
+class AddFamilyMemberScreen extends StatefulWidget {
+  const AddFamilyMemberScreen({super.key, this.initialMember});
 
-  final FamilyMember? initialMember;
+  final FamilyMemberModel? initialMember;
 
   @override
-  ConsumerState<AddFamilyMemberScreen> createState() => _AddFamilyMemberScreenState();
+  State<AddFamilyMemberScreen> createState() => _AddFamilyMemberScreenState();
 }
 
-class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
+class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
   static const List<String> _genderOptions = <String>[
-    'Male',
-    'Female',
-    'Other',
+    "MALE",
+    "FEMALE",
+    "OTHER",
   ];
 
   static const List<String> _bloodGroupOptions = <String>[
@@ -41,19 +38,15 @@ class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
   ];
 
   static const List<String> _relationOptions = <String>[
-    'Father',
-    'Mother',
-    'Spouse',
-    'Wife',
-    'Husband',
-    'Son',
-    'Daughter',
-    'Brother',
-    'Sister',
-    'Grandparent',
-    'Uncle',
-    'Aunt',
-    'Other',
+    "FATHER",
+    "MOTHER",
+    "SPOUSE",
+    "SON",
+    "DAUGHTER",
+    "BROTHER",
+    "SISTER",
+    "GRANDPARENT",
+    "OTHER",
   ];
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -86,19 +79,21 @@ class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
   }
 
   void _prefillForEditing() {
-    final FamilyMember? member = widget.initialMember;
+    final FamilyMemberModel? member = widget.initialMember;
     if (member == null) {
       return;
     }
+    _nameController.text = member.fullName;
 
-    _nameController.text = member.name;
     _selectedGender = member.gender;
     _selectedBloodGroup = member.bloodGroup;
     _selectedRelation = member.relation;
-    _selectedDob = member.dateOfBirth;
-    _dobController.text = _formatDate(member.dateOfBirth);
-    _heightController.text = _formatNumber(member.heightCm);
-    _weightController.text = _formatNumber(member.weightKg);
+
+    _dobController.text = member.dob;
+    _selectedDob = DateTime.tryParse(member.dob);
+    _heightController.text = member.heightCm.toString();
+
+    _weightController.text = member.weightKg.toString();
   }
 
   Future<void> _pickDateOfBirth() async {
@@ -134,37 +129,35 @@ class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
 
     await Future<void>.delayed(const Duration(milliseconds: 250));
 
-    final String name = _nameController.text.trim();
-    final double heightCm = double.parse(_heightController.text.trim());
-    final double weightKg = double.parse(_weightController.text.trim());
+    final controller = context.read<FamilyController>();
 
-    final FamilyMember member = FamilyMember(
-      name: name,
-      lastVisit: widget.initialMember?.lastVisit ?? 'No visits yet',
-      relation: _selectedRelation!,
-      gender: _selectedGender!,
-      bloodGroup: _selectedBloodGroup!,
-      initials: _buildInitials(name),
-      dateOfBirth: _selectedDob!,
-      heightCm: heightCm,
-      weightKg: weightKg,
-    );
-
-    if (!mounted) {
-      return;
-    }
-
-    final familyNotifier = ref.read(familyProvider.notifier);
     if (_isEditing) {
-      familyNotifier.updateMember(
-        oldMember: widget.initialMember!,
-        updatedMember: member,
+      await controller.updateMember(
+        id: widget.initialMember!.id,
+        fullName: _nameController.text.trim(),
+        gender: _selectedGender!,
+        dob: _selectedDob!.toIso8601String().split('T').first,
+        bloodGroup: _selectedBloodGroup!,
+        heightCm: _heightController.text.trim(),
+        weightKg: _weightController.text.trim(),
+        relation: _selectedRelation!,
       );
     } else {
-      familyNotifier.addMember(member);
+      await controller.addMember(
+        fullName: _nameController.text.trim(),
+        gender: _selectedGender!,
+        dob: _selectedDob!.toIso8601String().split('T').first,
+        bloodGroup: _selectedBloodGroup!,
+        heightCm: _heightController.text.trim(),
+        weightKg: _weightController.text.trim(),
+        relation: _selectedRelation!,
+      );
     }
 
-    context.pop(true);
+    if (mounted) {
+      context.pop(true);
+    }
+    setState(() => _isSaving = false);
   }
 
   @override
@@ -208,7 +201,9 @@ class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
                       children: <Widget>[
                         CircleAvatar(
                           radius: 22,
-                          backgroundColor: colorScheme.onPrimary.withValues(alpha: 0.16),
+                          backgroundColor: colorScheme.onPrimary.withValues(
+                            alpha: 0.16,
+                          ),
                           child: Icon(
                             _isEditing
                                 ? Icons.manage_accounts_rounded
@@ -236,7 +231,9 @@ class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
                                     ? 'Keep family details fresh for faster bookings.'
                                     : 'Add details once and use them for faster appointments.',
                                 style: textTheme.bodyMedium?.copyWith(
-                                  color: colorScheme.onPrimary.withValues(alpha: 0.9),
+                                  color: colorScheme.onPrimary.withValues(
+                                    alpha: 0.9,
+                                  ),
                                 ),
                               ),
                             ],
@@ -256,52 +253,82 @@ class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
                       child: Padding(
                         padding: const EdgeInsets.all(20),
                         child: LayoutBuilder(
-                          builder: (BuildContext context, BoxConstraints constraints) {
-                            final bool isWideLayout = constraints.maxWidth >= 760;
-                            final double fieldWidth = isWideLayout
-                                ? (constraints.maxWidth - 16) / 2
-                                : constraints.maxWidth;
+                          builder:
+                              (
+                                BuildContext context,
+                                BoxConstraints constraints,
+                              ) {
+                                final bool isWideLayout =
+                                    constraints.maxWidth >= 760;
+                                final double fieldWidth = isWideLayout
+                                    ? (constraints.maxWidth - 16) / 2
+                                    : constraints.maxWidth;
 
-                            return Column(
-                              children: <Widget>[
-                                Wrap(
-                                  spacing: 16,
-                                  runSpacing: 16,
+                                return Column(
                                   children: <Widget>[
-                                    SizedBox(width: fieldWidth, child: _buildNameField()),
-                                    SizedBox(width: fieldWidth, child: _buildGenderField()),
-                                    SizedBox(width: fieldWidth, child: _buildDobField()),
-                                    SizedBox(width: fieldWidth, child: _buildBloodGroupField()),
-                                    SizedBox(width: fieldWidth, child: _buildRelationField()),
-                                    SizedBox(width: fieldWidth, child: _buildHeightField()),
-                                    SizedBox(width: fieldWidth, child: _buildWeightField()),
-                                  ],
-                                ),
-                                const SizedBox(height: 28),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: <Widget>[
-                                    AppButton(
-                                      label: 'Cancel',
-                                      variant: AppButtonVariant.outlined,
-                                      onPressed: () => context.pop(false),
+                                    Wrap(
+                                      spacing: 16,
+                                      runSpacing: 16,
+                                      children: <Widget>[
+                                        SizedBox(
+                                          width: fieldWidth,
+                                          child: _buildNameField(),
+                                        ),
+                                        SizedBox(
+                                          width: fieldWidth,
+                                          child: _buildGenderField(),
+                                        ),
+                                        SizedBox(
+                                          width: fieldWidth,
+                                          child: _buildDobField(),
+                                        ),
+                                        SizedBox(
+                                          width: fieldWidth,
+                                          child: _buildBloodGroupField(),
+                                        ),
+                                        SizedBox(
+                                          width: fieldWidth,
+                                          child: _buildRelationField(),
+                                        ),
+                                        SizedBox(
+                                          width: fieldWidth,
+                                          child: _buildHeightField(),
+                                        ),
+                                        SizedBox(
+                                          width: fieldWidth,
+                                          child: _buildWeightField(),
+                                        ),
+                                      ],
                                     ),
-                                    const SizedBox(width: 12),
-                                    AppButton(
-                                      label: _isEditing ? 'Save Changes' : 'Save Member',
-                                      leading: Icon(
-                                        _isEditing
-                                            ? Icons.check_circle_outline_rounded
-                                            : Icons.person_add_alt_1_rounded,
-                                      ),
-                                      isLoading: _isSaving,
-                                      onPressed: _saveMember,
+                                    const SizedBox(height: 28),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: <Widget>[
+                                        AppButton(
+                                          label: 'Cancel',
+                                          variant: AppButtonVariant.outlined,
+                                          onPressed: () => context.pop(false),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        AppButton(
+                                          label: _isEditing
+                                              ? 'Save Changes'
+                                              : 'Save Member',
+                                          leading: Icon(
+                                            _isEditing
+                                                ? Icons
+                                                      .check_circle_outline_rounded
+                                                : Icons
+                                                      .person_add_alt_1_rounded,
+                                          ),
+                                          isLoading: _isSaving,
+                                          onPressed: _saveMember,
+                                        ),
+                                      ],
                                     ),
                                   ],
-                                ),
-                              ],
-                            );
-                          },
+                                );
+                              },
                         ),
                       ),
                     ),
@@ -462,8 +489,18 @@ class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
 
   String _formatDate(DateTime date) {
     const List<String> months = <String>[
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
 
     final String day = date.day.toString().padLeft(2, '0');
