@@ -31,6 +31,16 @@ dependencies:
   firebase_auth: ^6.5.4
   google_sign_in: ^7.2.0
 
+  # Local Storage
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+
+  # http Request
+  dio: ^5.10.0
+
+
+  flutter_dotenv: ^6.0.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -46,6 +56,8 @@ flutter:
   assets:
     - assets/logos/
     - assets/icons/
+
+    - .env
 
 
 flutter_launcher_icons:

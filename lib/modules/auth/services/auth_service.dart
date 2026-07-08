@@ -1,17 +1,12 @@
-import 'package:yodoctor/core/models/patient/patient_user.dart';
+import 'package:yodoctor/core/models/auth/login_response.dart';
 
 abstract class AuthService {
-  Future<PatientUser?> signIn();
+  Future<LoginResponse> signInWithEmail({
+    required String identifier,
+    required String password,
+  });
 
   Future<void> signOut();
 
-  Future<PatientUser?> getCurrentUser();
-
-  Future<String?> getIdToken();
-
-  bool get isLoggedIn;
-
   Future<bool> isAuthenticated();
-
-
 }

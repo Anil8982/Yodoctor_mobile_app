@@ -162,18 +162,24 @@ class AppLogger {
   }
 
   static void json(
-    Map<String, dynamic> data, {
-    String tag = LogTags.api,
-    String? subTag,
-  }) {
+      dynamic data, {
+        String tag = LogTags.api,
+        String? subTag,
+      }) {
     if (kReleaseMode || !enableLogs) return;
+
     try {
       const encoder = JsonEncoder.withIndent('  ');
       final pretty = encoder.convert(data);
-      final subTagStr = (subTag != null && subTag.isNotEmpty)
+
+      final subTagStr =
+      (subTag != null && subTag.isNotEmpty)
           ? "[$subTag]"
           : "";
-      debugPrint("$_green📦 [$tag]$subTagStr JSON Data →\n$pretty$_reset");
+
+      debugPrint(
+        "$_green📦 [$tag]$subTagStr JSON Data →\n$pretty$_reset",
+      );
     } catch (_) {
       _log(
         "Failed to parse JSON payload",

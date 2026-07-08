@@ -4,6 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
 import 'package:yodoctor/core/models/patient/patient_user.dart';
+import 'package:yodoctor/core/network/dio_provider.dart';
+import 'package:yodoctor/core/providers/storage_provider.dart';
+import 'package:yodoctor/modules/auth/services/email_auth_service.dart';
 import 'package:yodoctor/modules/auth/services/google_auth_service.dart';
 
 // 1. Dependency Injection for the Google Auth Service
@@ -11,10 +14,17 @@ final googleAuthServiceProvider = Provider<GoogleAuthService>((ref) {
   return GoogleAuthService();
 });
 
+final emailAuthServiceProvider = Provider<EmailAuthService>((ref) {
+  return EmailAuthService(
+    dio: ref.read(dioProvider),
+    storage: ref.read(storageProvider),
+  );
+});
+
 final patientAuthControllerProvider =
-AsyncNotifierProvider<PatientAuthController, PatientUser?>(
-  PatientAuthController.new,
-);
+    AsyncNotifierProvider<PatientAuthController, PatientUser?>(
+      PatientAuthController.new,
+    );
 
 class PatientAuthController extends AsyncNotifier<PatientUser?> {
   static const String _subTag = 'PatientAuthController';
@@ -32,33 +42,57 @@ class PatientAuthController extends AsyncNotifier<PatientUser?> {
     required VoidCallback onSuccess,
     required Function(String error) onFailure,
   }) async {
-    AppLogger.info('Initiating modern email authentication sequence', tag: LogTags.auth, subTag: _subTag);
+    AppLogger.info(
+      'Initiating email authentication',
+      tag: LogTags.auth,
+      subTag: _subTag,
+    );
 
-    // Set UI state to loading automatically
     state = const AsyncLoading();
 
-    // AsyncValue.guard automatically catches errors and wraps them beautifully
-    state = await AsyncValue.guard(() async {
-      // Mocking network latency matching original code delay
-      await Future.delayed(const Duration(seconds: 2));
+    final authService = ref.read(emailAuthServiceProvider);
 
-      final mockUser = PatientUser(
-        id: "email_mock_uid_123",
-        name: email.split('@').first.toUpperCase(),
-        email: email,
-        location: '', age: 0, bloodGroup: '', mobileNumber: '', dateOfBirth: '', gender: '',
+    try {
+      final response = await authService.signInWithEmail(
+        identifier: email,
+        password: password,
       );
 
-      AppLogger.success('Email login sequence completed inside controller', tag: LogTags.auth, subTag: _subTag);
-      onSuccess();
-      return mockUser;
-    });
+      if (!response.success) {
+        onFailure(response.message);
 
-    // Check if state has an error and trigger failure callback
-    if (state.hasError) {
-      final error = state.error;
-      AppLogger.exception(error ?? 'Email auth failed', StackTrace.current, tag: LogTags.auth, subTag: _subTag);
-      onFailure(error.toString());
+        state = AsyncError(response.message, StackTrace.current);
+
+        return;
+      }
+
+      final user = PatientUser(
+        id: '',
+        name: '',
+        email: email,
+        location: '',
+        age: 0,
+        bloodGroup: '',
+        mobileNumber: '',
+        dateOfBirth: '',
+        gender: '',
+      );
+
+      state = AsyncData(user);
+
+      AppLogger.success(
+        'Email login successful',
+        tag: LogTags.auth,
+        subTag: _subTag,
+      );
+
+      onSuccess();
+    } catch (e, st) {
+      AppLogger.exception(e, st, tag: LogTags.auth, subTag: _subTag);
+
+      state = AsyncError(e, st);
+
+      onFailure(e.toString());
     }
   }
 
@@ -67,20 +101,32 @@ class PatientAuthController extends AsyncNotifier<PatientUser?> {
     required Function(PatientUser user) onSuccess,
     required VoidCallback onCanceled,
   }) async {
-    AppLogger.info('Triggering Google Auth pipeline from UI request', tag: LogTags.auth, subTag: _subTag);
+    AppLogger.info(
+      'Triggering Google Auth pipeline from UI request',
+      tag: LogTags.auth,
+      subTag: _subTag,
+    );
 
     state = const AsyncLoading();
     final googleAuthService = ref.read(googleAuthServiceProvider);
 
     state = await AsyncValue.guard(() async {
-      final PatientUser? patient = await googleAuthService.signIn();
+      final PatientUser? patient = await googleAuthService.signInWithGoogle();
 
       if (patient != null) {
-        AppLogger.success('Google credentials verified. Profile session synchronized.', tag: LogTags.auth, subTag: _subTag);
+        AppLogger.success(
+          'Google credentials verified. Profile session synchronized.',
+          tag: LogTags.auth,
+          subTag: _subTag,
+        );
         onSuccess(patient);
         return patient;
       } else {
-        AppLogger.warning('Google sign in procedure was aborted by user action', tag: LogTags.auth, subTag: _subTag);
+        AppLogger.warning(
+          'Google sign in procedure was aborted by user action',
+          tag: LogTags.auth,
+          subTag: _subTag,
+        );
         onCanceled();
         return null;
       }
