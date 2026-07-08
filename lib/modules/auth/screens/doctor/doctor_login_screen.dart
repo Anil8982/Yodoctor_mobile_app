@@ -6,11 +6,12 @@ import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/constants/app_assets.dart';
 import 'package:yodoctor/core/providers/app_role_provider.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
-import 'package:yodoctor/core/theme/app_theme.dart' hide AppRole;
+import 'package:yodoctor/core/theme/app_theme.dart';
 
 import 'package:yodoctor/modules/auth/screens/doctor/doctor_register_screen.dart';
 import 'package:yodoctor/modules/auth/widgets/auth_widgets.dart';
 import 'package:yodoctor/modules/auth/widgets/top_bottom_curve_widgets.dart';
+import 'package:yodoctor/modules/auth/widgets/yo_login_text_field.dart';
 
 class DoctorLoginScreen extends ConsumerStatefulWidget {
   const DoctorLoginScreen({super.key});
@@ -156,12 +157,15 @@ class _DoctorLoginScreenState extends ConsumerState<DoctorLoginScreen>
 
                           Positioned(
                             top: 10,
-                            child: DoctorAvatar(
-                              color: AppTheme.primary,
-                              icon: Image.asset(
-                                AppAssets.logoV(context),
-                                width: 90,
-                                height: 90,
+                            child: Hero(
+                              tag: 'AppLogo',
+                              child: DoctorAvatar(
+                                color: AppTheme.primary,
+                                icon: Image.asset(
+                                  AppAssets.logoV(context),
+                                  width: 90,
+                                  height: 90,
+                                ),
                               ),
                             ),
                           ),

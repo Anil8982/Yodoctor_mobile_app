@@ -3,12 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/constants/app_assets.dart';
+import 'package:yodoctor/core/constants/log_tags.dart';
+import 'package:yodoctor/core/debug/app_logger.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
-import 'package:yodoctor/core/theme/app_theme.dart' hide AppRole;
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/core/providers/app_role_provider.dart';
 import 'package:yodoctor/modules/auth/screens/patient/patient_register_screen.dart';
 import 'package:yodoctor/modules/auth/widgets/auth_widgets.dart';
 import 'package:yodoctor/modules/auth/widgets/top_bottom_curve_widgets.dart';
+import 'package:yodoctor/modules/auth/controllers/patient_auth_controller.dart';
+import 'package:yodoctor/modules/auth/widgets/yo_login_text_field.dart';
 
 class PatientLoginScreen extends ConsumerStatefulWidget {
   const PatientLoginScreen({super.key});
@@ -25,10 +29,11 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
   final _passwordController = TextEditingController();
 
   bool _rememberMe = false;
-  bool _isLoading = false;
 
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
+
+  static const String _subTag = 'PatientLoginScreen';
 
   @override
   void initState() {
@@ -58,35 +63,46 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
 
+    // 🎯 कीबोर्ड आधी बंद करा भाऊ, जेणेकरून स्पिनर स्मूथ दिसेल
+    FocusManager.instance.primaryFocus?.unfocus();
+
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
-    setState(() => _isLoading = true);
-    await Future.delayed(const Duration(seconds: 2));
+    AppLogger.info(
+      'Form validated. Submitting payload to AsyncNotifier.',
+      tag: LogTags.ui,
+      subTag: _subTag,
+    );
 
-    if (!mounted) return;
-    setState(() => _isLoading = false);
-
-    if (email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Email or Password can't be empty")),
-      );
-      return;
-    }
-
-    if (email == "admin@gmail.com" || email.toLowerCase().contains("admin")) {
-      ref.read(appRoleProvider.notifier).setRole(AppRole.admin);
-      context.go(AppRoutes.adminDashboard);
-    } else {
-      ref.read(appRoleProvider.notifier).setRole(AppRole.patient);
-      context.go(AppRoutes.dashboard);
-    }
+    ref.read(patientAuthControllerProvider.notifier).signInWithEmail(
+      email: email,
+      password: password,
+      onSuccess: () {
+        if (email == "admin@gmail.com" ||
+            email.toLowerCase().contains("admin")) {
+          ref.read(appRoleProvider.notifier).setRole(AppRole.admin);
+          context.go(AppRoutes.adminDashboard);
+        } else {
+          ref.read(appRoleProvider.notifier).setRole(AppRole.patient);
+          context.go(AppRoutes.dashboard);
+        }
+      },
+      onFailure: (errorMessage) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(errorMessage)),
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+
+    final authState = ref.watch(patientAuthControllerProvider);
+    final bool isProcessing = authState is AsyncLoading;
 
     return Scaffold(
       backgroundColor: const Color(0xffF8FBF8),
@@ -147,22 +163,25 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
                         clipBehavior: Clip.none,
                         alignment: Alignment.topCenter,
                         children: [
-                          // Fixed login card
                           Positioned.fill(
                             top: 90,
                             left: 24,
                             right: 24,
                             bottom: 0,
-                            child: _buildMainScrollableLoginCard(),
+                            child: _buildMainScrollableLoginCard(isProcessing),
                           ),
                           Positioned(
                             top: 10,
-                            child: DoctorAvatar(
-                              color: AppTheme.secondary,
-                              icon: Image.asset(
-                                AppAssets.logoV(context),
-                                width: 90,
-                                height: 90,
+                            child: Hero(
+                              tag: 'AppLogo',
+
+                              child: DoctorAvatar(
+                                color: AppTheme.secondary,
+                                icon: Image.asset(
+                                  AppAssets.logoV(context),
+                                  width: 90,
+                                  height: 90,
+                                ),
                               ),
                             ),
                           ),
@@ -179,7 +198,7 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
     );
   }
 
-  Widget _buildMainScrollableLoginCard() {
+  Widget _buildMainScrollableLoginCard(bool isProcessing) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     return CustomScrollView(
@@ -187,7 +206,7 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
       slivers: [
         SliverList(
           delegate: SliverChildListDelegate([
-            _buildLoginCard(),
+            _buildLoginCard(isProcessing),
 
             const SizedBox(height: 24),
             Row(
@@ -200,7 +219,7 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
                   ),
                 ),
                 TextButton(
-                  onPressed: () {
+                  onPressed: isProcessing ? null : () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -216,7 +235,7 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
                   child: Text(
                     "Register Here",
                     style: TextStyle(
-                      color: AppTheme.secondary,
+                      color: isProcessing ? colorScheme.outline : AppTheme.secondary,
                       fontWeight: FontWeight.bold,
                       fontSize: 15,
                     ),
@@ -230,7 +249,7 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
     );
   }
 
-  Widget _buildLoginCard() {
+  Widget _buildLoginCard(bool isProcessing) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
@@ -283,6 +302,7 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
                 prefixIcon: Icons.email_rounded,
                 keyboardType: TextInputType.emailAddress,
                 controller: _emailController,
+                enabled: !isProcessing,
                 validator: (v) {
                   if (v == null || v.isEmpty) return 'Enter email address';
                   if (!RegExp(r'\S+@\S+\.\S+').hasMatch(v)) {
@@ -298,6 +318,7 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
                 prefixIcon: Icons.lock_rounded,
                 isPassword: true,
                 controller: _passwordController,
+                enabled: !isProcessing,
                 validator: (v) {
                   if (v == null || v.isEmpty) return 'Enter password';
                   if (v.length < 6) {
@@ -317,7 +338,7 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(4),
                       ),
-                      onChanged: (value) {
+                      onChanged: isProcessing ? null : (value) {
                         setState(() {
                           _rememberMe = value!;
                         });
@@ -332,7 +353,7 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
                   ),
                   const Spacer(),
                   TextButton(
-                    onPressed: () {
+                    onPressed: isProcessing ? null : () {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('Forgot password feature coming soon'),
@@ -347,7 +368,7 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
                     child: Text(
                       'Forgot Password?',
                       style: textTheme.bodySmall?.copyWith(
-                        color: AppTheme.secondary,
+                        color: isProcessing ? colorScheme.outline : AppTheme.secondary,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -358,8 +379,8 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
               YoPrimaryButton(
                 label: 'Login as Patient',
                 color: AppTheme.secondary,
-                isLoading: _isLoading,
-                onTap: _handleLogin,
+                isLoading: isProcessing,
+                onTap: isProcessing ? null : () => _handleLogin(),
               ),
               const SizedBox(height: 16),
               buildDividerWithText(context, 'OR'),
@@ -368,6 +389,39 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
                 context: context,
                 icon: Image.asset(AppAssets.google, height: 20),
                 label: 'Continue with Google',
+                isLoading: isProcessing, // 🎯 स्पिनर मॅनेजमेंट पॅरामीटर
+                onTap: isProcessing
+                    ? null
+                    : () {
+                  FocusManager.instance.primaryFocus?.unfocus(); // Close keyboard
+                  AppLogger.info(
+                    'Google button click event received',
+                    tag: LogTags.ui,
+                    subTag: _subTag,
+                  );
+                  ref
+                      .read(patientAuthControllerProvider.notifier)
+                      .signInWithGoogle(
+                    onSuccess: (user) {
+                      AppLogger.highlight(
+                        'OAuth authorization resolved for user: ${user.name}',
+                      );
+                      ref
+                          .read(appRoleProvider.notifier)
+                          .setRole(AppRole.patient);
+                      context.go(AppRoutes.dashboard);
+                    },
+                    onCanceled: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'Google Sign-In was canceled.',
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
               ),
             ],
           ),
@@ -380,13 +434,15 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
     required BuildContext context,
     required Widget icon,
     required String label,
+    required VoidCallback? onTap,
+    bool isLoading = false, // Added local spinner check
   }) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
     return InkWell(
       borderRadius: BorderRadius.circular(14),
-      onTap: () {},
+      onTap: onTap,
       child: Container(
         height: 52,
         width: double.infinity,
@@ -398,12 +454,22 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            icon,
+            isLoading
+                ? SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: colorScheme.primary,
+              ),
+            )
+                : icon,
             const SizedBox(width: 12),
             Text(
-              label,
+              isLoading ? 'Connecting...' : label,
               style: textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.w600,
+                color: isLoading ? colorScheme.outline : colorScheme.onSurface,
               ),
             ),
           ],

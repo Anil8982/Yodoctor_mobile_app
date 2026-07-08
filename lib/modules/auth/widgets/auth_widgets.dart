@@ -174,176 +174,10 @@ class _YoTextFieldState extends State<YoTextField> {
   }
 }
 
-class YoLoginTextField extends StatefulWidget {
-  final Color color;
-  final String hint;
-  final IconData prefixIcon;
-  final bool isPassword;
-  final TextInputType keyboardType;
-  final TextEditingController? controller;
-  final String? Function(String?)? validator;
-
-  const YoLoginTextField({
-    super.key,
-    required this.color,
-    required this.hint,
-    required this.prefixIcon,
-    this.isPassword = false,
-    this.keyboardType = TextInputType.text,
-    this.controller,
-    this.validator,
-  });
-
-  @override
-  State<YoLoginTextField> createState() => _YoLoginTextFieldState();
-}
-
-class _YoLoginTextFieldState extends State<YoLoginTextField> {
-  bool _obscure = true;
-  late FocusNode _focusNode;
-  bool _isFocused = false;
-  String? _errorText;
-
-  @override
-  void initState() {
-    super.initState();
-    _focusNode = FocusNode();
-    _focusNode.addListener(() {
-      setState(() {
-        _isFocused = _focusNode.hasFocus;
-      });
-    });
-  }
-
-  @override
-  void dispose() {
-    _focusNode.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          height: 50,
-          decoration: BoxDecoration(
-            color: colorScheme.surface,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: _errorText != null
-                  ? colorScheme.error
-                  : (_isFocused ? widget.color : colorScheme.outlineVariant),
-              width: _isFocused || _errorText != null ? 2 : 1,
-            ),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 50,
-                height: double.infinity,
-                decoration: BoxDecoration(
-                  color: _errorText != null ? colorScheme.error : widget.color,
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(10),
-                    bottomLeft: Radius.circular(10),
-                  ),
-                ),
-                child: Icon(widget.prefixIcon, color: Colors.white, size: 22),
-              ),
-              Expanded(
-                child: ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    topRight: Radius.circular(12),
-                    bottomRight: Radius.circular(12),
-                  ),
-                  child: TextFormField(
-                    focusNode: _focusNode,
-                    controller: widget.controller,
-                    autovalidateMode: AutovalidateMode.disabled,
-                    validator: (value) {
-                      final error = widget.validator?.call(value);
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        if (mounted) {
-                          setState(() {
-                            _errorText = error;
-                          });
-                        }
-                      });
-                      return error != null ? '' : null;
-                    },
-                    textAlignVertical: TextAlignVertical.center,
-                    keyboardType: widget.keyboardType,
-                    obscureText: widget.isPassword && _obscure,
-                    cursorColor: widget.color,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: colorScheme.onSurface,
-                    ),
-                    decoration: InputDecoration(
-                      hintText: widget.hint,
-                      hintStyle: TextStyle(
-                        color: colorScheme.onSurfaceVariant.transparency(0.6),
-                        fontSize: 16,
-                      ),
-                      border: InputBorder.none,
-                      enabledBorder: InputBorder.none,
-                      focusedBorder: InputBorder.none,
-                      errorBorder: InputBorder.none,
-                      focusedErrorBorder: InputBorder.none,
-                      disabledBorder: InputBorder.none,
-                      filled: false,
-                      isDense: true,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-                      errorStyle: const TextStyle(height: 0, fontSize: 0),
-                      suffixIcon: widget.isPassword
-                          ? SizedBox(
-                        width: 40,
-                        child: InkWell(
-                          onTap: () {
-                            setState(() => _obscure = !_obscure);
-                          },
-                          child: Icon(
-                            _obscure
-                                ? Icons.visibility_outlined
-                                : Icons.visibility_off_outlined,
-                            color: widget.color,
-                            size: 22,
-                          ),
-                        ),
-                      )
-                          : null,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        SizedBox(
-          height: 20,
-          child: _errorText != null && _errorText!.isNotEmpty
-              ? Padding(
-            padding: const EdgeInsets.only(left: 12, top: 4),
-            child: Text(
-              _errorText!,
-              style: TextStyle(color: colorScheme.error, fontSize: 12, fontWeight: FontWeight.w500),
-            ),
-          )
-              : const SizedBox.shrink(),
-        ),
-      ],
-    );
-  }
-}
 
 class YoPrimaryButton extends StatelessWidget {
   final String label;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
   final Color? color;
   final bool isLoading;
 
@@ -366,6 +200,7 @@ class YoPrimaryButton extends StatelessWidget {
       width: double.infinity,
       height: 54,
       child: ElevatedButton(
+
         onPressed: isLoading ? null : onTap,
         style: ElevatedButton.styleFrom(
           backgroundColor: btnColor,
@@ -395,6 +230,7 @@ class YoPrimaryButton extends StatelessWidget {
     );
   }
 }
+
 
 class YoLogoBar extends StatelessWidget {
   const YoLogoBar({super.key});

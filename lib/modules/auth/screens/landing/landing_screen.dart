@@ -84,26 +84,29 @@ class _LandingScreenState extends State<LandingScreen> {
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
                                     const SizedBox(height: 16),
-                                    Container(
-                                      width: 130,
-                                      height: 130,
-                                      decoration: BoxDecoration(
-                                        color: colorScheme.surfaceContainer,
-                                        shape: BoxShape.circle,
-                                        boxShadow: const [
-                                          BoxShadow(
-                                            color: Colors.black12,
-                                            blurRadius: 12,
-                                            offset: Offset(0, 4),
+                                    Hero(
+                                      tag: 'AppLogo',
+                                      child: Container(
+                                        width: 130,
+                                        height: 130,
+                                        decoration: BoxDecoration(
+                                          color: colorScheme.surfaceContainer,
+                                          shape: BoxShape.circle,
+                                          boxShadow: const [
+                                            BoxShadow(
+                                              color: Colors.black12,
+                                              blurRadius: 12,
+                                              offset: Offset(0, 4),
+                                            ),
+                                          ],
+                                        ),
+                                        padding: const EdgeInsets.all(4),
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(55),
+                                          child: Image.asset(
+                                            AppAssets.logoV(context),
+                                            fit: BoxFit.contain,
                                           ),
-                                        ],
-                                      ),
-                                      padding: const EdgeInsets.all(4),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(55),
-                                        child: Image.asset(
-                                          AppAssets.logoV(context),
-                                          fit: BoxFit.contain,
                                         ),
                                       ),
                                     ),

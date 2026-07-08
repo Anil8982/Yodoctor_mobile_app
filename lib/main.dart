@@ -1,14 +1,24 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:yodoctor/core/routes/app_router.dart';
 
-import 'core/theme/app_theme.dart' hide AppRole;
+import 'firebase_options.dart';
 import 'core/providers/app_role_provider.dart';
+import 'core/routes/app_router.dart';
+import 'core/theme/app_theme.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  runApp(const ProviderScope(child: YoDoctorApp()));
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  runApp(
+    const ProviderScope(
+      child: YoDoctorApp(),
+    ),
+  );
 }
 
 class YoDoctorApp extends ConsumerWidget {
@@ -22,9 +32,7 @@ class YoDoctorApp extends ConsumerWidget {
       title: 'yoDoctor',
       debugShowCheckedModeBanner: false,
       routerConfig: AppRouter.router,
-
       theme: _getThemeForRole(currentRole),
-
       themeMode: ThemeMode.light,
     );
   }
