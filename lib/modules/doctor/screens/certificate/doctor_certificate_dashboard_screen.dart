@@ -12,10 +12,13 @@ class DoctorCertificateDashboardScreen extends ConsumerStatefulWidget {
   const DoctorCertificateDashboardScreen({super.key});
 
   @override
-  ConsumerState<DoctorCertificateDashboardScreen> createState() => _DoctorCertificateDashboardScreenState();
+  ConsumerState<DoctorCertificateDashboardScreen> createState() =>
+      _DoctorCertificateDashboardScreenState();
 }
 
-class _DoctorCertificateDashboardScreenState extends ConsumerState<DoctorCertificateDashboardScreen> with SingleTickerProviderStateMixin {
+class _DoctorCertificateDashboardScreenState
+    extends ConsumerState<DoctorCertificateDashboardScreen>
+    with SingleTickerProviderStateMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final TextEditingController _searchController = TextEditingController();
   late TabController _tabController;
@@ -26,7 +29,9 @@ class _DoctorCertificateDashboardScreenState extends ConsumerState<DoctorCertifi
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(() {
       if (!_tabController.indexIsChanging) {
-        ref.read(doctorCertificateProvider.notifier).setTabIndex(_tabController.index);
+        ref
+            .read(doctorCertificateProvider.notifier)
+            .setTabIndex(_tabController.index);
       }
     });
   }
@@ -68,7 +73,10 @@ class _DoctorCertificateDashboardScreenState extends ConsumerState<DoctorCertifi
                     letterSpacing: -0.5,
                   ),
                 ),
-                titlePadding: EdgeInsets.only(left: horizontalPadding + 4, bottom: AppSpacing.lg),
+                titlePadding: EdgeInsets.only(
+                  left: horizontalPadding + 4,
+                  bottom: AppSpacing.lg,
+                ),
                 centerTitle: false,
               ),
             ),
@@ -86,9 +94,15 @@ class _DoctorCertificateDashboardScreenState extends ConsumerState<DoctorCertifi
                   unselectedLabelColor: colorScheme.onSurfaceVariant,
                   indicatorColor: colorScheme.primary,
                   indicatorSize: TabBarIndicatorSize.tab,
-                  dividerColor: colorScheme.outlineVariant.withValues(alpha: 0.5),
-                  labelStyle: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
-                  unselectedLabelStyle: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+                  dividerColor: colorScheme.outlineVariant.withValues(
+                    alpha: 0.5,
+                  ),
+                  labelStyle: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
+                  unselectedLabelStyle: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
                   tabs: const [
                     Tab(text: 'All Requests'),
                     Tab(text: 'Issued Certs'),
@@ -99,12 +113,21 @@ class _DoctorCertificateDashboardScreenState extends ConsumerState<DoctorCertifi
                 child: CustomScrollView(
                   slivers: [
                     SliverPadding(
-                      padding: EdgeInsets.fromLTRB(horizontalPadding, AppSpacing.xl, horizontalPadding, AppSpacing.xxxl),
+                      padding: EdgeInsets.fromLTRB(
+                        horizontalPadding,
+                        AppSpacing.xl,
+                        horizontalPadding,
+                        AppSpacing.xxxl,
+                      ),
                       sliver: SliverToBoxAdapter(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _buildSummaryCards(context, certificateState, notifier),
+                            _buildSummaryCards(
+                              context,
+                              certificateState,
+                              notifier,
+                            ),
                             const SizedBox(height: AppSpacing.xl),
                             _buildToolbar(context, certificateState, notifier),
                             const SizedBox(height: AppSpacing.lg),
@@ -113,7 +136,8 @@ class _DoctorCertificateDashboardScreenState extends ConsumerState<DoctorCertifi
                             else
                               CertificateListCards(
                                 certificates: filteredCerts,
-                                isIssuedTab: certificateState.activeTabIndex == 1,
+                                isIssuedTab:
+                                    certificateState.activeTabIndex == 1,
                               ),
                           ],
                         ),
@@ -129,7 +153,11 @@ class _DoctorCertificateDashboardScreenState extends ConsumerState<DoctorCertifi
     );
   }
 
-  Widget _buildSummaryCards(BuildContext context, CertificateState state, DoctorCertificateNotifier notifier) {
+  Widget _buildSummaryCards(
+    BuildContext context,
+    CertificateState state,
+    DoctorCertificateNotifier notifier,
+  ) {
     final isIssuedTab = state.activeTabIndex == 1;
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -139,22 +167,58 @@ class _DoctorCertificateDashboardScreenState extends ConsumerState<DoctorCertifi
       child: Row(
         children: isIssuedTab
             ? [
-          _buildCard(context, 'Total Issued', '${notifier.totalIssuedCount}', colorScheme.primary, colorScheme.primaryContainer),
-          const SizedBox(width: AppSpacing.md),
-          _buildCard(context, 'This Month', '${notifier.thisMonthIssuedCount}', colorScheme.secondary, colorScheme.secondaryContainer),
-          const SizedBox(width: AppSpacing.md),
-          _buildCard(context, 'Expiring Soon', '1', colorScheme.error, colorScheme.errorContainer),
-        ]
+                _buildCard(
+                  context,
+                  'Total Issued',
+                  '${notifier.totalIssuedCount}',
+                  colorScheme.primary,
+                  colorScheme.primaryContainer,
+                ),
+                const SizedBox(width: AppSpacing.md),
+                _buildCard(
+                  context,
+                  'This Month',
+                  '${notifier.thisMonthIssuedCount}',
+                  colorScheme.secondary,
+                  colorScheme.secondaryContainer,
+                ),
+                const SizedBox(width: AppSpacing.md),
+                _buildCard(
+                  context,
+                  'Expiring Soon',
+                  '1',
+                  colorScheme.error,
+                  colorScheme.errorContainer,
+                ),
+              ]
             : [
-          _buildCard(context, 'Pending Requests', '${notifier.pendingCount}', colorScheme.tertiary, colorScheme.tertiaryContainer),
-          const SizedBox(width: AppSpacing.md),
-          _buildCard(context, 'Total Requests', '${notifier.totalCount}', colorScheme.primary, colorScheme.primaryContainer),
-        ],
+                _buildCard(
+                  context,
+                  'Pending Requests',
+                  '${notifier.pendingCount}',
+                  colorScheme.tertiary,
+                  colorScheme.tertiaryContainer,
+                ),
+                const SizedBox(width: AppSpacing.md),
+                _buildCard(
+                  context,
+                  'Total Requests',
+                  '${notifier.totalCount}',
+                  colorScheme.primary,
+                  colorScheme.primaryContainer,
+                ),
+              ],
       ),
     );
   }
 
-  Widget _buildCard(BuildContext context, String title, String count, Color textColor, Color containerColor) {
+  Widget _buildCard(
+    BuildContext context,
+    String title,
+    String count,
+    Color textColor,
+    Color containerColor,
+  ) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -164,7 +228,9 @@ class _DoctorCertificateDashboardScreenState extends ConsumerState<DoctorCertifi
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.3)),
+        border: Border.all(
+          color: colorScheme.outlineVariant.withValues(alpha: 0.3),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -178,7 +244,10 @@ class _DoctorCertificateDashboardScreenState extends ConsumerState<DoctorCertifi
           ),
           const SizedBox(height: AppSpacing.sm),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xxs),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.sm,
+              vertical: AppSpacing.xxs,
+            ),
             decoration: BoxDecoration(
               color: containerColor.withValues(alpha: 0.4),
               borderRadius: BorderRadius.circular(8),
@@ -196,7 +265,11 @@ class _DoctorCertificateDashboardScreenState extends ConsumerState<DoctorCertifi
     );
   }
 
-  Widget _buildToolbar(BuildContext context, CertificateState state, DoctorCertificateNotifier notifier) {
+  Widget _buildToolbar(
+    BuildContext context,
+    CertificateState state,
+    DoctorCertificateNotifier notifier,
+  ) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final isMobile = Responsive.isMobile(context);
@@ -207,18 +280,31 @@ class _DoctorCertificateDashboardScreenState extends ConsumerState<DoctorCertifi
       style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
       decoration: InputDecoration(
         hintText: 'Search patient or ID...',
-        hintStyle: theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5)),
-        prefixIcon: Icon(Icons.search_rounded, color: colorScheme.primary, size: 20),
+        hintStyle: theme.textTheme.bodyMedium?.copyWith(
+          color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+        ),
+        prefixIcon: Icon(
+          Icons.search_rounded,
+          color: colorScheme.primary,
+          size: 20,
+        ),
         filled: true,
         fillColor: colorScheme.surface,
-        contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: 14,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
+          borderSide: BorderSide(
+            color: colorScheme.outlineVariant.withValues(alpha: 0.4),
+          ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
+          borderSide: BorderSide(
+            color: colorScheme.outlineVariant.withValues(alpha: 0.4),
+          ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
@@ -230,14 +316,21 @@ class _DoctorCertificateDashboardScreenState extends ConsumerState<DoctorCertifi
     final dropdownDecoration = InputDecoration(
       filled: true,
       fillColor: colorScheme.surface,
-      contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 12),
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: 12,
+      ),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
+        borderSide: BorderSide(
+          color: colorScheme.outlineVariant.withValues(alpha: 0.4),
+        ),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
+        borderSide: BorderSide(
+          color: colorScheme.outlineVariant.withValues(alpha: 0.4),
+        ),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
@@ -247,12 +340,19 @@ class _DoctorCertificateDashboardScreenState extends ConsumerState<DoctorCertifi
 
     final typeDropdown = DropdownButtonFormField<String>(
       initialValue: state.selectedTypeFilter,
+      isExpanded: true,
       decoration: dropdownDecoration,
-      style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700, color: colorScheme.onSurface),
+      style: theme.textTheme.bodyMedium?.copyWith(
+        fontWeight: FontWeight.w700,
+        color: colorScheme.onSurface,
+      ),
       dropdownColor: colorScheme.surface,
       items: const [
         DropdownMenuItem(value: 'All Types', child: Text('All Types')),
-        DropdownMenuItem(value: 'Medical Fitness', child: Text('Medical Fitness')),
+        DropdownMenuItem(
+          value: 'Medical Fitness',
+          child: Text('Medical Fitness'),
+        ),
         DropdownMenuItem(value: 'Vaccination', child: Text('Vaccination')),
       ],
       onChanged: (val) => notifier.updateTypeFilter(val!),
@@ -261,7 +361,10 @@ class _DoctorCertificateDashboardScreenState extends ConsumerState<DoctorCertifi
     final statusDropdown = DropdownButtonFormField<String>(
       initialValue: state.selectedStatusFilter,
       decoration: dropdownDecoration,
-      style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700, color: colorScheme.onSurface),
+      style: theme.textTheme.bodyMedium?.copyWith(
+        fontWeight: FontWeight.w700,
+        color: colorScheme.onSurface,
+      ),
       dropdownColor: colorScheme.surface,
       items: const [
         DropdownMenuItem(value: 'All Status', child: Text('All Status')),
@@ -282,7 +385,7 @@ class _DoctorCertificateDashboardScreenState extends ConsumerState<DoctorCertifi
               if (state.activeTabIndex == 0) ...[
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(child: statusDropdown),
-              ]
+              ],
             ],
           ),
         ],
@@ -317,13 +420,19 @@ class _EmptyHistory extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.3)),
+        border: Border.all(
+          color: colorScheme.outlineVariant.withValues(alpha: 0.3),
+        ),
       ),
       alignment: Alignment.center,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.folder_open_rounded, size: 40, color: colorScheme.onSurfaceVariant.withValues(alpha: 0.4)),
+          Icon(
+            Icons.folder_open_rounded,
+            size: 40,
+            color: colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+          ),
           const SizedBox(height: AppSpacing.sm),
           Text(
             'No matching records found',
