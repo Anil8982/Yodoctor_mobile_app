@@ -13,7 +13,7 @@ class SessionTimings {
 }
 
 class DoctorDetailModel {
-  final int doctorId;
+  final String doctorId;
   final String doctorName;
   final String specialization;
   final String qualification;

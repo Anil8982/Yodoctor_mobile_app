@@ -1,182 +1,203 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
-
-import '../../../services/patient_search_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/core/constants/log_tags.dart';
+import 'package:yodoctor/core/debug/app_logger.dart';
 import '../models/search/city_model.dart';
 import '../models/search/doctor_name_model.dart';
 import '../models/search/doctor_search_model.dart';
 import '../models/search/specialty_model.dart';
+import '../repositories/patient_search_repository.dart';
 
-class PatientSearchController extends ChangeNotifier {
-  final PatientSearchService _service = PatientSearchService();
+class PatientSearchState {
+  final bool isLoading;
+  final String? errorMessage;
+  final List<String> trendingSpecialties;
+  final List<DoctorSearchModel> doctorSuggestions;
+  final List<CityModel> cities;
+  final List<DoctorNameModel> doctorNames;
+  final String selectedTrending;
+  final String location;
+  final String query;
 
-  bool _isLoading = false;
-  String? _errorMessage;
+  PatientSearchState({
+    this.isLoading = false,
+    this.errorMessage,
+    this.trendingSpecialties = const [],
+    this.doctorSuggestions = const [],
+    this.cities = const [],
+    this.doctorNames = const [],
+    this.selectedTrending = "",
+    this.location = "",
+    this.query = "",
+  });
 
-  final List<SpecialtyModel> _trendingSpecialties = [];
-  final List<DoctorSearchModel> _doctorSuggestions = [];
-  final List<CityModel> _cities = [];
-  final List<DoctorNameModel> _doctorNames = [];
+  PatientSearchState copyWith({
+    bool? isLoading,
+    String? errorMessage,
+    bool clearError = false,
+    List<String>? trendingSpecialties,
+    List<DoctorSearchModel>? doctorSuggestions,
+    List<CityModel>? cities,
+    List<DoctorNameModel>? doctorNames,
+    String? selectedTrending,
+    String? location,
+    String? query,
+  }) {
+    return PatientSearchState(
+      isLoading: isLoading ?? this.isLoading,
+      errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
+      trendingSpecialties: trendingSpecialties ?? this.trendingSpecialties,
+      doctorSuggestions: doctorSuggestions ?? this.doctorSuggestions,
+      cities: cities ?? this.cities,
+      doctorNames: doctorNames ?? this.doctorNames,
+      selectedTrending: selectedTrending ?? this.selectedTrending,
+      location: location ?? this.location,
+      query: query ?? this.query,
+    );
+  }
+}
 
-  String _selectedTrending = "";
-  String _location = "";
-  String _query = "";
+final patientSearchControllerProvider =
+    NotifierProvider<PatientSearchController, PatientSearchState>(
+      PatientSearchController.new,
+    );
 
+class PatientSearchController extends Notifier<PatientSearchState> {
+  static const String _subTag = 'PatientSearchController';
   Timer? _debounce;
 
-  bool get isLoading => _isLoading;
-  String? get errorMessage => _errorMessage;
-
-  List<String> get trendingSpecialties =>
-      _trendingSpecialties.map((e) => e.name).toList();
-
-  List<DoctorSearchModel> get doctorSuggestions => _doctorSuggestions;
-
-  List<CityModel> get cities => _cities;
-
-  String get selectedTrending => _selectedTrending;
-
-  String get location => _location;
-
-  String get query => _query;
-
-  PatientSearchController() {
-    loadTrendingSpecialties();
+  @override
+  PatientSearchState build() {
+    ref.onDispose(() => _debounce?.cancel());
+    return PatientSearchState();
   }
 
-  // -------------------------------
-  // Trending Specialties
-  // -------------------------------
   Future<void> loadTrendingSpecialties() async {
-    _isLoading = true;
-    notifyListeners();
+    if (state.isLoading) return;
 
+    state = state.copyWith(isLoading: true, clearError: true);
     try {
-      final response = await _service.getSpecialties();
+      final repository = ref.read(patientSearchRepositoryProvider);
+      final response = await repository.getSpecialties();
 
       if (response.statusCode == 200) {
-        _trendingSpecialties.clear();
+        final rawList = response.data["data"] as List;
 
-        _trendingSpecialties.addAll(
-          (response.data["data"] as List).map(
-            (e) => SpecialtyModel.fromJson(e),
-          ),
-        );
+        final list = rawList
+            .map((e) => SpecialtyModel.fromJson(e).name)
+            .toList();
+
+        state = state.copyWith(trendingSpecialties: list, isLoading: false);
       } else {
-        _errorMessage = response.data["message"];
+        state = state.copyWith(
+          errorMessage: response.data["message"],
+          isLoading: false,
+        );
       }
-    } catch (e) {
-      _errorMessage = e.toString();
+    } catch (e, st) {
+      state = state.copyWith(
+        errorMessage: "Failed to load specialties",
+        isLoading: false,
+      );
+      AppLogger.exception(
+        e,
+        st,
+        message: 'Trending specialties fetch failed',
+        tag: LogTags.patient,
+        subTag: _subTag,
+      );
     }
-
-    _isLoading = false;
-    notifyListeners();
   }
 
-  // -------------------------------
-  // Search Suggestions
-  // -------------------------------
   void updateQuery(String value) {
-    _query = value;
-
+    state = state.copyWith(query: value);
     _debounce?.cancel();
 
     if (value.isEmpty) {
-      _doctorSuggestions.clear();
-      notifyListeners();
+      state = state.copyWith(doctorSuggestions: const []);
       return;
     }
 
     _debounce = Timer(const Duration(milliseconds: 400), () {
-      _loadDoctorSuggestions();
+      unawaited(_loadDoctorSuggestions());
     });
   }
 
   Future<void> _loadDoctorSuggestions() async {
     try {
-      final response = await _service.searchDoctors(
-        search: _query,
-        city: _location,
+      final repository = ref.read(patientSearchRepositoryProvider);
+      final response = await repository.searchDoctors(
+        search: state.query,
+        city: state.location,
       );
 
       if (response.statusCode == 200) {
-        _doctorSuggestions.clear();
-
-        _doctorSuggestions.addAll(
-          (response.data["data"]["doctors"] as List).map(
-            (e) => DoctorSearchModel.fromJson(e),
-          ),
-        );
+        final list = (response.data["data"]["doctors"] as List)
+            .map((e) => DoctorSearchModel.fromJson(e))
+            .toList();
+        state = state.copyWith(doctorSuggestions: list);
       }
-
-      notifyListeners();
-    } catch (_) {}
+    } catch (e, st) {
+      AppLogger.exception(
+        e,
+        st,
+        message: 'Suggestions fetch stream failed',
+        tag: LogTags.patient,
+        subTag: _subTag,
+      );
+    }
   }
 
-  // -------------------------------
-  // Location
-  // -------------------------------
   Future<void> updateLocation(String value) async {
-    _location = value;
-    notifyListeners();
-
+    state = state.copyWith(location: value);
     try {
-      final response = await _service.getCities(search: value);
+      final repository = ref.read(patientSearchRepositoryProvider);
+      final response = await repository.getCities(search: value);
 
       if (response.statusCode == 200) {
-        _cities.clear();
-
-        _cities.addAll(
-          (response.data["data"] as List).map((e) => CityModel.fromJson(e)),
-        );
+        final list = (response.data["data"] as List)
+            .map((e) => CityModel.fromJson(e))
+            .toList();
+        state = state.copyWith(cities: list);
       }
-
-      notifyListeners();
-    } catch (_) {}
+    } catch (e, st) {
+      AppLogger.exception(
+        e,
+        st,
+        message: 'City repository query failed',
+        tag: LogTags.patient,
+        subTag: _subTag,
+      );
+    }
   }
 
-  // -------------------------------
-  // Doctor Names
-  // -------------------------------
   Future<void> loadDoctorNames() async {
     try {
-      final response = await _service.getDoctorNames();
+      final repository = ref.read(patientSearchRepositoryProvider);
+      final response = await repository.getDoctorNames();
 
       if (response.statusCode == 200) {
-        _doctorNames.clear();
-
-        _doctorNames.addAll(
-          (response.data["data"] as List).map(
-            (e) => DoctorNameModel.fromJson(e),
-          ),
-        );
+        final list = (response.data["data"] as List)
+            .map((e) => DoctorNameModel.fromJson(e))
+            .toList();
+        state = state.copyWith(doctorNames: list);
       }
-    } catch (_) {}
+    } catch (e, st) {
+      AppLogger.exception(
+        e,
+        st,
+        message: 'Names mapping runtime fault',
+        tag: LogTags.patient,
+        subTag: _subTag,
+      );
+    }
+  }
+  Future<void> selectTrending(String specialty) async {
+    state = state.copyWith(selectedTrending: specialty, query: specialty);
+    await _loadDoctorSuggestions();
   }
 
-  // -------------------------------
-  // Trending Click
-  // -------------------------------
-  void selectTrending(String specialty) {
-    _selectedTrending = specialty;
-    _query = specialty;
-
-    _loadDoctorSuggestions();
-
-    notifyListeners();
-  }
-
-  // -------------------------------
-  // Clear
-  // -------------------------------
   void clearSuggestions() {
-    _doctorSuggestions.clear();
-    notifyListeners();
-  }
-
-  @override
-  void dispose() {
-    _debounce?.cancel();
-    super.dispose();
+    state = state.copyWith(doctorSuggestions: const []);
   }
 }

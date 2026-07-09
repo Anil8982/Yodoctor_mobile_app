@@ -1,12 +1,11 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
-import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/modules/auth/controllers/doctor_register_controller.dart';
 import 'package:yodoctor/modules/auth/models/doctor_register_model.dart';
 import 'shared_widgets.dart';
-import 'package:provider/provider.dart';
-import 'package:yodoctor/modules/auth/controllers/doctor_register_controller.dart';
 
-class Step7Declaration extends StatefulWidget {
+class Step7Declaration extends ConsumerStatefulWidget {
   final DoctorFormData data;
   final VoidCallback onBack;
   final Future<void> Function() onSubmit;
@@ -19,12 +18,10 @@ class Step7Declaration extends StatefulWidget {
   });
 
   @override
-  State<Step7Declaration> createState() => _Step7DeclarationState();
+  ConsumerState<Step7Declaration> createState() => _Step7DeclarationState();
 }
 
-class _Step7DeclarationState extends State<Step7Declaration> {
-  bool _loading = false;
-
+class _Step7DeclarationState extends ConsumerState<Step7Declaration> {
   final _declarations = const [
     {
       'key': 'accurate',
@@ -32,18 +29,15 @@ class _Step7DeclarationState extends State<Step7Declaration> {
     },
     {
       'key': 'display',
-      'text':
-          'I authorize Yo Doctor to display my professional information publicly for patient booking.',
+      'text': 'I authorize Yo Doctor to display my professional information publicly for patient booking.',
     },
     {
       'key': 'privacy',
-      'text':
-          'I consent to processing and storage of my personal data as per Privacy Policy.',
+      'text': 'I consent to processing and storage of my personal data as per Privacy Policy.',
     },
     {
       'key': 'terms',
-      'text':
-          "I agree to the platform's Terms, Cancellation and Refund policies.",
+      'text': "I agree to the platform's Terms, Cancellation and Refund policies.",
     },
   ];
 
@@ -81,20 +75,24 @@ class _Step7DeclarationState extends State<Step7Declaration> {
 
   bool get _allChecked =>
       widget.data.declAccurate &&
-      widget.data.declDisplay &&
-      widget.data.declPrivacy &&
-      widget.data.declTerms;
+          widget.data.declDisplay &&
+          widget.data.declPrivacy &&
+          widget.data.declTerms;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+
+    final registerState = ref.watch(doctorRegisterControllerProvider);
+    final bool isSubmitting = registerState.isLoading;
+
     return StepCard(
       children: [
         StepTitle(
           icon: Icons.gavel_rounded,
           title: 'Legal Declarations',
-          color: AppTheme.yoBlue,
+          color: colorScheme.primary,
         ),
         const SizedBox(height: 8),
         Text(
@@ -108,16 +106,17 @@ class _Step7DeclarationState extends State<Step7Declaration> {
         ..._declarations.map((decl) {
           final checked = _get(decl['key']!);
           return GestureDetector(
-            onTap: () => _toggle(decl['key']!),
+            onTap: isSubmitting ? null : () => _toggle(decl['key']!),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               margin: const EdgeInsets.only(bottom: 14),
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: checked ? AppTheme.yoBlueLight : colorScheme.surface,
+                // 🎯 FIXED BY CHROMA_KIT: Modern toggle visual states mapping
+                color: checked ? colorScheme.primary.transparency(0.06) : colorScheme.surface,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: checked ? AppTheme.yoBlue : colorScheme.outlineVariant,
+                  color: checked ? colorScheme.primary : colorScheme.outlineVariant.transparency(0.5),
                   width: checked ? 2 : 1.2,
                 ),
               ),
@@ -129,23 +128,19 @@ class _Step7DeclarationState extends State<Step7Declaration> {
                     width: 24,
                     height: 24,
                     decoration: BoxDecoration(
-                      color: checked
-                          ? AppTheme.yoBlue
-                          : colorScheme.surface.transparency(0),
+                      color: checked ? colorScheme.primary : Colors.transparent,
                       borderRadius: BorderRadius.circular(6),
                       border: Border.all(
-                        color: checked
-                            ? AppTheme.yoBlue
-                            : colorScheme.onSurfaceVariant,
+                        color: checked ? colorScheme.primary : colorScheme.onSurfaceVariant.transparency(0.7),
                         width: 2,
                       ),
                     ),
                     child: checked
                         ? Icon(
-                            Icons.check,
-                            color: colorScheme.onPrimary,
-                            size: 15,
-                          )
+                      Icons.check,
+                      color: colorScheme.primary.contrastColor,
+                      size: 15,
+                    )
                         : null,
                   ),
                   const SizedBox(width: 14),
@@ -154,9 +149,7 @@ class _Step7DeclarationState extends State<Step7Declaration> {
                       decl['text']!,
                       style: textTheme.bodyMedium?.copyWith(
                         height: 1.5,
-                        color: checked
-                            ? colorScheme.onSurface
-                            : colorScheme.onSurfaceVariant,
+                        color: checked ? colorScheme.onSurface : colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ),
@@ -169,54 +162,46 @@ class _Step7DeclarationState extends State<Step7Declaration> {
         SizedBox(
           width: double.infinity,
           height: 54,
-          child: ElevatedButton(
-            onPressed: (_allChecked && !_loading)
+          child: FilledButton(
+            onPressed: (_allChecked && !isSubmitting)
                 ? () async {
-                    setState(() => _loading = true);
-
-                    await widget.onSubmit();
-
-                    if (mounted) {
-                      setState(() => _loading = false);
-                    }
-                  }
+              await widget.onSubmit();
+            }
                 : null,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: _allChecked
-                  ? AppTheme.yoBlue
-                  : colorScheme.outlineVariant,
-              foregroundColor: colorScheme.onPrimary,
+            style: FilledButton.styleFrom(
+              backgroundColor: _allChecked ? colorScheme.primary : colorScheme.outlineVariant.transparency(0.4),
+              foregroundColor: colorScheme.primary.contrastColor,
               elevation: 0,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(14),
               ),
             ),
-            child: _loading
+            child: isSubmitting
                 ? SizedBox(
-                    width: 22,
-                    height: 22,
-                    child: CircularProgressIndicator(
-                      color: colorScheme.onPrimary,
-                      strokeWidth: 2.5,
-                    ),
-                  )
+              width: 22,
+              height: 22,
+              child: CircularProgressIndicator(
+                color: colorScheme.primary.contrastColor,
+                strokeWidth: 2.5,
+              ),
+            )
                 : Text(
-                    'Submit Registration',
-                    style: textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: colorScheme.onPrimary,
-                    ),
-                  ),
+              'Submit Registration',
+              style: textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w800,
+                color: _allChecked ? colorScheme.primary.contrastColor : colorScheme.onSurface.withValues(alpha: 0.38),
+              ),
+            ),
           ),
         ),
         const SizedBox(height: 12),
         SizedBox(
           width: double.infinity,
-          height: 50,
+          height: 52,
           child: OutlinedButton(
-            onPressed: widget.onBack,
+            onPressed: isSubmitting ? null : widget.onBack,
             style: OutlinedButton.styleFrom(
-              side: BorderSide(color: colorScheme.outlineVariant, width: 1.5),
+              side: BorderSide(color: colorScheme.outlineVariant.transparency(0.5), width: 1.5),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(14),
               ),
@@ -225,28 +210,32 @@ class _Step7DeclarationState extends State<Step7Declaration> {
               '← Back',
               style: textTheme.titleSmall?.copyWith(
                 color: colorScheme.onSurfaceVariant,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w700,
               ),
             ),
           ),
         ),
         if (!_allChecked) ...[
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
+          // 🎯 FIXED BY CHROMA_KIT: Unified error alert components layout
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: AppTheme.error.transparency(0.08),
+              color: colorScheme.error.transparency(0.06),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppTheme.error.transparency(0.3)),
+              border: Border.all(color: colorScheme.error.transparency(0.2)),
             ),
             child: Row(
               children: [
-                Icon(Icons.info_rounded, color: AppTheme.error, size: 16),
+                Icon(Icons.info_rounded, color: colorScheme.error, size: 18),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     'Please accept all declarations to submit',
-                    style: textTheme.bodySmall?.copyWith(color: AppTheme.error),
+                    style: textTheme.bodySmall?.copyWith(
+                      color: colorScheme.error,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
               ],

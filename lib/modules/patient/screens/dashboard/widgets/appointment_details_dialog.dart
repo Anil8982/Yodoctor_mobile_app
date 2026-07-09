@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../models/dashboard/appointment_model.dart';
-import 'package:provider/provider.dart';
 import '../../../controllers/patient_dashboard_controller.dart';
 
-class AppointmentDetailsDialog extends StatelessWidget {
+class AppointmentDetailsDialog extends ConsumerWidget {
   const AppointmentDetailsDialog({super.key, required this.appointment});
 
   final AppointmentModel appointment;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
@@ -56,7 +56,6 @@ class AppointmentDetailsDialog extends StatelessWidget {
               ),
             ),
             const Divider(height: 1),
-
             Flexible(
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
@@ -142,7 +141,6 @@ class AppointmentDetailsDialog extends StatelessWidget {
                         ),
                       ],
                     ),
-
                     const SizedBox(height: 24),
                     _buildSectionTitle(
                       textTheme,
@@ -187,7 +185,6 @@ class AppointmentDetailsDialog extends StatelessWidget {
                     const SizedBox(height: 24),
                     const Divider(height: 1),
                     const SizedBox(height: 24),
-
                     _buildSectionTitle(
                       textTheme,
                       colorScheme,
@@ -240,7 +237,6 @@ class AppointmentDetailsDialog extends StatelessWidget {
                 ),
               ),
             ),
-
             const Divider(height: 1),
             if (appointment.status == "PENDING" ||
                 appointment.status == "ACCEPTED")
@@ -272,9 +268,10 @@ class AppointmentDetailsDialog extends StatelessWidget {
 
                       if (confirm != true) return;
 
-                      final controller = context
-                          .read<PatientDashboardController>();
-
+                      // 🎯 FIXED: Replaced legacy context.read with clean Riverpod ref.read matrix sync
+                      final controller = ref.read(
+                        patientDashboardControllerProvider,
+                      );
                       final success = await controller.cancelAppointment(
                         appointment.id,
                       );
@@ -283,7 +280,6 @@ class AppointmentDetailsDialog extends StatelessWidget {
 
                       if (success) {
                         Navigator.pop(context);
-
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text("Appointment cancelled successfully"),
@@ -387,7 +383,6 @@ class AppointmentDetailsDialog extends StatelessWidget {
     if (isFullWidth) {
       return Padding(padding: const EdgeInsets.only(top: 4), child: content);
     }
-
     return content;
   }
 }

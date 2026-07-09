@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
-import 'package:yodoctor/core/utils/dummy_data.dart';
 import 'package:yodoctor/modules/patient/controllers/lab_test_controller.dart';
 import 'widgets/lab_categories_list.dart';
 import 'widgets/lab_package_card.dart';
@@ -22,7 +21,7 @@ class AllLabTestsScreen extends ConsumerWidget {
     final selectedCategory = labState.selectedCategory;
 
     final filteredPackages = notifier.filteredPackages;
-    final popularTests = labState.popularTests;
+    // final popularTests = labState.popularTests;
     final cartItems = labState.cart;
 
     return Scaffold(
@@ -91,9 +90,9 @@ class AllLabTestsScreen extends ConsumerWidget {
                           mainAxisSpacing: 12,
                           childAspectRatio: 0.61,
                         ),
-                    itemCount: popularTests.length,
+                    itemCount: filteredPackages.length,
                     itemBuilder: (context, index) {
-                      final package = popularTests[index];
+                      final package = filteredPackages[index];
                       final isInCart = cartItems.any(
                         (item) => item.id == package.id,
                       );

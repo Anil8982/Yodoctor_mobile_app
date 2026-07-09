@@ -6,11 +6,13 @@ class AppointmentBottomBar extends StatelessWidget {
     required this.consultationFee,
     required this.canConfirm,
     required this.onConfirmPressed,
+    this.isLoading = false,
   });
 
   final double consultationFee;
   final bool canConfirm;
-  final VoidCallback onConfirmPressed;
+  final VoidCallback? onConfirmPressed;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
@@ -55,20 +57,29 @@ class AppointmentBottomBar extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: FilledButton(
-              onPressed: canConfirm ? onConfirmPressed : null,
+              onPressed: (canConfirm && !isLoading) ? onConfirmPressed : null,
               style: FilledButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),
-              child: const Text(
-                'Confirm Appointment',
-                style: TextStyle(
-                  fontWeight: FontWeight.w900,
-                  fontSize: 16,
-                ),
-              ),
+              child: isLoading
+                  ? SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.5,
+                        color: colorScheme.onPrimary,
+                      ),
+                    )
+                  : const Text(
+                      'Confirm Appointment',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w900,
+                        fontSize: 16,
+                      ),
+                    ),
             ),
           ),
           const SizedBox(height: 8),

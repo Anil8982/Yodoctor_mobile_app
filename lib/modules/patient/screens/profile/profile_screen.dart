@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/core/constants/log_tags.dart';
+import 'package:yodoctor/core/debug/app_logger.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../controllers/profile_controller.dart';
 import '../../../../core/utils/app_spacing.dart';
@@ -7,28 +9,38 @@ import 'widgets/profile_header.dart';
 import 'widgets/profile_info_card.dart';
 import 'widgets/profile_action_bar.dart';
 
-class ProfileScreen extends StatefulWidget {
+class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
+  ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   bool isEditing = false;
+  static const String _subTag = 'ProfileScreen';
 
-  void toggleEdit() => setState(() => isEditing = !isEditing);
+  void toggleEdit() {
+    setState(() => isEditing = !isEditing);
+    AppLogger.info('Toggle edit mode: $isEditing', tag: LogTags.ui, subTag: _subTag);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    AppLogger.info('ProfileScreen Initialized', tag: LogTags.ui, subTag: _subTag);
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = Theme.of(context).colorScheme;
+    final colorScheme = theme.colorScheme;
+    final profileState = ref.watch(profileControllerProvider);
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         scrolledUnderElevation: 0,
-
         flexibleSpace: DecoratedBox(
           decoration: BoxDecoration(gradient: AppTheme.patientGradient),
         ),
@@ -66,42 +78,50 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],
         iconTheme: IconThemeData(color: colorScheme.onPrimary),
       ),
-
-      body: Consumer<ProfileController>(
-        builder: (context, controller, child) {
-          if (controller.user == null)
-            return const Center(child: CircularProgressIndicator());
-
-          return Column(
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(AppSpacing.md),
-                  physics: const BouncingScrollPhysics(),
-                  child: Column(
-                    children: [
-                      ProfileHeader(
-                        user: controller.user!,
-                        isEditing: isEditing,
+      body: profileState.user == null && profileState.isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                children: [
+                  if (profileState.user != null) ...[
+                    ProfileHeader(
+                      user: profileState.user!,
+                      isEditing: isEditing,
+                    ),
+                    const SizedBox(height: 32),
+                    ProfileInfoCard(
+                      controller: ref.read(profileControllerProvider.notifier),
+                      isEditing: isEditing,
+                    ),
+                  ] else if (profileState.errorMessage != null) ...[
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Text(
+                          profileState.errorMessage!,
+                          style: TextStyle(color: colorScheme.error),
+                        ),
                       ),
-                      const SizedBox(height: 32),
-                      ProfileInfoCard(
-                        controller: controller,
-                        isEditing: isEditing,
-                      ),
-                      const SizedBox(height: 24),
-                    ],
-                  ),
-                ),
+                    ),
+                  ],
+                  const SizedBox(height: 24),
+                ],
               ),
-              if (isEditing)
-                ProfileActionBar(
-                  controller: controller,
-                  onComplete: () => setState(() => isEditing = false),
-                ),
-            ],
-          );
-        },
+            ),
+          ),
+          if (isEditing)
+            ProfileActionBar(
+              onComplete: () {
+                setState(() => isEditing = false);
+                AppLogger.info('Profile editing mode completed', tag: LogTags.ui, subTag: _subTag);
+              },
+            ),
+        ],
       ),
     );
   }

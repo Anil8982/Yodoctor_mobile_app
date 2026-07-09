@@ -1,6 +1,6 @@
+import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import 'dart:io';
 
 class DocumentUploadTile extends StatelessWidget {
   const DocumentUploadTile({
@@ -32,15 +32,16 @@ class DocumentUploadTile extends StatelessWidget {
     final isUploaded = uploadedFileName != null;
 
     Color getTileBgColor() {
-      if (isUploaded)
-        return colorScheme.primaryContainer.withValues(alpha: 0.15);
-      if (hasError) return colorScheme.errorContainer.withValues(alpha: 0.2);
-      return colorScheme.outlineVariant.withValues(alpha: 0.1);
+      if (isUploaded) {
+        return colorScheme.primaryContainer.transparency(0.15);
+      }
+      if (hasError) return colorScheme.errorContainer.transparency(0.2);
+      return colorScheme.outlineVariant.transparency(0.1);
     }
 
     Color getBorderColor() {
       if (isUploaded) return colorScheme.primary;
-      if (hasError) return colorScheme.error.withValues(alpha: 0.8);
+      if (hasError) return colorScheme.error.transparency(0.8);
       return colorScheme.outlineVariant;
     }
 
@@ -92,7 +93,7 @@ class DocumentUploadTile extends StatelessWidget {
                 onTap: isUploading || isUploaded
                     ? null
                     : () async {
-                        final result = await FilePicker.platform.pickFiles(
+                        final result = await FilePicker.pickFiles(
                           allowMultiple: false,
 
                           type: FileType.custom,

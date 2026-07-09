@@ -1,26 +1,24 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
-import 'package:yodoctor/modules/auth/screens/doctor/doctor_register_screen.dart';
 import 'package:yodoctor/modules/auth/widgets/auth_widgets.dart';
-import 'package:provider/provider.dart';
 import '../../controllers/doctor_login_controller.dart';
 
-class DoctorLoginScreen extends StatefulWidget {
+class DoctorLoginScreen extends ConsumerStatefulWidget {
   const DoctorLoginScreen({super.key});
 
   @override
-  State<DoctorLoginScreen> createState() => _DoctorLoginScreenState();
+  ConsumerState<DoctorLoginScreen> createState() => _DoctorLoginScreenState();
 }
 
-class _DoctorLoginScreenState extends State<DoctorLoginScreen>
+class _DoctorLoginScreenState extends ConsumerState<DoctorLoginScreen>
     with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  bool _isLoading = false;
   bool _rememberMe = false;
 
   late AnimationController _animController;
@@ -48,9 +46,11 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen>
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final controller = context.read<DoctorLoginController>();
+    final notifier = ref.read(
+      doctorLoginControllerProvider.notifier,
+    );
 
-    final result = await controller.login(
+    final result = await notifier.login(
       identifier: _emailController.text.trim(),
       password: _passwordController.text.trim(),
     );
@@ -58,15 +58,23 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen>
     if (!mounted) return;
 
     if (result == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(controller.error ?? "Login Failed")),
-      );
+      final loginState =
+      ref.read(doctorLoginControllerProvider);
+
+      final errorMsg =
+          loginState.error?.toString() ??
+              "Login Failed";
+
+      _showErrorSnackBar(errorMsg);
       return;
     }
 
     switch (result["redirect"]) {
       case "resume":
-        context.go(AppRoutes.doctorRegister, extra: result["nextStep"]);
+        context.go(
+          AppRoutes.doctorRegister,
+          extra: result["nextStep"],
+        );
         break;
 
       case "waiting-approval":
@@ -78,18 +86,34 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen>
         break;
 
       default:
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text("Unknown login response")));
+        _showErrorSnackBar(
+          "Unknown login response protocol",
+        );
     }
+  }
+
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message, style: const TextStyle(fontWeight: FontWeight.w600)),
+        backgroundColor: Theme.of(context).colorScheme.error,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+
+    // 🎯 FIXED: Reactive tracking via global login controller streams
+    final loginState = ref.watch(doctorLoginControllerProvider);
+
     return Scaffold(
-      backgroundColor: colorScheme.surfaceContainer,
+      backgroundColor: colorScheme.surfaceContainerLow,
       body: Stack(
         children: [
           Positioned(
@@ -120,10 +144,7 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen>
               child: Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 16,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                     child: Row(
                       children: [
                         GestureDetector(
@@ -191,6 +212,7 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen>
                   const SizedBox(height: 16),
                   Expanded(
                     child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
                       padding: const EdgeInsets.symmetric(horizontal: 24),
                       child: Container(
                         margin: const EdgeInsets.only(top: 8, bottom: 24),
@@ -214,8 +236,7 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen>
                               AuthHeader(
                                 role: 'Doctor Portal',
                                 title: 'Welcome Back,\nDoctor!',
-                                subtitle:
-                                    'Login to manage your appointments and patients.',
+                                subtitle: 'Login to manage your appointments and patients.',
                                 color: AppTheme.primary,
                                 icon: Icons.medical_services_rounded,
                               ),
@@ -230,8 +251,7 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen>
                                   if (v == null || v.trim().isEmpty) {
                                     return 'Enter email or medical ID';
                                   }
-                                  if (v.contains('@') &&
-                                      !RegExp(r'\S+@\S+\.\S+').hasMatch(v)) {
+                                  if (v.contains('@') && !RegExp(r'\S+@\S+\.\S+').hasMatch(v)) {
                                     return 'Enter valid email';
                                   }
                                   return null;
@@ -261,8 +281,7 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen>
                                     scale: 0.9,
                                     child: Checkbox(
                                       value: _rememberMe,
-                                      onChanged: (v) =>
-                                          setState(() => _rememberMe = v!),
+                                      onChanged: (v) => setState(() => _rememberMe = v!),
                                       activeColor: AppTheme.primary,
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(4),
@@ -278,13 +297,10 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen>
                                   const Spacer(),
                                   TextButton(
                                     onPressed: () {
-                                      ScaffoldMessenger.of(
-                                        context,
-                                      ).showSnackBar(
+                                      ScaffoldMessenger.of(context).showSnackBar(
                                         const SnackBar(
-                                          content: Text(
-                                            'Forgot password feature coming soon',
-                                          ),
+                                          content: Text('Forgot password feature coming soon'),
+                                          behavior: SnackBarBehavior.floating,
                                         ),
                                       );
                                     },
@@ -299,15 +315,12 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen>
                                 ],
                               ),
                               const SizedBox(height: 20),
-                              Consumer<DoctorLoginController>(
-                                builder: (_, controller, __) {
-                                  return YoPrimaryButton(
-                                    label: 'Login as Doctor',
-                                    onTap: _handleLogin,
-                                    color: AppTheme.primary,
-                                    isLoading: controller.isLoading,
-                                  );
-                                },
+                              // 🎯 FIXED: Switched from legacy nested provider Consumers to top level state maps cleanly
+                              YoPrimaryButton(
+                                label: 'Login as Doctor',
+                                onTap: loginState.isLoading ? null : _handleLogin,
+                                color: AppTheme.primary,
+                                isLoading: loginState.isLoading,
                               ),
                               const SizedBox(height: 28),
                               Container(
@@ -326,8 +339,7 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen>
                                       ),
                                     ),
                                     GestureDetector(
-                                      onTap: () =>
-                                          context.go(AppRoutes.doctorRegister),
+                                      onTap: () => context.go(AppRoutes.doctorRegister),
                                       child: Text(
                                         'Register here',
                                         style: textTheme.labelMedium?.copyWith(

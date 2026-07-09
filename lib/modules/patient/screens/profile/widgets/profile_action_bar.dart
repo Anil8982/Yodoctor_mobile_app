@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/modules/patient/controllers/profile_controller.dart';
 
-class ProfileActionBar extends StatelessWidget {
-  final ProfileController controller;
+class ProfileActionBar extends ConsumerWidget {
   final VoidCallback onComplete;
 
   const ProfileActionBar({
     super.key,
-    required this.controller,
     required this.onComplete,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
+
+    final profileState = ref.watch(profileControllerProvider);
+    final notifier = ref.read(profileControllerProvider.notifier);
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -37,7 +39,7 @@ class ProfileActionBar extends StatelessWidget {
           Expanded(
             child: OutlinedButton(
               onPressed: () {
-                controller.discardChanges();
+                notifier.discardChanges();
                 onComplete();
               },
               style: OutlinedButton.styleFrom(
@@ -55,46 +57,47 @@ class ProfileActionBar extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(
             child: FilledButton(
-              onPressed: controller.isLoading
+              onPressed: profileState.isLoading
                   ? null
                   : () async {
-                      await controller.updateProfile();
-                      onComplete();
+                // final success = await notifier.updateProfile();
+                onComplete();
 
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              controller.errorMessage ??
-                                  "Profile Updated Successfully!",
-                            ),
-                            backgroundColor: controller.errorMessage == null
-                                ? Colors.green
-                                : Colors.red,
-                            behavior: SnackBarBehavior.floating,
-                          ),
-                        );
-                      }
-                    },
+                if (context.mounted) {
+                  final currentState = ref.read(profileControllerProvider);
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        currentState.errorMessage ?? "Profile Updated Successfully!",
+                      ),
+                      backgroundColor: currentState.errorMessage == null
+                          ? Colors.green
+                          : Colors.red,
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                }
+              },
               style: FilledButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),
-              child: controller.isLoading
+              child: profileState.isLoading
                   ? SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: colorScheme.onPrimary,
-                      ),
-                    )
+                height: 20,
+                width: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: colorScheme.onPrimary,
+                ),
+              )
                   : const Text(
-                      "Save Changes",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
+                "Save Changes",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
           ),
         ],

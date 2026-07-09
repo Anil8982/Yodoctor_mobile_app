@@ -1,5 +1,6 @@
+import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/modules/patient/screens/search/widgets/search_suggestions_overlay.dart';
 import 'package:yodoctor/modules/patient/screens/search/widgets/specialty_card_list.dart';
@@ -7,20 +8,19 @@ import 'package:yodoctor/modules/patient/widgets/custom_sliver_app_bar.dart';
 
 import '../../../../core/routes/app_routes.dart';
 import '../../../../core/utils/app_spacing.dart';
-
 import '../../../../core/utils/responsive.dart';
 import '../../controllers/patient_search_controller.dart';
 import '../../widgets/patient_drawer.dart';
 import 'widgets/hero_section.dart';
 
-class SearchScreen extends StatefulWidget {
+class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
 
   @override
-  State<SearchScreen> createState() => _SearchScreenState();
+  ConsumerState<SearchScreen> createState() => _SearchScreenState();
 }
 
-class _SearchScreenState extends State<SearchScreen> {
+class _SearchScreenState extends ConsumerState<SearchScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   late final TextEditingController _locationController;
@@ -31,13 +31,13 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   void initState() {
     super.initState();
-    final controller = context.read<PatientSearchController>();
-    _locationController = TextEditingController(text: controller.location);
-    _searchController = TextEditingController(text: controller.query);
+    final searchState = ref.read(patientSearchControllerProvider);
+    _locationController = TextEditingController(text: searchState.location);
+    _searchController = TextEditingController(text: searchState.query);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (controller.trendingSpecialties.isEmpty) {
-        controller.loadTrendingSpecialties();
+      if (ref.read(patientSearchControllerProvider).trendingSpecialties.isEmpty) {
+        ref.read(patientSearchControllerProvider.notifier).loadTrendingSpecialties();
       }
     });
   }
@@ -54,107 +54,94 @@ class _SearchScreenState extends State<SearchScreen> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
+    final searchState = ref.watch(patientSearchControllerProvider);
+    final notifier = ref.read(patientSearchControllerProvider.notifier);
+
+    final horizontalPadding = Responsive.horizontalPadding(context);
+    final hasSuggestions = searchState.doctorSuggestions.isNotEmpty;
+
     return Scaffold(
       key: _scaffoldKey,
       drawer: const PatientDrawer(),
       backgroundColor: theme.scaffoldBackgroundColor,
-      body: Consumer<PatientSearchController>(
-        builder: (context, controller, child) {
-          final horizontalPadding = Responsive.horizontalPadding(context);
-          final hasSuggestions = controller.doctorSuggestions.isNotEmpty;
-
-          return Stack(
-            children: [
-              NestedScrollView(
-                headerSliverBuilder: (context, innerBoxIsScrolled) {
-                  return [
-                    CustomSliverAppBar(
-                      expandedHeight: 290.0,
-                      scaffoldKey: _scaffoldKey,
-                      background: HeroSection(
-                        locationController: _locationController,
-                        searchController: _searchController,
-                        searchLayerLink: _searchLink,
-                        onLocationChanged: (val) =>
-                            controller.updateLocation(val),
-                        onQueryChanged: (val) => controller.updateQuery(val),
-                        onSearchTap: () => _onSearchTap(context, controller),
+      body: Stack(
+        children: [
+          NestedScrollView(
+            headerSliverBuilder: (context, innerBoxIsScrolled) {
+              return [
+                CustomSliverAppBar(
+                  expandedHeight: 290.0,
+                  scaffoldKey: _scaffoldKey,
+                  background: HeroSection(
+                    locationController: _locationController,
+                    searchController: _searchController,
+                    searchLayerLink: _searchLink,
+                    onLocationChanged: (val) => notifier.updateLocation(val),
+                    onQueryChanged: (val) => notifier.updateQuery(val),
+                    onSearchTap: () => _onSearchTap(context, searchState),
+                  ),
+                ),
+              ];
+            },
+            body: SingleChildScrollView(
+              padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: AppSpacing.xl),
+                  _buildQuickActions(colorScheme),
+                  const SizedBox(height: AppSpacing.xxl),
+                  _buildSectionHeader(theme, 'Featured Specialties'),
+                  SpecialtyCardList(
+                    specialties: searchState.trendingSpecialties,
+                    onTap: (specialtyName) async {
+                      await notifier.selectTrending(specialtyName);
+                      _searchController.text = specialtyName;
+                      if (context.mounted) {
+                        _onSearchTap(context, ref.read(patientSearchControllerProvider));
+                      }
+                    },
+                  ),
+                  const SizedBox(height: AppSpacing.xxl),
+                  const SizedBox(height: 100),
+                ],
+              ),
+            ),
+          ),
+          if (hasSuggestions)
+            Positioned(
+              width: MediaQuery.of(context).size.width - (horizontalPadding * 2) - 64,
+              child: CompositedTransformFollower(
+                link: _searchLink,
+                showWhenUnlinked: false,
+                offset: const Offset(0, 56),
+                child: Material(
+                  elevation: 24,
+                  borderRadius: BorderRadius.circular(24),
+                  color: colorScheme.surface,
+                  child: Container(
+                    constraints: const BoxConstraints(maxHeight: 350),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(
+                        color: colorScheme.outlineVariant.transparency(0.4),
                       ),
                     ),
-                  ];
-                },
-
-                body: SingleChildScrollView(
-                  padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: AppSpacing.xl),
-
-                      // 1. QUICK ACTION BAR (Icon + Text in a row)
-                      _buildQuickActions(colorScheme),
-
-                      const SizedBox(height: AppSpacing.xxl),
-
-                      // 2. FEATURED SPECIALTIES (With Depth)
-                      _buildSectionHeader(theme, 'Featured Specialties'),
-                      SpecialtyCardList(
-                        specialties: controller.trendingSpecialties,
-                        onTap: (specialtyName) {
-                          controller.selectTrending(specialtyName);
-                          _searchController.text = specialtyName;
-                          _onSearchTap(context, controller);
-                        },
-                      ),
-                      const SizedBox(height: AppSpacing.xxl),
-
-                      const SizedBox(height: 100),
-                    ],
+                    child: SearchSuggestionsOverlay(
+                      controller: ref.read(patientSearchControllerProvider.notifier) as dynamic,
+                      searchController: _searchController,
+                      onSearchTap: (ctx, state) => _onSearchTap(ctx, ref.read(patientSearchControllerProvider)),
+                    ),
                   ),
                 ),
               ),
-
-              if (hasSuggestions)
-                Positioned(
-                  width:
-                      MediaQuery.of(context).size.width -
-                      (horizontalPadding * 2) -
-                      64,
-                  child: CompositedTransformFollower(
-                    link: _searchLink,
-                    showWhenUnlinked: false,
-                    offset: const Offset(0, 56),
-                    child: Material(
-                      elevation: 24,
-                      borderRadius: BorderRadius.circular(24),
-                      color: colorScheme.surface,
-                      child: Container(
-                        constraints: const BoxConstraints(maxHeight: 350),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(24),
-                          border: Border.all(
-                            color: colorScheme.outlineVariant.withValues(
-                              alpha: 0.4,
-                            ),
-                          ),
-                        ),
-                        child: SearchSuggestionsOverlay(
-                          controller: controller,
-                          searchController: _searchController,
-                          onSearchTap: _onSearchTap,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-            ],
-          );
-        },
+            ),
+        ],
       ),
     );
   }
 
-  void _onSearchTap(BuildContext context, PatientSearchController controller) {
+  void _onSearchTap(BuildContext context, PatientSearchState state) {
     final query = _searchController.text.trim();
     if (query.isEmpty) {
       context.push(AppRoutes.findDoctors);
@@ -163,7 +150,6 @@ class _SearchScreenState extends State<SearchScreen> {
     }
   }
 
-  // 1. Horizontal Quick Actions (Clean Glassmorphic Feel)
   Widget _buildQuickActions(ColorScheme colorScheme) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -171,11 +157,7 @@ class _SearchScreenState extends State<SearchScreen> {
         _actionItem(Icons.near_me_rounded, 'Near Me', colorScheme),
         _actionItem(Icons.star_rounded, 'Top Rated', colorScheme),
         _actionItem(Icons.bolt_rounded, 'Available', colorScheme),
-        _actionItem(
-          Icons.local_fire_department_rounded,
-          'Trending',
-          colorScheme,
-        ),
+        _actionItem(Icons.local_fire_department_rounded, 'Trending', colorScheme),
       ],
     );
   }
@@ -186,7 +168,7 @@ class _SearchScreenState extends State<SearchScreen> {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: colorScheme.primary.withValues(alpha: 0.05),
+            color: colorScheme.primary.transparency(0.05),
             shape: BoxShape.circle,
           ),
           child: Icon(icon, color: colorScheme.primary, size: 24),
@@ -200,7 +182,6 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  // 3. Section Header Helper
   Widget _buildSectionHeader(ThemeData theme, String title) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),

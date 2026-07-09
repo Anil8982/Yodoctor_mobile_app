@@ -39,8 +39,9 @@ class ManualBookingForm extends StatelessWidget {
             icon: Icons.person_rounded,
             requiredField: true,
             validator: (value) {
-              if (value == null || value.trim().isEmpty)
+              if (value == null || value.trim().isEmpty) {
                 return 'Patient name is required';
+              }
               return null;
             },
           ),
@@ -57,8 +58,9 @@ class ManualBookingForm extends StatelessWidget {
             validator: (value) {
               final normalized = value?.trim() ?? '';
               if (normalized.isEmpty) return 'Mobile number is required';
-              if (!RegExp(r'^[0-9]{10}$').hasMatch(normalized))
+              if (!RegExp(r'^[0-9]{10}$').hasMatch(normalized)) {
                 return 'Enter a valid 10-digit number';
+              }
               return null;
             },
           ),
@@ -74,8 +76,9 @@ class ManualBookingForm extends StatelessWidget {
               final normalized = value?.trim() ?? '';
               if (normalized.isEmpty) return null;
               final age = int.tryParse(normalized);
-              if (age == null || age < 1 || age > 120)
+              if (age == null || age < 1 || age > 120) {
                 return 'Enter age between 1 and 120';
+              }
               return null;
             },
           ),

@@ -1,5 +1,6 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart'; // 🎯 Replaced legacy provider with Riverpod
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
@@ -8,25 +9,24 @@ import '../../../../core/utils/responsive.dart';
 import 'widgets/doctor_header_card.dart';
 import 'widgets/doctor_info_grid.dart';
 import '../../models/search/doctor_detail_model.dart';
-import 'package:provider/provider.dart';
-import '../../controllers/DoctorDetailController.dart';
+import '../../controllers/doctor_detail_controller.dart';
 
-class DoctorDetailScreen extends StatefulWidget {
+class DoctorDetailScreen extends ConsumerStatefulWidget {
   const DoctorDetailScreen({super.key, required this.doctorId});
 
   final int doctorId;
 
   @override
-  State<DoctorDetailScreen> createState() => _DoctorDetailScreenState();
+  ConsumerState<DoctorDetailScreen> createState() => _DoctorDetailScreenState();
 }
 
-class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
+class _DoctorDetailScreenState extends ConsumerState<DoctorDetailScreen> {
   @override
   void initState() {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<DoctorDetailController>().loadDoctor(widget.doctorId);
+      ref.read(doctorDetailControllerProvider.notifier).loadDoctor(widget.doctorId);
     });
   }
 
@@ -41,6 +41,9 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
     final isDesktop = Responsive.isDesktop(context);
     final isTablet = Responsive.isTablet(context);
     final isMobile = Responsive.isMobile(context);
+
+    // 🎯 Re-active state rendering mapping from new Riverpod structure
+    final doctorState = ref.watch(doctorDetailControllerProvider);
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -59,75 +62,65 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
         centerTitle: false,
         titleSpacing: 0,
       ),
-      body: Consumer<DoctorDetailController>(
-        builder: (context, controller, child) {
-          if (controller.isLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
+      body: () {
+        if (doctorState.isLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-          if (controller.errorMessage != null) {
-            return Center(child: Text(controller.errorMessage!));
-          }
+        if (doctorState.errorMessage != null) {
+          return Center(child: Text(doctorState.errorMessage!));
+        }
 
-          if (controller.doctor == null) {
-            return const SizedBox();
-          }
+        if (doctorState.doctor == null) {
+          return const SizedBox();
+        }
 
-          final doctor = controller.doctor!;
+        final doctor = doctorState.doctor!;
 
-          return SafeArea(
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              padding: EdgeInsets.symmetric(
-                horizontal: Responsive.horizontalPadding(context),
-                vertical: AppSpacing.lg,
-              ),
-              child: ResponsiveContainer(
-                child: _buildContent(
-                  context,
-                  Responsive.isMobile(context),
-                  Responsive.isTablet(context),
-                  Responsive.isDesktop(context),
-                  doctor,
-                ),
+        return SafeArea(
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            padding: EdgeInsets.symmetric(
+              horizontal: Responsive.horizontalPadding(context),
+              vertical: AppSpacing.lg,
+            ),
+            child: ResponsiveContainer(
+              child: _buildContent(
+                context,
+                isMobile,
+                isTablet,
+                isDesktop,
+                doctor,
               ),
             ),
-          );
-        },
-      ),
-      bottomNavigationBar: isMobile
-          ? Consumer<DoctorDetailController>(
-              builder: (context, controller, child) {
-                if (controller.doctor == null) {
-                  return const SizedBox();
-                }
-
-                return Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: colorScheme.surface,
-                    border: Border(
-                      top: BorderSide(
-                        color: colorScheme.outlineVariant.transparency(0.3),
-                        width: 1,
-                      ),
-                    ),
-                  ),
-                  child: _buildBookingButton(context, controller.doctor!),
-                );
-              },
-            )
+          ),
+        );
+      }(),
+      bottomNavigationBar: isMobile && doctorState.doctor != null
+          ? Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
+          border: Border(
+            top: BorderSide(
+              color: colorScheme.outlineVariant.transparency(0.3),
+              width: 1,
+            ),
+          ),
+        ),
+        child: _buildBookingButton(context, doctorState.doctor!),
+      )
           : null,
     );
   }
 
   Widget _buildContent(
-    BuildContext context,
-    bool isMobile,
-    bool isTablet,
-    bool isDesktop,
-    DoctorDetailModel doctor,
-  ) {
+      BuildContext context,
+      bool isMobile,
+      bool isTablet,
+      bool isDesktop,
+      DoctorDetailModel doctor,
+      ) {
     if (isDesktop || isTablet) {
       return Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -176,9 +169,9 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                         '₹${doctor.consultationFee.toStringAsFixed(0)}',
                         style: Theme.of(context).textTheme.headlineSmall
                             ?.copyWith(
-                              color: Theme.of(context).colorScheme.primary,
-                              fontWeight: FontWeight.w900,
-                            ),
+                          color: Theme.of(context).colorScheme.primary,
+                          fontWeight: FontWeight.w900,
+                        ),
                       ),
                     ],
                   ),

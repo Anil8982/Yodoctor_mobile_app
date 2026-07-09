@@ -6,7 +6,6 @@ import '../../../../core/utils/responsive.dart';
 import '../../widgets/doctor_drawer.dart';
 import '../../widgets/doctor_sliver_app_bar.dart';
 import 'widgets/certificate_list_cards.dart';
-import '../../../doctor/controllers/doctor_dashboard_controller.dart';
 import '../../controllers/doctor_profile_controller.dart';
 
 class DoctorCertificateDashboardScreen extends ConsumerStatefulWidget {
@@ -52,9 +51,9 @@ class _DoctorCertificateDashboardScreenState
 
     final certificateState = ref.watch(doctorCertificateProvider);
     final notifier = ref.read(doctorCertificateProvider.notifier);
-    final dashboard = ref.watch(doctorDashboardProvider);
     final filteredCerts = notifier.filteredCertificates;
     final profileState = ref.watch(doctorProfileProvider);
+
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: colorScheme.surfaceContainerLow,
@@ -65,7 +64,6 @@ class _DoctorCertificateDashboardScreenState
           return [
             DoctorSliverAppBar(
               expandedHeight: 140.0,
-
               background: FlexibleSpaceBar(
                 title: Text(
                   'Certificate Requests',
@@ -139,7 +137,7 @@ class _DoctorCertificateDashboardScreenState
                               CertificateListCards(
                                 certificates: filteredCerts,
                                 isIssuedTab:
-                                    certificateState.activeTabIndex == 1,
+                                certificateState.activeTabIndex == 1,
                               ),
                           ],
                         ),
@@ -156,10 +154,10 @@ class _DoctorCertificateDashboardScreenState
   }
 
   Widget _buildSummaryCards(
-    BuildContext context,
-    CertificateState state,
-    DoctorCertificateNotifier notifier,
-  ) {
+      BuildContext context,
+      CertificateState state,
+      DoctorCertificateNotifier notifier,
+      ) {
     final isIssuedTab = state.activeTabIndex == 1;
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -169,58 +167,58 @@ class _DoctorCertificateDashboardScreenState
       child: Row(
         children: isIssuedTab
             ? [
-                _buildCard(
-                  context,
-                  'Total Issued',
-                  '${notifier.issuedCount}',
-                  colorScheme.primary,
-                  colorScheme.primaryContainer,
-                ),
-                const SizedBox(width: AppSpacing.md),
-                _buildCard(
-                  context,
-                  'This Month',
-                  '${notifier.issuedCount}',
-                  colorScheme.secondary,
-                  colorScheme.secondaryContainer,
-                ),
-                const SizedBox(width: AppSpacing.md),
-                _buildCard(
-                  context,
-                  'Expiring Soon',
-                  '1',
-                  colorScheme.error,
-                  colorScheme.errorContainer,
-                ),
-              ]
+          _buildCard(
+            context,
+            'Total Issued',
+            '${notifier.issuedCount}',
+            colorScheme.primary,
+            colorScheme.primaryContainer,
+          ),
+          const SizedBox(width: AppSpacing.md),
+          _buildCard(
+            context,
+            'This Month',
+            '${notifier.issuedCount}',
+            colorScheme.secondary,
+            colorScheme.secondaryContainer,
+          ),
+          const SizedBox(width: AppSpacing.md),
+          _buildCard(
+            context,
+            'Expiring Soon',
+            '1',
+            colorScheme.error,
+            colorScheme.errorContainer,
+          ),
+        ]
             : [
-                _buildCard(
-                  context,
-                  'Pending Requests',
-                  '${notifier.pendingCount}',
-                  colorScheme.tertiary,
-                  colorScheme.tertiaryContainer,
-                ),
-                const SizedBox(width: AppSpacing.md),
-                _buildCard(
-                  context,
-                  'Total Requests',
-                  '${notifier.totalCount}',
-                  colorScheme.primary,
-                  colorScheme.primaryContainer,
-                ),
-              ],
+          _buildCard(
+            context,
+            'Pending Requests',
+            '${notifier.pendingCount}',
+            colorScheme.tertiary,
+            colorScheme.tertiaryContainer,
+          ),
+          const SizedBox(width: AppSpacing.md),
+          _buildCard(
+            context,
+            'Total Requests',
+            '${notifier.totalCount}',
+            colorScheme.primary,
+            colorScheme.primaryContainer,
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildCard(
-    BuildContext context,
-    String title,
-    String count,
-    Color textColor,
-    Color containerColor,
-  ) {
+      BuildContext context,
+      String title,
+      String count,
+      Color textColor,
+      Color containerColor,
+      ) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -268,10 +266,10 @@ class _DoctorCertificateDashboardScreenState
   }
 
   Widget _buildToolbar(
-    BuildContext context,
-    CertificateState state,
-    DoctorCertificateNotifier notifier,
-  ) {
+      BuildContext context,
+      CertificateState state,
+      DoctorCertificateNotifier notifier,
+      ) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final isMobile = Responsive.isMobile(context);
@@ -369,11 +367,8 @@ class _DoctorCertificateDashboardScreenState
       dropdownColor: colorScheme.surface,
       items: const [
         DropdownMenuItem(value: "All Status", child: Text("All Status")),
-
         DropdownMenuItem(value: "PENDING", child: Text("Pending")),
-
         DropdownMenuItem(value: "APPROVED", child: Text("Approved")),
-
         DropdownMenuItem(value: "REJECTED", child: Text("Rejected")),
       ],
       onChanged: (val) => notifier.updateStatusFilter(val!),

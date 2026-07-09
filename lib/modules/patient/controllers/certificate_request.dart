@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../services/patient_certificate_service.dart';
-import '../../../core/models/patient/doctor_profile.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:yodoctor/core/debug/app_logger.dart';
 import '../../../modules/patient/models/certificate/patient_certificate_request_model.dart';
 import '../../../modules/patient/models/certificate/patient_certificate_detail_model.dart';
 import '../../../modules/patient/models/certificate/patient_certificate_timeline_model.dart';
+import '../../patient/models/certificate/patient_doctor_model.dart';
+import '../../../core/constants/log_tags.dart';
+import '../repositories/patient_certificate_repository.dart' show patientCertificateRepositoryProvider;
 import 'dart:io';
 import 'package:open_filex/open_filex.dart';
-import 'package:path_provider/path_provider.dart';
-import '../../patient/models/certificate/patient_doctor_model.dart';
 
-// 🎯 Immutable state structure for tracking certificates data and dynamic form fields
+// 🎯 Immutable State Structure remains identical
 class CertificateFormState {
   final List<PatientCertificateRequestModel> allCertificates;
   final bool isLoading;
@@ -26,7 +27,6 @@ class CertificateFormState {
   final Map<String, double?> uploadProgress;
   final List<PatientDoctorModel> doctors;
   final PatientCertificateDetailModel? selectedCertificate;
-
   final List<PatientCertificateTimelineModel> timeline;
 
   CertificateFormState({
@@ -94,9 +94,7 @@ class CertificateFormState {
   }
 }
 
-// 🎯 Manual Riverpod Notifier implementation managing certificate workflow
 class CertificateNotifier extends Notifier<CertificateFormState> {
-  // Permanent text editing controllers
   final additionalNotesController = TextEditingController();
   final fullNameController = TextEditingController();
   final dobController = TextEditingController();
@@ -104,7 +102,9 @@ class CertificateNotifier extends Notifier<CertificateFormState> {
   final weightController = TextEditingController();
   final medicalConditionsController = TextEditingController();
   final medicationsController = TextEditingController();
-  final PatientCertificateService _service = PatientCertificateService();
+
+  static const String _subTag = 'CertificateNotifier';
+
   @override
   CertificateFormState build() {
     ref.onDispose(() {
@@ -116,105 +116,148 @@ class CertificateNotifier extends Notifier<CertificateFormState> {
       medicalConditionsController.dispose();
       medicationsController.dispose();
     });
-
-    Future.microtask(() async {
-      await loadDoctors();
-      await loadMyRequests();
-    });
-
     return CertificateFormState();
   }
 
   Future<void> loadCertificateDetail(int id) async {
     state = state.copyWith(isLoading: true);
-
     try {
-      final response = await _service.getRequestDetail(id);
+      final repo = ref.read(patientCertificateRepositoryProvider);
+      final response = await repo.getRequestDetail(id);
 
-      final detail = PatientCertificateDetailModel.fromJson(
-        response.data["request"],
-      );
-
-      final timeline = (response.data["timeline"] as List)
+      final detail = PatientCertificateDetailModel.fromJson(response.data["request"]);
+      final timelineList = (response.data["timeline"] as List)
           .map((e) => PatientCertificateTimelineModel.fromJson(e))
           .toList();
 
-      state = state.copyWith(
-        selectedCertificate: detail,
-        timeline: timeline,
-        isLoading: false,
-      );
-    } catch (e) {
-      debugPrint(e.toString());
-
+      state = state.copyWith(selectedCertificate: detail, timeline: timelineList, isLoading: false);
+    } catch (e, st) {
       state = state.copyWith(isLoading: false);
+      AppLogger.exception(e, st, message: 'Failed to load certificate detailed track matrix', tag: LogTags.patient, subTag: _subTag);
     }
   }
 
   Future<void> loadDoctors() async {
     try {
-      final response = await _service.getDoctors();
-
-      debugPrint("STATUS => ${response.statusCode}");
-      debugPrint("BODY => ${response.data}");
+      final repo = ref.read(patientCertificateRepositoryProvider);
+      final response = await repo.getDoctors();
 
       if (response.statusCode == 200 && response.data["success"] == true) {
         final list = (response.data["doctors"] as List)
             .map((e) => PatientDoctorModel.fromJson(e))
             .toList();
-
-        debugPrint("Doctors Count => ${list.length}");
-
         state = state.copyWith(doctors: list);
       }
-    } catch (e) {
-      debugPrint(e.toString());
+    } catch (e, st) {
+      AppLogger.exception(e, st, message: 'Failed fetching secure repository doctor list', tag: LogTags.patient, subTag: _subTag);
     }
   }
 
   Future<void> downloadCertificate(int id) async {
     try {
-      final response = await _service.downloadCertificate(id);
+      final repo = ref.read(patientCertificateRepositoryProvider);
+      final response = await repo.downloadCertificate(id);
 
       final directory = await getApplicationDocumentsDirectory();
-
       final file = File("${directory.path}/certificate_$id.pdf");
 
       await file.writeAsBytes(List<int>.from(response.data));
-
       await OpenFilex.open(file.path);
-    } catch (e) {
-      debugPrint(e.toString());
+    } catch (e, st) {
+      AppLogger.exception(e, st, message: 'PDF binary write system failure', tag: LogTags.patient, subTag: _subTag);
     }
   }
 
   Future<void> loadMyRequests() async {
     state = state.copyWith(isLoading: true);
-
     try {
-      final response = await _service.getMyRequests();
+      final repo = ref.read(patientCertificateRepositoryProvider);
+      final response = await repo.getMyRequests();
 
       final list = (response.data as List)
           .map((e) => PatientCertificateRequestModel.fromJson(e))
           .toList();
 
       state = state.copyWith(allCertificates: list, isLoading: false);
-    } catch (e) {
-      debugPrint(e.toString());
-
+    } catch (e, st) {
       state = state.copyWith(isLoading: false);
+      AppLogger.exception(e, st, message: 'Wallet requests sync engine faulted', tag: LogTags.patient, subTag: _subTag);
     }
   }
 
-  // Pure data computation matching sync querying profiles
+  Future<bool> submitRequest() async {
+    if (!validateDocuments() || state.selectedType == null || state.assignedDoctor == null) {
+      AppLogger.warning("Validation failed for certificate request submission", tag: LogTags.patient, subTag: _subTag);
+      return false;
+    }
+
+    state = state.copyWith(isLoading: true);
+
+    final payload = {
+      "doctor_id": state.assignedDoctor!.id,
+      "certificate_type": state.selectedType,
+      "purpose": state.purpose,
+      "notes": additionalNotesController.text,
+      "full_name": fullNameController.text,
+      "dob": dobController.text,
+      "gender": state.gender,
+      "blood_group": state.bloodGroup,
+      "height": double.tryParse(heightController.text),
+      "weight": double.tryParse(weightController.text),
+      "medical_conditions": medicalConditionsController.text,
+      "medications": medicationsController.text,
+    };
+
+    AppLogger.info("Submitting certificate request", tag: LogTags.patient, subTag: _subTag);
+    AppLogger.json(payload, tag: LogTags.patient, subTag: "$_subTag/Payload");
+
+    try {
+      final repo = ref.read(patientCertificateRepositoryProvider);
+      final create = await repo.createRequest(payload);
+
+      dynamic resId;
+      if (create.data is Map) {
+        if (create.data["data"] != null && create.data["data"]["requestId"] != null) {
+          resId = create.data["data"]["requestId"];
+        } else {
+          resId = create.data["requestId"];
+        }
+      }
+
+      if (resId == null) {
+        throw Exception("Backend failed to return valid response hash map identifier for requestId.");
+      }
+
+      final int requestId = int.parse(resId.toString());
+      AppLogger.success("Request created. Starting document streams upload...", tag: LogTags.patient, subTag: _subTag);
+
+      await repo.uploadDocuments(
+        requestId: requestId,
+        profilePhoto: state.uploadedDocs["Profile Photo"],
+        idProof: state.uploadedDocs["Government ID Proof"],
+        medicalReports: state.uploadedDocs["Medical Reports"],
+        prescription: state.uploadedDocs["Prescription"],
+      );
+
+      AppLogger.success("Certificate workflows synchronization complete", tag: LogTags.patient, subTag: _subTag);
+
+      await loadMyRequests();
+      resetForm();
+      return true;
+    } catch (e, st) {
+      state = state.copyWith(isLoading: false);
+      AppLogger.exception(e, st, message: 'Certificate creation workflow halted', tag: LogTags.patient, subTag: _subTag);
+      return false;
+    }
+  }
+
+  // 🎯 Restored synchronization data computations
   List<PatientCertificateRequestModel> getFilteredCertificates() {
     return state.allCertificates.where((cert) {
-      final matchesStatus =
-          state.selectedFilter == "All" ||
+      final matchesStatus = state.selectedFilter == "All" ||
           cert.status.toLowerCase() == state.selectedFilter.toLowerCase();
 
-      final matchesSearch =
-          state.searchQuery.isEmpty ||
+      final matchesSearch = state.searchQuery.isEmpty ||
           cert.certificateType.toLowerCase().contains(state.searchQuery) ||
           cert.doctorName.toLowerCase().contains(state.searchQuery);
 
@@ -222,58 +265,35 @@ class CertificateNotifier extends Notifier<CertificateFormState> {
     }).toList();
   }
 
-  void setFilter(String filter) =>
-      state = state.copyWith(selectedFilter: filter);
-  void setSearchQuery(String query) =>
-      state = state.copyWith(searchQuery: query);
-  void setSelectedType(String type) =>
-      state = state.copyWith(selectedType: type);
-  void setAssignedDoctor(PatientDoctorModel doctor) {
-    state = state.copyWith(assignedDoctor: doctor);
-  }
-
+  // 🎯 Restored Form Actions
+  void setFilter(String filter) => state = state.copyWith(selectedFilter: filter);
+  void setSearchQuery(String query) => state = state.copyWith(searchQuery: query.toLowerCase());
+  void setSelectedType(String type) => state = state.copyWith(selectedType: type);
+  void setAssignedDoctor(PatientDoctorModel doctor) => state = state.copyWith(assignedDoctor: doctor);
   void setPurpose(String purpose) => state = state.copyWith(purpose: purpose);
   void setGender(String gender) => state = state.copyWith(gender: gender);
   void setBloodGroup(String bg) => state = state.copyWith(bloodGroup: bg);
-  void clearValidationError() =>
-      state = state.copyWith(showValidationError: false);
+  void clearValidationError() => state = state.copyWith(showValidationError: false);
 
+  // 🎯 Restored Mandatory Identity Document Validations
   bool validateDocuments() {
-    if (state.uploadedDocs["Profile Photo"] == null) {
+    if (state.uploadedDocs["Profile Photo"] == null || state.uploadedDocs["Government ID Proof"] == null) {
       state = state.copyWith(showValidationError: true);
-
       return false;
     }
-
-    if (state.uploadedDocs["Government ID Proof"] == null) {
-      state = state.copyWith(showValidationError: true);
-
-      return false;
-    }
-
     state = state.copyWith(showValidationError: false);
-
     return true;
   }
 
-  // Emulate structural background asynchronous upload progress updates
   Future<void> uploadDocument(String key, String path) async {
-    final docs = Map<String, String?>.from(state.uploadedDocs);
-
-    docs[key] = path;
-
+    final docs = Map<String, String?>.from(state.uploadedDocs)..[key] = path;
     state = state.copyWith(uploadedDocs: docs);
   }
 
   void removeDocument(String documentKey) {
-    final updatedDocs = Map<String, String?>.from(state.uploadedDocs)
-      ..[documentKey] = null;
-    final updatedProgress = Map<String, double?>.from(state.uploadProgress)
-      ..[documentKey] = null;
-    state = state.copyWith(
-      uploadedDocs: updatedDocs,
-      uploadProgress: updatedProgress,
-    );
+    final updatedDocs = Map<String, String?>.from(state.uploadedDocs)..[documentKey] = null;
+    final updatedProgress = Map<String, double?>.from(state.uploadProgress)..[documentKey] = null;
+    state = state.copyWith(uploadedDocs: updatedDocs, uploadProgress: updatedProgress);
   }
 
   void resetForm() {
@@ -306,79 +326,6 @@ class CertificateNotifier extends Notifier<CertificateFormState> {
       },
     );
   }
-
-  // Handle transaction submission pipeline
-  Future<bool> submitRequest() async {
-    if (!validateDocuments()) {
-      return false;
-    }
-
-    if (state.selectedType == null || state.assignedDoctor == null) {
-      return false;
-    }
-
-    state = state.copyWith(isLoading: true);
-
-    try {
-      final create = await _service.createRequest({
-        "doctor_id": state.assignedDoctor!.id,
-
-        "certificate_type": state.selectedType,
-
-        "purpose": state.purpose,
-
-        "notes": additionalNotesController.text,
-
-        "full_name": fullNameController.text,
-
-        "dob": dobController.text,
-
-        "gender": state.gender,
-
-        "blood_group": state.bloodGroup,
-
-        "height": double.tryParse(heightController.text),
-
-        "weight": double.tryParse(weightController.text),
-
-        "medical_conditions": medicalConditionsController.text,
-
-        "medications": medicationsController.text,
-      });
-
-      final requestId = create.data["requestId"];
-
-      await _service.uploadDocuments(
-        requestId: requestId,
-
-        profilePhoto: state.uploadedDocs["Profile Photo"],
-
-        idProof: state.uploadedDocs["Government ID Proof"],
-
-        medicalReports: state.uploadedDocs["Medical Reports"],
-
-        prescription: state.uploadedDocs["Prescription"],
-      );
-
-      await loadMyRequests();
-
-      resetForm();
-
-      state = state.copyWith(isLoading: false);
-
-      return true;
-    } catch (e) {
-      debugPrint(e.toString());
-
-      state = state.copyWith(isLoading: false);
-
-      return false;
-    }
-  }
 }
 
-// 🎯 Provider declaration mapped with an autoDispose tag setup
-final certificateProvider =
-    NotifierProvider<CertificateNotifier, CertificateFormState>(
-      CertificateNotifier.new,
-    );
+final certificateProvider = NotifierProvider<CertificateNotifier, CertificateFormState>(CertificateNotifier.new);

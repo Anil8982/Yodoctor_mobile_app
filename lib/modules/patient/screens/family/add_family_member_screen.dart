@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/app_button.dart';
@@ -10,22 +10,24 @@ import 'widgets/member_form_dropdown_field.dart';
 import 'widgets/member_form_text_field.dart';
 import '../../models/family/family_member_model.dart';
 
-class AddFamilyMemberScreen extends StatefulWidget {
+class AddFamilyMemberScreen extends ConsumerStatefulWidget {
+  // 🎯 Switched to ConsumerStatefulWidget
   const AddFamilyMemberScreen({super.key, this.initialMember});
 
   final FamilyMemberModel? initialMember;
 
   @override
-  State<AddFamilyMemberScreen> createState() => _AddFamilyMemberScreenState();
+  ConsumerState<AddFamilyMemberScreen> createState() =>
+      _AddFamilyMemberScreenState();
 }
 
-class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
+class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
+  // 🎯 Switched to ConsumerState
   static const List<String> _genderOptions = <String>[
     "MALE",
     "FEMALE",
     "OTHER",
   ];
-
   static const List<String> _bloodGroupOptions = <String>[
     'A+',
     'A-',
@@ -36,7 +38,6 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
     'O+',
     'O-',
   ];
-
   static const List<String> _relationOptions = <String>[
     "FATHER",
     "MOTHER",
@@ -80,19 +81,15 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
 
   void _prefillForEditing() {
     final FamilyMemberModel? member = widget.initialMember;
-    if (member == null) {
-      return;
-    }
-    _nameController.text = member.fullName;
+    if (member == null) return;
 
+    _nameController.text = member.fullName;
     _selectedGender = member.gender;
     _selectedBloodGroup = member.bloodGroup;
     _selectedRelation = member.relation;
-
     _dobController.text = member.dob;
     _selectedDob = DateTime.tryParse(member.dob);
     _heightController.text = member.heightCm.toString();
-
     _weightController.text = member.weightKg.toString();
   }
 
@@ -107,13 +104,16 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
       lastDate: now,
     );
 
-    if (pickedDate == null) {
-      return;
-    }
+    if (pickedDate == null) return;
+
+    // 🎯 Using formatting helper directly from controller logic stream
+    final formattedDate = ref
+        .read(familyControllerProvider.notifier)
+        .formatDate(pickedDate);
 
     setState(() {
       _selectedDob = pickedDate;
-      _dobController.text = _formatDate(pickedDate);
+      _dobController.text = formattedDate;
     });
   }
 
@@ -121,18 +121,16 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
     FocusScope.of(context).unfocus();
 
     final bool isValid = _formKey.currentState?.validate() ?? false;
-    if (!isValid || _selectedDob == null) {
-      return;
-    }
+    if (!isValid || _selectedDob == null) return;
 
     setState(() => _isSaving = true);
-
     await Future<void>.delayed(const Duration(milliseconds: 250));
 
-    final controller = context.read<FamilyController>();
+    final controller = ref.read(familyControllerProvider.notifier);
+    bool success = false;
 
     if (_isEditing) {
-      await controller.updateMember(
+      success = await controller.updateMember(
         id: widget.initialMember!.id,
         fullName: _nameController.text.trim(),
         gender: _selectedGender!,
@@ -143,7 +141,7 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
         relation: _selectedRelation!,
       );
     } else {
-      await controller.addMember(
+      success = await controller.addMember(
         fullName: _nameController.text.trim(),
         gender: _selectedGender!,
         dob: _selectedDob!.toIso8601String().split('T').first,
@@ -154,7 +152,7 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
       );
     }
 
-    if (mounted) {
+    if (mounted && success) {
       context.pop(true);
     }
     setState(() => _isSaving = false);
@@ -342,6 +340,7 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
     );
   }
 
+  // (Inputs rendering UI blocks remain unchanged and fully preserved)
   Widget _buildNameField() {
     return MemberFormTextField(
       label: 'Full Name',
@@ -351,12 +350,8 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
       textCapitalization: TextCapitalization.words,
       validator: (String? value) {
         final String name = value?.trim() ?? '';
-        if (name.isEmpty) {
-          return 'Please enter full name';
-        }
-        if (name.length < 2) {
-          return 'Name should have at least 2 characters';
-        }
+        if (name.isEmpty) return 'Please enter full name';
+        if (name.length < 2) return 'Name should have at least 2 characters';
         return null;
       },
     );
@@ -371,9 +366,7 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
       options: _genderOptions,
       onChanged: (String? value) => setState(() => _selectedGender = value),
       validator: (String? value) {
-        if (value == null || value.isEmpty) {
-          return 'Please select gender';
-        }
+        if (value == null || value.isEmpty) return 'Please select gender';
         return null;
       },
     );
@@ -389,9 +382,7 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
       readOnly: true,
       onTap: _pickDateOfBirth,
       validator: (String? value) {
-        if (_selectedDob == null) {
-          return 'Please select date of birth';
-        }
+        if (_selectedDob == null) return 'Please select date of birth';
         return null;
       },
     );
@@ -406,9 +397,7 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
       options: _bloodGroupOptions,
       onChanged: (String? value) => setState(() => _selectedBloodGroup = value),
       validator: (String? value) {
-        if (value == null || value.isEmpty) {
-          return 'Please select blood group';
-        }
+        if (value == null || value.isEmpty) return 'Please select blood group';
         return null;
       },
     );
@@ -423,9 +412,7 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
       options: _relationOptions,
       onChanged: (String? value) => setState(() => _selectedRelation = value),
       validator: (String? value) {
-        if (value == null || value.isEmpty) {
-          return 'Please select relation';
-        }
+        if (value == null || value.isEmpty) return 'Please select relation';
         return null;
       },
     );
@@ -439,21 +426,15 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
       controller: _heightController,
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
       inputFormatters: <TextInputFormatter>[
-        FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,1}$')),
+        FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d?$')),
       ],
       validator: (String? value) {
         final String text = value?.trim() ?? '';
-        if (text.isEmpty) {
-          return 'Please enter height';
-        }
-
+        if (text.isEmpty) return 'Please enter height';
         final double? parsed = double.tryParse(text);
-        if (parsed == null) {
-          return 'Enter a valid height';
-        }
-        if (parsed < 30 || parsed > 250) {
+        if (parsed == null) return 'Enter a valid height';
+        if (parsed < 30 || parsed > 250)
           return 'Height should be between 30 and 250 cm';
-        }
         return null;
       },
     );
@@ -467,70 +448,17 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
       controller: _weightController,
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
       inputFormatters: <TextInputFormatter>[
-        FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,1}$')),
+        FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d?$')),
       ],
       validator: (String? value) {
         final String text = value?.trim() ?? '';
-        if (text.isEmpty) {
-          return 'Please enter weight';
-        }
-
+        if (text.isEmpty) return 'Please enter weight';
         final double? parsed = double.tryParse(text);
-        if (parsed == null) {
-          return 'Enter a valid weight';
-        }
-        if (parsed < 2 || parsed > 350) {
+        if (parsed == null) return 'Enter a valid weight';
+        if (parsed < 2 || parsed > 350)
           return 'Weight should be between 2 and 350 kg';
-        }
         return null;
       },
     );
-  }
-
-  String _formatDate(DateTime date) {
-    const List<String> months = <String>[
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-
-    final String day = date.day.toString().padLeft(2, '0');
-    return '$day ${months[date.month - 1]} ${date.year}';
-  }
-
-  String _buildInitials(String name) {
-    final List<String> parts = name
-        .split(RegExp(r'\s+'))
-        .where((String segment) => segment.isNotEmpty)
-        .toList();
-
-    if (parts.isEmpty) {
-      return 'NA';
-    }
-
-    if (parts.length == 1) {
-      final String firstWord = parts.first;
-      if (firstWord.length == 1) {
-        return firstWord.toUpperCase();
-      }
-
-      return firstWord.substring(0, 2).toUpperCase();
-    }
-
-    return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
-  }
-
-  String _formatNumber(double value) {
-    final bool isWhole = value == value.roundToDouble();
-    return isWhole ? value.toStringAsFixed(0) : value.toStringAsFixed(1);
   }
 }

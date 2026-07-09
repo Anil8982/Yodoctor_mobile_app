@@ -39,51 +39,72 @@ class _ManualBookingScreenState extends ConsumerState<ManualBookingScreen> {
             horizontal: AppSpacing.xl,
             vertical: AppSpacing.lg,
           ),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 460),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const BookingHeader(),
-                const SizedBox(height: AppSpacing.xxl),
-                ManualBookingForm(
-                  formKey: notifier.formKey,
-                  patientNameController: notifier.patientNameController,
-                  mobileController: notifier.mobileController,
-                  ageController: notifier.ageController,
-                  selectedShift: notifier.selectedShift,
-                  loading: state.loading,
-                  onShiftChanged: (value) {
-                    if (value != null) {
-                      notifier.changeShift(value);
-                    }
-                  },
-                  onSubmit: () async {
-                    try {
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 460),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const BookingHeader(),
+                  const SizedBox(height: AppSpacing.xxl),
+                  ManualBookingForm(
+                    formKey: notifier.formKey,
+                    patientNameController: notifier.patientNameController,
+                    mobileController: notifier.mobileController,
+                    ageController: notifier.ageController,
+                    selectedShift: state
+                        .selectedShift, // 🎯 FIXED: Direct reactive state injection
+                    loading: state.loading,
+                    onShiftChanged: (value) {
+                      if (value != null) {
+                        notifier.changeShift(value);
+                      }
+                    },
+                    onSubmit: () async {
                       final success = await notifier.submit();
 
-                      if (!mounted) return;
+                      if (!context.mounted) return;
 
                       if (success) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text("Patient booked successfully"),
-                          ),
+                        _showSnackBar(
+                          context,
+                          "Patient booked successfully! 🚀",
+                          isError: false,
+                        );
+                      } else {
+                        final currentState = ref.read(manualBookingProvider);
+                        _showSnackBar(
+                          context,
+                          currentState.errorMessage ??
+                              "Registration failed. Try again.",
+                          isError: true,
                         );
                       }
-                    } catch (e) {
-                      if (!mounted) return;
-
-                      ScaffoldMessenger.of(
-                        context,
-                      ).showSnackBar(SnackBar(content: Text(e.toString())));
-                    }
-                  },
-                ),
-              ],
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  void _showSnackBar(
+    BuildContext context,
+    String msg, {
+    required bool isError,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(msg, style: const TextStyle(fontWeight: FontWeight.w700)),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: isError ? colorScheme.error : colorScheme.primary,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        elevation: 4,
       ),
     );
   }

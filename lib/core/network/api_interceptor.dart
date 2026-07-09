@@ -6,10 +6,7 @@ class ApiInterceptor extends Interceptor {
   static const String _subTag = 'ApiInterceptor';
 
   @override
-  void onRequest(
-      RequestOptions options,
-      RequestInterceptorHandler handler,
-      ) {
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     AppLogger.info(
       '➡️ ${options.method} ${options.uri}',
       tag: LogTags.api,
@@ -28,10 +25,7 @@ class ApiInterceptor extends Interceptor {
   }
 
   @override
-  void onResponse(
-      Response response,
-      ResponseInterceptorHandler handler,
-      ) {
+  void onResponse(Response response, ResponseInterceptorHandler handler) {
     AppLogger.success(
       '✅ ${response.statusCode} ${response.requestOptions.path}',
       tag: LogTags.api,
@@ -50,15 +44,20 @@ class ApiInterceptor extends Interceptor {
   }
 
   @override
-  void onError(
-      DioException err,
-      ErrorInterceptorHandler handler,
-      ) {
+  void onError(DioException err, ErrorInterceptorHandler handler) {
     AppLogger.error(
       '❌ ${err.requestOptions.method} ${err.requestOptions.path}',
       tag: LogTags.api,
       subTag: _subTag,
     );
+
+    if (err.response != null) {
+      AppLogger.json(
+        err.response?.data,
+        tag: LogTags.api,
+        subTag: 'ErrorResponse',
+      );
+    }
 
     AppLogger.exception(
       err,

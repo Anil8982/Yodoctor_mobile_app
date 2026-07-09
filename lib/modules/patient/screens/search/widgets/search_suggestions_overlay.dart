@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart'; // 🎯 Added Riverpod Import
 import 'package:yodoctor/modules/patient/controllers/patient_search_controller.dart';
 
-class SearchSuggestionsOverlay extends StatelessWidget {
-  final PatientSearchController controller;
+class SearchSuggestionsOverlay extends ConsumerWidget {
+  final PatientSearchState controller;
   final TextEditingController searchController;
-  final Function(BuildContext, PatientSearchController) onSearchTap;
+  final Function(BuildContext, PatientSearchState) onSearchTap;
 
   const SearchSuggestionsOverlay({
     super.key,
@@ -14,7 +15,7 @@ class SearchSuggestionsOverlay extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -32,7 +33,6 @@ class SearchSuggestionsOverlay extends StatelessWidget {
         String displaySubtitle = '';
         IconData icon = Icons.person_search_rounded;
 
-        // Contextual Logic for matching fields
         if (doc.name.toLowerCase().contains(query)) {
           displayTitle = doc.name;
           displaySubtitle = "${doc.specialty} • ${doc.hospital}";
@@ -72,8 +72,10 @@ class SearchSuggestionsOverlay extends StatelessWidget {
           ),
           onTap: () {
             searchController.text = displayTitle;
-            controller.clearSuggestions();
-            onSearchTap(context, controller);
+
+            ref.read(patientSearchControllerProvider.notifier).clearSuggestions();
+
+            onSearchTap(context, ref.read(patientSearchControllerProvider));
           },
         );
       },

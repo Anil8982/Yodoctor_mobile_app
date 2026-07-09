@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 
 import '../../../../core/routes/app_routes.dart';
 import '../../controllers/family_controller.dart';
@@ -10,14 +10,14 @@ import 'widgets/family_member_card.dart';
 import 'widgets/family_header.dart';
 import '../../models/family/family_member_model.dart';
 
-class FamilyMembersScreen extends StatefulWidget {
+class FamilyMembersScreen extends ConsumerStatefulWidget {
   const FamilyMembersScreen({super.key});
 
   @override
-  State<FamilyMembersScreen> createState() => _FamilyMembersScreenState();
+  ConsumerState<FamilyMembersScreen> createState() => _FamilyMembersScreenState();
 }
 
-class _FamilyMembersScreenState extends State<FamilyMembersScreen> {
+class _FamilyMembersScreenState extends ConsumerState<FamilyMembersScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
@@ -25,58 +25,55 @@ class _FamilyMembersScreenState extends State<FamilyMembersScreen> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return Consumer<FamilyController>(
-      builder: (context, controller, _) {
-        return Scaffold(
-          key: _scaffoldKey,
-          drawer: const PatientDrawer(),
-          backgroundColor: theme.scaffoldBackgroundColor,
-          body: NestedScrollView(
-            headerSliverBuilder: (context, innerBoxIsScrolled) {
-              return <Widget>[
-                CustomSliverAppBar(
-                  expandedHeight: 220,
-                  scaffoldKey: _scaffoldKey,
-                  background: FamilyHeader(
-                    membersCount: controller.members.length,
-                  ),
-                ),
-              ];
-            },
-            body: controller.members.isEmpty
-                ? _buildEmptyState(context)
-                : ListView.separated(
-                    padding: const EdgeInsets.fromLTRB(16, 20, 16, 150),
-                    itemCount: controller.members.length,
-                    physics: const BouncingScrollPhysics(),
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(height: 12),
-                    itemBuilder: (context, index) {
-                      final member = controller.members[index];
-                      return FamilyMemberCard(
-                        member: member,
-                        onDelete: () async {
-                          await controller.deleteMember(member.id);
-                        },
-                        onEdit: () => _openEditMemberScreen(context, member),
-                      );
-                    },
-                  ),
-          ),
+    final familyState = ref.watch(familyControllerProvider);
+    final notifier = ref.read(familyControllerProvider.notifier);
 
-          floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-          floatingActionButton: Padding(
-            padding: const EdgeInsets.only(bottom: 75),
-            child: FloatingActionButton.extended(
-              onPressed: () => _openAddMemberScreen(context),
-              icon: const Icon(Icons.person_add_rounded),
-              label: const Text('Add Member'),
-              backgroundColor: colorScheme.primary,
-              foregroundColor: colorScheme.onPrimary,
+    return Scaffold(
+      key: _scaffoldKey,
+      drawer: const PatientDrawer(),
+      backgroundColor: theme.scaffoldBackgroundColor,
+      body: NestedScrollView(
+        headerSliverBuilder: (context, innerBoxIsScrolled) {
+          return <Widget>[
+            CustomSliverAppBar(
+              expandedHeight: 220,
+              scaffoldKey: _scaffoldKey,
+              background: FamilyHeader(
+                membersCount: familyState.members.length,
+              ),
             ),
-          ),
-        );
-      },
+          ];
+        },
+        body: familyState.members.isEmpty
+            ? _buildEmptyState(context)
+            : ListView.separated(
+          padding: const EdgeInsets.fromLTRB(16, 20, 16, 150),
+          itemCount: familyState.members.length,
+          physics: const BouncingScrollPhysics(),
+          separatorBuilder: (context, index) => const SizedBox(height: 12),
+          itemBuilder: (context, index) {
+            final member = familyState.members[index];
+            return FamilyMemberCard(
+              member: member,
+              onDelete: () async {
+                await notifier.deleteMember(member.id);
+              },
+              onEdit: () => _openEditMemberScreen(context, member),
+            );
+          },
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 75),
+        child: FloatingActionButton.extended(
+          onPressed: () => _openAddMemberScreen(context),
+          icon: const Icon(Icons.person_add_rounded),
+          label: const Text('Add Member'),
+          backgroundColor: colorScheme.primary,
+          foregroundColor: colorScheme.onPrimary,
+        ),
+      ),
     );
   }
 
@@ -98,9 +95,9 @@ class _FamilyMembersScreenState extends State<FamilyMembersScreen> {
   }
 
   Future<void> _openEditMemberScreen(
-    BuildContext context,
-    FamilyMemberModel member,
-  ) async {
+      BuildContext context,
+      FamilyMemberModel member,
+      ) async {
     final messenger = ScaffoldMessenger.of(context);
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -130,6 +127,7 @@ class _FamilyMembersScreenState extends State<FamilyMembersScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            Navigator.canPop(context) ? const SizedBox(height: 40) : const SizedBox(),
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(

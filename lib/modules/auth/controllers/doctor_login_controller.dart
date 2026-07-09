@@ -1,71 +1,118 @@
+import 'dart:async';
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/core/constants/log_tags.dart';
+import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:yodoctor/modules/auth/repository/doctor_auth_repository.dart';
 
-import '../../../services/doctor_login_service.dart';
+final doctorLoginControllerProvider =
+    AsyncNotifierProvider<DoctorLoginController, Map<String, dynamic>?>(
+      DoctorLoginController.new,
+    );
 
-class DoctorLoginController extends ChangeNotifier {
-  final DoctorLoginService _service = DoctorLoginService();
+class DoctorLoginController extends AsyncNotifier<Map<String, dynamic>?> {
+  static const String _subTag = 'DoctorLoginController';
 
-  bool isLoading = false;
-  String? error;
+  @override
+  FutureOr<Map<String, dynamic>?> build() => null;
 
   Future<Map<String, dynamic>?> login({
     required String identifier,
     required String password,
   }) async {
-    try {
-      isLoading = true;
-      error = null;
-      notifyListeners();
+    AppLogger.info(
+      'Initiating doctor email credential verification sequence',
+      tag: LogTags.auth,
+      subTag: _subTag,
+    );
+    state = const AsyncLoading();
 
-      final response = await _service.login(
+    try {
+      final repository = ref.read(doctorAuthRepositoryProvider);
+      final response = await repository.login(
         identifier: identifier,
         password: password,
       );
+      final statusCode = response.statusCode ?? 0;
 
-      final prefs = await SharedPreferences.getInstance();
+      if (statusCode >= 200 && statusCode < 300) {
+        final data = response.data;
+        final token = data["data"]?["token"];
 
-      final data = response.data;
+        if (token != null) {
+          await repository.saveSessionToken(token);
+          AppLogger.success(
+            'JWT Master session key captured and storage committed',
+            tag: LogTags.auth,
+            subTag: _subTag,
+          );
+        }
 
-      final token = data["data"]?["token"];
+        final redirectPayload = {
+          "redirect": data["redirect"],
+          "status": data["status"],
+          "nextStep": data["nextStep"],
+          "message": data["message"],
+        };
 
-      if (token != null) {
-        await prefs.setString("doctor_token", token);
+        state = AsyncData(redirectPayload);
+        return redirectPayload;
+      } else {
+        final msg = response.data?["message"] ?? "Authentication Rejected";
+        state = AsyncError(msg, StackTrace.current);
+        return null;
+      }
+    } catch (e, st) {
+      String message = 'Something went wrong';
+
+      if (e is DioException) {
+        final statusCode = e.response?.statusCode;
+
+        if (statusCode == 401) {
+          message = e.response?.data?['message'] ?? 'Invalid email or password';
+        } else if (statusCode == 404) {
+          message = 'Account not found';
+        } else if (statusCode == 500) {
+          message = 'Server error. Please try again later';
+        } else {
+          message = e.response?.data?['message'] ?? 'Request failed';
+        }
       }
 
-      isLoading = false;
-      notifyListeners();
+      state = AsyncError(message, st);
 
-      return {
-        "redirect": data["redirect"],
-        "status": data["status"],
-        "nextStep": data["nextStep"],
-        "message": data["message"],
-      };
-    } on DioException catch (e) {
-      error = e.response?.data["message"] ?? "Login Failed";
-
-      isLoading = false;
-      notifyListeners();
-
-      return null;
-    } catch (e) {
-      error = e.toString();
-
-      isLoading = false;
-      notifyListeners();
+      AppLogger.exception(
+        e,
+        st,
+        message: 'Fatal crash within session gate login wire',
+        tag: LogTags.auth,
+        subTag: _subTag,
+      );
 
       return null;
     }
   }
 
   Future<void> logout() async {
-    final prefs = await SharedPreferences.getInstance();
-
-    await prefs.remove("doctor_token");
-
-    error = null;
-    notifyListeners();
+    state = const AsyncLoading();
+    try {
+      final repository = ref.read(doctorAuthRepositoryProvider);
+      await repository.clearAuthSession();
+      state = const AsyncData(null);
+      AppLogger.success(
+        'Doctor control profile session tokens terminated successfully',
+        tag: LogTags.auth,
+        subTag: _subTag,
+      );
+    } catch (e, st) {
+      state = AsyncError(e, st);
+      AppLogger.exception(
+        e,
+        st,
+        message: 'Session clear failure sequence intercept',
+        tag: LogTags.auth,
+        subTag: _subTag,
+      );
+    }
   }
 }

@@ -1,3 +1,4 @@
+import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import '../../../models/family/family_member_model.dart';
 
@@ -15,9 +16,9 @@ class PatientSelectionSection extends StatelessWidget {
   final bool isSelf;
   final List<FamilyMemberModel> familyMembers;
   final FamilyMemberModel? selectedFamilyMember;
-  final ValueChanged<bool> onProfileTypeChanged;
-  final ValueChanged<FamilyMemberModel?> onMemberChanged;
-  final VoidCallback onAddFamilyPressed;
+  final ValueChanged<bool>? onProfileTypeChanged;
+  final ValueChanged<FamilyMemberModel?>? onMemberChanged;
+  final VoidCallback? onAddFamilyPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +35,8 @@ class PatientSelectionSection extends StatelessWidget {
                 label: 'For Self',
                 icon: Icons.person_rounded,
                 isSelected: isSelf,
-                onTap: () => onProfileTypeChanged(true),
+                // 🎯 जर वरून फंक्शन null आलं (Loading मुळे), तर क्लिक लॉक होईल
+                onTap: onProfileTypeChanged != null ? () => onProfileTypeChanged!(true) : null,
                 colorScheme: colorScheme,
                 textTheme: textTheme,
               ),
@@ -45,7 +47,7 @@ class PatientSelectionSection extends StatelessWidget {
                 label: 'Family Member',
                 icon: Icons.group_rounded,
                 isSelected: !isSelf,
-                onTap: () => onProfileTypeChanged(false),
+                onTap: onProfileTypeChanged != null ? () => onProfileTypeChanged!(false) : null,
                 colorScheme: colorScheme,
                 textTheme: textTheme,
               ),
@@ -68,10 +70,12 @@ class PatientSelectionSection extends StatelessWidget {
               children: [
                 Expanded(
                   child: DropdownButtonFormField<FamilyMemberModel>(
-                    value: selectedFamilyMember,
+                    initialValue: selectedFamilyMember,
                     hint: const Text("Choose Member"),
                     decoration: InputDecoration(
-                      fillColor: colorScheme.surfaceContainerLow,
+                      fillColor: onMemberChanged == null
+                          ? colorScheme.surfaceContainerHighest.transparency(0.3)
+                          : colorScheme.surfaceContainerLow,
                       filled: true,
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16,
@@ -106,7 +110,7 @@ class PatientSelectionSection extends StatelessWidget {
     required String label,
     required IconData icon,
     required bool isSelected,
-    required VoidCallback onTap,
+    required VoidCallback? onTap,
     required ColorScheme colorScheme,
     required TextTheme textTheme,
   }) {
@@ -117,14 +121,14 @@ class PatientSelectionSection extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
         decoration: BoxDecoration(
-          color: isSelected
-              ? colorScheme.primaryContainer
-              : colorScheme.surfaceContainerLow,
+          color: onTap == null
+              ? colorScheme.surfaceContainerHighest.transparency(0.2)
+              : (isSelected ? colorScheme.primaryContainer : colorScheme.surfaceContainerLow),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected
+            color: isSelected && onTap != null
                 ? colorScheme.primary
-                : colorScheme.outlineVariant.withValues(alpha: 0),
+                : colorScheme.outlineVariant.transparency(0),
             width: 1.5,
           ),
         ),
@@ -134,9 +138,9 @@ class PatientSelectionSection extends StatelessWidget {
             Icon(
               icon,
               size: 18,
-              color: isSelected
+              color: isSelected && onTap != null
                   ? colorScheme.primary
-                  : colorScheme.onSurfaceVariant,
+                  : colorScheme.onSurfaceVariant.transparency(onTap == null ? 0.4 : 1.0),
             ),
             const SizedBox(width: 8),
             Flexible(
@@ -145,9 +149,9 @@ class PatientSelectionSection extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: textTheme.labelLarge?.copyWith(
                   fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
-                  color: isSelected
+                  color: isSelected && onTap != null
                       ? colorScheme.primary
-                      : colorScheme.onSurfaceVariant,
+                      : colorScheme.onSurfaceVariant.transparency(onTap == null ? 0.4 : 1.0),
                 ),
               ),
             ),

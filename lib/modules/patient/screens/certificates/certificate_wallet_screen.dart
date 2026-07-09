@@ -1,3 +1,4 @@
+import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -8,11 +9,8 @@ import '../../controllers/certificate_request.dart';
 import '../../widgets/custom_sliver_app_bar.dart';
 import '../../widgets/patient_drawer.dart';
 import 'widgets/certificate_header.dart';
-import 'widgets/certificate_preview_dialog.dart';
 import '../../../patient/models/certificate/patient_certificate_request_model.dart';
-import '../../models/certificate/patient_certificate_detail_model.dart';
 import '../../controllers/patient_dashboard_controller.dart';
-import 'package:provider/provider.dart';
 
 class CertificateWalletScreen extends ConsumerStatefulWidget {
   const CertificateWalletScreen({super.key});
@@ -22,10 +20,19 @@ class CertificateWalletScreen extends ConsumerStatefulWidget {
       _CertificateWalletScreenState();
 }
 
-class _CertificateWalletScreenState
-    extends ConsumerState<CertificateWalletScreen> {
+class _CertificateWalletScreenState extends ConsumerState<CertificateWalletScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    // 🎯 Triggers async data load via screen lifecycle instead of build microtasks
+    Future.microtask(() {
+      ref.read(certificateProvider.notifier).loadDoctors();
+      ref.read(certificateProvider.notifier).loadMyRequests();
+    });
+  }
 
   @override
   void dispose() {
@@ -38,9 +45,10 @@ class _CertificateWalletScreenState
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final horizontalPadding = Responsive.horizontalPadding(context);
-    final dashboardController = context.watch<PatientDashboardController>();
 
-    final dashboard = dashboardController.dashboardData;
+    // 🎯 Replaced provider's context.watch with reactive Riverpod ref.watch sync
+    final dashboardState = ref.watch(patientDashboardControllerProvider);
+    final dashboardData = dashboardState.dashboardData;
 
     // Watch dynamic state layout values from profile notifier provider
     final formState = ref.watch(certificateProvider);
@@ -51,7 +59,7 @@ class _CertificateWalletScreenState
 
     return Scaffold(
       key: _scaffoldKey,
-      drawer: PatientDrawer(dashboard: dashboard),
+      drawer: PatientDrawer(dashboard: dashboardData),
       backgroundColor: theme.scaffoldBackgroundColor,
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
@@ -97,15 +105,15 @@ class _CertificateWalletScreenState
                           ),
                           suffixIcon: value.text.isNotEmpty
                               ? IconButton(
-                                  icon: const Icon(
-                                    Icons.clear_rounded,
-                                    size: 20,
-                                  ),
-                                  onPressed: () {
-                                    _searchController.clear();
-                                    notifier.setSearchQuery('');
-                                  },
-                                )
+                            icon: const Icon(
+                              Icons.clear_rounded,
+                              size: 20,
+                            ),
+                            onPressed: () {
+                              _searchController.clear();
+                              notifier.setSearchQuery('');
+                            },
+                          )
                               : null,
                           filled: true,
                           fillColor: theme.colorScheme.surfaceContainerLow,
@@ -117,7 +125,7 @@ class _CertificateWalletScreenState
                             borderRadius: BorderRadius.circular(14),
                             borderSide: BorderSide(
                               color: theme.colorScheme.outlineVariant
-                                  .withValues(alpha: 0.35),
+                                  .transparency(0.35),
                               width: 1.0,
                             ),
                           ),
@@ -137,15 +145,12 @@ class _CertificateWalletScreenState
                     scrollDirection: Axis.horizontal,
                     physics: const BouncingScrollPhysics(),
                     child: Row(
-                      children: ['All', 'Pending', 'Approved', 'Rejected'].map((
-                        filter,
-                      ) {
+                      children: ['All', 'Pending', 'Approved', 'Rejected'].map((filter) {
                         final isSelected = formState.selectedFilter == filter;
                         return Padding(
                           padding: const EdgeInsets.only(right: 8.0),
                           child: FilterChip(
                             label: Text(filter),
-
                             selected: isSelected,
                             onSelected: (_) => notifier.setFilter(filter),
                             selectedColor: colorScheme.primaryContainer,
@@ -173,26 +178,26 @@ class _CertificateWalletScreenState
           ),
           filteredCertificates.isEmpty
               ? SliverFillRemaining(
-                  hasScrollBody: false,
-                  child: _buildEmptyState(context, formState.selectedFilter),
-                )
+            hasScrollBody: false,
+            child: _buildEmptyState(context, formState.selectedFilter),
+          )
               : SliverPadding(
-                  padding: EdgeInsets.fromLTRB(
-                    horizontalPadding,
-                    12,
-                    horizontalPadding,
-                    95,
-                  ),
-                  sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate((context, index) {
-                      final cert = filteredCertificates[index];
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 12.0),
-                        child: _buildCertificateCard(context, cert),
-                      );
-                    }, childCount: filteredCertificates.length),
-                  ),
-                ),
+            padding: EdgeInsets.fromLTRB(
+              horizontalPadding,
+              12,
+              horizontalPadding,
+              95,
+            ),
+            sliver: SliverList(
+              delegate: SliverChildBuilderDelegate((context, index) {
+                final cert = filteredCertificates[index];
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 12.0),
+                  child: _buildCertificateCard(context, cert),
+                );
+              }, childCount: filteredCertificates.length),
+            ),
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
@@ -209,9 +214,9 @@ class _CertificateWalletScreenState
   }
 
   Widget _buildCertificateCard(
-    BuildContext context,
-    PatientCertificateRequestModel cert,
-  ) {
+      BuildContext context,
+      PatientCertificateRequestModel cert,
+      ) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final dateStr = DateFormat('dd MMM yyyy').format(cert.createdAt);
@@ -246,7 +251,6 @@ class _CertificateWalletScreenState
 
     return InkWell(
       borderRadius: BorderRadius.circular(16),
-
       onTap: () async {
         await ref
             .read(certificateProvider.notifier)
@@ -256,14 +260,13 @@ class _CertificateWalletScreenState
           context.push(AppRoutes.patientCertificateDetail);
         }
       },
-
       child: Card(
         margin: EdgeInsets.zero,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
           side: BorderSide(
-            color: colorScheme.outlineVariant.withValues(alpha: 0.4),
+            color: colorScheme.outlineVariant.transparency(0.4),
           ),
         ),
         child: Padding(
@@ -309,10 +312,10 @@ class _CertificateWalletScreenState
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: getStatusColor().withValues(alpha: 0.1),
+                      color: getStatusColor().transparency(0.1),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: getStatusColor().withValues(alpha: 0.3),
+                        color: getStatusColor().transparency(0.3),
                       ),
                     ),
                     child: Text(

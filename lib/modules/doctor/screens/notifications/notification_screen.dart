@@ -16,18 +16,11 @@ class NotificationScreen extends ConsumerWidget {
     final notifier = ref.read(notificationProvider.notifier);
 
     final todayNotifications = state.notifications
-        .where(
-          (n) => n.createdAt.isAfter(
-            DateTime.now().subtract(const Duration(days: 1)),
-          ),
-        )
+        .where((n) => n.createdAt.isAfter(DateTime.now().subtract(const Duration(days: 1))))
         .toList();
+
     final olderNotifications = state.notifications
-        .where(
-          (n) => n.createdAt.isBefore(
-            DateTime.now().subtract(const Duration(days: 1)),
-          ),
-        )
+        .where((n) => n.createdAt.isBefore(DateTime.now().subtract(const Duration(days: 1))))
         .toList();
 
     return Scaffold(
@@ -61,21 +54,35 @@ class NotificationScreen extends ConsumerWidget {
         actions: [
           IconButton(
             icon: Icon(Icons.done_all_rounded, color: colorScheme.onPrimary),
-            onPressed: state.unreadCount == 0
+            // 🎯 FIXED: Disable action button during active loading states to prevent multiple network fires
+            onPressed: state.unreadCount == 0 || state.loading
                 ? null
                 : () async {
-                    await notifier.markAllAsRead();
-                  },
+              await notifier.markAllAsRead();
+            },
           ),
         ],
       ),
-      body: SafeArea(
-        child: Align(
-          alignment: Alignment.topLeft,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 720),
-            child: state.notifications.isEmpty
-                ? Center(
+      // 🎯 FIXED LOADING BUG: Show progress indicator cleanly instead of flashing "All caught up!" on initialization
+      body: state.loading && state.notifications.isEmpty
+          ? const Center(child: CircularProgressIndicator())
+          : SafeArea(
+        child: Column(
+          children: [
+            // 🎯 FIXED UX: Non-blocking top indicator if background refresh/mutation pipeline runs
+            if (state.loading && state.notifications.isNotEmpty)
+              LinearProgressIndicator(
+                color: colorScheme.primary,
+                backgroundColor: colorScheme.primaryContainer.withValues(alpha: 0.2),
+              ),
+
+            Expanded(
+              child: Align(
+                alignment: Alignment.topLeft,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 720),
+                  child: state.notifications.isEmpty
+                      ? Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -92,7 +99,7 @@ class NotificationScreen extends ConsumerWidget {
                           ),
                         ),
                         Text(
-                          "You don't have any notifications right now.",
+                          state.errorMessage ?? "You don't have any notifications right now.",
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                           ),
@@ -100,7 +107,7 @@ class NotificationScreen extends ConsumerWidget {
                       ],
                     ),
                   )
-                : ListView(
+                      : ListView(
                     padding: const EdgeInsets.all(AppSpacing.lg),
                     children: [
                       if (todayNotifications.isNotEmpty) ...[
@@ -114,7 +121,7 @@ class NotificationScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: AppSpacing.sm),
                         ...todayNotifications.map(
-                          (n) => NotificationCard(
+                              (n) => NotificationCard(
                             notification: n,
                             onTap: () async {
                               await notifier.markAsRead(n.id);
@@ -134,7 +141,7 @@ class NotificationScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: AppSpacing.sm),
                         ...olderNotifications.map(
-                          (n) => NotificationCard(
+                              (n) => NotificationCard(
                             notification: n,
                             onTap: () async {
                               await notifier.markAsRead(n.id);
@@ -144,7 +151,10 @@ class NotificationScreen extends ConsumerWidget {
                       ],
                     ],
                   ),
-          ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

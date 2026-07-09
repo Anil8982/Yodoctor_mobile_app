@@ -1,36 +1,63 @@
-import 'package:flutter/foundation.dart';
-
-import '../../../services/patient_search_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/core/constants/log_tags.dart';
+import 'package:yodoctor/core/debug/app_logger.dart';
 import '../models/search/doctor_search_model.dart';
+import '../repositories/patient_search_repository.dart';
 
-class DoctorListingController extends ChangeNotifier {
-  final PatientSearchService _service = PatientSearchService();
+class DoctorListingState {
+  final bool isLoading;
+  final String? errorMessage;
+  final List<DoctorSearchModel> allDoctors;
+  final List<DoctorSearchModel> doctors;
+  final String selectedSpecialty;
+  final String activeQuery;
 
-  bool _isLoading = false;
-  String? _errorMessage;
+  DoctorListingState({
+    this.isLoading = false,
+    this.errorMessage,
+    this.allDoctors = const [],
+    this.doctors = const [],
+    this.selectedSpecialty = "All",
+    this.activeQuery = "",
+  });
 
-  final List<DoctorSearchModel> _allDoctors = [];
-  final List<DoctorSearchModel> _doctors = [];
-
-  String _selectedSpecialty = "All";
-  String _activeQuery = "";
-
-  bool get isLoading => _isLoading;
-
-  String? get errorMessage => _errorMessage;
-
-  List<DoctorSearchModel> get doctors => _doctors;
-
-  String get selectedSpecialty => _selectedSpecialty;
-
-  String get activeQuery => _activeQuery;
-
-  int get foundCount => _doctors.length;
+  int get foundCount => doctors.length;
 
   List<String> get specialties {
-    final values = <String>{"All", ..._allDoctors.map((e) => e.specialty)};
-
+    final values = <String>{"All", ...allDoctors.map((e) => e.specialty)};
     return values.toList();
+  }
+
+  DoctorListingState copyWith({
+    bool? isLoading,
+    String? errorMessage,
+    List<DoctorSearchModel>? allDoctors,
+    List<DoctorSearchModel>? doctors,
+    String? selectedSpecialty,
+    String? activeQuery,
+  }) {
+    return DoctorListingState(
+      isLoading: isLoading ?? this.isLoading,
+      errorMessage: errorMessage ?? this.errorMessage,
+      allDoctors: allDoctors ?? this.allDoctors,
+      doctors: doctors ?? this.doctors,
+      selectedSpecialty: selectedSpecialty ?? this.selectedSpecialty,
+      activeQuery: activeQuery ?? this.activeQuery,
+    );
+  }
+}
+
+final doctorListingControllerProvider =
+NotifierProvider<DoctorListingController, DoctorListingState>(
+  DoctorListingController.new,
+);
+
+class DoctorListingController extends Notifier<DoctorListingState> {
+  static const String _subTag = 'DoctorListingController';
+
+  @override
+  DoctorListingState build() {
+    return DoctorListingState(); // Initial State Lock
   }
 
   Future<void> loadDoctors({
@@ -38,65 +65,73 @@ class DoctorListingController extends ChangeNotifier {
     String city = "",
     int page = 1,
   }) async {
-    _isLoading = true;
-    _errorMessage = null;
-    _activeQuery = query;
+    // 🎯 Loading Guard
+    if (state.isLoading) return;
 
-    notifyListeners();
+    state = state.copyWith(
+      isLoading: true,
+      errorMessage: null,
+      activeQuery: query,
+    );
+
+    AppLogger.info('Loading doctors list matrix', tag: LogTags.patient, subTag: _subTag);
 
     try {
-      final response = await _service.searchDoctors(
+      final repository = ref.read(patientSearchRepositoryProvider);
+      final response = await repository.searchDoctors(
         search: query,
         city: city,
         page: page,
       );
 
       if (response.statusCode == 200) {
-        _allDoctors.clear();
+        final rawDoctorsList = response.data["data"]["doctors"] as List;
+        final parsedAllDoctors = rawDoctorsList.map((e) => DoctorSearchModel.fromJson(e)).toList();
 
-        _allDoctors.addAll(
-          (response.data["data"]["doctors"] as List).map(
-            (e) => DoctorSearchModel.fromJson(e),
-          ),
+        // Safe evaluation filtering pipeline
+        final filteredDoctors = _computeSpecialtyFilter(parsedAllDoctors, state.selectedSpecialty);
+
+        state = state.copyWith(
+          allDoctors: parsedAllDoctors,
+          doctors: filteredDoctors,
+          isLoading: false,
         );
-
-        _applySpecialtyFilter();
       } else {
-        _errorMessage = response.data["message"];
-        _allDoctors.clear();
-        _doctors.clear();
+        final errorMsg = response.data["message"] ?? "Failed to load doctors";
+        state = state.copyWith(
+          errorMessage: errorMsg,
+          allDoctors: const [],
+          doctors: const [],
+          isLoading: false,
+        );
+        AppLogger.warning('Failed to load doctors: $errorMsg', tag: LogTags.patient, subTag: _subTag);
       }
-    } catch (e) {
-      _errorMessage = e.toString();
-      _allDoctors.clear();
-      _doctors.clear();
+    } catch (e, stackTrace) {
+      state = state.copyWith(
+        errorMessage: "Failed to load doctors",
+        allDoctors: const [],
+        doctors: const [],
+        isLoading: false,
+      );
+      AppLogger.exception(e, stackTrace, message: 'Failed to load doctors', tag: LogTags.patient, subTag: _subTag);
     }
-
-    _isLoading = false;
-    notifyListeners();
   }
 
   void setSpecialty(String specialty) {
-    if (_selectedSpecialty == specialty) return;
+    if (state.selectedSpecialty == specialty) return;
 
-    _selectedSpecialty = specialty;
+    final filteredDoctors = _computeSpecialtyFilter(state.allDoctors, specialty);
 
-    _applySpecialtyFilter();
-
-    notifyListeners();
+    state = state.copyWith(
+      selectedSpecialty: specialty,
+      doctors: filteredDoctors,
+    );
   }
 
-  void _applySpecialtyFilter() {
-    if (_selectedSpecialty == "All") {
-      _doctors
-        ..clear()
-        ..addAll(_allDoctors);
-
-      return;
+  List<DoctorSearchModel> _computeSpecialtyFilter(List<DoctorSearchModel> targetList, String specialty) {
+    if (specialty == "All") {
+      return List.from(targetList);
     }
-
-    _doctors
-      ..clear()
-      ..addAll(_allDoctors.where((e) => e.specialty == _selectedSpecialty));
+    return targetList.where((e) => e.specialty == specialty).toList();
   }
 }

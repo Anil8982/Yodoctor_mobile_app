@@ -1,5 +1,5 @@
 class BookAppointmentRequest {
-  final int doctorId;
+  final String doctorId;
   final String appointmentType;
   final String appointmentDate;
   final String slot;

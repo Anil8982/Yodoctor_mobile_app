@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import '../../widgets/custom_sliver_app_bar.dart';
-import '../../widgets/patient_drawer.dart';
+import 'package:yodoctor/modules/patient/controllers/patient_dashboard_controller.dart';
+import 'package:yodoctor/modules/patient/widgets/custom_sliver_app_bar.dart';
+import 'package:yodoctor/modules/patient/widgets/patient_drawer.dart';
 import 'models/services_model.dart';
 import 'widgets/service_card.dart';
 import 'widgets/services_header.dart';
-import 'package:provider/provider.dart' as provider;
-import '../../controllers/patient_dashboard_controller.dart';
 
 class ServicesScreen extends ConsumerStatefulWidget {
   const ServicesScreen({super.key});
@@ -48,11 +47,12 @@ class _ServicesScreenState extends ConsumerState<ServicesScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final dashboardController =
-        provider.Provider.of<PatientDashboardController>(context);
+
+    final dashboardState = ref.watch(patientDashboardControllerProvider);
+
     return Scaffold(
       key: _scaffoldKey,
-      drawer: PatientDrawer(dashboard: dashboardController.dashboardData),
+      drawer: PatientDrawer(dashboard: dashboardState.dashboardData),
       backgroundColor: theme.scaffoldBackgroundColor,
       body: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart'; // 🎯 Added Riverpod core import
 import 'package:yodoctor/modules/patient/screens/dashboard/widgets/patient_header.dart';
 import 'package:yodoctor/modules/patient/widgets/custom_sliver_app_bar.dart';
 import 'package:yodoctor/modules/patient/widgets/patient_drawer.dart';
@@ -14,99 +14,103 @@ import 'widgets/appointment_filter_chips.dart';
 import 'widgets/token_card.dart';
 import 'widgets/search_doctor_card.dart';
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends ConsumerWidget {
+  // 🎯 Converted to ConsumerWidget
   DashboardScreen({super.key});
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // 🎯 Injected WidgetRef
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return Consumer<PatientDashboardController>(
-      builder: (context, controller, child) {
-        final loading = controller.isLoading;
-        final data = controller.dashboardData;
+    // 🎯 Watching Riverpod provider directly instead of legacy Consumer block
+    final controller = ref.watch(patientDashboardControllerProvider);
+    final loading = controller.isLoading;
+    final data = controller.dashboardData;
 
-        if (loading && data == null) {
-          return Scaffold(
-            backgroundColor: theme.scaffoldBackgroundColor,
-            body: const Center(child: CircularProgressIndicator()),
-          );
-        }
-        if (data == null) {
-          return Scaffold(
-            body: Center(
-              child: Text(controller.errorMessage ?? "Dashboard Data is NULL"),
+    if (loading && data == null) {
+      return Scaffold(
+        backgroundColor: theme.scaffoldBackgroundColor,
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+    if (data == null) {
+      return Scaffold(
+        body: Center(
+          child: Text(controller.errorMessage ?? "Dashboard Data is NULL"),
+        ),
+      );
+    }
+
+    final bool mobile = Responsive.isMobile(context);
+    final double horizontal = Responsive.horizontalPadding(context);
+
+    return Scaffold(
+      key: _scaffoldKey,
+      extendBodyBehindAppBar: true,
+      backgroundColor: theme.scaffoldBackgroundColor,
+      drawer: PatientDrawer(dashboard: data),
+      body: NestedScrollView(
+        headerSliverBuilder: (context, innerBoxIsScrolled) {
+          return [
+            CustomSliverAppBar(
+              expandedHeight: 190.0,
+              scaffoldKey: _scaffoldKey,
+              background: PatientHeader(dashboard: data),
             ),
-          );
-        }
-        final bool mobile = Responsive.isMobile(context);
-        final double horizontal = Responsive.horizontalPadding(context);
-
-        return Scaffold(
-          key: _scaffoldKey,
-          extendBodyBehindAppBar: true,
-          backgroundColor: theme.scaffoldBackgroundColor,
-          drawer: PatientDrawer(dashboard: data),
-          body: NestedScrollView(
-            headerSliverBuilder: (context, innerBoxIsScrolled) {
-              return [
-                CustomSliverAppBar(
-                  expandedHeight: 190.0,
-                  scaffoldKey: _scaffoldKey,
-                  background: PatientHeader(dashboard: data),
+          ];
+        },
+        body: RefreshIndicator(
+          onRefresh: controller.loadDashboard,
+          color: colorScheme.primary,
+          backgroundColor: colorScheme.surface,
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: EdgeInsets.fromLTRB(
+              horizontal,
+              AppSpacing.lg,
+              horizontal,
+              AppSpacing.xl,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SearchDoctorCard(),
+                const SizedBox(height: AppSpacing.xl),
+                TokenCard(token: data.todayToken),
+                const SizedBox(height: AppSpacing.xl),
+                _buildSectionHeader(
+                  context,
+                  colorScheme,
+                  'Upcoming Appointments',
                 ),
-              ];
-            },
-            body: RefreshIndicator(
-              onRefresh: controller.loadDashboard,
-              color: colorScheme.primary,
-              backgroundColor: colorScheme.surface,
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: EdgeInsets.fromLTRB(
-                  horizontal,
-                  AppSpacing.lg,
-                  horizontal,
-                  AppSpacing.xl,
+                const SizedBox(height: AppSpacing.sm),
+                AppointmentFilterChips(
+                  filters: PatientDashboardController.availableFilters,
+                  selectedFilter: controller.selectedFilter,
+                  onFilterSelected: (filter) {
+                    HapticFeedback.selectionClick();
+                    // 🎯 Direct execution trigger using read on the provider context
+                    ref
+                        .read(patientDashboardControllerProvider)
+                        .setFilter(filter);
+                  },
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SearchDoctorCard(),
-                    const SizedBox(height: AppSpacing.xl),
-                    TokenCard(token: data.todayToken),
-                    const SizedBox(height: AppSpacing.xl),
-                    _buildSectionHeader(
-                      context,
-                      colorScheme,
-                      'Upcoming Appointments',
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    AppointmentFilterChips(
-                      filters: PatientDashboardController.availableFilters,
-                      selectedFilter: controller.selectedFilter,
-                      onFilterSelected: (filter) {
-                        HapticFeedback.selectionClick();
-                        controller.setFilter(filter);
-                      },
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                    if (loading)
-                      LinearProgressIndicator(
-                        color: colorScheme.primary,
-                        backgroundColor: colorScheme.primaryContainer,
-                      ),
-                    _buildAppointmentsContent(data, mobile),
-                  ],
-                ),
-              ),
+                const SizedBox(height: AppSpacing.md),
+                if (loading)
+                  LinearProgressIndicator(
+                    color: colorScheme.primary,
+                    backgroundColor: colorScheme.primaryContainer,
+                  ),
+                _buildAppointmentsContent(data, mobile),
+              ],
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 
@@ -179,6 +183,7 @@ class DashboardScreen extends StatelessWidget {
   }
 }
 
+// (_EmptyAppointments widget implementation remains identical to old source layout)
 class _EmptyAppointments extends StatelessWidget {
   const _EmptyAppointments();
 

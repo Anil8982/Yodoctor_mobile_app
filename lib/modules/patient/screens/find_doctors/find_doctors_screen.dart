@@ -1,5 +1,6 @@
+import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/routes/app_routes.dart';
@@ -7,27 +8,27 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/app_spacing.dart';
 import '../../models/search/doctor_search_model.dart';
 import '../../../../core/utils/responsive.dart';
-import '../../controllers/DoctorDetailController.dart';
+import '../../controllers/doctor_detail_controller.dart';
 import '../../controllers/doctor_listing_controller.dart';
 import 'widgets/doctor_card.dart';
 
-class FindDoctorsScreen extends StatefulWidget {
+class FindDoctorsScreen extends ConsumerStatefulWidget {
   const FindDoctorsScreen({super.key, this.initialQuery = ''});
 
   final String initialQuery;
 
   @override
-  State<FindDoctorsScreen> createState() => _FindDoctorsScreenState();
+  ConsumerState<FindDoctorsScreen> createState() => _FindDoctorsScreenState();
 }
 
-class _FindDoctorsScreenState extends State<FindDoctorsScreen> {
+class _FindDoctorsScreenState extends ConsumerState<FindDoctorsScreen> {
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<DoctorListingController>().loadDoctors(
-        query: widget.initialQuery,
-      );
+      ref
+          .read(doctorListingControllerProvider.notifier)
+          .loadDoctors(query: widget.initialQuery);
     });
   }
 
@@ -35,9 +36,9 @@ class _FindDoctorsScreenState extends State<FindDoctorsScreen> {
   void didUpdateWidget(covariant FindDoctorsScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.initialQuery != widget.initialQuery) {
-      context.read<DoctorListingController>().loadDoctors(
-        query: widget.initialQuery,
-      );
+      ref
+          .read(doctorListingControllerProvider.notifier)
+          .loadDoctors(query: widget.initialQuery);
     }
   }
 
@@ -46,102 +47,109 @@ class _FindDoctorsScreenState extends State<FindDoctorsScreen> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return Consumer<DoctorListingController>(
-      builder: (context, controller, child) {
-        final bool mobile = Responsive.isMobile(context);
-        final bool desktop = Responsive.isDesktop(context);
-        final double horizontal = Responsive.horizontalPadding(context);
+    // 🎯 Watching Riverpod state channel directly
+    final listingState = ref.watch(doctorListingControllerProvider);
+    final controllerNotifier = ref.read(
+      doctorListingControllerProvider.notifier,
+    );
 
-        return Scaffold(
-          backgroundColor: theme.scaffoldBackgroundColor,
-          appBar: AppBar(
-            elevation: 0,
-            scrolledUnderElevation: 0,
-            flexibleSpace: DecoratedBox(
-              decoration: BoxDecoration(gradient: AppTheme.patientGradient),
+    final bool mobile = Responsive.isMobile(context);
+    final bool desktop = Responsive.isDesktop(context);
+    final double horizontal = Responsive.horizontalPadding(context);
+
+    return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
+      appBar: AppBar(
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        flexibleSpace: DecoratedBox(
+          decoration: BoxDecoration(gradient: AppTheme.patientGradient),
+        ),
+        centerTitle: false,
+        leadingWidth: 72,
+        leading: Center(child: _buildBackButton(context, colorScheme)),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Find Doctors',
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: colorScheme.onPrimary,
+              ),
             ),
-            centerTitle: false,
-            leadingWidth: 72,
-            leading: Center(child: _buildBackButton(context, colorScheme)),
-            title: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Find Doctors',
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: colorScheme.onPrimary,
-                  ),
+            if (listingState.activeQuery.isNotEmpty)
+              Text(
+                'Results for "${listingState.activeQuery}"',
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: colorScheme.onPrimary.transparency(0.8),
                 ),
-                if (controller.activeQuery.isNotEmpty)
-                  Text(
-                    'Results for "${controller.activeQuery}"',
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: colorScheme.onPrimary.withValues(alpha: 0.8),
+              ),
+          ],
+        ),
+        actions: [
+          _buildResultCounter(listingState.foundCount, colorScheme),
+          const SizedBox(width: AppSpacing.md),
+        ],
+      ),
+      body: RefreshIndicator(
+        onRefresh: () =>
+            controllerNotifier.loadDoctors(query: listingState.activeQuery),
+        child: listingState.isLoading && listingState.doctors.isEmpty
+            ? const _LoadingView()
+            : CustomScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                slivers: [
+                  // --- Sticky Filter Section ---
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: horizontal,
+                        vertical: AppSpacing.md,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (listingState.activeQuery.trim().isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                bottom: AppSpacing.md,
+                              ),
+                              child: Text(
+                                'Results for "${listingState.activeQuery}"',
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ),
+                          _buildSpecialtyFilters(
+                            listingState,
+                            controllerNotifier,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-              ],
-            ),
-            actions: [
-              _buildResultCounter(controller, colorScheme),
-              const SizedBox(width: AppSpacing.md),
-            ],
-          ),
-          body: RefreshIndicator(
-            onRefresh: () =>
-                controller.loadDoctors(query: controller.activeQuery),
-            child: controller.isLoading && controller.doctors.isEmpty
-                ? const _LoadingView()
-                : CustomScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    slivers: [
-                      // --- Sticky Filter Section ---
-                      SliverToBoxAdapter(
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: horizontal,
-                            vertical: AppSpacing.md,
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              if (controller.activeQuery.trim().isNotEmpty)
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                    bottom: AppSpacing.md,
-                                  ),
-                                  child: Text(
-                                    'Results for "${controller.activeQuery}"',
-                                    style: theme.textTheme.bodyMedium?.copyWith(
-                                      color: colorScheme.onSurfaceVariant,
-                                    ),
-                                  ),
-                                ),
-                              _buildSpecialtyFilters(controller),
-                            ],
-                          ),
-                        ),
-                      ),
 
-                      // --- Doctor Listing ---
-                      SliverPadding(
-                        padding: EdgeInsets.fromLTRB(
-                          horizontal,
-                          0,
-                          horizontal,
-                          AppSpacing.xxs,
-                        ),
-                        sliver: controller.doctors.isEmpty
-                            ? const SliverToBoxAdapter(
-                                child: _EmptyDoctorsView(),
-                              )
-                            : _buildDoctorGrid(controller, mobile, desktop),
-                      ),
-                    ],
+                  // --- Doctor Listing ---
+                  SliverPadding(
+                    padding: EdgeInsets.fromLTRB(
+                      horizontal,
+                      0,
+                      horizontal,
+                      AppSpacing.xxs,
+                    ),
+                    sliver: listingState.doctors.isEmpty
+                        ? const SliverToBoxAdapter(child: _EmptyDoctorsView())
+                        : _buildDoctorGrid(
+                            listingState.doctors,
+                            mobile,
+                            desktop,
+                          ),
                   ),
-          ),
-        );
-      },
+                ],
+              ),
+      ),
     );
   }
 
@@ -160,10 +168,7 @@ class _FindDoctorsScreenState extends State<FindDoctorsScreen> {
   }
 
   // --- Widgets: Result Counter ---
-  Widget _buildResultCounter(
-    DoctorListingController controller,
-    ColorScheme colorScheme,
-  ) {
+  Widget _buildResultCounter(int count, ColorScheme colorScheme) {
     return Center(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -172,7 +177,7 @@ class _FindDoctorsScreenState extends State<FindDoctorsScreen> {
           color: colorScheme.secondaryContainer,
         ),
         child: Text(
-          '${controller.foundCount} found',
+          '$count found',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 12,
@@ -184,19 +189,22 @@ class _FindDoctorsScreenState extends State<FindDoctorsScreen> {
   }
 
   // --- Widgets: Filter Row ---
-  Widget _buildSpecialtyFilters(DoctorListingController controller) {
+  Widget _buildSpecialtyFilters(
+    DoctorListingState state,
+    DoctorListingController notifier,
+  ) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       physics: const BouncingScrollPhysics(),
       child: Row(
-        children: controller.specialties.map((String item) {
-          final isSelected = controller.selectedSpecialty == item;
+        children: state.specialties.map((String item) {
+          final isSelected = state.selectedSpecialty == item;
           return Padding(
             padding: const EdgeInsets.only(right: 8),
             child: FilterChip(
               label: Text(item),
               selected: isSelected,
-              onSelected: (_) => controller.setSpecialty(item),
+              onSelected: (_) => notifier.setSpecialty(item),
               showCheckmark: false,
               labelStyle: TextStyle(
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
@@ -213,7 +221,7 @@ class _FindDoctorsScreenState extends State<FindDoctorsScreen> {
 
   // --- Widgets: Doctor List / Grid ---
   Widget _buildDoctorGrid(
-    DoctorListingController controller,
+    List<DoctorSearchModel> doctors,
     bool mobile,
     bool desktop,
   ) {
@@ -221,13 +229,11 @@ class _FindDoctorsScreenState extends State<FindDoctorsScreen> {
       return SliverList(
         delegate: SliverChildBuilderDelegate(
           (context, index) => DoctorCard(
-            doctor: controller.doctors[index],
-            onProfileTap: () =>
-                _openDoctorProfile(context, controller.doctors[index]),
-            onBookTap: () =>
-                _openBookAppointment(context, controller.doctors[index]),
+            doctor: doctors[index],
+            onProfileTap: () => _openDoctorProfile(context, doctors[index]),
+            onBookTap: () => _openBookAppointment(context, doctors[index]),
           ),
-          childCount: controller.doctors.length,
+          childCount: doctors.length,
         ),
       );
     }
@@ -242,47 +248,39 @@ class _FindDoctorsScreenState extends State<FindDoctorsScreen> {
       ),
       delegate: SliverChildBuilderDelegate(
         (context, index) => DoctorCard(
-          doctor: controller.doctors[index],
-          onProfileTap: () =>
-              _openDoctorProfile(context, controller.doctors[index]),
-          onBookTap: () =>
-              _openBookAppointment(context, controller.doctors[index]),
+          doctor: doctors[index],
+          onProfileTap: () => _openDoctorProfile(context, doctors[index]),
+          onBookTap: () => _openBookAppointment(context, doctors[index]),
         ),
-        childCount: controller.doctors.length,
+        childCount: doctors.length,
       ),
     );
   }
 
   void _openDoctorProfile(BuildContext context, DoctorSearchModel doctor) {
-    context.push(AppRoutes.doctorDetail, extra: doctor.doctorId);
+    context.push('${AppRoutes.doctorDetail}/${doctor.doctorId}');
   }
 
   Future<void> _openBookAppointment(
     BuildContext context,
     DoctorSearchModel doctor,
   ) async {
-    print("Button Clicked");
-    print("Doctor Id = ${doctor.doctorId}");
+    final detailNotifier = ref.read(doctorDetailControllerProvider.notifier);
 
-    final controller = context.read<DoctorDetailController>();
+    await detailNotifier.loadDoctor(doctor.doctorId);
 
-    final doctorDetail = await controller.getDoctor(doctor.doctorId);
-
-    print("Doctor Detail = $doctorDetail");
+    final detailState = ref.read(doctorDetailControllerProvider);
 
     if (!context.mounted) return;
 
-    if (doctorDetail == null) {
-      print("Doctor Detail NULL");
+    if (detailState.doctor == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Unable to load doctor details")),
       );
       return;
     }
 
-    print("Navigating...");
-
-    context.push(AppRoutes.bookAppointment, extra: doctorDetail);
+    context.push(AppRoutes.bookAppointment, extra: detailState.doctor);
   }
 }
 

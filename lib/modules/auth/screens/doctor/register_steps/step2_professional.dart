@@ -1,12 +1,13 @@
+import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/modules/auth/controllers/doctor_register_controller.dart';
 import 'package:yodoctor/modules/auth/models/doctor_register_model.dart';
+import 'nav_buttons.dart';
 import 'shared_widgets.dart';
-import 'package:provider/provider.dart';
-import '../../../controllers/doctor_register_controller.dart';
 
-class Step2Professional extends StatefulWidget {
+class Step2Professional extends ConsumerStatefulWidget {
   final DoctorFormData data;
   final VoidCallback onNext;
   final VoidCallback onBack;
@@ -19,10 +20,10 @@ class Step2Professional extends StatefulWidget {
   });
 
   @override
-  State<Step2Professional> createState() => _Step2ProfessionalState();
+  ConsumerState<Step2Professional> createState() => _Step2ProfessionalState();
 }
 
-class _Step2ProfessionalState extends State<Step2Professional> {
+class _Step2ProfessionalState extends ConsumerState<Step2Professional> {
   final _formKey = GlobalKey<FormState>();
   final _specCtrl = TextEditingController();
   final _expCtrl = TextEditingController();
@@ -63,6 +64,7 @@ class _Step2ProfessionalState extends State<Step2Professional> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final registerState = ref.watch(doctorRegisterControllerProvider);
 
     return Form(
       key: _formKey,
@@ -71,7 +73,7 @@ class _Step2ProfessionalState extends State<Step2Professional> {
           StepTitle(
             icon: Icons.school_rounded,
             title: 'Professional Details',
-            color: AppTheme.yoBlue,
+            color: colorScheme.primary,
           ),
           const SizedBox(height: 24),
           DropdownField(
@@ -135,16 +137,12 @@ class _Step2ProfessionalState extends State<Step2Professional> {
             onTap: () async {
               final picked = await showDatePicker(
                 context: context,
-                initialDate:
-                    widget.data.validTill ??
-                    DateTime.now().add(const Duration(days: 365)),
+                initialDate: widget.data.validTill ?? DateTime.now().add(const Duration(days: 365)),
                 firstDate: DateTime.now(),
                 lastDate: DateTime(2040),
                 builder: (ctx, child) => Theme(
                   data: Theme.of(ctx).copyWith(
-                    colorScheme: Theme.of(
-                      ctx,
-                    ).colorScheme.copyWith(primary: AppTheme.yoBlue),
+                    colorScheme: Theme.of(ctx).colorScheme.copyWith(primary: colorScheme.primary),
                   ),
                   child: child!,
                 ),
@@ -159,7 +157,7 @@ class _Step2ProfessionalState extends State<Step2Professional> {
                 color: colorScheme.surfaceContainerLow,
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
-                  color: colorScheme.outlineVariant,
+                  color: colorScheme.outlineVariant.transparency(0.4),
                   width: 1.2,
                 ),
               ),
@@ -167,7 +165,7 @@ class _Step2ProfessionalState extends State<Step2Professional> {
                 children: [
                   Icon(
                     Icons.calendar_today_rounded,
-                    color: AppTheme.yoBlue,
+                    color: colorScheme.primary,
                     size: 20,
                   ),
                   const SizedBox(width: 12),
@@ -186,36 +184,41 @@ class _Step2ProfessionalState extends State<Step2Professional> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(top: 6),
+            padding: const EdgeInsets.only(top: 6, left: 4),
             child: Text(
               'Must be a future date',
-              style: textTheme.bodySmall?.copyWith(color: AppTheme.yoBlue),
+              style: textTheme.bodySmall?.copyWith(
+                color: colorScheme.primary,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
           const SizedBox(height: 20),
           const InfoBox(
-            text:
-                'By submitting these details, we may verify your credentials with the relevant medical councils to maintain platform integrity.',
+            text: 'By submitting these details, we may verify your credentials with the relevant medical councils to maintain platform integrity.',
           ),
           const SizedBox(height: 28),
           NavButtons(
             onBack: widget.onBack,
-            onNext: () async {
+            onNext: registerState.isLoading ? null : () async {
               if (!_formKey.currentState!.validate()) return;
 
               _save();
 
-              final controller = context.read<DoctorRegisterController>();
+              final success = await ref
+                  .read(doctorRegisterControllerProvider.notifier)
+                  .registerStep2(widget.data);
 
-              final success = await controller.registerStep2(widget.data);
-
-              if (!mounted) return;
+              if (!context.mounted) return;
 
               if (success) {
                 widget.onNext();
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(controller.error ?? "Step 2 Failed")),
+                  SnackBar(
+                    content: Text(ref.read(doctorRegisterControllerProvider).errorMessage ?? "Step 2 Failed"),
+                    behavior: SnackBarBehavior.floating,
+                  ),
                 );
               }
             },

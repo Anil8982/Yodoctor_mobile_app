@@ -1,5 +1,4 @@
 import 'package:hive/hive.dart';
-
 import 'hive_boxes.dart';
 import 'hive_keys.dart';
 
@@ -22,6 +21,23 @@ class StorageService {
 
   Future<void> clearToken() async {
     await _box.delete(HiveKeys.authToken);
+  }
+
+  // ----------------------------
+  // Doctor Registration Token
+  // ----------------------------
+
+  // 🎯 FIXED: Named methods matching DoctorAuthRepository interop proxies perfectly
+  Future<void> saveRegistrationToken(String token) async {
+    await _box.put(HiveKeys.doctorRegisterToken, token);
+  }
+
+  String? getRegistrationToken() {
+    return _box.get(HiveKeys.doctorRegisterToken);
+  }
+
+  Future<void> clearRegistrationToken() async {
+    await _box.delete(HiveKeys.doctorRegisterToken);
   }
 
   // ----------------------------

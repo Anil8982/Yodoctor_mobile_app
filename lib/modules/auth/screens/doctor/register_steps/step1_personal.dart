@@ -1,22 +1,23 @@
+import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/modules/auth/controllers/doctor_register_controller.dart';
 import 'package:yodoctor/modules/auth/models/doctor_register_model.dart';
+import 'next_button.dart';
 import 'shared_widgets.dart';
-import 'package:provider/provider.dart';
-import '../../../controllers/doctor_register_controller.dart';
 
-class Step1Personal extends StatefulWidget {
+class Step1Personal extends ConsumerStatefulWidget {
   final DoctorFormData data;
   final VoidCallback onNext;
 
   const Step1Personal({super.key, required this.data, required this.onNext});
 
   @override
-  State<Step1Personal> createState() => _Step1PersonalState();
+  ConsumerState<Step1Personal> createState() => _Step1PersonalState();
 }
 
-class _Step1PersonalState extends State<Step1Personal> {
+class _Step1PersonalState extends ConsumerState<Step1Personal> {
   final _formKey = GlobalKey<FormState>();
   final _nameCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
@@ -80,6 +81,8 @@ class _Step1PersonalState extends State<Step1Personal> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final registerState = ref.watch(doctorRegisterControllerProvider);
+
     return Form(
       key: _formKey,
       child: StepCard(
@@ -87,7 +90,7 @@ class _Step1PersonalState extends State<Step1Personal> {
           StepTitle(
             icon: Icons.person_rounded,
             title: 'Personal Information',
-            color: AppTheme.yoBlue,
+            color: colorScheme.primary,
           ),
           const SizedBox(height: 24),
           YoField(
@@ -186,32 +189,32 @@ class _Step1PersonalState extends State<Step1Personal> {
               final selected = widget.data.languages.contains(lang);
               return GestureDetector(
                 onTap: () => setState(
-                  () => selected
+                      () => selected
                       ? widget.data.languages.remove(lang)
                       : widget.data.languages.add(lang),
                 ),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 10,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   decoration: BoxDecoration(
-                    color: selected ? AppTheme.yoBlue : colorScheme.surface,
+                    // 🎯 FIXED BY CHROMA_KIT: Premium selection transitions via primary контейнер pastel rules
+                    color: selected
+                        ? colorScheme.primaryContainer.transparency(0.85)
+                        : colorScheme.surface,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: selected
-                          ? AppTheme.yoBlue
-                          : colorScheme.outlineVariant,
+                          ? colorScheme.primary
+                          : colorScheme.outlineVariant.transparency(0.4),
                       width: 1.5,
                     ),
                   ),
                   child: Text(
                     lang,
                     style: textTheme.labelLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w700,
                       color: selected
-                          ? colorScheme.onPrimary
+                          ? colorScheme.primary
                           : colorScheme.onSurfaceVariant,
                     ),
                   ),
@@ -230,9 +233,14 @@ class _Step1PersonalState extends State<Step1Personal> {
               context,
               'Share a brief overview of your expertise...',
               Icons.description_rounded,
+            ).copyWith(
+              // 🎯 FIXED BY CHROMA_KIT: Subtle input border enhancements
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: BorderSide(color: colorScheme.outlineVariant.transparency(0.3)),
+              ),
             ),
-            validator: (v) =>
-                _wordCount < 30 ? 'Minimum 30 words required' : null,
+            validator: (v) => _wordCount < 30 ? 'Minimum 30 words required' : null,
           ),
           Padding(
             padding: const EdgeInsets.only(top: 6),
@@ -248,7 +256,8 @@ class _Step1PersonalState extends State<Step1Personal> {
                 Text(
                   '$_wordCount/100',
                   style: textTheme.labelSmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
+                    color: _wordCount < 30 ? colorScheme.error : colorScheme.onSurfaceVariant,
+                    fontWeight: _wordCount < 30 ? FontWeight.bold : FontWeight.normal,
                   ),
                 ),
               ],
@@ -257,24 +266,26 @@ class _Step1PersonalState extends State<Step1Personal> {
           const SizedBox(height: 28),
           NextButton(
             label: 'Next →',
-            color: AppTheme.yoBlue,
-            onTap: () async {
+            color: colorScheme.primary,
+            onTap: registerState.isLoading ? null : () async {
               if (!_formKey.currentState!.validate()) return;
 
               _save();
 
-              final controller = context.read<DoctorRegisterController>();
+              final success = await ref
+                  .read(doctorRegisterControllerProvider.notifier)
+                  .registerStep1(widget.data);
 
-              final success = await controller.registerStep1(widget.data);
-
-              if (!mounted) return;
+              // 🎯 FIXED: Async context boundary safety shield checked
+              if (!context.mounted) return;
 
               if (success) {
                 widget.onNext();
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(controller.error ?? "Registration Failed"),
+                    content: Text(ref.read(doctorRegisterControllerProvider).errorMessage ?? "Registration Failed"),
+                    behavior: SnackBarBehavior.floating,
                   ),
                 );
               }

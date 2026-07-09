@@ -6,6 +6,7 @@ import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
 import 'package:yodoctor/core/utils/responsive.dart';
 
+// 🎯 CHANGED: Refactored to a clean design wrapper to work inside CustomScrollView
 class CertificateListCards extends StatelessWidget {
   const CertificateListCards({
     super.key,
@@ -22,262 +23,263 @@ class CertificateListCards extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final isMobile = Responsive.isMobile(context);
 
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: certificates.length,
-      itemBuilder: (context, index) {
-        final cert = certificates[index];
-        final formattedDate = DateFormat('dd MMM yyyy').format(
-          isIssuedTab ? cert.issuedAt ?? cert.createdAt : cert.createdAt,
-        );
-        final expiryDate = DateFormat(
-          'dd MMM yyyy',
-        ).format(cert.expiryDate ?? DateTime.now());
+    // 🎯 FIXED: Replaced shrink-wrapped ListView with an optimized SliverList for production performance
+    return SliverList(
+      delegate: SliverChildBuilderDelegate(
+            (context, index) {
+          final cert = certificates[index];
+          final formattedDate = DateFormat('dd MMM yyyy').format(
+            isIssuedTab ? cert.issuedAt ?? cert.createdAt : cert.createdAt,
+          );
+          final expiryDate = DateFormat(
+            'dd MMM yyyy',
+          ).format(cert.expiryDate ?? DateTime.now());
 
-        if (isMobile) {
-          return Container(
-            margin: const EdgeInsets.only(bottom: AppSpacing.md),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: colorScheme.surfaceContainer,
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: colorScheme.outlineVariant),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 18,
-                      backgroundColor: colorScheme.primary,
-                      child: Text(
-                        cert.fullName.substring(0, 1).toUpperCase(),
-                        style: theme.textTheme.labelLarge?.copyWith(
-                          color: colorScheme.onPrimary,
-                          fontWeight: FontWeight.bold,
+          if (isMobile) {
+            return Container(
+              margin: const EdgeInsets.only(bottom: AppSpacing.md),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: colorScheme.surfaceContainer,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: colorScheme.outlineVariant),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 18,
+                        backgroundColor: colorScheme.primary,
+                        child: Text(
+                          cert.fullName.substring(0, 1).toUpperCase(),
+                          style: theme.textTheme.labelLarge?.copyWith(
+                            color: colorScheme.onPrimary,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: AppSpacing.sm),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            cert.fullName,
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w800,
-                              color: colorScheme.onSurface,
-                            ),
-                          ),
-                          Text(
-                            cert.id.toString(),
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: colorScheme.onSurfaceVariant.withValues(
-                                alpha: 0.7,
+                      const SizedBox(width: AppSpacing.sm),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              cert.fullName,
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w800,
+                                color: colorScheme.onSurface,
                               ),
-                              letterSpacing: 0.5,
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    if (!isIssuedTab) _buildStatusChip(context, cert.status),
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.md),
-                Wrap(
-                  spacing: AppSpacing.xs,
-                  runSpacing: AppSpacing.xs,
-                  children: [
-                    _buildTypeChip(context, cert.certificateType),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: colorScheme.surfaceContainerLowest,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.calendar_today_rounded,
-                            size: 12,
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            formattedDate,
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: colorScheme.onSurfaceVariant,
-                              fontWeight: FontWeight.w700,
+                            Text(
+                              cert.id.toString(),
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: colorScheme.onSurfaceVariant.withValues(
+                                  alpha: 0.7,
+                                ),
+                                letterSpacing: 0.5,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                    if (isIssuedTab)
+                      if (!isIssuedTab) _buildStatusChip(context, cert.status),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  Wrap(
+                    spacing: AppSpacing.xs,
+                    runSpacing: AppSpacing.xs,
+                    children: [
+                      _buildTypeChip(context, cert.certificateType),
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 10,
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: colorScheme.errorContainer.withValues(
-                            alpha: 0.2,
-                          ),
+                          color: colorScheme.surfaceContainerLowest,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(
-                              Icons.running_with_errors_rounded,
+                              Icons.calendar_today_rounded,
                               size: 12,
-                              color: colorScheme.error,
+                              color: colorScheme.onSurfaceVariant,
                             ),
                             const SizedBox(width: 6),
                             Text(
-                              'Exp: $expiryDate',
+                              formattedDate,
                               style: theme.textTheme.labelSmall?.copyWith(
-                                color: colorScheme.error,
-                                fontWeight: FontWeight.w800,
+                                color: colorScheme.onSurfaceVariant,
+                                fontWeight: FontWeight.w700,
                               ),
                             ),
                           ],
                         ),
                       ),
-                  ],
+                      if (isIssuedTab)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: colorScheme.errorContainer.withValues(
+                              alpha: 0.2,
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.running_with_errors_rounded,
+                                size: 12,
+                                color: colorScheme.error,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                'Exp: $expiryDate',
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  color: colorScheme.error,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  _buildActionButton(
+                    context,
+                    theme,
+                    cert,
+                    width: double.infinity,
+                  ),
+                ],
+              ),
+            );
+          }
+
+          return Container(
+            width: double.infinity,
+            margin: const EdgeInsets.only(bottom: AppSpacing.md),
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: colorScheme.surfaceContainerHigh,
+              borderRadius: BorderRadius.circular(28),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  flex: 3,
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 22,
+                        backgroundColor: colorScheme.primary,
+                        child: Text(
+                          cert.fullName.substring(0, 1).toUpperCase(),
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            color: colorScheme.onPrimary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.md),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              cert.fullName,
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              cert.id.toString(),
+                              style: theme.textTheme.labelMedium?.copyWith(
+                                color: colorScheme.onSurfaceVariant.withValues(
+                                  alpha: 0.7,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: AppSpacing.lg),
-                _buildActionButton(
-                  context,
-                  theme,
-                  cert,
-                  width: double.infinity,
+                Expanded(
+                  flex: 3,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'CERTIFICATE TYPE',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant.withValues(
+                            alpha: 0.5,
+                          ),
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.8,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      _buildTypeChip(context, cert.certificateType),
+                    ],
+                  ),
                 ),
+                Expanded(
+                  flex: 2,
+                  child: _buildInfoColumn(
+                    context,
+                    isIssuedTab ? 'ISSUED ON' : 'SUBMITTED',
+                    formattedDate,
+                  ),
+                ),
+                Expanded(
+                  flex: 2,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        isIssuedTab ? 'EXPIRES ON' : 'STATUS',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant.withValues(
+                            alpha: 0.5,
+                          ),
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.8,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      isIssuedTab
+                          ? Text(
+                        expiryDate,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: colorScheme.error,
+                        ),
+                      )
+                          : _buildStatusChip(context, cert.status),
+                    ],
+                  ),
+                ),
+                _buildActionButton(context, theme, cert),
               ],
             ),
           );
-        }
-
-        return Container(
-          width: double.infinity,
-          margin: const EdgeInsets.only(bottom: AppSpacing.md),
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: colorScheme.surfaceContainerHigh,
-            borderRadius: BorderRadius.circular(28),
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                flex: 3,
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 22,
-                      backgroundColor: colorScheme.primary,
-                      child: Text(
-                        cert.fullName.substring(0, 1).toUpperCase(),
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          color: colorScheme.onPrimary,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: AppSpacing.md),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            cert.fullName,
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w900,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            cert.id.toString(),
-                            style: theme.textTheme.labelMedium?.copyWith(
-                              color: colorScheme.onSurfaceVariant.withValues(
-                                alpha: 0.7,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                flex: 3,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'CERTIFICATE TYPE',
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant.withValues(
-                          alpha: 0.5,
-                        ),
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 0.8,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    _buildTypeChip(context, cert.certificateType),
-                  ],
-                ),
-              ),
-              Expanded(
-                flex: 2,
-                child: _buildInfoColumn(
-                  context,
-                  isIssuedTab ? 'ISSUED ON' : 'SUBMITTED',
-                  formattedDate,
-                ),
-              ),
-              Expanded(
-                flex: 2,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      isIssuedTab ? 'EXPIRES ON' : 'STATUS',
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant.withValues(
-                          alpha: 0.5,
-                        ),
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 0.8,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    isIssuedTab
-                        ? Text(
-                            expiryDate,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w800,
-                              color: colorScheme.error,
-                            ),
-                          )
-                        : _buildStatusChip(context, cert.status),
-                  ],
-                ),
-              ),
-              _buildActionButton(context, theme, cert),
-            ],
-          ),
-        );
-      },
+        },
+        childCount: certificates.length,
+      ),
     );
   }
 
@@ -309,11 +311,11 @@ class CertificateListCards extends StatelessWidget {
   }
 
   Widget _buildActionButton(
-    BuildContext context,
-    ThemeData theme,
-    DoctorCertificateRequestModel certificate, {
-    double? width,
-  }) {
+      BuildContext context,
+      ThemeData theme,
+      DoctorCertificateRequestModel certificate, {
+        double? width,
+      }) {
     final colorScheme = theme.colorScheme;
 
     return SizedBox(
@@ -322,7 +324,7 @@ class CertificateListCards extends StatelessWidget {
       child: FilledButton(
         onPressed: () => isIssuedTab
             ? null
-            : context.push("${AppRoutes.certificateReview}/${certificate.id}"),
+            : context.push("${AppRoutes.doctorCertificateReview}/${certificate.id}"),
         style: FilledButton.styleFrom(
           backgroundColor: isIssuedTab
               ? colorScheme.secondaryContainer
@@ -334,14 +336,12 @@ class CertificateListCards extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
-
           side: BorderSide(
             color: isIssuedTab
                 ? colorScheme.outlineVariant.withValues(alpha: 0.9)
                 : Colors.transparent,
             width: 1.2,
           ),
-
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
         ),
         child: Row(

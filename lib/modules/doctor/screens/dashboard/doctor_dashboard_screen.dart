@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'widgets/doctor_header.dart';
 import 'widgets/dashboard_cards.dart';
-import '../../widgets/doctor_drawer.dart';
 import '../../widgets/doctor_sliver_app_bar.dart';
 
 import '../../../../core/utils/app_spacing.dart';

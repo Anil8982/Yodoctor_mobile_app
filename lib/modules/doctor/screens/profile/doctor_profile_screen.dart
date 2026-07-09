@@ -189,7 +189,7 @@ class _DoctorProfileScreenState extends ConsumerState<DoctorProfileScreen> {
                       ]
                     : doctor.documents.entries.map<Widget>((entry) {
                         final key = entry.key;
-                        final value = entry.value;
+                        // final value = entry.value;
 
                         return Padding(
                           padding: const EdgeInsets.only(bottom: AppSpacing.sm),
