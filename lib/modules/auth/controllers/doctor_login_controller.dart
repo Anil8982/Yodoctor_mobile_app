@@ -6,9 +6,9 @@ import 'package:yodoctor/core/debug/app_logger.dart';
 import 'package:yodoctor/modules/auth/repository/doctor_auth_repository.dart';
 
 final doctorLoginControllerProvider =
-    AsyncNotifierProvider<DoctorLoginController, Map<String, dynamic>?>(
-      DoctorLoginController.new,
-    );
+AsyncNotifierProvider<DoctorLoginController, Map<String, dynamic>?>(
+  DoctorLoginController.new,
+);
 
 class DoctorLoginController extends AsyncNotifier<Map<String, dynamic>?> {
   static const String _subTag = 'DoctorLoginController';
@@ -37,15 +37,17 @@ class DoctorLoginController extends AsyncNotifier<Map<String, dynamic>?> {
 
       if (statusCode >= 200 && statusCode < 300) {
         final data = response.data;
+        final redirect = data["redirect"];
         final token = data["data"]?["token"];
 
         if (token != null) {
-          await repository.saveSessionToken(token);
-          AppLogger.success(
-            'JWT Master session key captured and storage committed',
-            tag: LogTags.auth,
-            subTag: _subTag,
-          );
+          if (redirect == "resume") {
+            await repository.saveRegistrationToken(token);
+            AppLogger.success('Temporary Registration Token captured and cached natively for onboarding steps', tag: LogTags.auth, subTag: _subTag);
+          } else {
+            await repository.saveSessionToken(token);
+            AppLogger.success('JWT Master active session token captured and saved for dashboard lifecycle', tag: LogTags.auth, subTag: _subTag);
+          }
         }
 
         final redirectPayload = {

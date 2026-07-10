@@ -15,6 +15,8 @@ class PatientHeader extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final topPadding = MediaQuery.of(context).padding.top;
 
+    final String safePatientName = dashboard.patientName;
+
     return GradientBackground(
       borderRadius: const BorderRadius.vertical(bottom: Radius.circular(32)),
       padding: EdgeInsets.fromLTRB(
@@ -30,7 +32,7 @@ class PatientHeader extends StatelessWidget {
           const SizedBox(height: 10),
 
           Text(
-            dashboard.patient.name,
+            safePatientName,
             style: theme.textTheme.headlineMedium?.copyWith(
               color: colorScheme.onPrimary,
               fontWeight: FontWeight.w800,

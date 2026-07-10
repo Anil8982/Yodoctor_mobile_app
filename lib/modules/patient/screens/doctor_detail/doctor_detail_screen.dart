@@ -42,7 +42,6 @@ class _DoctorDetailScreenState extends ConsumerState<DoctorDetailScreen> {
     final isTablet = Responsive.isTablet(context);
     final isMobile = Responsive.isMobile(context);
 
-    // 🎯 Re-active state rendering mapping from new Riverpod structure
     final doctorState = ref.watch(doctorDetailControllerProvider);
 
     return Scaffold(

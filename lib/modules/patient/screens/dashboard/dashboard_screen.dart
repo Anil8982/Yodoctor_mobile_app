@@ -31,6 +31,10 @@ class DashboardScreen extends ConsumerWidget {
     final loading = controller.isLoading;
     final data = controller.dashboardData;
 
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(patientDashboardControllerProvider.notifier).refreshTokenStatus();
+    });
+
     if (loading && data == null) {
       return Scaffold(
         backgroundColor: theme.scaffoldBackgroundColor,
@@ -93,9 +97,8 @@ class DashboardScreen extends ConsumerWidget {
                   selectedFilter: controller.selectedFilter,
                   onFilterSelected: (filter) {
                     HapticFeedback.selectionClick();
-                    // 🎯 Direct execution trigger using read on the provider context
                     ref
-                        .read(patientDashboardControllerProvider)
+                        .read(patientDashboardControllerProvider.notifier)
                         .setFilter(filter);
                   },
                 ),

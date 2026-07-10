@@ -161,7 +161,6 @@ class _Step5ConsultationState extends ConsumerState<Step5Consultation> {
                   vertical: 12,
                 ),
                 decoration: BoxDecoration(
-                  // 🎯 FIXED BY CHROMA_KIT: Balanced toggle selections
                   color: selected ? colorScheme.primaryContainer.transparency(0.85) : colorScheme.surface,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
@@ -219,7 +218,8 @@ class _Step5ConsultationState extends ConsumerState<Step5Consultation> {
           }).toList(),
         ),
         const SizedBox(height: 24),
-        // 🎯 FIXED BY CHROMA_KIT: Modern Material 3 container tokens with transparency fallbacks
+
+        // Morning Slot Block
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
@@ -248,22 +248,20 @@ class _Step5ConsultationState extends ConsumerState<Step5Consultation> {
                 ],
               ),
               const SizedBox(height: 14),
+
+              // 🎯 FIXED: Removed outer Expanded wrappers from Row children to resolve ParentDataWidget conflict natively
               Row(
                 children: [
-                  Expanded(
-                    child: TimePickerTile(
-                      label: 'Start',
-                      time: widget.data.morningStart,
-                      onTap: () => _pickTime('morningStart'),
-                    ),
+                  TimePickerTile(
+                    label: 'Start',
+                    time: widget.data.morningStart,
+                    onTap: () => _pickTime('morningStart'),
                   ),
                   const SizedBox(width: 12),
-                  Expanded(
-                    child: TimePickerTile(
-                      label: 'End',
-                      time: widget.data.morningEnd,
-                      onTap: () => _pickTime('morningEnd'),
-                    ),
+                  TimePickerTile(
+                    label: 'End',
+                    time: widget.data.morningEnd,
+                    onTap: () => _pickTime('morningEnd'),
                   ),
                 ],
               ),
@@ -271,6 +269,8 @@ class _Step5ConsultationState extends ConsumerState<Step5Consultation> {
           ),
         ),
         const SizedBox(height: 14),
+
+        // Evening Slot Block
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
@@ -305,22 +305,19 @@ class _Step5ConsultationState extends ConsumerState<Step5Consultation> {
                 ],
               ),
               const SizedBox(height: 14),
+
               Row(
                 children: [
-                  Expanded(
-                    child: TimePickerTile(
-                      label: 'Start',
-                      time: widget.data.eveningStart.isEmpty ? '--:--' : widget.data.eveningStart,
-                      onTap: () => _pickTime('eveningStart'),
-                    ),
+                  TimePickerTile(
+                    label: 'Start',
+                    time: widget.data.eveningStart.isEmpty ? '--:--' : widget.data.eveningStart,
+                    onTap: () => _pickTime('eveningStart'),
                   ),
                   const SizedBox(width: 12),
-                  Expanded(
-                    child: TimePickerTile(
-                      label: 'End',
-                      time: widget.data.eveningEnd.isEmpty ? '--:--' : widget.data.eveningEnd,
-                      onTap: () => _pickTime('eveningEnd'),
-                    ),
+                  TimePickerTile(
+                    label: 'End',
+                    time: widget.data.eveningEnd.isEmpty ? '--:--' : widget.data.eveningEnd,
+                    onTap: () => _pickTime('eveningEnd'),
                   ),
                 ],
               ),
@@ -343,7 +340,6 @@ class _Step5ConsultationState extends ConsumerState<Step5Consultation> {
                 .read(doctorRegisterControllerProvider.notifier)
                 .saveStep5(widget.data);
 
-            // 🎯 FIXED: Async gap safety checked
             if (!context.mounted) return;
 
             if (success) {

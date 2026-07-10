@@ -14,11 +14,29 @@ class DoctorHeaderCard extends StatefulWidget {
 class _DoctorHeaderCardState extends State<DoctorHeaderCard> {
   bool _isAboutExpanded = false;
 
+  // 🎯 HELPER WIDGET BY SATYAM STUDIOS: नावाचं पहिलं आद्यक्षर दाखवण्यासाठी फॉलबॅक विजेट
+  Widget _buildInitialAvatar(TextTheme textTheme, ColorScheme colorScheme) {
+    return Center(
+      child: Text(
+        widget.doctor.doctorName.isNotEmpty
+            ? widget.doctor.doctorName.replaceAll('Dr. ', '')[0]
+            : 'D',
+        style: textTheme.headlineMedium?.copyWith(
+          color: colorScheme.primary,
+          fontWeight: FontWeight.w900,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
+
+    final bool hasImage = widget.doctor.profileImage.isNotEmpty &&
+        widget.doctor.profileImage.startsWith('http');
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -42,35 +60,43 @@ class _DoctorHeaderCardState extends State<DoctorHeaderCard> {
         children: [
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
-
             children: [
-              Column(
-                crossAxisAlignment: .center,
-                children: [
-                  Container(
-                    width: 76,
-                    height: 76,
-                    decoration: BoxDecoration(
-                      color: colorScheme.primaryContainer.transparency(0.35),
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(
-                        color: colorScheme.primary.transparency(0.5),
-                        width: 1.5,
-                      ),
-                    ),
-                    child: Center(
-                      child: Text(
-                        widget.doctor.doctorName.isNotEmpty
-                            ? widget.doctor.doctorName.replaceAll('Dr. ', '')[0]
-                            : 'D',
-                        style: textTheme.headlineMedium?.copyWith(
+              // 🎯 IMAGE CONTAINER GUARD
+              Container(
+                width: 76,
+                height: 76,
+                clipBehavior: Clip.antiAlias, // इमेज बॉर्डरच्या बाहेर जाऊ नये म्हणून कडक कटिंग
+                decoration: BoxDecoration(
+                  color: colorScheme.primaryContainer.transparency(0.35),
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(
+                    color: colorScheme.primary.transparency(0.5),
+                    width: 1.5,
+                  ),
+                ),
+                child: hasImage
+                    ? Image.network(
+                  widget.doctor.profileImage,
+                  fit: BoxFit.cover,
+                  // 🎯 SAFE ERROR CATCH: S3 एरर किंवा इंटरनेट बंद असल्यास पहिल्यासारखा बॅकअप रेंडर होईल!
+                  errorBuilder: (context, error, stackTrace) {
+                    return _buildInitialAvatar(textTheme, colorScheme);
+                  },
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Center(
+                      child: SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
                           color: colorScheme.primary,
-                          fontWeight: FontWeight.w900,
                         ),
                       ),
-                    ),
-                  ),
-                ],
+                    );
+                  },
+                )
+                    : _buildInitialAvatar(textTheme, colorScheme),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -124,7 +150,6 @@ class _DoctorHeaderCardState extends State<DoctorHeaderCard> {
               ),
             ],
           ),
-
           const SizedBox(height: 10),
           Row(
             mainAxisSize: MainAxisSize.min,
@@ -258,7 +283,6 @@ class _DoctorHeaderCardState extends State<DoctorHeaderCard> {
                         ),
                       ),
                       const SizedBox(width: 2),
-                      // आयकॉन बदलताना येणारा झटका रोखण्यासाठी AnimatedRotation किंवा साधा स्मूथ आयकॉन
                       Icon(
                         _isAboutExpanded
                             ? Icons.keyboard_arrow_up_rounded
@@ -273,7 +297,6 @@ class _DoctorHeaderCardState extends State<DoctorHeaderCard> {
             ],
           ),
           const SizedBox(height: 8),
-
           AnimatedCrossFade(
             firstChild: Text(
               widget.doctor.description.isEmpty

@@ -1,10 +1,11 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:yodoctor/core/theme/app_theme.dart' hide AppRole;
-import 'package:yodoctor/core/providers/app_role_provider.dart';
+import 'package:yodoctor/core/constants/log_tags.dart';
+import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:yodoctor/modules/auth/controllers/patient_register_controller.dart';
 import 'package:yodoctor/modules/auth/widgets/auth_widgets.dart';
 
 class PatientRegisterScreen extends ConsumerStatefulWidget {
@@ -18,14 +19,11 @@ class PatientRegisterScreen extends ConsumerStatefulWidget {
 class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
     with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
+  static const String _subTag = 'PatientRegisterScreen';
 
-  bool _isLoading = false;
-  bool _agreedToTerms = false;
-  String? _selectedGender;
-  DateTime? _selectedDOB;
-  String? _dobError;
-  String? _genderError;
-
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
@@ -35,6 +33,7 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
   @override
   void initState() {
     super.initState();
+    AppLogger.info('PatientRegisterScreen Initialized', tag: LogTags.ui, subTag: _subTag);
     _animController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
@@ -45,70 +44,32 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
 
   @override
   void dispose() {
+    AppLogger.info('PatientRegisterScreen Disposed', tag: LogTags.ui, subTag: _subTag);
     _animController.dispose();
+    _nameController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
   }
 
-  Future<void> _handleRegister() async {
-    setState(() {
-      _dobError = null;
-      _genderError = null;
-    });
-
-    if (!_formKey.currentState!.validate()) return;
-
-    if (_selectedDOB == null) {
-      setState(() => _dobError = 'Please select date of birth');
+  void _submitForm() {
+    if (!_formKey.currentState!.validate()) {
+      AppLogger.warning('Form validation failed for patient registration', tag: LogTags.ui, subTag: _subTag);
       return;
     }
 
-    if (_selectedGender == null) {
-      setState(() => _genderError = 'Please select gender');
-      return;
-    }
+    AppLogger.info('Form validation passed. Triggering patient registration flow...', tag: LogTags.ui, subTag: _subTag);
 
-    if (!_agreedToTerms) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please agree to Terms & Conditions')),
-      );
-      return;
-    }
-
-    setState(() => _isLoading = true);
-    await Future.delayed(const Duration(seconds: 2));
-    setState(() => _isLoading = false);
-
-    if (!mounted) return;
-
-    ref.read(appRoleProvider.notifier).setRole(AppRole.patient);
-
-    context.go('/patient-dashboard');
-  }
-
-  Future<void> _pickDateOfBirth() async {
-    final picked = await showDatePicker(
+    ref.read(patientRegisterControllerProvider.notifier).registerPatient(
       context: context,
-      initialDate: DateTime(1995),
-      firstDate: DateTime(1920),
-      lastDate: DateTime.now(),
-      builder: (context, child) => Theme(
-        data: Theme.of(context).copyWith(
-          colorScheme: Theme.of(
-            context,
-          ).colorScheme.copyWith(primary: AppTheme.secondary),
-        ),
-        child: child!,
-      ),
+      fullName: _nameController.text.trim(),
+      phone: _phoneController.text.trim(),
+      email: _emailController.text.trim(),
+      password: _passwordController.text,
+      confirmPassword: _confirmPasswordController.text,
     );
-    if (picked != null) {
-      setState(() {
-        _selectedDOB = picked;
-        _dobError = null;
-      });
-    }
   }
 
   @override
@@ -116,11 +77,13 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
+    final registerState = ref.watch(patientRegisterControllerProvider);
+    final controllerNotifier = ref.read(patientRegisterControllerProvider.notifier);
+
     return Scaffold(
       backgroundColor: colorScheme.surfaceContainer,
       body: FadeTransition(
         opacity: _fadeAnim,
-
         child: Column(
           children: [
             Container(
@@ -150,7 +113,10 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                       child: Row(
                         children: [
                           GestureDetector(
-                            onTap: () => Navigator.pop(context),
+                            onTap: () {
+                              AppLogger.info('Back arrow tapped, popping register screen', tag: LogTags.ui, subTag: _subTag);
+                              Navigator.pop(context);
+                            },
                             child: Container(
                               width: 40,
                               height: 40,
@@ -242,6 +208,7 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                         _sectionLabel(context, 'Personal Information'),
                         const SizedBox(height: 14),
                         YoTextField(
+                          controller: _nameController,
                           label: 'Full Name',
                           hint: 'Enter your full name',
                           prefixIcon: Icons.person_rounded,
@@ -249,19 +216,22 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                         ),
                         const SizedBox(height: 16),
                         YoTextField(
+                          controller: _emailController,
                           label: 'Email Address',
                           hint: 'patient@example.com',
                           prefixIcon: Icons.email_rounded,
                           keyboardType: TextInputType.emailAddress,
                           validator: (v) {
                             if (v == null || v.isEmpty) return 'Enter email';
-                            if (!RegExp(r'\S+@\S+\.\S+').hasMatch(v))
+                            if (!RegExp(r'\S+@\S+\.\S+').hasMatch(v)) {
                               return 'Enter valid email';
+                            }
                             return null;
                           },
                         ),
                         const SizedBox(height: 16),
                         YoTextField(
+                          controller: _phoneController,
                           label: 'Phone Number',
                           hint: '+91 9876543210',
                           prefixIcon: Icons.phone_rounded,
@@ -281,7 +251,10 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                             ),
                             const SizedBox(height: 8),
                             GestureDetector(
-                              onTap: _pickDateOfBirth,
+                              onTap: () {
+                                AppLogger.info('Triggering Date of Birth picker bottom sheet/dialog', tag: LogTags.ui, subTag: _subTag);
+                                controllerNotifier.pickDateOfBirth(context);
+                              },
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 16,
@@ -304,16 +277,13 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                                     ),
                                     const SizedBox(width: 12),
                                     Text(
-                                      _selectedDOB != null
-                                          ? DateFormat(
-                                              'dd/MM/yyyy',
-                                            ).format(_selectedDOB!)
+                                      registerState.selectedDOB != null
+                                          ? DateFormat('dd/MM/yyyy').format(registerState.selectedDOB!)
                                           : 'Select date of birth',
                                       style: textTheme.bodyMedium?.copyWith(
-                                        color: _selectedDOB != null
+                                        color: registerState.selectedDOB != null
                                             ? colorScheme.onSurface
-                                            : colorScheme.onSurfaceVariant
-                                                  .transparency(0.65),
+                                            : colorScheme.onSurfaceVariant.transparency(0.65),
                                       ),
                                     ),
                                     const Spacer(),
@@ -325,14 +295,12 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                                 ),
                               ),
                             ),
-                            if (_dobError != null)
+                            if (registerState.dobError != null)
                               Padding(
                                 padding: const EdgeInsets.only(top: 6),
                                 child: Text(
-                                  _dobError!,
-                                  style: textTheme.bodySmall?.copyWith(
-                                    color: colorScheme.error,
-                                  ),
+                                  registerState.dobError!,
+                                  style: textTheme.bodySmall?.copyWith(color: colorScheme.error),
                                 ),
                               ),
                           ],
@@ -351,19 +319,17 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                             const SizedBox(height: 10),
                             Row(
                               children: [
-                                _genderButton(context, 'Male'),
-                                _genderButton(context, 'Female'),
-                                _genderButton(context, 'Other'),
+                                _genderButton(context, 'Male', registerState.selectedGender),
+                                _genderButton(context, 'Female', registerState.selectedGender),
+                                _genderButton(context, 'Other', registerState.selectedGender),
                               ],
                             ),
-                            if (_genderError != null)
+                            if (registerState.genderError != null)
                               Padding(
                                 padding: const EdgeInsets.only(top: 6),
                                 child: Text(
-                                  _genderError!,
-                                  style: textTheme.bodySmall?.copyWith(
-                                    color: colorScheme.error,
-                                  ),
+                                  registerState.genderError!,
+                                  style: textTheme.bodySmall?.copyWith(color: colorScheme.error),
                                 ),
                               ),
                           ],
@@ -379,8 +345,7 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                           isPassword: true,
                           validator: (v) {
                             if (v == null || v.isEmpty) return 'Enter password';
-                            if (v.length < 8)
-                              return 'Password must be 8 characters';
+                            if (v.length < 8) return 'Password must be 8 characters';
                             return null;
                           },
                         ),
@@ -392,40 +357,41 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                           prefixIcon: Icons.lock_outline_rounded,
                           isPassword: true,
                           validator: (v) {
-                            if (v == null || v.isEmpty)
-                              return 'Confirm password';
-                            if (v != _passwordController.text)
-                              return 'Passwords do not match';
+                            if (v == null || v.isEmpty) return 'Confirm password';
+                            if (v != _passwordController.text) return 'Passwords do not match';
                             return null;
                           },
                         ),
                         const SizedBox(height: 20),
                         GestureDetector(
-                          onTap: () =>
-                              setState(() => _agreedToTerms = !_agreedToTerms),
+                          onTap: () {
+                            final targetValue = !registerState.agreedToTerms;
+                            AppLogger.info('Toggling terms checkbox selection path to: $targetValue', tag: LogTags.ui, subTag: _subTag);
+                            controllerNotifier.toggleTerms(targetValue);
+                          },
                           child: Row(
                             children: [
                               Container(
                                 width: 22,
                                 height: 22,
                                 decoration: BoxDecoration(
-                                  color: _agreedToTerms
+                                  color: registerState.agreedToTerms
                                       ? AppTheme.secondary
                                       : colorScheme.surface.transparency(0),
                                   border: Border.all(
-                                    color: _agreedToTerms
+                                    color: registerState.agreedToTerms
                                         ? AppTheme.secondary
                                         : colorScheme.outlineVariant,
                                     width: 2,
                                   ),
                                   borderRadius: BorderRadius.circular(6),
                                 ),
-                                child: _agreedToTerms
+                                child: registerState.agreedToTerms
                                     ? Icon(
-                                        Icons.check,
-                                        color: colorScheme.onPrimary,
-                                        size: 14,
-                                      )
+                                  Icons.check,
+                                  color: colorScheme.onPrimary,
+                                  size: 14,
+                                )
                                     : null,
                               ),
                               const SizedBox(width: 10),
@@ -462,9 +428,9 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                         const SizedBox(height: 24),
                         YoPrimaryButton(
                           label: 'Register as Patient',
-                          onTap: _handleRegister,
+                          onTap: _submitForm,
                           color: AppTheme.secondary,
-                          isLoading: _isLoading,
+                          isLoading: registerState.isLoading,
                         ),
                         const SizedBox(height: 20),
                         Container(
@@ -483,7 +449,10 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                                 ),
                               ),
                               GestureDetector(
-                                onTap: () => Navigator.pop(context),
+                                onTap: () {
+                                  AppLogger.info('Redirecting to login via navigation pop block', tag: LogTags.ui, subTag: _subTag);
+                                  Navigator.pop(context);
+                                },
                                 child: Text(
                                   'Login here',
                                   style: textTheme.labelMedium?.copyWith(
@@ -509,26 +478,22 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
     );
   }
 
-  Widget _genderButton(BuildContext context, String gender) {
+  Widget _genderButton(BuildContext context, String gender, String? currentSelected) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final selected = _selectedGender == gender;
+    final selected = currentSelected == gender;
 
     return Expanded(
       child: GestureDetector(
         onTap: () {
-          setState(() {
-            _selectedGender = gender;
-            _genderError = null;
-          });
+          AppLogger.info('Gender selected row state update ->: $gender', tag: LogTags.ui, subTag: _subTag);
+          ref.read(patientRegisterControllerProvider.notifier).selectGender(gender);
         },
         child: Container(
           margin: EdgeInsets.only(right: gender != 'Other' ? 10 : 0),
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
-            color: selected
-                ? AppTheme.secondary
-                : colorScheme.surfaceContainerLow,
+            color: selected ? AppTheme.secondary : colorScheme.surfaceContainerLow,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: selected ? AppTheme.secondary : colorScheme.outlineVariant,
@@ -540,9 +505,7 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
             textAlign: TextAlign.center,
             style: textTheme.labelLarge?.copyWith(
               fontWeight: FontWeight.w600,
-              color: selected
-                  ? colorScheme.onPrimary
-                  : colorScheme.onSurfaceVariant,
+              color: selected ? colorScheme.onPrimary : colorScheme.onSurfaceVariant,
             ),
           ),
         ),

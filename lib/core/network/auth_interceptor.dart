@@ -9,26 +9,61 @@ class AuthInterceptor extends Interceptor {
   final StorageService _storage;
   static const String _subTag = 'AuthInterceptor';
 
+  // @override
+  // void onRequest(
+  //     RequestOptions options,
+  //     RequestInterceptorHandler handler,
+  //     ) {
+  //   final regToken = _storage.getRegistrationToken();
+  //   final mainToken = _storage.getToken();
+  //   final token = regToken ?? mainToken;
+  //
+  //   AppLogger.info('Intercepting outgoing HTTP request: [${options.method}] -> ${options.uri}', tag: LogTags.api, subTag: _subTag);
+  //
+  //   if (token != null && token.isNotEmpty) {
+  //     options.headers['Authorization'] = 'Bearer $token';
+  //
+  //     final tokenType = regToken != null ? "Temporary Registration Token" : "Active Session Token";
+  //     AppLogger.success('Security context attached safely ($tokenType)', tag: LogTags.api, subTag: _subTag);
+  //   } else {
+  //     AppLogger.warning('No active authentication token discovered in secure storage nodes', tag: LogTags.api, subTag: _subTag);
+  //   }
+  //
+  //   handler.next(options);
+  // }
+
   @override
   void onRequest(
       RequestOptions options,
       RequestInterceptorHandler handler,
       ) {
-    final regToken = _storage.getRegistrationToken();
-    final mainToken = _storage.getToken();
-    final token = regToken ?? mainToken;
+    final path = options.path.toLowerCase();
 
-    AppLogger.info('Intercepting outgoing HTTP request: [${options.method}] -> ${options.uri}', tag: LogTags.api, subTag: _subTag);
+    final isRegistrationApi =
+        path.contains('/doctor/register') ||
+            path.contains('/doctor/registration');
+
+    final token = isRegistrationApi
+        ? _storage.getRegistrationToken()
+        : _storage.getToken();
+
+    AppLogger.info(
+      'Intercepting outgoing HTTP request: [${options.method}] -> ${options.uri}',
+      tag: LogTags.api,
+      subTag: _subTag,
+    );
 
     if (token != null && token.isNotEmpty) {
       options.headers['Authorization'] = 'Bearer $token';
 
-      final tokenType = regToken != null ? "Temporary Registration Token" : "Active Session Token";
-      AppLogger.success('Security context attached safely ($tokenType)', tag: LogTags.api, subTag: _subTag);
-    } else {
-      AppLogger.warning('No active authentication token discovered in secure storage nodes', tag: LogTags.api, subTag: _subTag);
+      AppLogger.success(
+        'Security context attached safely (${isRegistrationApi ? "Temporary Registration Token" : "Active Session Token"})',
+        tag: LogTags.api,
+        subTag: _subTag,
+      );
     }
 
     handler.next(options);
   }
+
 }

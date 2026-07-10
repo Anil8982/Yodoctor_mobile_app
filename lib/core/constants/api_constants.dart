@@ -5,11 +5,12 @@ class ApiConstants {
 
   static String get baseUrl => EnvConfig.baseUrl;
 
-  // ---Auth
-  static const login = '/auth/login';
   static const forgotPassword = '/auth/forgot-password';
   static const verifyReset = '/auth/verify-reset';
   static const resetPassword = '/auth/reset-password';
+
+  // --- Patient Authentication & Registration ---
+  static const login = '/auth/login';
   static const patientRegister = '/patient/register';
 
   // --- Doctor Authentication & Registration ---

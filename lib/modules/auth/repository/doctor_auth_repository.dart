@@ -208,7 +208,8 @@ class DoctorAuthRepository {
   Future<Response> registerStep6({required DoctorFormData data}) async {
     AppLogger.info('Compiling and uploading registration multipart fields for step 6', tag: LogTags.auth, subTag: _subTag);
 
-    AppLogger.info("REG TOKEN => ${_storage.getRegistrationToken()}");
+    final token = _storage.getRegistrationToken() ?? _storage.getToken();
+    AppLogger.info("ACTIVE RESOLVING TOKEN IN REPOSITORY WIRE => $token");
 
     try {
       final formData = FormData.fromMap({
@@ -218,6 +219,7 @@ class DoctorAuthRepository {
         if (data.clinicProofFile != null)
           "clinicProof": await MultipartFile.fromFile(data.clinicProofFile!.path, filename: p.basename(data.clinicProofFile!.path)),
       });
+
       for (final e in formData.fields) {
         AppLogger.info("FIELD => ${e.key} = ${e.value}");
       }
@@ -229,7 +231,12 @@ class DoctorAuthRepository {
       final response = await _dio.patch(
         ApiConstants.doctorRegisterStep6,
         data: formData,
-        options: Options(headers: {"Content-Type": "multipart/form-data"}),
+        options: Options(
+          headers: {
+            "Content-Type": "multipart/form-data",
+            if (token != null) "Authorization": "Bearer $token", // Bulletproof token injection
+          },
+        ),
       );
 
       AppLogger.success('Registration step 6 multipart upload completed. Status: ${response.statusCode}', tag: LogTags.auth, subTag: _subTag);
@@ -239,7 +246,6 @@ class DoctorAuthRepository {
       rethrow;
     }
   }
-
   Future<Response> submitRegistration({required DoctorFormData data}) async {
     final payload = {
       "accurate": data.declAccurate,

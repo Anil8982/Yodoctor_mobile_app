@@ -1,7 +1,8 @@
+import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
-import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import '../models/dashboard/dashboard_model.dart';
 
 class PatientDrawer extends StatelessWidget {
@@ -14,6 +15,10 @@ class PatientDrawer extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
+    final String drawerName = dashboard?.patientName ?? "Patient";
+
+    final String drawerEmail = dashboard?.patient != null ? (dashboard?.patient.email ?? "N/A") : "N/A";
+
     return Drawer(
       backgroundColor: colorScheme.surface,
       child: Column(
@@ -23,7 +28,7 @@ class PatientDrawer extends StatelessWidget {
             decoration: BoxDecoration(gradient: AppTheme.patientGradient),
 
             accountName: Text(
-              dashboard?.patient.name ?? "Patient",
+              drawerName,
               style: theme.textTheme.titleMedium?.copyWith(
                 color: colorScheme.onPrimary,
                 fontWeight: FontWeight.bold,
@@ -31,22 +36,22 @@ class PatientDrawer extends StatelessWidget {
             ),
 
             accountEmail: Text(
-              dashboard?.patient.email ?? "",
+              drawerEmail,
               style: theme.textTheme.bodySmall?.copyWith(
-                color: colorScheme.onPrimary.withValues(alpha: .8),
+                color: colorScheme.onPrimary.transparency(0.8),
               ),
             ),
 
             currentAccountPicture: CircleAvatar(
               backgroundColor: colorScheme.onPrimaryContainer,
               backgroundImage:
-                  dashboard?.patient.image != null &&
-                      dashboard!.patient.image!.isNotEmpty
+              dashboard?.patient.image != null &&
+                  dashboard!.patient.image!.isNotEmpty
                   ? NetworkImage(dashboard!.patient.image!)
                   : null,
               child:
-                  (dashboard?.patient.image == null ||
-                      dashboard!.patient.image!.isEmpty)
+              (dashboard?.patient.image == null ||
+                  dashboard!.patient.image!.isEmpty)
                   ? Icon(Icons.person, color: colorScheme.primary, size: 32)
                   : null,
             ),
@@ -149,13 +154,13 @@ class PatientDrawer extends StatelessWidget {
   }
 
   Widget _buildDrawerItem(
-    BuildContext context, {
-    required IconData icon,
-    required String label,
-    required ColorScheme colorScheme,
-    required VoidCallback onTap,
-    Color? textColor,
-  }) {
+      BuildContext context, {
+        required IconData icon,
+        required String label,
+        required ColorScheme colorScheme,
+        required VoidCallback onTap,
+        Color? textColor,
+      }) {
     return ListTile(
       leading: Icon(icon, color: textColor ?? colorScheme.onSurfaceVariant),
       title: Text(

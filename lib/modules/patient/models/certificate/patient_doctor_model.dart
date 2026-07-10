@@ -17,11 +17,16 @@ class PatientDoctorModel {
 
   factory PatientDoctorModel.fromJson(Map<String, dynamic> json) {
     return PatientDoctorModel(
-      id: json["id"],
+      id: json["_id"] is int
+          ? json["_id"]
+          : (json["id"] is int ? json["id"] : int.tryParse(json["_id"]?.toString() ?? json["id"]?.toString() ?? "0") ?? 0),
+
       name: json["doctorName"] ?? "",
       specialty: json["specialization"] ?? "",
       experience: json["experience_years"] ?? 0,
-      rating: (json["rating"] ?? 0).toDouble(),
+
+      rating: double.tryParse(json["rating"]?.toString() ?? "0") ?? 0.0,
+
       image: json["profile_image"],
     );
   }

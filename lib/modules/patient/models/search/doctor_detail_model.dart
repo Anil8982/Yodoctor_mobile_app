@@ -51,7 +51,9 @@ class DoctorDetailModel {
 
   factory DoctorDetailModel.fromJson(Map<String, dynamic> json) {
     return DoctorDetailModel(
-      doctorId: json["doctorId"] ?? 0,
+      // 🎯 FIXED BY SATYAM STUDIOS: Converted int explicitly to String to match model definition and avoid subtype crashes
+      doctorId: json["doctorId"]?.toString() ?? "0",
+
       doctorName: json["doctorName"] ?? "",
       specialization: json["specialization"] ?? "",
       qualification: json["qualification"] ?? "",
@@ -59,8 +61,13 @@ class DoctorDetailModel {
       address: json["address"] ?? "",
       city: json["city"] ?? "",
       licenseNumber: json["licenseNumber"] ?? "",
+
       consultationFee: double.tryParse(json["consultationFee"].toString()) ?? 0,
-      experienceYears: json["experience_years"] ?? 0,
+
+      experienceYears: json["experience_years"] is int
+          ? json["experience_years"]
+          : int.tryParse(json["experience_years"]?.toString() ?? "0") ?? 0,
+
       rating: double.tryParse(json["rating"].toString()) ?? 0,
 
       languages: json["languages"] is List
@@ -68,10 +75,13 @@ class DoctorDetailModel {
           : json["languages"]?.toString() ?? "",
 
       description: json["description"] ?? "",
+
+      // Safe fallback handled cleanly
       sessionTimings: SessionTimings.fromJson(json["sessionTimings"] ?? {}),
+
       profileImage: json["profile_image"] ?? "",
       availableDays:
-          (json["availableDays"] as List?)?.map((e) => e.toString()).toList() ??
+      (json["availableDays"] as List?)?.map((e) => e.toString()).toList() ??
           [],
     );
   }

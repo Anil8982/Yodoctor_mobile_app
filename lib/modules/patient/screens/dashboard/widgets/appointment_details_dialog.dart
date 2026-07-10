@@ -270,7 +270,7 @@ class AppointmentDetailsDialog extends ConsumerWidget {
 
                       // 🎯 FIXED: Replaced legacy context.read with clean Riverpod ref.read matrix sync
                       final controller = ref.read(
-                        patientDashboardControllerProvider,
+                        patientDashboardControllerProvider.notifier,
                       );
                       final success = await controller.cancelAppointment(
                         appointment.id,

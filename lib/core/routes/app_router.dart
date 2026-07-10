@@ -81,11 +81,23 @@ class AppRouter {
         path: AppRoutes.doctorLogin,
         builder: (context, state) => DoctorLoginScreen(),
       ),
+      // GoRoute(
+      //   parentNavigatorKey: _rootNavigatorKey,
+      //   path: AppRoutes.doctorRegister,
+      //   builder: (context, state) => DoctorRegisterScreen(),
+      // ),
+
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.doctorRegister,
-        builder: (context, state) => DoctorRegisterScreen(),
+        builder: (context, state) {
+          final extraStep = state.extra;
+          final int targetStep = extraStep is int ? extraStep : 1;
+
+          return DoctorRegisterScreen(initialStep: targetStep);
+        },
       ),
+
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.waitingApproval,

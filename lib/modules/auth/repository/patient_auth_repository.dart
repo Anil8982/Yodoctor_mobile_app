@@ -112,6 +112,76 @@ class PatientAuthRepository implements AuthRepository {
     }
   }
 
+  Future<LoginResponse> signUpPatient({
+    required String fullName,
+    required String phone,
+    required String email,
+    required String password,
+    required String confirmPassword,
+    required String gender,
+    required String dob,
+  }) async {
+    try {
+      AppLogger.info(
+        'Initiating network register request for new patient context',
+        tag: LogTags.auth,
+        subTag: _subTag,
+      );
+
+      final response = await _dio.post(
+        'http://100.54.44.160/patient/register',
+        data: {
+          'fullName': fullName.trim(),
+          'phone': phone.trim(),
+          'email': email.trim(),
+          'password': password,
+          'confirmPassword': confirmPassword,
+          'gender': gender,
+          'dob': dob,
+        },
+      );
+
+      final Map<String, dynamic> data = Map<String, dynamic>.from(response.data);
+
+      return LoginResponse(
+        success: data['success'] ?? true,
+        message: data['message'] ?? 'Patient registered successfully',
+      );
+    } on DioException catch (e, st) {
+      AppLogger.exception(
+        e,
+        st,
+        message: 'Registration pipeline rejected by gateway branch',
+        tag: LogTags.auth,
+        subTag: _subTag,
+      );
+
+      String errorMessage = 'Registration failed. Please try again.';
+      final responseData = e.response?.data;
+
+      if (responseData is Map<String, dynamic>) {
+        errorMessage = responseData['message']?.toString() ?? errorMessage;
+      }
+
+      return LoginResponse(
+        success: false,
+        message: errorMessage,
+      );
+    } catch (e, st) {
+      AppLogger.exception(
+        e,
+        st,
+        message: 'Unexpected structural dynamic crash during register parser',
+        tag: LogTags.auth,
+        subTag: _subTag,
+      );
+      return LoginResponse(
+        success: false,
+        message: 'Something went wrong.',
+      );
+    }
+  }
+
   @override
   Future<void> signOut() async {
     try {
