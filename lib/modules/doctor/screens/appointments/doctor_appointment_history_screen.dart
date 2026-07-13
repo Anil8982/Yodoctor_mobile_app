@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/utils/app_spacing.dart';
-import '../../../../core/utils/dummy_data.dart';
 import '../../../../core/utils/responsive.dart';
 import '../../widgets/doctor_drawer.dart';
 import '../../widgets/doctor_sliver_app_bar.dart';
@@ -13,15 +12,19 @@ import '../../controllers/appointment_history_controller.dart';
 import 'widgets/history_toolbar.dart';
 import 'widgets/appointment_history_table.dart';
 import 'widgets/mobile_appointment_list.dart';
+import 'package:yodoctor/modules/doctor/controllers/doctor_profile_controller.dart';
+import '../../../../core/models/appointment_history_item.dart';
 
 class DoctorAppointmentHistoryScreen extends ConsumerStatefulWidget {
   const DoctorAppointmentHistoryScreen({super.key});
 
   @override
-  ConsumerState<DoctorAppointmentHistoryScreen> createState() => _DoctorAppointmentHistoryScreenState();
+  ConsumerState<DoctorAppointmentHistoryScreen> createState() =>
+      _DoctorAppointmentHistoryScreenState();
 }
 
-class _DoctorAppointmentHistoryScreenState extends ConsumerState<DoctorAppointmentHistoryScreen> {
+class _DoctorAppointmentHistoryScreenState
+    extends ConsumerState<DoctorAppointmentHistoryScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final TextEditingController _searchController = TextEditingController();
 
@@ -32,11 +35,20 @@ class _DoctorAppointmentHistoryScreenState extends ConsumerState<DoctorAppointme
   }
 
   @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(appointmentHistoryProvider.notifier).loadHistory();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final double horizontalPadding = Responsive.horizontalPadding(context);
-
+    final profileState = ref.watch(doctorProfileProvider);
     final historyState = ref.watch(appointmentHistoryProvider);
     final historyNotifier = ref.read(appointmentHistoryProvider.notifier);
     final filteredAppointments = historyNotifier.getFilteredHistory();
@@ -45,13 +57,14 @@ class _DoctorAppointmentHistoryScreenState extends ConsumerState<DoctorAppointme
       key: _scaffoldKey,
       backgroundColor: colorScheme.surfaceContainer,
       extendBodyBehindAppBar: true,
-      drawer: const DoctorDrawer(doctor: DummyData.currentDoctorProfile),
+
+      drawer: DoctorDrawer(doctor: profileState.profile),
       body: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
             DoctorSliverAppBar(
               expandedHeight: 140.0,
-              scaffoldKey: _scaffoldKey,
+
               background: FlexibleSpaceBar(
                 title: Text(
                   'Appointment History',
@@ -91,7 +104,9 @@ class _DoctorAppointmentHistoryScreenState extends ConsumerState<DoctorAppointme
                           HistoryToolbar(
                             selectedFilter: historyState.selectedFilter,
                             searchController: _searchController,
-                            onFilterChanged: historyNotifier.setFilter,
+                            onFilterChanged: (filter) {
+                              historyNotifier.setFilter(filter);
+                            },
                             onSearchChanged: historyNotifier.setSearchQuery,
                           ),
                           const SizedBox(height: AppSpacing.lg),
@@ -137,8 +152,13 @@ class _DoctorAppointmentHistoryScreenState extends ConsumerState<DoctorAppointme
           radius: 22,
           backgroundColor: colorScheme.primaryContainer,
           child: Text(
-            _patientName(appointment.patientLabel).substring(0, 1).toUpperCase(),
-            style: TextStyle(color: colorScheme.primary, fontWeight: FontWeight.w900),
+            _patientName(
+              appointment.patientLabel,
+            ).substring(0, 1).toUpperCase(),
+            style: TextStyle(
+              color: colorScheme.primary,
+              fontWeight: FontWeight.w900,
+            ),
           ),
         ),
         const SizedBox(width: AppSpacing.sm),
@@ -168,7 +188,10 @@ class _DoctorAppointmentHistoryScreenState extends ConsumerState<DoctorAppointme
   Widget _buildTokenChip(String token) {
     final colorScheme = Theme.of(context).colorScheme;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.xs,
+      ),
       decoration: BoxDecoration(
         color: colorScheme.primaryContainer.withValues(alpha: 0.55),
         borderRadius: BorderRadius.circular(99),
@@ -203,7 +226,10 @@ class _DoctorAppointmentHistoryScreenState extends ConsumerState<DoctorAppointme
         : Colors.orange.transparency(0.15);
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.xs,
+      ),
       decoration: BoxDecoration(
         color: background,
         borderRadius: BorderRadius.circular(99),
@@ -222,7 +248,10 @@ class _DoctorAppointmentHistoryScreenState extends ConsumerState<DoctorAppointme
   Widget _buildInfoChip(IconData icon, String label) {
     final colorScheme = Theme.of(context).colorScheme;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.xs,
+      ),
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(99),
@@ -319,12 +348,16 @@ class _EmptyHistory extends StatelessWidget {
           const SizedBox(height: AppSpacing.md),
           Text(
             'No appointments found',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900),
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900),
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
             'Try another date filter or patient name.',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
           ),
         ],
       ),

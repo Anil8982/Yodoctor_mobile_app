@@ -1,50 +1,62 @@
+import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
-
-import '../../../core/utils/dummy_data.dart';
+import '../models/dashboard/dashboard_model.dart';
 
 class PatientDrawer extends StatelessWidget {
-  const PatientDrawer({super.key, required this.user});
+  const PatientDrawer({super.key, this.dashboard});
 
-  final PatientUser user;
+  final DashboardModel? dashboard;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
+    final String drawerName = dashboard?.patientName ?? "Patient";
+
+    final String drawerEmail = dashboard?.patient != null ? (dashboard?.patient.email ?? "N/A") : "N/A";
+
     return Drawer(
       backgroundColor: colorScheme.surface,
       child: Column(
         children: [
-          // Header Section
           UserAccountsDrawerHeader(
             margin: EdgeInsets.zero,
-            decoration: BoxDecoration(
-              gradient: AppTheme.patientGradient,
-            ),
+            decoration: BoxDecoration(gradient: AppTheme.patientGradient),
+
             accountName: Text(
-              user.name,
+              drawerName,
               style: theme.textTheme.titleMedium?.copyWith(
                 color: colorScheme.onPrimary,
                 fontWeight: FontWeight.bold,
               ),
             ),
+
             accountEmail: Text(
-              user.email,
+              drawerEmail,
               style: theme.textTheme.bodySmall?.copyWith(
-                color: colorScheme.onPrimary.withValues(alpha: 0.8),
+                color: colorScheme.onPrimary.transparency(0.8),
               ),
             ),
+
             currentAccountPicture: CircleAvatar(
               backgroundColor: colorScheme.onPrimaryContainer,
-              child: Icon(Icons.person, color: colorScheme.primary, size: 32),
+              backgroundImage:
+              dashboard?.patient.image != null &&
+                  dashboard!.patient.image!.isNotEmpty
+                  ? NetworkImage(dashboard!.patient.image!)
+                  : null,
+              child:
+              (dashboard?.patient.image == null ||
+                  dashboard!.patient.image!.isEmpty)
+                  ? Icon(Icons.person, color: colorScheme.primary, size: 32)
+                  : null,
             ),
           ),
 
-          // Menu Items
           Expanded(
             child: ListView(
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
@@ -54,7 +66,10 @@ class PatientDrawer extends StatelessWidget {
                   icon: Icons.home_rounded,
                   label: 'Home',
                   colorScheme: colorScheme,
-                  onTap: () => Navigator.pop(context),
+                  onTap: () {
+                    Navigator.pop(context);
+                    context.go(AppRoutes.dashboard);
+                  },
                 ),
                 _buildDrawerItem(
                   context,
@@ -73,29 +88,37 @@ class PatientDrawer extends StatelessWidget {
                   colorScheme: colorScheme,
                   onTap: () {
                     Navigator.pop(context);
-                    context.push(AppRoutes.history);
+                    context.go(AppRoutes.history);
                   },
                 ),
-
                 _buildDrawerItem(
                   context,
-                  icon: Icons.family_restroom_rounded,
-                  label: 'Family Members',
-                  colorScheme: colorScheme,
-                  onTap: () {
-                    Navigator.pop(context);
-                    context.push(AppRoutes.family);
-                  },
-                ),
-
-                _buildDrawerItem(
-                  context,
-                  icon: Icons.card_membership_rounded,
-                  label: 'Medical Certificates',
+                  icon: Icons.description_rounded,
+                  label: 'Certificate',
                   colorScheme: colorScheme,
                   onTap: () {
                     Navigator.pop(context);
                     context.push(AppRoutes.certificateWallet);
+                  },
+                ),
+                _buildDrawerItem(
+                  context,
+                  icon: Icons.home_repair_service_rounded,
+                  label: 'Book Nurse',
+                  colorScheme: colorScheme,
+                  onTap: () {
+                    Navigator.pop(context);
+                    context.push(AppRoutes.homeServiceBooking);
+                  },
+                ),
+                _buildDrawerItem(
+                  context,
+                  icon: Icons.science_rounded,
+                  label: 'Book Lab Test',
+                  colorScheme: colorScheme,
+                  onTap: () {
+                    Navigator.pop(context);
+                    context.push(AppRoutes.labTest);
                   },
                 ),
                 const Divider(indent: 8, endIndent: 8),
@@ -106,20 +129,23 @@ class PatientDrawer extends StatelessWidget {
                   colorScheme: colorScheme,
                   textColor: colorScheme.error,
                   onTap: () {
-                    Navigator.pop(context);
-                    context.go(AppRoutes.landing);
+                    if (context.mounted) {
+                      Navigator.pop(context);
+                      context.go(AppRoutes.landing);
+                    }
                   },
                 ),
               ],
             ),
           ),
 
-          // Footer / Version Info
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16),
             child: Text(
-              'v1.0.0',
-              style: theme.textTheme.labelSmall?.copyWith(color: colorScheme.outline),
+              "v1.0.0",
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: colorScheme.outline,
+              ),
             ),
           ),
         ],

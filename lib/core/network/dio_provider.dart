@@ -5,8 +5,11 @@ import 'package:yodoctor/core/network/api_interceptor.dart';
 import 'package:yodoctor/core/network/auth_interceptor.dart';
 import 'package:yodoctor/core/providers/storage_provider.dart';
 
+/// Clean Architecture compliant Dio instance provider for YoDoctor.
+/// Bypasses the old static instance to allow full testability and mock injection.
 final dioProvider = Provider<Dio>((ref) {
-  final storage = ref.read(storageProvider);
+  // 🎯 Watch storage to handle reactive dependency coupling correctly
+  final storage = ref.watch(storageProvider);
 
   final dio = Dio(
     BaseOptions(
@@ -21,9 +24,10 @@ final dioProvider = Provider<Dio>((ref) {
     ),
   );
 
+  // Register clean pipeline interceptors without duplicate LogInterceptors
   dio.interceptors.addAll([
-    AuthInterceptor(storage),
-    ApiInterceptor(),
+    AuthInterceptor(storage), // Automatically appends Bearer JWT safely
+    ApiInterceptor(),         // Uses AppLogger internally for professional mapping
   ]);
 
   return dio;

@@ -1,11 +1,12 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
-import 'package:yodoctor/core/models/patient/doctor_profile.dart';
+
+import '../../../models/search/doctor_detail_model.dart';
 
 class DoctorInfoCard extends StatelessWidget {
   const DoctorInfoCard({super.key, required this.doctor});
 
-  final DoctorProfile doctor;
+  final DoctorDetailModel doctor;
 
   @override
   Widget build(BuildContext context) {
@@ -18,20 +19,27 @@ class DoctorInfoCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.primaryContainer.transparency(0.25),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: colorScheme.primaryContainer.transparency(0.5)),
+        border: Border.all(
+          color: colorScheme.primaryContainer.transparency(0.5),
+        ),
       ),
       child: Row(
         children: [
           CircleAvatar(
             radius: 28,
             backgroundColor: colorScheme.primary,
-            child: Text(
-              doctor.name.replaceAll('Dr. ', '')[0],
-              style: textTheme.titleLarge?.copyWith(
-                color: colorScheme.onPrimary,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            backgroundImage: doctor.profileImage.isNotEmpty
+                ? NetworkImage(doctor.profileImage)
+                : null,
+            child: doctor.profileImage.isEmpty
+                ? Text(
+                    doctor.doctorName.replaceAll('Dr. ', '')[0],
+                    style: textTheme.titleLarge?.copyWith(
+                      color: colorScheme.onPrimary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )
+                : null,
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -39,12 +47,14 @@ class DoctorInfoCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  doctor.name,
-                  style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900),
+                  doctor.doctorName,
+                  style: textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w900,
+                  ),
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  doctor.specialty,
+                  doctor.specialization,
                   style: textTheme.bodyMedium?.copyWith(
                     color: colorScheme.primary,
                     fontWeight: FontWeight.w700,

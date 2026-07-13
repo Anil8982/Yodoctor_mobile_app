@@ -1,11 +1,11 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:yodoctor/modules/patient/controllers/profile_controller.dart';
+
+import '../../../controllers/profile_controller.dart';
 import 'profile_text_field.dart';
 
-class ProfileInfoCard extends ConsumerWidget {
-  final ProfileNotifier controller;
+class ProfileInfoCard extends StatelessWidget {
+  final ProfileController controller;
   final bool isEditing;
 
   const ProfileInfoCard({
@@ -15,7 +15,7 @@ class ProfileInfoCard extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
     Widget buildDivider() => Divider(
@@ -26,9 +26,6 @@ class ProfileInfoCard extends ConsumerWidget {
       color: colorScheme.outlineVariant.transparency(0.4),
     );
 
-    // Watch the profile state fields reactively if needed to sync dynamic layout rebuilds
-    ref.watch(profileProvider);
-
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
@@ -36,7 +33,7 @@ class ProfileInfoCard extends ConsumerWidget {
         side: BorderSide(color: colorScheme.outlineVariant.transparency(0.4)),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 10.0),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
         child: Column(
           children: [
             ProfileTextField(
@@ -45,21 +42,36 @@ class ProfileInfoCard extends ConsumerWidget {
               controller: controller.nameController,
               isEditing: isEditing,
             ),
+
             buildDivider(),
+
             ProfileTextField(
               label: "Email Address",
               icon: Icons.alternate_email_rounded,
               controller: controller.emailController,
-              isEditing: isEditing,
+              isEditing: false, // Email edit नहीं होगा
             ),
+
             buildDivider(),
+
             ProfileTextField(
               label: "Phone Number",
               icon: Icons.phone_android_rounded,
               controller: controller.mobileController,
               isEditing: isEditing,
             ),
+
             buildDivider(),
+
+            ProfileTextField(
+              label: "Gender",
+              icon: Icons.wc_rounded,
+              controller: controller.genderController,
+              isEditing: isEditing,
+            ),
+
+            buildDivider(),
+
             ProfileTextField(
               label: "Date of Birth",
               icon: Icons.cake_rounded,

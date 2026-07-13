@@ -1,28 +1,38 @@
+import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:yodoctor/core/models/medical_certificate.dart';
-
 import '../../../../core/routes/app_routes.dart';
-import '../../../../core/utils/dummy_data.dart';
 import '../../../../core/utils/responsive.dart';
 import '../../controllers/certificate_request.dart';
 import '../../widgets/custom_sliver_app_bar.dart';
 import '../../widgets/patient_drawer.dart';
 import 'widgets/certificate_header.dart';
-import 'widgets/certificate_preview_dialog.dart';
+import '../../../patient/models/certificate/patient_certificate_request_model.dart';
+import '../../controllers/patient_dashboard_controller.dart';
 
 class CertificateWalletScreen extends ConsumerStatefulWidget {
   const CertificateWalletScreen({super.key});
 
   @override
-  ConsumerState<CertificateWalletScreen> createState() => _CertificateWalletScreenState();
+  ConsumerState<CertificateWalletScreen> createState() =>
+      _CertificateWalletScreenState();
 }
 
 class _CertificateWalletScreenState extends ConsumerState<CertificateWalletScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    // 🎯 Triggers async data load via screen lifecycle instead of build microtasks
+    Future.microtask(() {
+      ref.read(certificateProvider.notifier).loadDoctors();
+      ref.read(certificateProvider.notifier).loadMyRequests();
+    });
+  }
 
   @override
   void dispose() {
@@ -36,6 +46,10 @@ class _CertificateWalletScreenState extends ConsumerState<CertificateWalletScree
     final colorScheme = theme.colorScheme;
     final horizontalPadding = Responsive.horizontalPadding(context);
 
+    // 🎯 Replaced provider's context.watch with reactive Riverpod ref.watch sync
+    final dashboardState = ref.watch(patientDashboardControllerProvider);
+    final dashboardData = dashboardState.dashboardData;
+
     // Watch dynamic state layout values from profile notifier provider
     final formState = ref.watch(certificateProvider);
     final notifier = ref.read(certificateProvider.notifier);
@@ -45,7 +59,7 @@ class _CertificateWalletScreenState extends ConsumerState<CertificateWalletScree
 
     return Scaffold(
       key: _scaffoldKey,
-      drawer: const PatientDrawer(user: DummyData.currentUser),
+      drawer: PatientDrawer(dashboard: dashboardData),
       backgroundColor: theme.scaffoldBackgroundColor,
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
@@ -85,10 +99,16 @@ class _CertificateWalletScreenState extends ConsumerState<CertificateWalletScree
                         style: theme.textTheme.bodyMedium,
                         decoration: InputDecoration(
                           hintText: 'Search by type or doctor...',
-                          prefixIcon: const Icon(Icons.search_rounded, size: 22),
+                          prefixIcon: const Icon(
+                            Icons.search_rounded,
+                            size: 22,
+                          ),
                           suffixIcon: value.text.isNotEmpty
                               ? IconButton(
-                            icon: const Icon(Icons.clear_rounded, size: 20),
+                            icon: const Icon(
+                              Icons.clear_rounded,
+                              size: 20,
+                            ),
                             onPressed: () {
                               _searchController.clear();
                               notifier.setSearchQuery('');
@@ -104,7 +124,8 @@ class _CertificateWalletScreenState extends ConsumerState<CertificateWalletScree
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
                             borderSide: BorderSide(
-                              color: theme.colorScheme.outlineVariant.withValues(alpha: 0.35),
+                              color: theme.colorScheme.outlineVariant
+                                  .transparency(0.35),
                               width: 1.0,
                             ),
                           ),
@@ -130,16 +151,22 @@ class _CertificateWalletScreenState extends ConsumerState<CertificateWalletScree
                           padding: const EdgeInsets.only(right: 8.0),
                           child: FilterChip(
                             label: Text(filter),
-
                             selected: isSelected,
                             onSelected: (_) => notifier.setFilter(filter),
                             selectedColor: colorScheme.primaryContainer,
                             labelStyle: TextStyle(
-                              color: isSelected ? colorScheme.onPrimaryContainer : colorScheme.onSurface,
-                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                              color: isSelected
+                                  ? colorScheme.onPrimaryContainer
+                                  : colorScheme.onSurface,
+                              fontWeight: isSelected
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
                             ),
                             showCheckmark: false,
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 4,
+                            ),
                           ),
                         );
                       }).toList(),
@@ -155,25 +182,27 @@ class _CertificateWalletScreenState extends ConsumerState<CertificateWalletScree
             child: _buildEmptyState(context, formState.selectedFilter),
           )
               : SliverPadding(
-            padding: EdgeInsets.fromLTRB(horizontalPadding, 12, horizontalPadding, 95),
+            padding: EdgeInsets.fromLTRB(
+              horizontalPadding,
+              12,
+              horizontalPadding,
+              95,
+            ),
             sliver: SliverList(
-              delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                  final cert = filteredCertificates[index];
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 12.0),
-                    child: _buildCertificateCard(context, cert),
-                  );
-                },
-                childCount: filteredCertificates.length,
-              ),
+              delegate: SliverChildBuilderDelegate((context, index) {
+                final cert = filteredCertificates[index];
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 12.0),
+                  child: _buildCertificateCard(context, cert),
+                );
+              }, childCount: filteredCertificates.length),
             ),
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          notifier.initFormWithDefaults(DummyData.currentUser);
+          notifier.resetForm();
           context.push(AppRoutes.applyCertificate);
         },
         icon: const Icon(Icons.add_rounded),
@@ -184,13 +213,16 @@ class _CertificateWalletScreenState extends ConsumerState<CertificateWalletScree
     );
   }
 
-  Widget _buildCertificateCard(BuildContext context, MedicalCertificate cert) {
+  Widget _buildCertificateCard(
+      BuildContext context,
+      PatientCertificateRequestModel cert,
+      ) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final dateStr = DateFormat('dd MMM yyyy').format(cert.requestDate);
+    final dateStr = DateFormat('dd MMM yyyy').format(cert.createdAt);
 
     IconData getIcon() {
-      switch (cert.type.toLowerCase()) {
+      switch (cert.certificateType.toLowerCase()) {
         case 'medical fitness':
           return Icons.fitness_center_rounded;
         case 'vaccination':
@@ -217,122 +249,149 @@ class _CertificateWalletScreenState extends ConsumerState<CertificateWalletScree
       }
     }
 
-    return Card(
-      margin: EdgeInsets.zero, // Controlled boundary inside SliverPadding spacing parameters
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: colorScheme.primaryContainer.withValues(alpha: 0.2),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(getIcon(), color: colorScheme.primary, size: 24),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        cert.type,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: colorScheme.onSurface,
-                        ),
+    return InkWell(
+      borderRadius: BorderRadius.circular(16),
+      onTap: () async {
+        await ref
+            .read(certificateProvider.notifier)
+            .loadCertificateDetail(cert.id);
+
+        if (context.mounted) {
+          context.push(AppRoutes.patientCertificateDetail);
+        }
+      },
+      child: Card(
+        margin: EdgeInsets.zero,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(
+            color: colorScheme.outlineVariant.transparency(0.4),
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: colorScheme.primaryContainer.withValues(
+                        alpha: 0.2,
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        'Patient: ${cert.patientName}',
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      getIcon(),
+                      color: colorScheme.primary,
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          cert.certificateType,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: colorScheme.onSurface,
+                          ),
                         ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: getStatusColor().transparency(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: getStatusColor().transparency(0.3),
                       ),
-                    ],
+                    ),
+                    child: Text(
+                      cert.status,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: getStatusColor(),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: getStatusColor().withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: getStatusColor().withValues(alpha: 0.3)),
+                ],
+              ),
+              const Divider(height: 24, thickness: 0.5),
+              Row(
+                children: [
+                  Icon(
+                    Icons.person_pin_rounded,
+                    color: colorScheme.onSurfaceVariant,
+                    size: 16,
                   ),
-                  child: Text(
-                    cert.status,
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: getStatusColor(),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Assigned to: ',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  Text(
+                    cert.doctorName,
+                    style: theme.textTheme.bodySmall?.copyWith(
                       fontWeight: FontWeight.bold,
+                      color: colorScheme.onSurface,
+                    ),
+                  ),
+                  const Spacer(),
+                  Text(
+                    dateStr,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              if (cert.status.toUpperCase() == 'APPROVED') ...[
+                const SizedBox(height: 4),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () async {
+                      await ref
+                          .read(certificateProvider.notifier)
+                          .downloadCertificate(cert.id);
+                    },
+                    icon: const Icon(Icons.verified_rounded, size: 16),
+                    label: const Text('View & Download Certificate'),
+                    style: OutlinedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      side: BorderSide(color: colorScheme.primary),
                     ),
                   ),
                 ),
-              ],
-            ),
-            const Divider(height: 24, thickness: 0.5),
-            Row(
-              children: [
-                Icon(Icons.person_pin_rounded, color: colorScheme.onSurfaceVariant, size: 16),
-                const SizedBox(width: 8),
+              ] else if (cert.status.toUpperCase() == 'REJECTED') ...[
+                const SizedBox(height: 4),
                 Text(
-                  'Assigned to: ',
-                  style: theme.textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
-                ),
-                Text(
-                  cert.doctor.name,
+                  'Note: Request was declined by doctor due to insufficient medical evidence.',
                   style: theme.textTheme.bodySmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: colorScheme.onSurface,
+                    color: colorScheme.error,
+                    fontStyle: FontStyle.italic,
                   ),
-                ),
-                const Spacer(),
-                Text(
-                  dateStr,
-                  style: theme.textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
                 ),
               ],
-            ),
-            const SizedBox(height: 12),
-            if (cert.status.toUpperCase() == 'APPROVED') ...[
-              const SizedBox(height: 4),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  onPressed: () {
-                    showDialog<void>(
-                      context: context,
-                      builder: (context) => CertificatePreviewDialog(certificate: cert),
-                    );
-                  },
-                  icon: const Icon(Icons.verified_rounded, size: 16),
-                  label: const Text('View & Download Certificate'),
-                  style: OutlinedButton.styleFrom(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                    side: BorderSide(color: colorScheme.primary),
-                  ),
-                ),
-              ),
-            ] else if (cert.status.toUpperCase() == 'REJECTED') ...[
-              const SizedBox(height: 4),
-              Text(
-                'Note: Request was declined by doctor due to insufficient medical evidence.',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: colorScheme.error,
-                  fontStyle: FontStyle.italic,
-                ),
-              ),
             ],
-          ],
+          ),
         ),
       ),
     );
@@ -349,7 +408,11 @@ class _CertificateWalletScreenState extends ConsumerState<CertificateWalletScree
           CircleAvatar(
             radius: 36,
             backgroundColor: colorScheme.surfaceContainerHighest,
-            child: Icon(Icons.card_membership_rounded, size: 36, color: colorScheme.onSurfaceVariant),
+            child: Icon(
+              Icons.card_membership_rounded,
+              size: 36,
+              color: colorScheme.onSurfaceVariant,
+            ),
           ),
           const SizedBox(height: 16),
           Text(

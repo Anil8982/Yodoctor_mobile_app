@@ -28,7 +28,7 @@ class HeroSection extends StatelessWidget {
     final topPadding = MediaQuery.of(context).padding.top;
 
     return GradientBackground(
-      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(0)),
+      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(32)),
       padding: EdgeInsets.fromLTRB(
         AppSpacing.xl,
         topPadding + 70,
@@ -50,7 +50,7 @@ class HeroSection extends StatelessWidget {
             colorScheme,
             child: AppSearchField(
               controller: locationController,
-              hintText: 'Location',
+              hintText: 'Search city',
               onChanged: onLocationChanged,
               prefixIcon: Icon(
                 Icons.location_on_rounded,
@@ -64,15 +64,16 @@ class HeroSection extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                // --- TARGET: BOX HYA LINK LA FOLLOW KAREL ---
                 child: CompositedTransformTarget(
                   link: searchLayerLink,
                   child: _buildSearchWrapper(
                     colorScheme,
                     child: AppSearchField(
                       controller: searchController,
-                      hintText: 'Search doctors...',
+                      hintText: 'Search doctor, specialty, clinic',
+                      textInputAction: TextInputAction.search,
                       onChanged: onQueryChanged,
+                      onSubmitted: (_) => onSearchTap(),
                       prefixIcon: Icon(
                         Icons.search_rounded,
                         color: colorScheme.primary,
@@ -126,4 +127,3 @@ class HeroSection extends StatelessWidget {
     );
   }
 }
-

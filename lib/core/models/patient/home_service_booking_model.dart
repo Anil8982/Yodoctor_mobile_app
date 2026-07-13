@@ -1,4 +1,3 @@
-
 class HomeServiceBookingModel {
   final String fullName;
   final String contactNumber;
@@ -14,13 +13,16 @@ class HomeServiceBookingModel {
   final String timePreference; // Morning, Afternoon, Evening, Night
   final String medicalCondition;
   final String additionalNotes;
-
+  final double? latitude;
+  final double? longitude;
   const HomeServiceBookingModel({
     this.fullName = '',
     this.contactNumber = '',
     this.patientAge = '',
     this.patientGender = 'Select Gender',
     this.address = '',
+    this.latitude,
+    this.longitude,
     this.preferredCaregiverGender = 'No Preference',
     this.needEmergencyService = false,
     this.selectedServiceType = '',
@@ -38,6 +40,8 @@ class HomeServiceBookingModel {
     String? patientAge,
     String? patientGender,
     String? address,
+    double? latitude,
+    double? longitude,
     String? preferredCaregiverGender,
     bool? needEmergencyService,
     String? selectedServiceType,
@@ -54,7 +58,10 @@ class HomeServiceBookingModel {
       patientAge: patientAge ?? this.patientAge,
       patientGender: patientGender ?? this.patientGender,
       address: address ?? this.address,
-      preferredCaregiverGender: preferredCaregiverGender ?? this.preferredCaregiverGender,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
+      preferredCaregiverGender:
+          preferredCaregiverGender ?? this.preferredCaregiverGender,
       needEmergencyService: needEmergencyService ?? this.needEmergencyService,
       selectedServiceType: selectedServiceType ?? this.selectedServiceType,
       durationType: durationType ?? this.durationType,

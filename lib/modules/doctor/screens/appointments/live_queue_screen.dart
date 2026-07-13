@@ -24,10 +24,10 @@ class LiveQueueScreen extends ConsumerWidget {
           ),
         ),
         centerTitle: false,
-        backgroundColor: colorScheme.primary, // 👈 प्युअर प्रायमरी कलर बॅकग्राउंड
+        backgroundColor: colorScheme.primary,
         elevation: 0,
         scrolledUnderElevation: 0,
-        iconTheme: IconThemeData(color: colorScheme.onPrimary), // 👈 बॅक अ‍ॅरो पांढरा दिसेल भाऊ
+        iconTheme: IconThemeData(color: colorScheme.onPrimary),
       ),
       body: SafeArea(
         child: ConstrainedBox(

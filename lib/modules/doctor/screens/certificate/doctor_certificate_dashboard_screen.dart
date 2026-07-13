@@ -3,10 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/modules/doctor/controllers/doctor_certificate_controller.dart';
 import '../../../../core/utils/app_spacing.dart';
 import '../../../../core/utils/responsive.dart';
-import '../../../../core/utils/dummy_data.dart';
 import '../../widgets/doctor_drawer.dart';
 import '../../widgets/doctor_sliver_app_bar.dart';
 import 'widgets/certificate_list_cards.dart';
+import '../../controllers/doctor_profile_controller.dart';
 
 class DoctorCertificateDashboardScreen extends ConsumerStatefulWidget {
   const DoctorCertificateDashboardScreen({super.key});
@@ -52,18 +52,18 @@ class _DoctorCertificateDashboardScreenState
     final certificateState = ref.watch(doctorCertificateProvider);
     final notifier = ref.read(doctorCertificateProvider.notifier);
     final filteredCerts = notifier.filteredCertificates;
+    final profileState = ref.watch(doctorProfileProvider);
 
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: colorScheme.surfaceContainerLow,
       extendBodyBehindAppBar: true,
-      drawer: const DoctorDrawer(doctor: DummyData.currentDoctorProfile),
+      drawer: DoctorDrawer(doctor: profileState.profile),
       body: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
             DoctorSliverAppBar(
               expandedHeight: 140.0,
-              scaffoldKey: _scaffoldKey,
               background: FlexibleSpaceBar(
                 title: Text(
                   'Certificate Requests',
@@ -170,7 +170,7 @@ class _DoctorCertificateDashboardScreenState
                 _buildCard(
                   context,
                   'Total Issued',
-                  '${notifier.totalIssuedCount}',
+                  '${notifier.issuedCount}',
                   colorScheme.primary,
                   colorScheme.primaryContainer,
                 ),
@@ -178,7 +178,7 @@ class _DoctorCertificateDashboardScreenState
                 _buildCard(
                   context,
                   'This Month',
-                  '${notifier.thisMonthIssuedCount}',
+                  '${notifier.issuedCount}',
                   colorScheme.secondary,
                   colorScheme.secondaryContainer,
                 ),
@@ -367,9 +367,10 @@ class _DoctorCertificateDashboardScreenState
       ),
       dropdownColor: colorScheme.surface,
       items: const [
-        DropdownMenuItem(value: 'All Status', child: Text('All Status')),
-        DropdownMenuItem(value: 'Verification', child: Text('Verification')),
-        DropdownMenuItem(value: 'Pending', child: Text('Pending')),
+        DropdownMenuItem(value: "All Status", child: Text("All Status")),
+        DropdownMenuItem(value: "PENDING", child: Text("Pending")),
+        DropdownMenuItem(value: "APPROVED", child: Text("Approved")),
+        DropdownMenuItem(value: "REJECTED", child: Text("Rejected")),
       ],
       onChanged: (val) => notifier.updateStatusFilter(val!),
     );

@@ -13,6 +13,7 @@ class AppSearchField extends StatelessWidget {
     this.onTap,
     this.onChanged,
     this.textInputAction,
+    this.onSubmitted,
   });
 
   final TextEditingController? controller;
@@ -25,6 +26,7 @@ class AppSearchField extends StatelessWidget {
   final VoidCallback? onTap;
   final ValueChanged<String>? onChanged;
   final TextInputAction? textInputAction;
+  final ValueChanged<String>? onSubmitted;
 
   @override
   Widget build(BuildContext context) {

@@ -3,12 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/modules/patient/controllers/profile_controller.dart';
 
 class ProfileActionBar extends ConsumerWidget {
-  final ProfileNotifier controller;
   final VoidCallback onComplete;
 
   const ProfileActionBar({
     super.key,
-    required this.controller,
     required this.onComplete,
   });
 
@@ -16,22 +14,24 @@ class ProfileActionBar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    // Watch profile state reactively for background transaction status flags
-    final profileState = ref.watch(profileProvider);
+    final profileState = ref.watch(profileControllerProvider);
+    final notifier = ref.read(profileControllerProvider.notifier);
 
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: colorScheme.surface,
         border: Border(
-          top: BorderSide(color: colorScheme.outlineVariant.withValues(alpha: 0.3)),
+          top: BorderSide(
+            color: colorScheme.outlineVariant.withValues(alpha: 0.3),
+          ),
         ),
         boxShadow: [
           BoxShadow(
             color: colorScheme.shadow.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, -4),
-          )
+          ),
         ],
       ),
       child: Row(
@@ -39,7 +39,7 @@ class ProfileActionBar extends ConsumerWidget {
           Expanded(
             child: OutlinedButton(
               onPressed: () {
-                controller.discardChanges();
+                notifier.discardChanges();
                 onComplete();
               },
               style: OutlinedButton.styleFrom(
@@ -60,12 +60,20 @@ class ProfileActionBar extends ConsumerWidget {
               onPressed: profileState.isLoading
                   ? null
                   : () async {
-                await controller.updateProfile();
+                // final success = await notifier.updateProfile();
                 onComplete();
+
                 if (context.mounted) {
+                  final currentState = ref.read(profileControllerProvider);
+
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Profile Updated Successfully!'),
+                    SnackBar(
+                      content: Text(
+                        currentState.errorMessage ?? "Profile Updated Successfully!",
+                      ),
+                      backgroundColor: currentState.errorMessage == null
+                          ? Colors.green
+                          : Colors.red,
                       behavior: SnackBarBehavior.floating,
                     ),
                   );

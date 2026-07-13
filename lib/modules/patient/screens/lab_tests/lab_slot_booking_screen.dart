@@ -36,7 +36,10 @@ class _LabSlotBookingScreenState extends ConsumerState<LabSlotBookingScreen> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final bookingState = ref.watch(labBookingProvider);
-    final cartItems = ref.watch(labCartProvider);
+
+    final labState = ref.watch(labProvider);
+
+    final cartItems = labState.cart;
     final double totalPayable = cartItems.fold(
       0,
       (sum, item) => sum + item.currentPrice,
@@ -584,11 +587,29 @@ class _LabSlotBookingScreenState extends ConsumerState<LabSlotBookingScreen> {
             child: SizedBox(
               height: 48,
               child: ElevatedButton(
-                onPressed: isReady ? () {
-                  if (_formKey.currentState?.validate() ?? false) {
-                    _showSuccessDialog(context);
-                  }
-                } : null,
+                onPressed: isReady
+                    ? () async {
+                        if (!(_formKey.currentState?.validate() ?? false)) {
+                          return;
+                        }
+
+                        final booking = ref.read(labBookingProvider);
+
+                        final success = await ref
+                            .read(labProvider.notifier)
+                            .createBooking(booking: booking);
+
+                        if (!mounted) return;
+
+                        if (success) {
+                          _showSuccessDialog(context);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text("Booking failed")),
+                          );
+                        }
+                      }
+                    : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: colorScheme.primary,
                   foregroundColor: colorScheme.onPrimary,
@@ -617,7 +638,9 @@ class _LabSlotBookingScreenState extends ConsumerState<LabSlotBookingScreen> {
       barrierDismissible: false,
       builder: (context) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(28),
+          ),
           content: Padding(
             padding: const EdgeInsets.symmetric(vertical: 12),
             child: Column(
@@ -664,7 +687,9 @@ class _LabSlotBookingScreenState extends ConsumerState<LabSlotBookingScreen> {
                     backgroundColor: colorScheme.primary,
                     foregroundColor: colorScheme.onPrimary,
                     minimumSize: const Size.fromHeight(48),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
                     elevation: 0,
                   ),
                 ),
@@ -678,7 +703,9 @@ class _LabSlotBookingScreenState extends ConsumerState<LabSlotBookingScreen> {
                   child: Text(
                     'Go to Dashboard',
                     style: TextStyle(
-                      color: colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
+                      color: colorScheme.onSurfaceVariant.withValues(
+                        alpha: 0.8,
+                      ),
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -690,6 +717,7 @@ class _LabSlotBookingScreenState extends ConsumerState<LabSlotBookingScreen> {
       },
     );
   }
+
   String _getWeekdayName(int weekday) {
     const names = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
     return names[weekday - 1];

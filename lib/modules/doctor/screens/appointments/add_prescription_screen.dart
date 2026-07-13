@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
+import '../../../doctor/controllers/live_queue_controller.dart';
+import '../../../../core/models/doctor/prescription_model.dart';
 
 class AddPrescriptionScreen extends ConsumerStatefulWidget {
   const AddPrescriptionScreen({
@@ -17,7 +19,8 @@ class AddPrescriptionScreen extends ConsumerStatefulWidget {
   final String tokenNumber;
 
   @override
-  ConsumerState<AddPrescriptionScreen> createState() => _AddPrescriptionScreenState();
+  ConsumerState<AddPrescriptionScreen> createState() =>
+      _AddPrescriptionScreenState();
 }
 
 class _AddPrescriptionScreenState extends ConsumerState<AddPrescriptionScreen> {
@@ -26,22 +29,46 @@ class _AddPrescriptionScreenState extends ConsumerState<AddPrescriptionScreen> {
   final _instructionsController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final notifier = ref.read(liveQueueProvider.notifier);
+
+      final prescription = await notifier.getPrescription(widget.appointmentId);
+
+      if (prescription != null) {
+        _medicinesController.text = prescription.medicines;
+        _instructionsController.text = prescription.instructions;
+      }
+    });
+  }
+
+  @override
   void dispose() {
     _medicinesController.dispose();
     _instructionsController.dispose();
     super.dispose();
   }
 
-  void _handleSave() {
-    if (_formKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Prescription saved successfully for ${widget.patientName}'),
-          backgroundColor: Theme.of(context).colorScheme.primary,
-        ),
-      );
-      context.pop();
-    }
+  Future<void> _handleSave() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    final notifier = ref.read(liveQueueProvider.notifier);
+
+    await notifier.savePrescription(
+      appointmentId: widget.appointmentId,
+      medicines: _medicinesController.text.trim(),
+      instructions: _instructionsController.text.trim(),
+    );
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Prescription Saved Successfully")),
+    );
+
+    context.pop();
   }
 
   @override
@@ -83,14 +110,20 @@ class _AddPrescriptionScreenState extends ConsumerState<AddPrescriptionScreen> {
                       decoration: BoxDecoration(
                         color: colorScheme.primaryContainer.transparency(0.25),
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: colorScheme.primary.transparency(0.12)),
+                        border: Border.all(
+                          color: colorScheme.primary.transparency(0.12),
+                        ),
                       ),
                       child: Row(
                         children: [
                           CircleAvatar(
                             radius: 20,
                             backgroundColor: colorScheme.primary,
-                            child: Icon(Icons.person_outline_rounded, color: colorScheme.onPrimary, size: 22),
+                            child: Icon(
+                              Icons.person_outline_rounded,
+                              color: colorScheme.onPrimary,
+                              size: 22,
+                            ),
                           ),
                           const SizedBox(width: AppSpacing.md),
                           Expanded(
@@ -115,7 +148,10 @@ class _AddPrescriptionScreenState extends ConsumerState<AddPrescriptionScreen> {
                             ),
                           ),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
                             decoration: BoxDecoration(
                               color: colorScheme.secondaryContainer,
                               borderRadius: BorderRadius.circular(12),
@@ -156,19 +192,29 @@ class _AddPrescriptionScreenState extends ConsumerState<AddPrescriptionScreen> {
                         fillColor: colorScheme.surfaceContainerLow,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: colorScheme.outlineVariant.transparency(0.3)),
+                          borderSide: BorderSide(
+                            color: colorScheme.outlineVariant.transparency(0.3),
+                          ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: colorScheme.outlineVariant.transparency(0.3)),
+                          borderSide: BorderSide(
+                            color: colorScheme.outlineVariant.transparency(0.3),
+                          ),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: colorScheme.primary, width: 2),
+                          borderSide: BorderSide(
+                            color: colorScheme.primary,
+                            width: 2,
+                          ),
                         ),
                         errorBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: colorScheme.error, width: 1),
+                          borderSide: BorderSide(
+                            color: colorScheme.error,
+                            width: 1,
+                          ),
                         ),
                       ),
                       validator: (value) {
@@ -201,15 +247,22 @@ class _AddPrescriptionScreenState extends ConsumerState<AddPrescriptionScreen> {
                         fillColor: colorScheme.surfaceContainerLow,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: colorScheme.outlineVariant.transparency(0.3)),
+                          borderSide: BorderSide(
+                            color: colorScheme.outlineVariant.transparency(0.3),
+                          ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: colorScheme.outlineVariant.transparency(0.3)),
+                          borderSide: BorderSide(
+                            color: colorScheme.outlineVariant.transparency(0.3),
+                          ),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: colorScheme.primary, width: 2),
+                          borderSide: BorderSide(
+                            color: colorScheme.primary,
+                            width: 2,
+                          ),
                         ),
                       ),
                     ),
@@ -220,9 +273,14 @@ class _AddPrescriptionScreenState extends ConsumerState<AddPrescriptionScreen> {
                         OutlinedButton(
                           onPressed: () => context.pop(),
                           style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 14,
+                            ),
                             side: BorderSide(color: colorScheme.outline),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(100),
+                            ),
                           ),
                           child: Text(
                             "Cancel",
@@ -238,8 +296,13 @@ class _AddPrescriptionScreenState extends ConsumerState<AddPrescriptionScreen> {
                           style: FilledButton.styleFrom(
                             backgroundColor: colorScheme.primary,
                             foregroundColor: colorScheme.onPrimary,
-                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 14,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(100),
+                            ),
                             elevation: 0,
                           ),
                           child: Text(

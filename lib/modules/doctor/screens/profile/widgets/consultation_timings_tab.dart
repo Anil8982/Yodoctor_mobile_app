@@ -17,7 +17,13 @@ class ConsultationTimingsTab extends ConsumerWidget {
     final formState = ref.watch(doctorProfileProvider);
 
     final List<String> weekDays = [
-      'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
+      "Mon",
+      "Tue",
+      "Wed",
+      "Thu",
+      "Fri",
+      "Sat",
+      "Sun",
     ];
 
     return SingleChildScrollView(
@@ -27,9 +33,19 @@ class ConsultationTimingsTab extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Consultation Settings', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+            Text(
+              'Consultation Settings',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w800,
+              ),
+            ),
             const SizedBox(height: AppSpacing.xxs),
-            Text('Configure your consultation pricing and expected checkup time slots.', style: theme.textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant)),
+            Text(
+              'Configure your consultation pricing and expected checkup time slots.',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
             const SizedBox(height: AppSpacing.xl),
 
             Row(
@@ -50,20 +66,39 @@ class ConsultationTimingsTab extends ConsumerWidget {
                     children: [
                       Text(
                         'Avg. Duration',
-                        style: theme.textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w800, color: colorScheme.onSurfaceVariant),
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
                       ),
                       const SizedBox(height: AppSpacing.xs),
                       DropdownButtonFormField<int>(
                         initialValue: formState.avgDuration,
                         dropdownColor: colorScheme.surfaceContainerHigh,
-                        style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700, color: colorScheme.onSurface),
-                        icon: Icon(Icons.keyboard_arrow_down_rounded, color: colorScheme.onSurfaceVariant),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: colorScheme.onSurface,
+                        ),
+                        icon: Icon(
+                          Icons.keyboard_arrow_down_rounded,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
                         decoration: InputDecoration(
-                          prefixIcon: Icon(Icons.access_time_rounded, color: colorScheme.primary, size: 20),
+                          prefixIcon: Icon(
+                            Icons.access_time_rounded,
+                            color: colorScheme.primary,
+                            size: 20,
+                          ),
                           filled: true,
                           fillColor: colorScheme.surfaceContainerHigh,
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
-                          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: BorderSide.none,
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: BorderSide.none,
+                          ),
                         ),
                         items: const [
                           DropdownMenuItem(value: 10, child: Text('10 Mins')),
@@ -72,7 +107,9 @@ class ConsultationTimingsTab extends ConsumerWidget {
                           DropdownMenuItem(value: 30, child: Text('30 Mins')),
                         ],
                         onChanged: (val) {
-                          // TODO: Implement duration update logic inside notifier if needed
+                          if (val != null) {
+                            controller.updateDuration(val);
+                          }
                         },
                       ),
                     ],
@@ -82,7 +119,13 @@ class ConsultationTimingsTab extends ConsumerWidget {
             ),
             const SizedBox(height: AppSpacing.xl),
 
-            Text('Available Days', style: theme.textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w800, color: colorScheme.onSurfaceVariant)),
+            Text(
+              'Available Days',
+              style: theme.textTheme.bodySmall?.copyWith(
+                fontWeight: FontWeight.w800,
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
             const SizedBox(height: AppSpacing.sm),
             Wrap(
               spacing: AppSpacing.sm,
@@ -90,14 +133,27 @@ class ConsultationTimingsTab extends ConsumerWidget {
               children: weekDays.map((day) {
                 final isSelected = formState.activeDays.contains(day);
                 return FilterChip(
-                  label: Text(day, style: TextStyle(fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600)),
+                  label: Text(
+                    day,
+                    style: TextStyle(
+                      fontWeight: isSelected
+                          ? FontWeight.w800
+                          : FontWeight.w600,
+                    ),
+                  ),
                   selected: isSelected,
                   selectedColor: colorScheme.primaryContainer,
                   checkmarkColor: colorScheme.onPrimaryContainer,
-                  labelStyle: TextStyle(color: isSelected ? colorScheme.onPrimaryContainer : colorScheme.onSurface),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  onSelected: (selected) {
-                    // TODO: Implement toggle functionality inside profile state structure
+                  labelStyle: TextStyle(
+                    color: isSelected
+                        ? colorScheme.onPrimaryContainer
+                        : colorScheme.onSurface,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  onSelected: (_) {
+                    controller.toggleDay(day);
                   },
                 );
               }).toList(),

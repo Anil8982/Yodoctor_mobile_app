@@ -1,20 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import '../../../../../core/models/patient/patient_appointment.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../models/dashboard/appointment_model.dart';
+import '../../../controllers/patient_dashboard_controller.dart';
 
-class AppointmentDetailsDialog extends StatelessWidget {
+class AppointmentDetailsDialog extends ConsumerWidget {
   const AppointmentDetailsDialog({super.key, required this.appointment});
 
-  final PatientAppointment appointment;
+  final AppointmentModel appointment;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
 
-    final bool isAccepted = appointment.appointmentStatus == 'ACCEPTED';
-    final Color statusColor = isAccepted ? colorScheme.primary : colorScheme.secondary;
+    final bool isAccepted = appointment.status == 'ACCEPTED';
+    final Color statusColor = isAccepted
+        ? colorScheme.primary
+        : colorScheme.secondary;
     final Color statusBg = isAccepted
         ? colorScheme.primaryContainer.withValues(alpha: 0.4)
         : colorScheme.secondaryContainer.withValues(alpha: 0.45);
@@ -53,11 +56,13 @@ class AppointmentDetailsDialog extends StatelessWidget {
               ),
             ),
             const Divider(height: 1),
-
             Flexible(
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 20,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -68,13 +73,18 @@ class AppointmentDetailsDialog extends StatelessWidget {
                           width: 64,
                           height: 64,
                           decoration: BoxDecoration(
-                            color: colorScheme.primaryContainer.withValues(alpha: 0.35),
+                            color: colorScheme.primaryContainer.withValues(
+                              alpha: 0.35,
+                            ),
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Center(
                             child: Text(
                               appointment.doctorName.isNotEmpty
-                                  ? appointment.doctorName.replaceAll('Dr. ', '')[0]
+                                  ? appointment.doctorName.replaceAll(
+                                      'Dr. ',
+                                      '',
+                                    )[0]
                                   : 'D',
                               style: textTheme.titleLarge?.copyWith(
                                 color: colorScheme.primary,
@@ -99,7 +109,7 @@ class AppointmentDetailsDialog extends StatelessWidget {
                               Row(
                                 children: [
                                   Text(
-                                    appointment.specialty,
+                                    appointment.specialization,
                                     style: textTheme.bodyMedium?.copyWith(
                                       color: colorScheme.primary,
                                       fontWeight: FontWeight.w700,
@@ -107,13 +117,16 @@ class AppointmentDetailsDialog extends StatelessWidget {
                                   ),
                                   const SizedBox(width: 10),
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 3,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: statusBg,
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Text(
-                                      appointment.appointmentStatus,
+                                      appointment.status,
                                       style: textTheme.labelSmall?.copyWith(
                                         color: statusColor,
                                         fontWeight: FontWeight.w900,
@@ -128,9 +141,12 @@ class AppointmentDetailsDialog extends StatelessWidget {
                         ),
                       ],
                     ),
-
                     const SizedBox(height: 24),
-                    _buildSectionTitle(textTheme, colorScheme, 'APPOINTMENT INFO'),
+                    _buildSectionTitle(
+                      textTheme,
+                      colorScheme,
+                      'APPOINTMENT INFO',
+                    ),
                     const SizedBox(height: 12),
                     GridView.count(
                       shrinkWrap: true,
@@ -140,17 +156,40 @@ class AppointmentDetailsDialog extends StatelessWidget {
                       crossAxisSpacing: 16,
                       mainAxisSpacing: 16,
                       children: [
-                        _buildGridInfoItem(context, Icons.person_rounded, 'Patient', appointment.patientName),
-                        _buildGridInfoItem(context, Icons.calendar_month_rounded, 'Date', DateFormat('EEE, MMM dd, yyyy').format(appointment.dateTime)),
-                        _buildGridInfoItem(context, Icons.access_time_filled_rounded, 'Time Slot', 'Evening'),
-                        _buildGridInfoItem(context, Icons.tag_rounded, 'Token Number', '#1'),
+                        _buildGridInfoItem(
+                          context,
+                          Icons.person_rounded,
+                          'Patient',
+                          appointment.familyName ?? "Self",
+                        ),
+                        _buildGridInfoItem(
+                          context,
+                          Icons.calendar_month_rounded,
+                          'Date',
+                          appointment.appointmentDate,
+                        ),
+                        _buildGridInfoItem(
+                          context,
+                          Icons.access_time_filled_rounded,
+                          'Time Slot',
+                          appointment.appointmentSlot,
+                        ),
+                        _buildGridInfoItem(
+                          context,
+                          Icons.tag_rounded,
+                          'Token Number',
+                          '#${appointment.tokenNumber}',
+                        ),
                       ],
                     ),
                     const SizedBox(height: 24),
                     const Divider(height: 1),
                     const SizedBox(height: 24),
-
-                    _buildSectionTitle(textTheme, colorScheme, 'CLINIC INFORMATION'),
+                    _buildSectionTitle(
+                      textTheme,
+                      colorScheme,
+                      'CLINIC INFORMATION',
+                    ),
                     const SizedBox(height: 12),
                     GridView.count(
                       shrinkWrap: true,
@@ -160,46 +199,136 @@ class AppointmentDetailsDialog extends StatelessWidget {
                       crossAxisSpacing: 16,
                       mainAxisSpacing: 16,
                       children: [
-                        _buildGridInfoItem(context, Icons.local_hospital_rounded, 'Clinic', appointment.hospital),
-                        _buildGridInfoItem(context, Icons.payments_rounded, 'Consultation Fee', '₹500'),
-                        _buildGridInfoItem(context, Icons.location_city_rounded, 'City', 'Chhatrapati Sambhajinagar'),
-                        _buildGridInfoItem(context, Icons.badge_rounded, 'Experience', '7+ Years'),
+                        _buildGridInfoItem(
+                          context,
+                          Icons.local_hospital_rounded,
+                          'Clinic',
+                          appointment.clinicName,
+                        ),
+                        _buildGridInfoItem(
+                          context,
+                          Icons.payments_rounded,
+                          'Consultation Fee',
+                          '₹${appointment.consultationFee}',
+                        ),
+                        _buildGridInfoItem(
+                          context,
+                          Icons.location_city_rounded,
+                          'City',
+                          appointment.city,
+                        ),
+                        _buildGridInfoItem(
+                          context,
+                          Icons.badge_rounded,
+                          'Experience',
+                          '${appointment.experience} Years',
+                        ),
                       ],
                     ),
                     const SizedBox(height: 16),
-                    _buildGridInfoItem(context, Icons.map_rounded, 'Address', 'Ashoka Garden', isFullWidth: true),
+                    _buildGridInfoItem(
+                      context,
+                      Icons.map_rounded,
+                      'Address',
+                      appointment.address,
+                      isFullWidth: true,
+                    ),
                   ],
                 ),
               ),
             ),
-
             const Divider(height: 1),
-            Padding(
-              padding: const EdgeInsets.all(24),
-              child: SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  onPressed: () {},
-                  icon: const Icon(Icons.cancel_rounded, size: 18),
-                  label: const Text('Cancel Appointment'),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: colorScheme.error,
-                    side: BorderSide(color: colorScheme.error.withValues(alpha: 0.3)),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                    backgroundColor: colorScheme.error.withValues(alpha: 0.04),
-                    textStyle: const TextStyle(fontWeight: FontWeight.w900, fontSize: 15),
+            if (appointment.status == "PENDING" ||
+                appointment.status == "ACCEPTED")
+              Padding(
+                padding: const EdgeInsets.all(24),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () async {
+                      final confirm = await showDialog<bool>(
+                        context: context,
+                        builder: (_) => AlertDialog(
+                          title: const Text("Cancel Appointment"),
+                          content: const Text(
+                            "Are you sure you want to cancel this appointment?",
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, false),
+                              child: const Text("No"),
+                            ),
+                            FilledButton(
+                              onPressed: () => Navigator.pop(context, true),
+                              child: const Text("Yes"),
+                            ),
+                          ],
+                        ),
+                      );
+
+                      if (confirm != true) return;
+
+                      // 🎯 FIXED: Replaced legacy context.read with clean Riverpod ref.read matrix sync
+                      final controller = ref.read(
+                        patientDashboardControllerProvider.notifier,
+                      );
+                      final success = await controller.cancelAppointment(
+                        appointment.id,
+                      );
+
+                      if (!context.mounted) return;
+
+                      if (success) {
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Appointment cancelled successfully"),
+                          ),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              controller.errorMessage ??
+                                  "Unable to cancel appointment",
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                    icon: const Icon(Icons.cancel_rounded, size: 18),
+                    label: const Text('Cancel Appointment'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: colorScheme.error,
+                      side: BorderSide(
+                        color: colorScheme.error.withValues(alpha: 0.3),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      backgroundColor: colorScheme.error.withValues(
+                        alpha: 0.04,
+                      ),
+                      textStyle: const TextStyle(
+                        fontWeight: FontWeight.w900,
+                        fontSize: 15,
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSectionTitle(TextTheme textTheme, ColorScheme colorScheme, String title) {
+  Widget _buildSectionTitle(
+    TextTheme textTheme,
+    ColorScheme colorScheme,
+    String title,
+  ) {
     return Text(
       title,
       style: textTheme.labelSmall?.copyWith(
@@ -210,7 +339,13 @@ class AppointmentDetailsDialog extends StatelessWidget {
     );
   }
 
-  Widget _buildGridInfoItem(BuildContext context, IconData icon, String label, String value, {bool isFullWidth = false}) {
+  Widget _buildGridInfoItem(
+    BuildContext context,
+    IconData icon,
+    String label,
+    String value, {
+    bool isFullWidth = false,
+  }) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -246,12 +381,8 @@ class AppointmentDetailsDialog extends StatelessWidget {
     );
 
     if (isFullWidth) {
-      return Padding(
-        padding: const EdgeInsets.only(top: 4),
-        child: content,
-      );
+      return Padding(padding: const EdgeInsets.only(top: 4), child: content);
     }
-
     return content;
   }
 }

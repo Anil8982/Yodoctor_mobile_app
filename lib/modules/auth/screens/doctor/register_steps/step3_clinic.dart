@@ -1,11 +1,13 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/modules/auth/controllers/doctor_register_controller.dart';
 import 'package:yodoctor/modules/auth/models/doctor_register_model.dart';
+import 'nav_buttons.dart';
 import 'shared_widgets.dart';
 
-class Step3Clinic extends StatefulWidget {
+class Step3Clinic extends ConsumerStatefulWidget {
   final DoctorFormData data;
   final VoidCallback onNext;
   final VoidCallback onBack;
@@ -18,10 +20,10 @@ class Step3Clinic extends StatefulWidget {
   });
 
   @override
-  State<Step3Clinic> createState() => _Step3ClinicState();
+  ConsumerState<Step3Clinic> createState() => _Step3ClinicState();
 }
 
-class _Step3ClinicState extends State<Step3Clinic> {
+class _Step3ClinicState extends ConsumerState<Step3Clinic> {
   final _formKey = GlobalKey<FormState>();
   final _nameCtrl = TextEditingController();
   final _cityCtrl = TextEditingController();
@@ -82,6 +84,8 @@ class _Step3ClinicState extends State<Step3Clinic> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final registerState = ref.watch(doctorRegisterControllerProvider);
+
     return Form(
       key: _formKey,
       child: StepCard(
@@ -89,7 +93,7 @@ class _Step3ClinicState extends State<Step3Clinic> {
           StepTitle(
             icon: Icons.local_hospital_rounded,
             title: 'Clinic Details',
-            color: AppTheme.yoBlue,
+            color: colorScheme.primary,
           ),
           const SizedBox(height: 24),
           YoField(
@@ -114,7 +118,16 @@ class _Step3ClinicState extends State<Step3Clinic> {
             controller: _addrCtrl,
             maxLines: 3,
             style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface),
-            decoration: inputDeco(context, 'Street, Area, District...', Icons.home_rounded),
+            decoration: inputDeco(
+              context,
+              'Street, Area, District...',
+              Icons.home_rounded,
+            ).copyWith(
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: BorderSide(color: colorScheme.outlineVariant.transparency(0.4)),
+              ),
+            ),
             validator: (v) => v!.isEmpty ? 'Address required' : null,
           ),
           const SizedBox(height: 16),
@@ -134,7 +147,7 @@ class _Step3ClinicState extends State<Step3Clinic> {
             controller: _pincodeCtrl,
             keyboardType: TextInputType.number,
             maxLength: 6,
-            inputFormatters:  [FilteringTextInputFormatter.digitsOnly],
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             validator: (v) => v!.length != 6 ? 'Enter valid 6-digit pincode' : null,
           ),
           const SizedBox(height: 16),
@@ -157,13 +170,14 @@ class _Step3ClinicState extends State<Step3Clinic> {
             },
           ),
           const SizedBox(height: 20),
+          // 🎯 FIXED BY CHROMA_KIT: Premium layout surface integration via transparency rules
           Container(
             height: 110,
             decoration: BoxDecoration(
-              color: AppTheme.yoBlueLight,
+              color: colorScheme.primary.transparency(0.06),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: AppTheme.yoBlue.transparency(0.3),
+                color: colorScheme.primary.transparency(0.25),
                 width: 1.5,
               ),
             ),
@@ -173,14 +187,15 @@ class _Step3ClinicState extends State<Step3Clinic> {
                 children: [
                   Icon(
                     Icons.map_rounded,
-                    color: AppTheme.yoBlue.transparency(0.4),
+                    color: colorScheme.primary.transparency(0.4),
                     size: 34,
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Map Preview will appear here',
                     style: textTheme.labelLarge?.copyWith(
-                      color: AppTheme.yoBlue.transparency(0.6),
+                      color: colorScheme.primary.transparency(0.6),
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                 ],
@@ -190,10 +205,26 @@ class _Step3ClinicState extends State<Step3Clinic> {
           const SizedBox(height: 28),
           NavButtons(
             onBack: widget.onBack,
-            onNext: () {
-              if (_formKey.currentState!.validate()) {
-                _save();
+            onNext: registerState.isLoading ? null : () async {
+              if (!_formKey.currentState!.validate()) return;
+
+              _save();
+
+              final success = await ref
+                  .read(doctorRegisterControllerProvider.notifier)
+                  .registerStep3(widget.data);
+
+              if (!context.mounted) return;
+
+              if (success) {
                 widget.onNext();
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(ref.read(doctorRegisterControllerProvider).errorMessage ?? "Step 3 Failed"),
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
               }
             },
           ),

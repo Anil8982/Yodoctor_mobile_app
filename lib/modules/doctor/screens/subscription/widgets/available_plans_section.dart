@@ -1,3 +1,4 @@
+import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/models/doctor/available_plan_model.dart';
@@ -28,7 +29,7 @@ class AvailablePlansSection extends ConsumerWidget {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+              color: colorScheme.onSurfaceVariant.transparency(0.4),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -76,7 +77,7 @@ class AvailablePlansSection extends ConsumerWidget {
                     Container(
                       padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
-                        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+                        color: colorScheme.surfaceContainerHighest.transparency(0.4),
                         borderRadius: BorderRadius.circular(25),
                       ),
                       child: Row(
@@ -202,7 +203,7 @@ class AvailablePlansSection extends ConsumerWidget {
         color: colorScheme.surfaceContainerHigh,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
+            color: Colors.black.transparency(0.08),
             blurRadius: 10,
             offset: const Offset(0, -4),
           )
@@ -244,8 +245,9 @@ class AvailablePlansSection extends ConsumerWidget {
                 height: 48,
                 child: FilledButton(
                   onPressed: () {
-                    ref.read(doctorSubscriptionProvider.notifier).upgradePlan();
+                    // 🎯 FIXED ASYNC GAP BUG: Flush current modal context layout boundaries instantly before upgrading plans triggers
                     Navigator.pop(context);
+                    ref.read(doctorSubscriptionProvider.notifier).upgradePlan();
                   },
                   style: FilledButton.styleFrom(
                     backgroundColor: colorScheme.primary,
@@ -283,7 +285,7 @@ class AvailablePlansSection extends ConsumerWidget {
                 width: 32,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
+                  color: colorScheme.onSurfaceVariant.transparency(0.3),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),

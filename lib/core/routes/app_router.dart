@@ -1,15 +1,18 @@
+import 'package:yodoctor/modules/auth/screens/doctor/waiting_approval_screen.dart';
+import 'package:yodoctor/modules/doctor/screens/qr/doctor_qr_screen.dart';
+import 'package:yodoctor/modules/patient/screens/certificates/patient_certificate_detail_screen.dart';
+
+import 'app_routes.dart';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:yodoctor/core/models/patient/lab_test_model.dart';
-import 'package:yodoctor/core/utils/dummy_data.dart';
+import 'package:yodoctor/modules/patient/models/family/family_member_model.dart';
+import 'package:yodoctor/modules/patient/models/search/doctor_detail_model.dart';
 import 'package:yodoctor/modules/admin/admin_scaffold_shell.dart';
 import 'package:yodoctor/modules/admin/screens/doctors_management/doctor_management_screen.dart';
 import 'package:yodoctor/modules/admin/screens/enquiries/enquiry_screen.dart';
 import 'package:yodoctor/modules/admin/screens/home_care_bookings/home_care_bookings_screen.dart';
 import 'package:yodoctor/modules/patient/screens/home_care/home_service_booking_screen.dart';
-
-import 'app_routes.dart';
-
 import 'package:yodoctor/modules/auth/screens/doctor/doctor_login_screen.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/doctor_register_screen.dart';
 import 'package:yodoctor/modules/auth/screens/landing/landing_screen.dart';
@@ -78,10 +81,27 @@ class AppRouter {
         path: AppRoutes.doctorLogin,
         builder: (context, state) => DoctorLoginScreen(),
       ),
+      // GoRoute(
+      //   parentNavigatorKey: _rootNavigatorKey,
+      //   path: AppRoutes.doctorRegister,
+      //   builder: (context, state) => DoctorRegisterScreen(),
+      // ),
+
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.doctorRegister,
-        builder: (context, state) => DoctorRegisterScreen(),
+        builder: (context, state) {
+          final extraStep = state.extra;
+          final int targetStep = extraStep is int ? extraStep : 1;
+
+          return DoctorRegisterScreen(initialStep: targetStep);
+        },
+      ),
+
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: AppRoutes.waitingApproval,
+        builder: (context, state) => const WaitingApprovalScreen(),
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
@@ -96,15 +116,15 @@ class AppRouter {
           return FindDoctorsScreen(initialQuery: query);
         },
       ),
+
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
-        path: AppRoutes.doctorDetail,
+        path: '${AppRoutes.doctorDetail}/:doctorId',
         builder: (context, state) {
-          final doctor = state.extra;
-          final DoctorProfile fallbackDoctor = DummyData.allDoctors.first;
-          return DoctorDetailScreen(
-            doctor: doctor is DoctorProfile ? doctor : fallbackDoctor,
-          );
+          final doctorId =
+              int.tryParse(state.pathParameters['doctorId'] ?? '') ?? 0;
+
+          return DoctorDetailScreen(doctorId: doctorId);
         },
       ),
       GoRoute(
@@ -117,8 +137,9 @@ class AppRouter {
         path: AppRoutes.addFamilyMember,
         builder: (context, state) {
           final member = state.extra;
+
           return AddFamilyMemberScreen(
-            initialMember: member is FamilyMember ? member : null,
+            initialMember: member is FamilyMemberModel ? member : null,
           );
         },
       ),
@@ -127,10 +148,14 @@ class AppRouter {
         path: AppRoutes.bookAppointment,
         builder: (context, state) {
           final doctor = state.extra;
-          final DoctorProfile fallbackDoctor = DummyData.allDoctors.first;
-          return BookAppointmentScreen(
-            doctor: doctor is DoctorProfile ? doctor : fallbackDoctor,
-          );
+
+          if (doctor is! DoctorDetailModel) {
+            return const Scaffold(
+              body: Center(child: Text('Doctor data not found')),
+            );
+          }
+
+          return BookAppointmentScreen(doctor: doctor);
         },
       ),
       GoRoute(
@@ -140,8 +165,18 @@ class AppRouter {
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
-        path: AppRoutes.doctorCertificateReview,
-        builder: (context, state) => const CertificateReviewScreen(),
+        path: AppRoutes.patientCertificateDetail,
+        builder: (context, state) => const PatientCertificateDetailScreen(),
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: '${AppRoutes.doctorCertificateReview}/:requestId',
+        builder: (context, state) {
+          final requestId =
+              int.tryParse(state.pathParameters['requestId'] ?? '') ?? 0;
+
+          return CertificateReviewScreen(requestId: requestId);
+        },
       ),
 
       GoRoute(
@@ -152,6 +187,12 @@ class AppRouter {
         parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.doctorProfile,
         builder: (context, state) => const DoctorProfileScreen(),
+      ),
+
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: AppRoutes.doctorQr,
+        builder: (context, state) => const DoctorQrScreen(),
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
@@ -208,8 +249,7 @@ class AppRouter {
         parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.labTestDetails,
         builder: (context, state) {
-          final package = state.extra as LabPackage;
-          return LabTestDetailsScreen(package: package);
+          return const LabTestDetailsScreen();
         },
       ),
 
@@ -237,9 +277,7 @@ class AppRouter {
         builder: (context, state) => const HomeServiceBookingScreen(),
       ),
 
-
       // Admin
-
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,
         path: AppRoutes.adminDashboard,

@@ -38,6 +38,18 @@ dependencies:
   # http Request
   dio: ^5.10.0
 
+  file_picker: ^11.0.2
+
+  qr_flutter: ^4.1.0
+
+  open_filex: ^4.7.0
+
+  path_provider: ^2.1.6
+
+  # Maps
+  geolocator: ^14.0.2
+  geocoding: ^5.0.0
+
 
   flutter_dotenv: ^6.0.1
 

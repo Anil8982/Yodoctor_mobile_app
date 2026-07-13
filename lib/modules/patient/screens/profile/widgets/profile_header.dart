@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:yodoctor/core/utils/dummy_data.dart';
+
+import '../models/patient_model.dart';
 
 class ProfileHeader extends StatelessWidget {
-  final PatientUser user;
+  final PatientModel user;
   final bool isEditing;
 
   const ProfileHeader({super.key, required this.user, required this.isEditing});
@@ -10,6 +11,7 @@ class ProfileHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+
     return Column(
       children: [
         Stack(
@@ -18,14 +20,23 @@ class ProfileHeader extends StatelessWidget {
             Container(
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: colorScheme.primary.withValues(alpha: 0.1), width: 6),
+                border: Border.all(
+                  color: colorScheme.primary.withValues(alpha: 0.1),
+                  width: 6,
+                ),
               ),
               child: CircleAvatar(
                 radius: 65,
                 backgroundColor: colorScheme.primaryContainer,
                 child: Text(
-                  user.name.substring(0, 1).toUpperCase(),
-                  style: TextStyle(fontSize: 52, fontWeight: FontWeight.w900, color: colorScheme.onPrimaryContainer),
+                  user.fullName.isEmpty
+                      ? "P"
+                      : user.fullName.substring(0, 1).toUpperCase(),
+                  style: TextStyle(
+                    fontSize: 52,
+                    fontWeight: FontWeight.w900,
+                    color: colorScheme.onPrimaryContainer,
+                  ),
                 ),
               ),
             ),
@@ -41,9 +52,19 @@ class ProfileHeader extends StatelessWidget {
               ),
           ],
         ),
+
         const SizedBox(height: 16),
-        Text(user.name, style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w900, letterSpacing: -0.5)),
+
+        Text(
+          user.fullName,
+          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+            fontWeight: FontWeight.w900,
+            letterSpacing: -0.5,
+          ),
+        ),
+
         const SizedBox(height: 8),
+
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
@@ -52,7 +73,12 @@ class ProfileHeader extends StatelessWidget {
           ),
           child: Text(
             'PATIENT ID: ${user.id}',
-            style: TextStyle(color: colorScheme.onSecondaryContainer, fontSize: 14, fontWeight: FontWeight.w900, letterSpacing: 1.2),
+            style: TextStyle(
+              color: colorScheme.onSecondaryContainer,
+              fontSize: 14,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 1.2,
+            ),
           ),
         ),
       ],

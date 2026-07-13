@@ -1,4 +1,6 @@
+import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
 
 class DocumentUploadTile extends StatelessWidget {
   const DocumentUploadTile({
@@ -30,14 +32,16 @@ class DocumentUploadTile extends StatelessWidget {
     final isUploaded = uploadedFileName != null;
 
     Color getTileBgColor() {
-      if (isUploaded) return colorScheme.primaryContainer.withValues(alpha: 0.15);
-      if (hasError) return colorScheme.errorContainer.withValues(alpha: 0.2);
-      return colorScheme.outlineVariant.withValues(alpha: 0.1);
+      if (isUploaded) {
+        return colorScheme.primaryContainer.transparency(0.15);
+      }
+      if (hasError) return colorScheme.errorContainer.transparency(0.2);
+      return colorScheme.outlineVariant.transparency(0.1);
     }
 
     Color getBorderColor() {
       if (isUploaded) return colorScheme.primary;
-      if (hasError) return colorScheme.error.withValues(alpha: 0.8);
+      if (hasError) return colorScheme.error.transparency(0.8);
       return colorScheme.outlineVariant;
     }
 
@@ -57,7 +61,9 @@ class DocumentUploadTile extends StatelessWidget {
                 style: theme.textTheme.labelMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   letterSpacing: 0.5,
-                  color: hasError ? colorScheme.error : colorScheme.onSurfaceVariant,
+                  color: hasError
+                      ? colorScheme.error
+                      : colorScheme.onSurfaceVariant,
                 ),
               ),
               if (isRequired)
@@ -86,14 +92,29 @@ class DocumentUploadTile extends StatelessWidget {
               child: InkWell(
                 onTap: isUploading || isUploaded
                     ? null
-                    : () {
-                  final extension = label.contains('Report') ? 'pdf' : 'jpg';
-                  final cleanLabel = label.toLowerCase().replaceAll(' ', '_');
-                  onUpload('${cleanLabel}_upload.$extension');
-                },
+                    : () async {
+                        final result = await FilePicker.pickFiles(
+                          allowMultiple: false,
+
+                          type: FileType.custom,
+
+                          allowedExtensions: ["jpg", "jpeg", "png", "pdf"],
+                        );
+
+                        if (result == null) return;
+
+                        final file = result.files.single;
+
+                        if (file.path == null) return;
+
+                        onUpload(file.path!);
+                      },
                 borderRadius: BorderRadius.circular(16),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 18,
+                  ),
                   child: Column(
                     children: [
                       if (isUploading) ...[
@@ -126,8 +147,11 @@ class DocumentUploadTile extends StatelessWidget {
                                     child: LinearProgressIndicator(
                                       value: uploadProgress,
                                       minHeight: 4,
-                                      backgroundColor: colorScheme.surfaceContainerHigh,
-                                      valueColor: AlwaysStoppedAnimation<Color>(colorScheme.primary),
+                                      backgroundColor:
+                                          colorScheme.surfaceContainerHigh,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        colorScheme.primary,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -176,7 +200,10 @@ class DocumentUploadTile extends StatelessWidget {
                               ),
                             ),
                             IconButton(
-                              icon: Icon(Icons.delete_outline_rounded, color: colorScheme.error),
+                              icon: Icon(
+                                Icons.delete_outline_rounded,
+                                color: colorScheme.error,
+                              ),
                               onPressed: onRemove,
                               tooltip: 'Delete Upload',
                             ),
@@ -210,14 +237,20 @@ class DocumentUploadTile extends StatelessWidget {
                                     'Click to upload',
                                     style: theme.textTheme.bodyMedium?.copyWith(
                                       fontWeight: FontWeight.bold,
-                                      color: hasError ? colorScheme.error : colorScheme.onSurface,
+                                      color: hasError
+                                          ? colorScheme.error
+                                          : colorScheme.onSurface,
                                     ),
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
-                                    hasError ? 'This document is required!' : hint,
+                                    hasError
+                                        ? 'This document is required!'
+                                        : hint,
                                     style: theme.textTheme.bodySmall?.copyWith(
-                                      color: hasError ? colorScheme.error : colorScheme.onSurfaceVariant,
+                                      color: hasError
+                                          ? colorScheme.error
+                                          : colorScheme.onSurfaceVariant,
                                     ),
                                   ),
                                 ],

@@ -12,43 +12,85 @@ class MySubscriptionScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(doctorSubscriptionProvider);
     final colorScheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+
     final bool hasActivePlan =
         state.currentPlan != null && state.currentPlan!.isActive;
 
     return Scaffold(
-      backgroundColor: colorScheme.surfaceContainer,
+      // 🎯 FIXED: Standardized M3 background container tokens natively
+      backgroundColor: colorScheme.surfaceContainerLow,
       appBar: AppBar(
         title: const Text(
           'My Subscription',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18),
         ),
+        backgroundColor: colorScheme.surfaceContainerLow,
         scrolledUnderElevation: 0,
       ),
-      body: state.isLoading
+      body: state.isLoading && state.currentPlan == null
           ? const Center(child: CircularProgressIndicator())
-          : state.errorMessage != null
-          ? Center(child: Text(state.errorMessage!))
-          : SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.all(24.0),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 1000),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (hasActivePlan) ...[
-                        MainPlanCard(plan: state.currentPlan!),
-                        const SizedBox(height: 32),
-                      ],
-                      _buildUpgradeButton(context, ref),
-                      const SizedBox(height: 32),
-                      BillingHistorySection(history: state.billingHistory),
-                    ],
-                  ),
+          : state.errorMessage != null && state.currentPlan == null
+          ? Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.cloud_off_rounded, size: 48, color: colorScheme.error),
+              const SizedBox(height: 16),
+              Text(
+                state.errorMessage!,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: colorScheme.onSurfaceVariant,
                 ),
               ),
+              const SizedBox(height: 20),
+              FilledButton.icon(
+                onPressed: () {
+                  ref.read(doctorSubscriptionProvider.notifier).loadSubscriptionDetails();
+                },
+                icon: const Icon(Icons.refresh_rounded, size: 18),
+                label: const Text('Retry Connection'),
+              ),
+            ],
+          ),
+        ),
+      )
+          : RefreshIndicator(
+        onRefresh: () async {
+          await ref.read(doctorSubscriptionProvider.notifier).loadSubscriptionDetails();
+        },
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(
+            parent: BouncingScrollPhysics(),
+          ),
+          padding: const EdgeInsets.all(24.0),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1000),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (state.isLoading && state.currentPlan != null) ...[
+                    LinearProgressIndicator(color: colorScheme.primary),
+                    const SizedBox(height: 16),
+                  ],
+                  if (hasActivePlan) ...[
+                    MainPlanCard(plan: state.currentPlan!),
+                    const SizedBox(height: 32),
+                  ],
+                  _buildUpgradeButton(context, ref),
+                  const SizedBox(height: 32),
+                  BillingHistorySection(history: state.billingHistory),
+                ],
+              ),
             ),
+          ),
+        ),
+      ),
     );
   }
 

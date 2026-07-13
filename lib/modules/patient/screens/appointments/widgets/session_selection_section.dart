@@ -5,11 +5,16 @@ class SessionSelectionSection extends StatelessWidget {
   const SessionSelectionSection({
     super.key,
     required this.selectedSession,
-    required this.onSessionChanged,
+    required this.onSessionChanged, // Can accept null during loading
+    required this.morningTime,
+    required this.eveningTime,
   });
 
   final String selectedSession;
-  final ValueChanged<String> onSessionChanged;
+  final ValueChanged<String>? onSessionChanged; // Made nullable
+
+  final String morningTime;
+  final String eveningTime;
 
   @override
   Widget build(BuildContext context) {
@@ -22,10 +27,10 @@ class SessionSelectionSection extends StatelessWidget {
         Expanded(
           child: _buildSessionCard(
             label: 'Morning',
-            subLabel: '09:00 AM - 12:00 PM',
+            subLabel: morningTime,
             icon: Icons.light_mode_rounded,
             isSelected: selectedSession == 'Morning',
-            onTap: () => onSessionChanged('Morning'),
+            onTap: onSessionChanged != null ? () => onSessionChanged!('Morning') : null,
             colorScheme: colorScheme,
             textTheme: textTheme,
           ),
@@ -34,10 +39,10 @@ class SessionSelectionSection extends StatelessWidget {
         Expanded(
           child: _buildSessionCard(
             label: 'Evening',
-            subLabel: '04:00 PM - 08:00 PM',
+            subLabel: eveningTime,
             icon: Icons.dark_mode_rounded,
             isSelected: selectedSession == 'Evening',
-            onTap: () => onSessionChanged('Evening'),
+            onTap: onSessionChanged != null ? () => onSessionChanged!('Evening') : null,
             colorScheme: colorScheme,
             textTheme: textTheme,
           ),
@@ -51,10 +56,12 @@ class SessionSelectionSection extends StatelessWidget {
     required String subLabel,
     required IconData icon,
     required bool isSelected,
-    required VoidCallback onTap,
+    required VoidCallback? onTap, // Made nullable
     required ColorScheme colorScheme,
     required TextTheme textTheme,
   }) {
+    final bool isDisabled = onTap == null;
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(20),
@@ -62,10 +69,15 @@ class SessionSelectionSection extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected ? colorScheme.primary : colorScheme.surfaceContainerLow,
+          // Fade non-selected background when loading
+          color: isDisabled && !isSelected
+              ? colorScheme.surfaceContainerHighest.transparency(0.2)
+              : (isSelected ? colorScheme.primary : colorScheme.surfaceContainerLow),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected ? colorScheme.primary : colorScheme.outlineVariant.transparency(0.3),
+            color: isSelected
+                ? colorScheme.primary
+                : colorScheme.outlineVariant.transparency(0.3),
           ),
         ),
         child: Column(
@@ -73,7 +85,9 @@ class SessionSelectionSection extends StatelessWidget {
           children: [
             Icon(
               icon,
-              color: isSelected ? colorScheme.onPrimary : colorScheme.primary,
+              color: isSelected
+                  ? colorScheme.onPrimary
+                  : colorScheme.primary.withValues(alpha: isDisabled ? 0.4 : 1.0),
               size: 24,
             ),
             const SizedBox(height: 14),
@@ -81,14 +95,18 @@ class SessionSelectionSection extends StatelessWidget {
               label,
               style: textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w800,
-                color: isSelected ? colorScheme.onPrimary : colorScheme.onSurface,
+                color: isSelected
+                    ? colorScheme.onPrimary
+                    : colorScheme.onSurface.withValues(alpha: isDisabled ? 0.4 : 1.0),
               ),
             ),
             const SizedBox(height: 2),
             Text(
               subLabel,
               style: textTheme.bodySmall?.copyWith(
-                color: isSelected ? colorScheme.onPrimary.transparency(0.8) : colorScheme.outline,
+                color: isSelected
+                    ? colorScheme.onPrimary.transparency(0.8)
+                    : colorScheme.outline.withValues(alpha: isDisabled ? 0.4 : 1.0),
                 fontSize: 11,
               ),
             ),

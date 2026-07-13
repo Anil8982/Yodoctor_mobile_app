@@ -10,7 +10,7 @@ class DoctorSliverAppBar extends StatelessWidget {
     super.key,
     required this.expandedHeight,
     required this.background,
-    this.scaffoldKey,
+
     this.onProfileTap,
     this.onNotificationTap,
     this.isNavBar = true,
@@ -18,7 +18,7 @@ class DoctorSliverAppBar extends StatelessWidget {
 
   final double expandedHeight;
   final Widget background;
-  final GlobalKey<ScaffoldState>? scaffoldKey;
+
   final VoidCallback? onProfileTap;
   final VoidCallback? onNotificationTap;
   final bool isNavBar;
@@ -39,10 +39,12 @@ class DoctorSliverAppBar extends StatelessWidget {
       title: Row(
         children: [
           _DoctorHeaderAction(
-            icon: isNavBar ? Icons.notes_rounded : Icons.arrow_back_ios_new_rounded,
+            icon: isNavBar
+                ? Icons.notes_rounded
+                : Icons.arrow_back_ios_new_rounded,
             onTap: () {
               if (isNavBar) {
-                scaffoldKey?.currentState?.openDrawer();
+                Scaffold.of(context).openDrawer();
               } else {
                 context.pop();
               }
@@ -51,16 +53,20 @@ class DoctorSliverAppBar extends StatelessWidget {
           const Spacer(),
           _DoctorHeaderAction(
             icon: Icons.notifications_outlined,
-            onTap: onNotificationTap ?? () {
-              context.push(AppRoutes.doctorNotifications);
-              },
+            onTap:
+                onNotificationTap ??
+                () {
+                  context.push(AppRoutes.notifications);
+                },
           ),
           if (isNavBar) ...[
             const SizedBox(width: 12),
             _DoctorProfileAvatar(
-              onTap: onProfileTap ?? () {
-                context.push(AppRoutes.doctorProfile);
-              },
+              onTap:
+                  onProfileTap ??
+                  () {
+                    context.push(AppRoutes.doctorProfile);
+                  },
             ),
           ],
         ],
@@ -83,10 +89,7 @@ class DoctorSliverAppBar extends StatelessWidget {
 }
 
 class _DoctorHeaderAction extends StatelessWidget {
-  const _DoctorHeaderAction({
-    required this.icon,
-    required this.onTap,
-  });
+  const _DoctorHeaderAction({required this.icon, required this.onTap});
 
   final IconData icon;
   final VoidCallback onTap;
@@ -103,7 +106,9 @@ class _DoctorHeaderAction extends StatelessWidget {
         decoration: BoxDecoration(
           color: colorScheme.onPrimary.withValues(alpha: 0.16),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: colorScheme.onPrimary.withValues(alpha: 0.08)),
+          border: Border.all(
+            color: colorScheme.onPrimary.withValues(alpha: 0.08),
+          ),
         ),
         child: Icon(icon, color: colorScheme.onPrimary, size: 20),
       ),
@@ -112,9 +117,7 @@ class _DoctorHeaderAction extends StatelessWidget {
 }
 
 class _DoctorProfileAvatar extends StatelessWidget {
-  const _DoctorProfileAvatar({
-    required this.onTap,
-  });
+  const _DoctorProfileAvatar({required this.onTap});
 
   final VoidCallback onTap;
 
@@ -129,12 +132,18 @@ class _DoctorProfileAvatar extends StatelessWidget {
         padding: const EdgeInsets.all(2),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          border: Border.all(color: colorScheme.onPrimary.withValues(alpha: 0.35)),
+          border: Border.all(
+            color: colorScheme.onPrimary.withValues(alpha: 0.35),
+          ),
         ),
         child: CircleAvatar(
           radius: 18,
           backgroundColor: colorScheme.onPrimary.withValues(alpha: 0.18),
-          child: Icon(Icons.medical_services_rounded, color: colorScheme.onPrimary, size: 20),
+          child: Icon(
+            Icons.medical_services_rounded,
+            color: colorScheme.onPrimary,
+            size: 20,
+          ),
         ),
       ),
     );

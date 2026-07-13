@@ -4,14 +4,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:yodoctor/core/constants/app_assets.dart';
-import 'package:yodoctor/core/providers/app_role_provider.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
 
-import 'package:yodoctor/modules/auth/screens/doctor/doctor_register_screen.dart';
 import 'package:yodoctor/modules/auth/widgets/auth_widgets.dart';
 import 'package:yodoctor/modules/auth/widgets/top_bottom_curve_widgets.dart';
 import 'package:yodoctor/modules/auth/widgets/yo_login_text_field.dart';
+import '../../controllers/doctor_login_controller.dart';
 
 class DoctorLoginScreen extends ConsumerStatefulWidget {
   const DoctorLoginScreen({super.key});
@@ -28,7 +27,6 @@ class _DoctorLoginScreenState extends ConsumerState<DoctorLoginScreen>
   final _passwordController = TextEditingController();
 
   bool _rememberMe = false;
-  bool _isLoading = false;
 
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
@@ -61,26 +59,57 @@ class _DoctorLoginScreenState extends ConsumerState<DoctorLoginScreen>
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final email = _emailController.text.trim();
-    final password = _passwordController.text.trim();
+    final notifier = ref.read(doctorLoginControllerProvider.notifier);
 
-    setState(() => _isLoading = true);
-
-    await Future.delayed(const Duration(seconds: 2));
+    final result = await notifier.login(
+      identifier: _emailController.text.trim(),
+      password: _passwordController.text.trim(),
+    );
 
     if (!mounted) return;
 
-    setState(() => _isLoading = false);
-
-    if (email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Email or Password can't be empty")),
-      );
+    if (result == null) {
+      final loginState = ref.read(doctorLoginControllerProvider);
+      final errorMsg = loginState.error?.toString() ?? "Login Failed";
+      _showErrorSnackBar(errorMsg);
       return;
     }
 
-    ref.read(appRoleProvider.notifier).setRole(AppRole.doctor);
-    context.go(AppRoutes.doctorDashboard);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      switch (result["redirect"]) {
+        case "resume":
+          context.go(
+            AppRoutes.doctorRegister,
+            extra: result["nextStep"],
+          );
+          break;
+
+        case "waiting-approval":
+          context.go(AppRoutes.waitingApproval);
+          break;
+
+        case "dashboard":
+          context.go(AppRoutes.doctorDashboard);
+          break;
+
+        default:
+          _showErrorSnackBar("Unknown login response protocol");
+      }
+    });
+  }
+
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message, style: const TextStyle(fontWeight: FontWeight.w600)),
+        backgroundColor: Theme.of(context).colorScheme.error,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
   }
 
   @override
@@ -88,13 +117,14 @@ class _DoctorLoginScreenState extends ConsumerState<DoctorLoginScreen>
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
+    // 🎯 FIXED: Reactive tracking synced with riverpod state emission clocks
+    final loginState = ref.watch(doctorLoginControllerProvider);
+
     return Scaffold(
-      backgroundColor: const Color(0xffF8FBF8),
+      backgroundColor: colorScheme.surfaceContainerLow,
       body: GestureDetector(
         behavior: HitTestBehavior.translucent,
-        onTap: () {
-          FocusManager.instance.primaryFocus?.unfocus();
-        },
+        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
         child: FadeTransition(
           opacity: _fadeAnimation,
           child: Stack(
@@ -107,10 +137,7 @@ class _DoctorLoginScreenState extends ConsumerState<DoctorLoginScreen>
                 child: Column(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 16,
-                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                       child: Row(
                         children: [
                           GestureDetector(
@@ -152,7 +179,7 @@ class _DoctorLoginScreenState extends ConsumerState<DoctorLoginScreen>
                             left: 24,
                             right: 24,
                             bottom: 0,
-                            child: _buildMainScrollableLoginCard(),
+                            child: _buildMainScrollableLoginCard(loginState.isLoading),
                           ),
 
                           Positioned(
@@ -182,7 +209,7 @@ class _DoctorLoginScreenState extends ConsumerState<DoctorLoginScreen>
     );
   }
 
-  Widget _buildMainScrollableLoginCard() {
+  Widget _buildMainScrollableLoginCard(bool isLoading) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
@@ -191,7 +218,7 @@ class _DoctorLoginScreenState extends ConsumerState<DoctorLoginScreen>
       slivers: [
         SliverList(
           delegate: SliverChildListDelegate([
-            _buildLoginCard(),
+            _buildLoginCard(isLoading),
             const SizedBox(height: 24),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -203,14 +230,7 @@ class _DoctorLoginScreenState extends ConsumerState<DoctorLoginScreen>
                   ),
                 ),
                 TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const DoctorRegisterScreen(),
-                      ),
-                    );
-                  },
+                  onPressed: () => context.go(AppRoutes.doctorRegister),
                   style: TextButton.styleFrom(
                     padding: const EdgeInsets.symmetric(horizontal: 6),
                     minimumSize: Size.zero,
@@ -233,7 +253,7 @@ class _DoctorLoginScreenState extends ConsumerState<DoctorLoginScreen>
     );
   }
 
-  Widget _buildLoginCard() {
+  Widget _buildLoginCard(bool isLoading) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
@@ -348,6 +368,7 @@ class _DoctorLoginScreenState extends ConsumerState<DoctorLoginScreen>
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('Forgot password feature coming soon'),
+                          behavior: SnackBarBehavior.floating,
                         ),
                       );
                     },
@@ -372,8 +393,8 @@ class _DoctorLoginScreenState extends ConsumerState<DoctorLoginScreen>
               YoPrimaryButton(
                 label: 'Login as Doctor',
                 color: AppTheme.primary,
-                isLoading: _isLoading,
-                onTap: _handleLogin,
+                isLoading: isLoading,
+                onTap: isLoading ? null : _handleLogin,
               ),
             ],
           ),
