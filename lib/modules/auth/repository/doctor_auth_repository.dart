@@ -61,7 +61,6 @@ class DoctorAuthRepository {
     };
 
     AppLogger.info("REG TOKEN => ${_storage.getRegistrationToken()}");
-
     AppLogger.info('Submitting registration step 1 payload', tag: LogTags.auth, subTag: _subTag);
     AppLogger.json(payload, tag: LogTags.auth, subTag: '$_subTag/Step1Payload');
 
@@ -85,14 +84,8 @@ class DoctorAuthRepository {
       "gender": gender,
       "bio": bio,
     };
-
     AppLogger.info("REG TOKEN => ${_storage.getRegistrationToken()}");
-
-
-    return await _dio.patch(
-      ApiConstants.doctorRegisterUpdateStep1,
-      data: payload,
-    );
+    return await _dio.patch(ApiConstants.doctorRegisterUpdateStep1, data: payload);
   }
 
   Future<Response> registerStep2({
@@ -113,8 +106,6 @@ class DoctorAuthRepository {
     };
 
     AppLogger.info("REG TOKEN => ${_storage.getRegistrationToken()}");
-
-
     AppLogger.info('Submitting registration step 2 payload', tag: LogTags.auth, subTag: _subTag);
     AppLogger.json(payload, tag: LogTags.auth, subTag: '$_subTag/Step2Payload');
 
@@ -158,9 +149,7 @@ class DoctorAuthRepository {
   }
 
   Future<Response> registerStep4({required DoctorFormData data}) async {
-
     AppLogger.info("REG TOKEN => ${_storage.getRegistrationToken()}");
-
     final payload = {"practiceType": data.practiceType, "hospitalName": data.hospitalName};
 
     AppLogger.info('Submitting registration step 4 payload', tag: LogTags.auth, subTag: _subTag);
@@ -177,9 +166,7 @@ class DoctorAuthRepository {
   }
 
   Future<Response> registerStep5({required DoctorFormData data}) async {
-
     AppLogger.info("REG TOKEN => ${_storage.getRegistrationToken()}");
-
     final payload = {
       "fee": data.fee,
       "duration": data.duration,
@@ -207,9 +194,7 @@ class DoctorAuthRepository {
 
   Future<Response> registerStep6({required DoctorFormData data}) async {
     AppLogger.info('Compiling and uploading registration multipart fields for step 6', tag: LogTags.auth, subTag: _subTag);
-
     final token = _storage.getRegistrationToken() ?? _storage.getToken();
-    AppLogger.info("ACTIVE RESOLVING TOKEN IN REPOSITORY WIRE => $token");
 
     try {
       final formData = FormData.fromMap({
@@ -220,32 +205,23 @@ class DoctorAuthRepository {
           "clinicProof": await MultipartFile.fromFile(data.clinicProofFile!.path, filename: p.basename(data.clinicProofFile!.path)),
       });
 
-      for (final e in formData.fields) {
-        AppLogger.info("FIELD => ${e.key} = ${e.value}");
-      }
-
-      for (final e in formData.files) {
-        AppLogger.info("FILE => ${e.key} = ${e.value.filename}");
-      }
-
       final response = await _dio.patch(
         ApiConstants.doctorRegisterStep6,
         data: formData,
         options: Options(
           headers: {
             "Content-Type": "multipart/form-data",
-            if (token != null) "Authorization": "Bearer $token", // Bulletproof token injection
+            if (token != null) "Authorization": "Bearer $token",
           },
         ),
       );
-
-      AppLogger.success('Registration step 6 multipart upload completed. Status: ${response.statusCode}', tag: LogTags.auth, subTag: _subTag);
       return response;
     } catch (e, st) {
       AppLogger.error('Registration step 6 upload failure', tag: LogTags.auth, subTag: _subTag, error: e, stackTrace: st);
       rethrow;
     }
   }
+
   Future<Response> submitRegistration({required DoctorFormData data}) async {
     final payload = {
       "accurate": data.declAccurate,
@@ -254,17 +230,20 @@ class DoctorAuthRepository {
       "terms": data.declTerms,
     };
 
-    AppLogger.info('Submitting final declaration registration packet', tag: LogTags.auth, subTag: _subTag);
-    AppLogger.json(payload, tag: LogTags.auth, subTag: '$_subTag/FinalSubmissionPayload');
-
     try {
-      final response = await _dio.patch(ApiConstants.doctorRegisterSubmit, data: payload);
-      AppLogger.success('Final registration deployment bundle processed. Status: ${response.statusCode}', tag: LogTags.auth, subTag: _subTag);
-      return response;
+      return await _dio.patch(ApiConstants.doctorRegisterSubmit, data: payload);
     } catch (e, st) {
       AppLogger.error('Final registration submission execution loss', tag: LogTags.auth, subTag: _subTag, error: e, stackTrace: st);
       rethrow;
     }
+  }
+
+  // --------------------------------------------------------
+  // 🎯 Persistent Session & Role Management Proxies (FIXED)
+  // --------------------------------------------------------
+
+  Future<String?> getSessionToken() async {
+    return _storage.getToken();
   }
 
   Future<void> saveSessionToken(String token) async {
@@ -277,9 +256,19 @@ class DoctorAuthRepository {
     await _storage.saveRegistrationToken(token);
   }
 
+  Future<void> saveUserRole(String role) async {
+    AppLogger.info('Caching user role descriptor natively: $role', tag: LogTags.auth, subTag: _subTag);
+    await _storage.saveRole(role);
+  }
+
+  Future<String?> getUserRole() async {
+    return _storage.getRole();
+  }
+
   Future<void> clearAuthSession() async {
     AppLogger.info('Flushing auth session local records and clearing identifiers', tag: LogTags.auth, subTag: _subTag);
     await _storage.clearToken();
     await _storage.clearRegistrationToken();
+    await _storage.clearRole();
   }
 }

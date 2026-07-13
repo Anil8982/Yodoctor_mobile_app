@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
 import 'package:yodoctor/core/models/patient/patient_user.dart';
+import 'package:yodoctor/core/providers/app_role_provider.dart';
+import 'package:yodoctor/core/providers/storage_provider.dart';
 import 'package:yodoctor/modules/auth/repository/patient_auth_repository.dart';
 import 'package:yodoctor/modules/auth/services/google_auth_service.dart';
 
@@ -38,7 +40,6 @@ class PatientAuthController extends AsyncNotifier<PatientUser?> {
     );
 
     state = const AsyncLoading();
-
     final repository = ref.read(patientAuthRepositoryProvider);
 
     try {
@@ -54,7 +55,7 @@ class PatientAuthController extends AsyncNotifier<PatientUser?> {
       }
 
       final user = PatientUser(
-        id: '', // Backend response mapping points inject dynamically if available
+        id: '',
         name: '',
         email: email.trim(),
         location: '',
@@ -66,6 +67,8 @@ class PatientAuthController extends AsyncNotifier<PatientUser?> {
       );
 
       state = AsyncData(user);
+
+      ref.read(appRoleProvider.notifier).setRole(AppRole.patient);
 
       AppLogger.success(
         'Patient credentials authenticated and state committed successfully',
@@ -81,7 +84,7 @@ class PatientAuthController extends AsyncNotifier<PatientUser?> {
     }
   }
 
-  /// Handles OAuth2 Google Sign-In pipeline (Maintained outside repository as per SDK rules)
+  /// Handles OAuth2 Google Sign-In pipeline
   Future<void> signInWithGoogle({
     required Function(PatientUser user) onSuccess,
     required VoidCallback onCanceled,
@@ -94,13 +97,17 @@ class PatientAuthController extends AsyncNotifier<PatientUser?> {
 
     state = const AsyncLoading();
     final googleAuthService = ref.read(googleAuthServiceProvider);
+    final storage = ref.read(storageProvider);
 
     state = await AsyncValue.guard(() async {
       final PatientUser? patient = await googleAuthService.signInWithGoogle();
 
       if (patient != null) {
+        await storage.saveRole('patient');
+        ref.read(appRoleProvider.notifier).setRole(AppRole.patient);
+
         AppLogger.success(
-          'Google OAuth session tokens successfully synced to context state',
+          'Google OAuth session tokens and patient role successfully synced to context state',
           tag: LogTags.auth,
           subTag: _subTag,
         );

@@ -1,3 +1,4 @@
+import 'package:yodoctor/core/providers/app_role_provider.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/waiting_approval_screen.dart';
 import 'package:yodoctor/modules/doctor/screens/qr/doctor_qr_screen.dart';
 import 'package:yodoctor/modules/patient/screens/certificates/patient_certificate_detail_screen.dart';
@@ -6,6 +7,8 @@ import 'app_routes.dart';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/core/providers/storage_provider.dart';
 import 'package:yodoctor/modules/patient/models/family/family_member_model.dart';
 import 'package:yodoctor/modules/patient/models/search/doctor_detail_model.dart';
 import 'package:yodoctor/modules/admin/admin_scaffold_shell.dart';
@@ -51,166 +54,177 @@ import '../../modules/patient/screens/search/search_screen.dart';
 import '../../modules/patient/screens/certificates/apply_certificate_screen.dart';
 import '../../modules/patient/screens/certificates/certificate_wallet_screen.dart';
 
-class AppRouter {
-  const AppRouter._();
+final routerProvider = Provider<GoRouter>((ref) {
+  final storage = ref.watch(storageProvider);
 
-  static final GlobalKey<NavigatorState> _rootNavigatorKey =
-      GlobalKey<NavigatorState>();
+  final refreshListenable = ValueNotifier<AppRole>(ref.watch(appRoleProvider));
 
-  static final GoRouter router = GoRouter(
-    navigatorKey: _rootNavigatorKey,
-    initialLocation: AppRoutes.landing,
+  return GoRouter(
+    navigatorKey: AppRouter.rootNavigatorKey,
+
+    initialLocation: AppRouter.getInitialLocation(storage.getToken(), storage.getRole()),
+    refreshListenable: refreshListenable,
+
+    redirect: (context, state) {
+      final token = ref.read(storageProvider).getToken();
+      final role = ref.read(storageProvider).getRole();
+
+      final isLoggedIn = token != null && token.isNotEmpty;
+      final matchedPath = state.matchedLocation;
+
+      final isAuthScreen = matchedPath == AppRoutes.landing ||
+          matchedPath == AppRoutes.patientLogin ||
+          matchedPath == AppRoutes.patientRegister ||
+          matchedPath == AppRoutes.doctorLogin ||
+          matchedPath == AppRoutes.doctorRegister;
+
+      if (!isLoggedIn && !isAuthScreen) {
+        return AppRoutes.landing;
+      }
+
+      if (isLoggedIn && isAuthScreen) {
+        if (role == 'doctor') {
+          return AppRoutes.doctorDashboard;
+        } else if (role == 'patient') {
+          return AppRoutes.dashboard;
+        }
+      }
+
+      return null;
+    },
     routes: <RouteBase>[
       GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.landing,
         builder: (context, state) => LandingScreen(),
       ),
       GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.patientLogin,
         builder: (context, state) => PatientLoginScreen(),
       ),
       GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.patientRegister,
         builder: (context, state) => PatientRegisterScreen(),
       ),
       GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.doctorLogin,
         builder: (context, state) => DoctorLoginScreen(),
       ),
-      // GoRoute(
-      //   parentNavigatorKey: _rootNavigatorKey,
-      //   path: AppRoutes.doctorRegister,
-      //   builder: (context, state) => DoctorRegisterScreen(),
-      // ),
-
       GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.doctorRegister,
         builder: (context, state) {
           final extraStep = state.extra;
           final int targetStep = extraStep is int ? extraStep : 1;
-
           return DoctorRegisterScreen(initialStep: targetStep);
         },
       ),
-
       GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.waitingApproval,
         builder: (context, state) => const WaitingApprovalScreen(),
       ),
       GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.search,
         builder: (context, state) => const SearchScreen(),
       ),
       GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.findDoctors,
         builder: (context, state) {
           final query = state.uri.queryParameters['q'] ?? '';
           return FindDoctorsScreen(initialQuery: query);
         },
       ),
-
       GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: '${AppRoutes.doctorDetail}/:doctorId',
         builder: (context, state) {
-          final doctorId =
-              int.tryParse(state.pathParameters['doctorId'] ?? '') ?? 0;
-
+          final doctorId = int.tryParse(state.pathParameters['doctorId'] ?? '') ?? 0;
           return DoctorDetailScreen(doctorId: doctorId);
         },
       ),
       GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.profile,
         builder: (context, state) => const ProfileScreen(),
       ),
       GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.addFamilyMember,
         builder: (context, state) {
           final member = state.extra;
-
           return AddFamilyMemberScreen(
             initialMember: member is FamilyMemberModel ? member : null,
           );
         },
       ),
       GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.bookAppointment,
         builder: (context, state) {
           final doctor = state.extra;
-
           if (doctor is! DoctorDetailModel) {
             return const Scaffold(
               body: Center(child: Text('Doctor data not found')),
             );
           }
-
           return BookAppointmentScreen(doctor: doctor);
         },
       ),
       GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.applyCertificate,
         builder: (context, state) => const ApplyCertificateScreen(),
       ),
       GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.patientCertificateDetail,
         builder: (context, state) => const PatientCertificateDetailScreen(),
       ),
       GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: '${AppRoutes.doctorCertificateReview}/:requestId',
         builder: (context, state) {
-          final requestId =
-              int.tryParse(state.pathParameters['requestId'] ?? '') ?? 0;
-
+          final requestId = int.tryParse(state.pathParameters['requestId'] ?? '') ?? 0;
           return CertificateReviewScreen(requestId: requestId);
         },
       ),
-
       GoRoute(
         path: AppRoutes.doctorManualBooking,
         builder: (context, state) => const ManualBookingScreen(),
       ),
       GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.doctorProfile,
         builder: (context, state) => const DoctorProfileScreen(),
       ),
-
       GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.doctorQr,
         builder: (context, state) => const DoctorQrScreen(),
       ),
       GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.doctorLiveQueue,
         builder: (context, state) => const LiveQueueScreen(),
       ),
       GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.doctorProfileEdit,
         builder: (context, state) => const DoctorProfileEditScreen(),
       ),
       GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.doctorSubscription,
         builder: (context, state) => const MySubscriptionScreen(),
       ),
       GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.doctorAddPrescription,
         builder: (context, state) {
           final patientName = state.uri.queryParameters['name'] ?? 'Patient';
@@ -229,76 +243,66 @@ class AppRouter {
         },
       ),
       GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.doctorNotifications,
         builder: (context, state) => const NotificationScreen(),
       ),
-
       GoRoute(
         path: AppRoutes.family,
         builder: (context, state) => const FamilyMembersScreen(),
       ),
-
       GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.labTest,
         builder: (context, state) => const LabTestsScreen(),
       ),
-
       GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.labTestDetails,
         builder: (context, state) {
           return const LabTestDetailsScreen();
         },
       ),
-
       GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.labCart,
         builder: (context, state) => const LabCartScreen(),
       ),
-
       GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.allLabTests,
         builder: (context, state) => const AllLabTestsScreen(),
       ),
-
       GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.labSlotBooking,
         builder: (context, state) => const LabSlotBookingScreen(),
       ),
-
       GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.homeServiceBooking,
         builder: (context, state) => const HomeServiceBookingScreen(),
       ),
-
-      // Admin
       GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.adminDashboard,
         builder: (context, state) => const AdminScaffoldShell(),
       ),
       GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.enquiry,
         builder: (context, state) => EnquiryScreen(),
       ),
       GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.homeCareBooking,
         builder: (context, state) => HomeCareBookingsScreen(),
       ),
       GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.doctorsManagement,
         builder: (context, state) => DoctorsManagementScreen(),
       ),
-
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return PatientScaffoldShell(navigationShell: navigationShell);
@@ -320,7 +324,6 @@ class AppRouter {
               ),
             ],
           ),
-
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -329,7 +332,6 @@ class AppRouter {
               ),
             ],
           ),
-
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -340,13 +342,11 @@ class AppRouter {
           ),
         ],
       ),
-      // 🎯 Doctor Side Shell
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return DoctorScaffoldShell(navigationShell: navigationShell);
         },
         branches: [
-          // Index 0: Dashboard
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -355,27 +355,22 @@ class AppRouter {
               ),
             ],
           ),
-          // Index 1: Appointment History
           StatefulShellBranch(
             routes: [
               GoRoute(
                 path: AppRoutes.doctorAppointments,
-                builder: (context, state) =>
-                    const DoctorAppointmentHistoryScreen(),
+                builder: (context, state) => const DoctorAppointmentHistoryScreen(),
               ),
             ],
           ),
-          // Index 2: Certificates Dashboard
           StatefulShellBranch(
             routes: [
               GoRoute(
                 path: AppRoutes.doctorCertificates,
-                builder: (context, state) =>
-                    const DoctorCertificateDashboardScreen(),
+                builder: (context, state) => const DoctorCertificateDashboardScreen(),
               ),
             ],
           ),
-          // Index 3: Reviews Dashboard
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -388,4 +383,23 @@ class AppRouter {
       ),
     ],
   );
+});
+
+class AppRouter {
+  const AppRouter._();
+
+  static final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
+  static GlobalKey<NavigatorState> get rootNavigatorKey => _rootNavigatorKey;
+
+  static String getInitialLocation(String? token, String? role) {
+    if (token == null || token.isEmpty) {
+      return AppRoutes.landing;
+    }
+    if (role == 'doctor') {
+      return AppRoutes.doctorDashboard;
+    } else if (role == 'patient') {
+      return AppRoutes.dashboard;
+    }
+    return AppRoutes.landing;
+  }
 }

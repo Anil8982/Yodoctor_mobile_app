@@ -1,3 +1,4 @@
+import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import '../../../../../core/utils/app_spacing.dart';
 import '../../../models/dashboard/appointment_model.dart';
@@ -13,32 +14,38 @@ class AppointmentCard extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
+    final String? imageUrl = appointment.profileImage;
+
     final bool isAccepted = appointment.status == 'ACCEPTED';
     final Color statusColor = isAccepted
         ? colorScheme.primary
         : colorScheme.secondary;
     final Color statusBg = isAccepted
-        ? colorScheme.primaryContainer
-        : colorScheme.secondaryContainer;
+        ? colorScheme.onPrimaryContainer
+        : colorScheme.onSecondaryContainer;
+
+    final String doctorInitial = appointment.doctorName.isNotEmpty
+        ? appointment.doctorName.replaceAll('Dr. ', '')[0].toUpperCase()
+        : 'D';
 
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.sm),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainer.withValues(alpha: 0.2),
+        color: colorScheme.secondaryContainer.transparency(1),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+          color: colorScheme.outlineVariant.transparency(0.5),
         ),
         boxShadow: [
           BoxShadow(
-            color: colorScheme.shadow.withValues(alpha: 0.04),
+            color: colorScheme.shadow.transparency(0.04),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
         ],
       ),
       child: Material(
-        color: colorScheme.surface.withValues(alpha: 0),
+        color: colorScheme.surface.transparency(0),
         child: InkWell(
           borderRadius: BorderRadius.circular(20),
           onTap: () {
@@ -61,19 +68,24 @@ class AppointmentCard extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: colorScheme.primaryContainer,
                         borderRadius: BorderRadius.circular(16),
+                        image: imageUrl != null && imageUrl.isNotEmpty
+                            ? DecorationImage(
+                          image: NetworkImage(imageUrl),
+                          fit: BoxFit.cover,
+                        )
+                            : null,
                       ),
-                      child: Center(
+                      child: imageUrl == null || imageUrl.isEmpty
+                          ? Center(
                         child: Text(
-                          appointment.doctorName
-                              .split(' ')
-                              .last
-                              .substring(0, 1),
+                          doctorInitial,
                           style: theme.textTheme.titleLarge?.copyWith(
                             color: colorScheme.onPrimaryContainer,
                             fontWeight: FontWeight.w800,
                           ),
                         ),
-                      ),
+                      )
+                          : null,
                     ),
                     const SizedBox(width: AppSpacing.md),
                     Expanded(
@@ -112,8 +124,8 @@ class AppointmentCard extends StatelessWidget {
                                   vertical: 4,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: statusBg.withValues(alpha: 0.5),
-                                  borderRadius: BorderRadius.circular(10),
+                                  color: statusBg.transparency(0.2),
+                                  borderRadius: BorderRadius.circular(180),
                                 ),
                                 child: Row(
                                   children: [

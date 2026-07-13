@@ -5,9 +5,9 @@ import '../../../../../core/widgets/gradient_background.dart';
 import '../../../models/dashboard/dashboard_model.dart';
 
 class PatientHeader extends StatelessWidget {
-  const PatientHeader({super.key, required this.dashboard});
+  const PatientHeader({super.key, this.dashboard});
 
-  final DashboardModel dashboard;
+  final DashboardModel? dashboard;
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +15,7 @@ class PatientHeader extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final topPadding = MediaQuery.of(context).padding.top;
 
-    final String safePatientName = dashboard.patientName;
+    final String safePatientName = dashboard?.patientName ?? "YoDoctor";
 
     return GradientBackground(
       borderRadius: const BorderRadius.vertical(bottom: Radius.circular(32)),
@@ -41,31 +41,41 @@ class PatientHeader extends StatelessWidget {
 
           const SizedBox(height: AppSpacing.md),
 
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: colorScheme.onPrimary.withValues(alpha: .15),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.calendar_today_rounded,
-                  size: 14,
-                  color: colorScheme.onPrimary,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  "${dashboard.upcomingCount} upcoming visits",
-                  style: theme.textTheme.bodySmall?.copyWith(
+          if (dashboard != null)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: colorScheme.onPrimary.withValues(alpha: .15),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.calendar_today_rounded,
+                    size: 14,
                     color: colorScheme.onPrimary,
-                    fontWeight: FontWeight.w700,
                   ),
-                ),
-              ],
+                  const SizedBox(width: 8),
+                  Text(
+                    "${dashboard!.upcomingCount} upcoming visits",
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onPrimary,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+            )
+          else
+
+            Text(
+              "Patient Dashboard",
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onPrimary.withValues(alpha: 0.8),
+                fontWeight: FontWeight.w600,
+              ),
             ),
-          ),
         ],
       ),
     );

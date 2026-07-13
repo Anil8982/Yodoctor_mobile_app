@@ -3,9 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/routes/app_routes.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../controllers/family_controller.dart';
-import '../../widgets/custom_sliver_app_bar.dart';
-import '../../widgets/patient_drawer.dart';
 import 'widgets/family_member_card.dart';
 import 'widgets/family_header.dart';
 import '../../models/family/family_member_model.dart';
@@ -24,55 +23,73 @@ class _FamilyMembersScreenState extends ConsumerState<FamilyMembersScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
 
     final familyState = ref.watch(familyControllerProvider);
     final notifier = ref.read(familyControllerProvider.notifier);
 
     return Scaffold(
       key: _scaffoldKey,
-      drawer: const PatientDrawer(),
       backgroundColor: theme.scaffoldBackgroundColor,
-      body: NestedScrollView(
-        headerSliverBuilder: (context, innerBoxIsScrolled) {
-          return <Widget>[
-            CustomSliverAppBar(
-              expandedHeight: 220,
-              scaffoldKey: _scaffoldKey,
-              background: FamilyHeader(
-                membersCount: familyState.members.length,
-              ),
-            ),
-          ];
-        },
-        body: familyState.members.isEmpty
-            ? _buildEmptyState(context)
-            : ListView.separated(
-          padding: const EdgeInsets.fromLTRB(16, 20, 16, 150),
-          itemCount: familyState.members.length,
-          physics: const BouncingScrollPhysics(),
-          separatorBuilder: (context, index) => const SizedBox(height: 12),
-          itemBuilder: (context, index) {
-            final member = familyState.members[index];
-            return FamilyMemberCard(
-              member: member,
-              onDelete: () async {
-                await notifier.deleteMember(member.id);
-              },
-              onEdit: () => _openEditMemberScreen(context, member),
-            );
-          },
+
+      appBar: AppBar(
+        scrolledUnderElevation: 0,
+        flexibleSpace: DecoratedBox(
+          decoration: BoxDecoration(gradient: AppTheme.patientGradient),
+        ),
+        centerTitle: true,
+        iconTheme: IconThemeData(color: colorScheme.onPrimary),
+        title: Text(
+          'Family Members',
+          style: textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.w700,
+            color: colorScheme.onPrimary,
+          ),
         ),
       ),
+
+      body: familyState.members.isEmpty
+          ? Column(
+        children: [
+          FamilyHeader(membersCount: familyState.members.length),
+          Expanded(child: _buildEmptyState(context)),
+        ],
+      )
+          : ListView.separated(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 120),
+        itemCount: familyState.members.length + 1,
+        physics: const BouncingScrollPhysics(),
+        separatorBuilder: (context, index) {
+          if (index == 0) return const SizedBox.shrink();
+          return const SizedBox(height: 12);
+        },
+        itemBuilder: (context, index) {
+          if (index == 0) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 16),
+              child: FamilyHeader(membersCount: familyState.members.length),
+            );
+          }
+
+          final member = familyState.members[index - 1];
+          return FamilyMemberCard(
+            member: member,
+            onDelete: () async {
+              await notifier.deleteMember(member.id);
+            },
+            onEdit: () => _openEditMemberScreen(context, member),
+          );
+        },
+      ),
+
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 75),
-        child: FloatingActionButton.extended(
-          onPressed: () => _openAddMemberScreen(context),
-          icon: const Icon(Icons.person_add_rounded),
-          label: const Text('Add Member'),
-          backgroundColor: colorScheme.primary,
-          foregroundColor: colorScheme.onPrimary,
-        ),
+      floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'family_members_screen_fab_tag',
+        onPressed: () => _openAddMemberScreen(context),
+        icon: const Icon(Icons.person_add_rounded),
+        label: const Text('Add Member'),
+        backgroundColor: colorScheme.primary,
+        foregroundColor: colorScheme.onPrimary,
       ),
     );
   }
@@ -127,7 +144,6 @@ class _FamilyMembersScreenState extends ConsumerState<FamilyMembersScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Navigator.canPop(context) ? const SizedBox(height: 40) : const SizedBox(),
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -143,9 +159,7 @@ class _FamilyMembersScreenState extends ConsumerState<FamilyMembersScreen> {
             const SizedBox(height: 16),
             Text(
               'No family members yet',
-              style: textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w900,
-              ),
+              style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900),
             ),
             const SizedBox(height: 8),
             Text(

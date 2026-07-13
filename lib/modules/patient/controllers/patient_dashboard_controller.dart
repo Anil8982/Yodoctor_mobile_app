@@ -21,11 +21,13 @@ class PatientDashboardController extends ChangeNotifier {
   static const String _subTag = 'PatientDashboardController';
 
   bool _isLoading = false;
+  bool _isRefreshingToken = false;
   String? _errorMessage;
   DashboardModel? _dashboardData;
   String _selectedFilter = "All";
 
   bool get isLoading => _isLoading;
+  bool get isRefreshingToken => _isRefreshingToken;
   String? get errorMessage => _errorMessage;
   DashboardModel? get dashboardData => _dashboardData;
   String get selectedFilter => _selectedFilter;
@@ -39,7 +41,6 @@ class PatientDashboardController extends ChangeNotifier {
       _selectedFilter = filter;
     }
 
-    // 🎯 Fix #2: Simplified production logger string
     AppLogger.info(
       'Loading dashboard',
       tag: LogTags.patient,
@@ -121,6 +122,9 @@ class PatientDashboardController extends ChangeNotifier {
 
   Future<void> refreshTokenStatus() async {
     if (_dashboardData?.todayToken == null) return;
+    if (_isRefreshingToken) return;
+
+    _isRefreshingToken = true;
 
     AppLogger.info(
       'Refreshing token status',
@@ -157,6 +161,8 @@ class PatientDashboardController extends ChangeNotifier {
         tag: LogTags.patient,
         subTag: _subTag,
       );
+    } finally {
+      _isRefreshingToken = false;
     }
   }
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart'; // 🎯 Added Riverpod core import
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/modules/patient/screens/dashboard/widgets/patient_header.dart';
 import 'package:yodoctor/modules/patient/widgets/custom_sliver_app_bar.dart';
 import 'package:yodoctor/modules/patient/widgets/patient_drawer.dart';
@@ -14,26 +14,32 @@ import 'widgets/appointment_filter_chips.dart';
 import 'widgets/token_card.dart';
 import 'widgets/search_doctor_card.dart';
 
-class DashboardScreen extends ConsumerWidget {
-  // 🎯 Converted to ConsumerWidget
-  DashboardScreen({super.key});
+class DashboardScreen extends ConsumerStatefulWidget {
+  const DashboardScreen({super.key});
 
+  @override
+  ConsumerState<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    // 🎯 Injected WidgetRef
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    // 🎯 Watching Riverpod provider directly instead of legacy Consumer block
-    final controller = ref.watch(patientDashboardControllerProvider);
-    final loading = controller.isLoading;
-    final data = controller.dashboardData;
-
+  void initState() {
+    super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(patientDashboardControllerProvider.notifier).refreshTokenStatus();
     });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    final controller = ref.watch(patientDashboardControllerProvider);
+    final loading = controller.isLoading;
+    final data = controller.dashboardData;
 
     if (loading && data == null) {
       return Scaffold(
@@ -41,10 +47,76 @@ class DashboardScreen extends ConsumerWidget {
         body: const Center(child: CircularProgressIndicator()),
       );
     }
+
     if (data == null) {
       return Scaffold(
-        body: Center(
-          child: Text(controller.errorMessage ?? "Dashboard Data is NULL"),
+        key: _scaffoldKey,
+        extendBodyBehindAppBar: true,
+        backgroundColor: theme.scaffoldBackgroundColor,
+        drawer: const PatientDrawer(dashboard: null),
+        body: NestedScrollView(
+          headerSliverBuilder: (context, innerBoxIsScrolled) {
+            return [
+              CustomSliverAppBar(
+                expandedHeight: 190.0,
+                scaffoldKey: _scaffoldKey,
+                background: const PatientHeader(dashboard: null),
+              ),
+            ];
+          },
+          body: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.xl),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: colorScheme.errorContainer.withValues(alpha: 0.2),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.cloud_off_rounded,
+                      size: 48,
+                      color: colorScheme.error,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  Text(
+                    'Dashboard Load Error',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: colorScheme.onSurface,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(
+                    controller.errorMessage ?? "Unable to connect to the server. Please check your internet connection.",
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.xl),
+                  FilledButton.icon(
+                    onPressed: () {
+                      ref.read(patientDashboardControllerProvider.notifier).loadDashboard();
+                    },
+                    icon: const Icon(Icons.refresh_rounded, size: 20),
+                    label: const Text('Try Again'),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: colorScheme.primary,
+                      foregroundColor: colorScheme.onPrimary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       );
     }
@@ -118,10 +190,10 @@ class DashboardScreen extends ConsumerWidget {
   }
 
   Widget _buildSectionHeader(
-    BuildContext context,
-    ColorScheme colorScheme,
-    String title,
-  ) {
+      BuildContext context,
+      ColorScheme colorScheme,
+      String title,
+      ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -153,16 +225,16 @@ class DashboardScreen extends ConsumerWidget {
   }
 
   Widget _buildAppointmentsContent(dynamic data, bool mobile) {
-    if (data.appointments.isEmpty) return const _EmptyAppointments();
+    if (data.appointments.isEmpty) return _EmptyAppointments();
     if (mobile) {
       return Column(
         children: data.appointments
             .map<Widget>(
               (appointment) => Padding(
-                padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                child: AppointmentCard(appointment: appointment),
-              ),
-            )
+            padding: const EdgeInsets.only(bottom: AppSpacing.md),
+            child: AppointmentCard(appointment: appointment),
+          ),
+        )
             .toList(),
       );
     }
@@ -175,10 +247,10 @@ class DashboardScreen extends ConsumerWidget {
           children: data.appointments
               .map<Widget>(
                 (appointment) => SizedBox(
-                  width: itemWidth,
-                  child: AppointmentCard(appointment: appointment),
-                ),
-              )
+              width: itemWidth,
+              child: AppointmentCard(appointment: appointment),
+            ),
+          )
               .toList(),
         );
       },
@@ -186,7 +258,6 @@ class DashboardScreen extends ConsumerWidget {
   }
 }
 
-// (_EmptyAppointments widget implementation remains identical to old source layout)
 class _EmptyAppointments extends StatelessWidget {
   const _EmptyAppointments();
 

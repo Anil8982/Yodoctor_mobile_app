@@ -1,3 +1,4 @@
+import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../models/dashboard/appointment_model.dart';
@@ -14,17 +15,15 @@ class AppointmentDetailsDialog extends ConsumerWidget {
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
 
-    final bool isAccepted = appointment.status == 'ACCEPTED';
-    final Color statusColor = isAccepted
-        ? colorScheme.primary
-        : colorScheme.secondary;
+    bool isAccepted = appointment.status == 'ACCEPTED';
+    final Color statusColor = isAccepted ? colorScheme.primary : colorScheme.secondary;
     final Color statusBg = isAccepted
-        ? colorScheme.primaryContainer.withValues(alpha: 0.4)
-        : colorScheme.secondaryContainer.withValues(alpha: 0.45);
+        ? colorScheme.onPrimaryContainer.withValues(alpha: 0.2)
+        : colorScheme.onSecondaryContainer.withValues(alpha: 0.2);
 
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
-      backgroundColor: colorScheme.surface,
+      backgroundColor: colorScheme.secondaryContainer,
       surfaceTintColor: colorScheme.surface.withValues(alpha: 0),
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 460),
@@ -59,10 +58,7 @@ class AppointmentDetailsDialog extends ConsumerWidget {
             Flexible(
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 20,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -73,25 +69,28 @@ class AppointmentDetailsDialog extends ConsumerWidget {
                           width: 64,
                           height: 64,
                           decoration: BoxDecoration(
-                            color: colorScheme.primaryContainer.withValues(
-                              alpha: 0.35,
-                            ),
+                            color: colorScheme.primaryContainer.withValues(alpha: 0.35),
                             borderRadius: BorderRadius.circular(16),
+                            image: appointment.profileImage != null && appointment.profileImage!.isNotEmpty
+                                ? DecorationImage(
+                              image: NetworkImage(appointment.profileImage!),
+                              fit: BoxFit.cover,
+                            )
+                                : null,
                           ),
-                          child: Center(
+                          child: appointment.profileImage == null || appointment.profileImage!.isEmpty
+                              ? Center(
                             child: Text(
                               appointment.doctorName.isNotEmpty
-                                  ? appointment.doctorName.replaceAll(
-                                      'Dr. ',
-                                      '',
-                                    )[0]
+                                  ? appointment.doctorName.replaceAll('Dr. ', '')[0].toUpperCase()
                                   : 'D',
                               style: textTheme.titleLarge?.copyWith(
                                 color: colorScheme.primary,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                          ),
+                          )
+                              : null,
                         ),
                         const SizedBox(width: 16),
                         Expanded(
@@ -117,13 +116,10 @@ class AppointmentDetailsDialog extends ConsumerWidget {
                                   ),
                                   const SizedBox(width: 10),
                                   Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 3,
-                                    ),
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                     decoration: BoxDecoration(
                                       color: statusBg,
-                                      borderRadius: BorderRadius.circular(8),
+                                      borderRadius: BorderRadius.circular(180),
                                     ),
                                     child: Text(
                                       appointment.status,
@@ -142,11 +138,7 @@ class AppointmentDetailsDialog extends ConsumerWidget {
                       ],
                     ),
                     const SizedBox(height: 24),
-                    _buildSectionTitle(
-                      textTheme,
-                      colorScheme,
-                      'APPOINTMENT INFO',
-                    ),
+                    _buildSectionTitle(textTheme, colorScheme, 'APPOINTMENT INFO'),
                     const SizedBox(height: 12),
                     GridView.count(
                       shrinkWrap: true,
@@ -178,18 +170,14 @@ class AppointmentDetailsDialog extends ConsumerWidget {
                           context,
                           Icons.tag_rounded,
                           'Token Number',
-                          '#${appointment.tokenNumber}',
+                          '#${appointment.tokenNumber.toString()}', // 🎯 फिक्स: .toString() लावून कास्टिंग एरर घालवला
                         ),
                       ],
                     ),
                     const SizedBox(height: 24),
                     const Divider(height: 1),
                     const SizedBox(height: 24),
-                    _buildSectionTitle(
-                      textTheme,
-                      colorScheme,
-                      'CLINIC INFORMATION',
-                    ),
+                    _buildSectionTitle(textTheme, colorScheme, 'CLINIC INFORMATION'),
                     const SizedBox(height: 12),
                     GridView.count(
                       shrinkWrap: true,
@@ -238,8 +226,7 @@ class AppointmentDetailsDialog extends ConsumerWidget {
               ),
             ),
             const Divider(height: 1),
-            if (appointment.status == "PENDING" ||
-                appointment.status == "ACCEPTED")
+            if (appointment.status == "PENDING" || appointment.status == "ACCEPTED")
               Padding(
                 padding: const EdgeInsets.all(24),
                 child: SizedBox(
@@ -250,9 +237,7 @@ class AppointmentDetailsDialog extends ConsumerWidget {
                         context: context,
                         builder: (_) => AlertDialog(
                           title: const Text("Cancel Appointment"),
-                          content: const Text(
-                            "Are you sure you want to cancel this appointment?",
-                          ),
+                          content: const Text("Are you sure you want to cancel this appointment?"),
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.pop(context, false),
@@ -268,30 +253,20 @@ class AppointmentDetailsDialog extends ConsumerWidget {
 
                       if (confirm != true) return;
 
-                      // 🎯 FIXED: Replaced legacy context.read with clean Riverpod ref.read matrix sync
-                      final controller = ref.read(
-                        patientDashboardControllerProvider.notifier,
-                      );
-                      final success = await controller.cancelAppointment(
-                        appointment.id,
-                      );
+                      final controller = ref.read(patientDashboardControllerProvider.notifier);
+                      final success = await controller.cancelAppointment(appointment.id);
 
                       if (!context.mounted) return;
 
                       if (success) {
                         Navigator.pop(context);
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text("Appointment cancelled successfully"),
-                          ),
+                          const SnackBar(content: Text("Appointment cancelled successfully")),
                         );
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text(
-                              controller.errorMessage ??
-                                  "Unable to cancel appointment",
-                            ),
+                            content: Text(controller.errorMessage ?? "Unable to cancel appointment"),
                           ),
                         );
                       }
@@ -300,20 +275,11 @@ class AppointmentDetailsDialog extends ConsumerWidget {
                     label: const Text('Cancel Appointment'),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: colorScheme.error,
-                      side: BorderSide(
-                        color: colorScheme.error.withValues(alpha: 0.3),
-                      ),
+                      side: BorderSide(color: colorScheme.error.withValues(alpha: 0.3)),
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      backgroundColor: colorScheme.error.withValues(
-                        alpha: 0.04,
-                      ),
-                      textStyle: const TextStyle(
-                        fontWeight: FontWeight.w900,
-                        fontSize: 15,
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      backgroundColor: colorScheme.error.withValues(alpha: 0.04),
+                      textStyle: const TextStyle(fontWeight: FontWeight.w900, fontSize: 15),
                     ),
                   ),
                 ),
@@ -324,15 +290,11 @@ class AppointmentDetailsDialog extends ConsumerWidget {
     );
   }
 
-  Widget _buildSectionTitle(
-    TextTheme textTheme,
-    ColorScheme colorScheme,
-    String title,
-  ) {
+  Widget _buildSectionTitle(TextTheme textTheme, ColorScheme colorScheme, String title) {
     return Text(
       title,
       style: textTheme.labelSmall?.copyWith(
-        color: colorScheme.outline,
+        color: colorScheme.onSecondaryFixedVariant,
         fontWeight: FontWeight.w900,
         letterSpacing: 0.8,
       ),
@@ -340,12 +302,12 @@ class AppointmentDetailsDialog extends ConsumerWidget {
   }
 
   Widget _buildGridInfoItem(
-    BuildContext context,
-    IconData icon,
-    String label,
-    String value, {
-    bool isFullWidth = false,
-  }) {
+      BuildContext context,
+      IconData icon,
+      String label,
+      String value, {
+        bool isFullWidth = false,
+      }) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -356,12 +318,12 @@ class AppointmentDetailsDialog extends ConsumerWidget {
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 15, color: colorScheme.outline),
+            Icon(icon, size: 15, color: colorScheme.onSecondaryContainer.transparency(0.7)),
             const SizedBox(width: 6),
             Text(
               label,
               style: theme.textTheme.labelMedium?.copyWith(
-                color: colorScheme.outline,
+                color: colorScheme.onSecondaryContainer.transparency(0.8),
                 fontWeight: FontWeight.w600,
               ),
             ),

@@ -37,11 +37,12 @@ class YoDoctorApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentRole = ref.watch(appRoleProvider);
+    final goRouter = ref.watch(routerProvider);
 
     return MaterialApp.router(
       title: 'yoDoctor',
       debugShowCheckedModeBanner: false,
-      routerConfig: AppRouter.router,
+      routerConfig: goRouter,
       theme: _getThemeForRole(currentRole),
       themeMode: ThemeMode.light,
     );

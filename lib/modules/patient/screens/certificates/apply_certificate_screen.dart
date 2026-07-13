@@ -28,6 +28,14 @@ class _ApplyCertificateScreenState
   final List<String> _steps = ['Type', 'Medical Info', 'Documents', 'Review'];
 
   @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      ref.read(certificateProvider.notifier).loadDoctors();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
