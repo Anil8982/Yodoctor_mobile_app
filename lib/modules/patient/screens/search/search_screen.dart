@@ -36,8 +36,13 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     _searchController = TextEditingController(text: searchState.query);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (ref.read(patientSearchControllerProvider).trendingSpecialties.isEmpty) {
-        ref.read(patientSearchControllerProvider.notifier).loadTrendingSpecialties();
+      if (ref
+          .read(patientSearchControllerProvider)
+          .trendingSpecialties
+          .isEmpty) {
+        ref
+            .read(patientSearchControllerProvider.notifier)
+            .loadTrendingSpecialties();
       }
     });
   }
@@ -98,7 +103,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                       await notifier.selectTrending(specialtyName);
                       _searchController.text = specialtyName;
                       if (context.mounted) {
-                        _onSearchTap(context, ref.read(patientSearchControllerProvider));
+                        _onSearchTap(
+                          context,
+                          ref.read(patientSearchControllerProvider),
+                        );
                       }
                     },
                   ),
@@ -110,7 +118,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           ),
           if (hasSuggestions)
             Positioned(
-              width: MediaQuery.of(context).size.width - (horizontalPadding * 2) - 64,
+              width:
+                  MediaQuery.of(context).size.width -
+                  (horizontalPadding * 2) -
+                  64,
               child: CompositedTransformFollower(
                 link: _searchLink,
                 showWhenUnlinked: false,
@@ -128,9 +139,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                       ),
                     ),
                     child: SearchSuggestionsOverlay(
-                      controller: ref.read(patientSearchControllerProvider.notifier) as dynamic,
+                      controller: searchState,
                       searchController: _searchController,
-                      onSearchTap: (ctx, state) => _onSearchTap(ctx, ref.read(patientSearchControllerProvider)),
+                      onSearchTap: (ctx, state) => _onSearchTap(
+                        ctx,
+                        ref.read(patientSearchControllerProvider),
+                      ),
                     ),
                   ),
                 ),
@@ -157,7 +171,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         _actionItem(Icons.near_me_rounded, 'Near Me', colorScheme),
         _actionItem(Icons.star_rounded, 'Top Rated', colorScheme),
         _actionItem(Icons.bolt_rounded, 'Available', colorScheme),
-        _actionItem(Icons.local_fire_department_rounded, 'Trending', colorScheme),
+        _actionItem(
+          Icons.local_fire_department_rounded,
+          'Trending',
+          colorScheme,
+        ),
       ],
     );
   }
