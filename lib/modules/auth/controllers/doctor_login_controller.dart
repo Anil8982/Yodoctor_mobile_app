@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:yodoctor/core/providers/app_role_provider.dart';
 import 'package:yodoctor/modules/auth/repository/doctor_auth_repository.dart';
 
 final doctorLoginControllerProvider =
@@ -43,10 +44,22 @@ class DoctorLoginController extends AsyncNotifier<Map<String, dynamic>?> {
         if (token != null) {
           if (redirect == "resume") {
             await repository.saveRegistrationToken(token);
-            AppLogger.success('Temporary Registration Token captured and cached natively for onboarding steps', tag: LogTags.auth, subTag: _subTag);
+            AppLogger.success(
+              'Temporary Registration Token captured and cached natively for onboarding steps',
+              tag: LogTags.auth,
+              subTag: _subTag,
+            );
           } else {
             await repository.saveSessionToken(token);
-            AppLogger.success('JWT Master active session token captured and saved for dashboard lifecycle', tag: LogTags.auth, subTag: _subTag);
+            await repository.saveUserRole('doctor');
+
+            ref.read(appRoleProvider.notifier).setRole(AppRole.doctor);
+
+            AppLogger.success(
+              'JWT Master active session token and role cached',
+              tag: LogTags.auth,
+              subTag: _subTag,
+            );
           }
         }
 
@@ -100,6 +113,7 @@ class DoctorLoginController extends AsyncNotifier<Map<String, dynamic>?> {
     try {
       final repository = ref.read(doctorAuthRepositoryProvider);
       await repository.clearAuthSession();
+      ref.read(appRoleProvider.notifier).clearRole();
       state = const AsyncData(null);
       AppLogger.success(
         'Doctor control profile session tokens terminated successfully',

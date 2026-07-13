@@ -29,7 +29,6 @@ class _CertificateWalletScreenState extends ConsumerState<CertificateWalletScree
     super.initState();
     // 🎯 Triggers async data load via screen lifecycle instead of build microtasks
     Future.microtask(() {
-      ref.read(certificateProvider.notifier).loadDoctors();
       ref.read(certificateProvider.notifier).loadMyRequests();
     });
   }

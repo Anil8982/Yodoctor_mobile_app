@@ -1,23 +1,25 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
 import '../models/dashboard/dashboard_model.dart';
+import 'logout_dialog.dart';
 
-class PatientDrawer extends StatelessWidget {
+class PatientDrawer extends ConsumerWidget {
   const PatientDrawer({super.key, this.dashboard});
 
   final DashboardModel? dashboard;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
     final String drawerName = dashboard?.patientName ?? "Patient";
-
-    final String drawerEmail = dashboard?.patient != null ? (dashboard?.patient.email ?? "N/A") : "N/A";
+    final String drawerEmail = dashboard?.patient.email ?? "N/A";
+    final String? userImageUrl = dashboard?.patient.image;
 
     return Drawer(
       backgroundColor: colorScheme.surface,
@@ -26,7 +28,6 @@ class PatientDrawer extends StatelessWidget {
           UserAccountsDrawerHeader(
             margin: EdgeInsets.zero,
             decoration: BoxDecoration(gradient: AppTheme.patientGradient),
-
             accountName: Text(
               drawerName,
               style: theme.textTheme.titleMedium?.copyWith(
@@ -34,24 +35,18 @@ class PatientDrawer extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-
             accountEmail: Text(
               drawerEmail,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: colorScheme.onPrimary.transparency(0.8),
               ),
             ),
-
             currentAccountPicture: CircleAvatar(
               backgroundColor: colorScheme.onPrimaryContainer,
-              backgroundImage:
-              dashboard?.patient.image != null &&
-                  dashboard!.patient.image!.isNotEmpty
-                  ? NetworkImage(dashboard!.patient.image!)
+              backgroundImage: userImageUrl != null && userImageUrl.isNotEmpty
+                  ? NetworkImage(userImageUrl)
                   : null,
-              child:
-              (dashboard?.patient.image == null ||
-                  dashboard!.patient.image!.isEmpty)
+              child: (userImageUrl == null || userImageUrl.isEmpty)
                   ? Icon(Icons.person, color: colorScheme.primary, size: 32)
                   : null,
             ),
@@ -79,6 +74,16 @@ class PatientDrawer extends StatelessWidget {
                   onTap: () {
                     Navigator.pop(context);
                     context.push(AppRoutes.profile);
+                  },
+                ),
+                _buildDrawerItem(
+                  context,
+                  icon: Icons.family_restroom_rounded,
+                  label: 'Family',
+                  colorScheme: colorScheme,
+                  onTap: () {
+                    Navigator.pop(context);
+                    context.push(AppRoutes.family);
                   },
                 ),
                 _buildDrawerItem(
@@ -122,6 +127,7 @@ class PatientDrawer extends StatelessWidget {
                   },
                 ),
                 const Divider(indent: 8, endIndent: 8),
+
                 _buildDrawerItem(
                   context,
                   icon: Icons.logout_rounded,
@@ -129,10 +135,9 @@ class PatientDrawer extends StatelessWidget {
                   colorScheme: colorScheme,
                   textColor: colorScheme.error,
                   onTap: () {
-                    if (context.mounted) {
-                      Navigator.pop(context);
-                      context.go(AppRoutes.landing);
-                    }
+                    Navigator.pop(context);
+
+                    LogoutDialog.show(context);
                   },
                 ),
               ],
@@ -154,13 +159,13 @@ class PatientDrawer extends StatelessWidget {
   }
 
   Widget _buildDrawerItem(
-      BuildContext context, {
-        required IconData icon,
-        required String label,
-        required ColorScheme colorScheme,
-        required VoidCallback onTap,
-        Color? textColor,
-      }) {
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required ColorScheme colorScheme,
+    required VoidCallback onTap,
+    Color? textColor,
+  }) {
     return ListTile(
       leading: Icon(icon, color: textColor ?? colorScheme.onSurfaceVariant),
       title: Text(

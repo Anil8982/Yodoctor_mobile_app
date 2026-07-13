@@ -62,8 +62,10 @@ class PatientAuthRepository implements AuthRepository {
 
       if (loginResponse.token?.isNotEmpty == true) {
         await _storage.saveToken(loginResponse.token!);
+        await _storage.saveRole('patient');
+
         AppLogger.success(
-          'Master JWT session key captured and secure local storage committed',
+          'Master JWT session key and patient role captured to secure local storage',
           tag: LogTags.auth,
           subTag: _subTag,
         );
@@ -187,8 +189,10 @@ class PatientAuthRepository implements AuthRepository {
     try {
       AppLogger.info('Initiating session cancellation request', tag: LogTags.auth, subTag: _subTag);
       await _storage.clearToken();
+      await _storage.clearRole();
+
       AppLogger.success(
-        'Local token session blocks flushed and terminated cleanly',
+        'Local token session and role blocks flushed cleanly',
         tag: LogTags.auth,
         subTag: _subTag,
       );
@@ -208,5 +212,9 @@ class PatientAuthRepository implements AuthRepository {
   Future<bool> isAuthenticated() async {
     final token = _storage.getToken();
     return token != null && token.isNotEmpty;
+  }
+
+  Future<String?> getUserRole() async {
+    return _storage.getRole();
   }
 }

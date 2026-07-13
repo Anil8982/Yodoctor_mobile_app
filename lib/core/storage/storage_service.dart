@@ -27,7 +27,6 @@ class StorageService {
   // Doctor Registration Token
   // ----------------------------
 
-  // 🎯 FIXED: Named methods matching DoctorAuthRepository interop proxies perfectly
   Future<void> saveRegistrationToken(String token) async {
     await _box.put(HiveKeys.doctorRegisterToken, token);
   }
@@ -38,6 +37,22 @@ class StorageService {
 
   Future<void> clearRegistrationToken() async {
     await _box.delete(HiveKeys.doctorRegisterToken);
+  }
+
+  // ----------------------------
+  // 🎯 User Role Management (ADDED FOR PERSISTENT LOGIN)
+  // ----------------------------
+
+  Future<void> saveRole(String role) async {
+    await _box.put(HiveKeys.appRole, role);
+  }
+
+  String? getRole() {
+    return _box.get(HiveKeys.appRole);
+  }
+
+  Future<void> clearRole() async {
+    await _box.delete(HiveKeys.appRole);
   }
 
   // ----------------------------
