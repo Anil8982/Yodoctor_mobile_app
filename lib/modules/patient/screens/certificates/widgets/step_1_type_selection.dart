@@ -88,6 +88,7 @@ class Step1TypeSelection extends ConsumerWidget {
 
           DropdownButtonFormField<PatientDoctorModel>(
             initialValue: formState.assignedDoctor,
+            isExpanded: true,
             decoration: const InputDecoration(
               labelText: "Assigned Doctor *",
               hintText: "Select Doctor",

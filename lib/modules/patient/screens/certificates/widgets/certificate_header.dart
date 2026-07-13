@@ -23,9 +23,9 @@ class CertificateHeader extends StatelessWidget {
       borderRadius: const BorderRadius.vertical(bottom: Radius.circular(32)),
       padding: EdgeInsets.fromLTRB(
         AppSpacing.xl,
-        topPadding + 70,
+        topPadding + 60,
         AppSpacing.xl,
-        AppSpacing.xl,
+        AppSpacing.lg,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -38,14 +38,14 @@ class CertificateHeader extends StatelessWidget {
               fontWeight: FontWeight.w800,
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 5),
           Text(
             'Track requests and download approved certificate.',
             style: textTheme.bodyMedium?.copyWith(
               color: colorScheme.onPrimary.withValues(alpha: 0.9),
             ),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(

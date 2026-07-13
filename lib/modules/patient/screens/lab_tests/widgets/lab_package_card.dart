@@ -25,7 +25,9 @@ class LabPackageCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.cardColor,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.6)),
+        border: Border.all(
+          color: colorScheme.outlineVariant.withValues(alpha: 0.6),
+        ),
         boxShadow: [
           BoxShadow(
             color: colorScheme.shadow.withValues(alpha: 0.04),
@@ -43,17 +45,26 @@ class LabPackageCard extends StatelessWidget {
                 height: 95,
                 decoration: BoxDecoration(
                   color: colorScheme.primary.withValues(alpha: 0.05),
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(24),
+                  ),
                 ),
                 child: Center(
-                  child: Icon(Icons.science_rounded, size: 36, color: colorScheme.primary),
+                  child: Icon(
+                    Icons.science_rounded,
+                    size: 36,
+                    color: colorScheme.primary,
+                  ),
                 ),
               ),
               Positioned(
                 top: 8,
                 left: 8,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
                     color: colorScheme.primaryContainer,
                     borderRadius: BorderRadius.circular(6),
@@ -72,14 +83,21 @@ class LabPackageCard extends StatelessWidget {
                 top: 8,
                 right: 8,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.green,
                     borderRadius: BorderRadius.circular(100),
                   ),
                   child: Text(
                     '${package.discountPercentage}% OFF',
-                    style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.white),
+                    style: const TextStyle(
+                      fontSize: 9,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
@@ -114,7 +132,9 @@ class LabPackageCard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             style: theme.textTheme.bodySmall?.copyWith(
                               fontSize: 11,
-                              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
+                              color: colorScheme.onSurfaceVariant.withValues(
+                                alpha: 0.8,
+                              ),
                               height: 1.2,
                             ),
                           ),
@@ -125,7 +145,11 @@ class LabPackageCard extends StatelessWidget {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      Icon(Icons.analytics_outlined, size: 12, color: colorScheme.outline),
+                      Icon(
+                        Icons.analytics_outlined,
+                        size: 12,
+                        color: colorScheme.outline,
+                      ),
                       const SizedBox(width: 4),
                       Flexible(
                         child: Text(
@@ -144,7 +168,11 @@ class LabPackageCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        const Icon(Icons.check_circle_rounded, size: 11, color: Colors.green),
+                        const Icon(
+                          Icons.check_circle_rounded,
+                          size: 11,
+                          color: Colors.green,
+                        ),
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
@@ -163,7 +191,8 @@ class LabPackageCard extends StatelessWidget {
                   ],
 
                   // 🎯 FIX: किंमत आणि बटन्स नेहमी तळाशी स्थिर राहतील
-                  const SizedBox(height: 12),
+                  // const SizedBox(height: 12),
+                  const Spacer(),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.baseline,
                     textBaseline: TextBaseline.alphabetic,
@@ -195,8 +224,12 @@ class LabPackageCard extends StatelessWidget {
                           child: OutlinedButton(
                             onPressed: onViewDetails,
                             style: OutlinedButton.styleFrom(
-                              side: BorderSide(color: colorScheme.outlineVariant),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              side: BorderSide(
+                                color: colorScheme.outlineVariant,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
                               padding: EdgeInsets.zero,
                             ),
                             child: Text(
@@ -217,9 +250,13 @@ class LabPackageCard extends StatelessWidget {
                           child: OutlinedButton(
                             onPressed: onAddToCart,
                             style: OutlinedButton.styleFrom(
-                              backgroundColor: isInCart ? colorScheme.primary : Colors.transparent,
+                              backgroundColor: isInCart
+                                  ? colorScheme.primary
+                                  : Colors.transparent,
                               side: BorderSide(color: colorScheme.primary),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
                               padding: EdgeInsets.zero,
                             ),
                             child: Text(
@@ -227,7 +264,9 @@ class LabPackageCard extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
-                                color: isInCart ? colorScheme.onPrimary : colorScheme.primary,
+                                color: isInCart
+                                    ? colorScheme.onPrimary
+                                    : colorScheme.primary,
                               ),
                             ),
                           ),
