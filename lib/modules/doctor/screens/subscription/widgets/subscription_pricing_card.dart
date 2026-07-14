@@ -22,7 +22,9 @@ class SubscriptionPricingCard extends ConsumerWidget {
     final isFree = plan.currentPrice == 0;
 
     const cleanPremiumColor = Color(0xFF123BB5);
-    final activeColor = isDarkMode ? cleanPremiumColor.darkModeVariant() : cleanPremiumColor;
+    final activeColor = isDarkMode
+        ? cleanPremiumColor.darkModeVariant()
+        : cleanPremiumColor;
     final headerTextColor = activeColor.contrastColor;
 
     final cardBg = isSelected
@@ -46,7 +48,9 @@ class SubscriptionPricingCard extends ConsumerWidget {
 
     final headerBadgeBg = isSelected
         ? headerTextColor.transparency(0.15)
-        : (isDarkMode ? activeColor.transparency(0.2) : activeColor.pastel(0.90));
+        : (isDarkMode
+              ? activeColor.transparency(0.2)
+              : activeColor.pastel(0.90));
 
     final headerBadgeTextColor = isSelected
         ? headerTextColor
@@ -61,21 +65,24 @@ class SubscriptionPricingCard extends ConsumerWidget {
         color: cardBg,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: isSelected ? activeColor : colorScheme.outlineVariant.transparency(0.3),
+          color: isSelected
+              ? activeColor
+              : colorScheme.outlineVariant.transparency(0.3),
           width: 2.0,
         ),
         boxShadow: isSelected
             ? [
-          Colors.black.shadow(
-            opacity: isDarkMode ? 0.2 : 0.04,
-            blurRadius: 16,
-            offset: const Offset(0, 6),
-          )
-        ]
+                Colors.black.shadow(
+                  opacity: isDarkMode ? 0.2 : 0.04,
+                  blurRadius: 16,
+                  offset: const Offset(0, 6),
+                ),
+              ]
             : null,
       ),
       child: InkWell(
-        onTap: () => ref.read(doctorSubscriptionProvider.notifier).selectNewPlan(plan),
+        onTap: () =>
+            ref.read(doctorSubscriptionProvider.notifier).selectNewPlan(plan),
         borderRadius: BorderRadius.circular(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -84,7 +91,9 @@ class SubscriptionPricingCard extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
               color: isSelected
                   ? activeColor
-                  : (isDarkMode ? colorScheme.surfaceContainerHighest.darken(0.1) : colorScheme.surfaceContainerHighest.lighten(0.04)),
+                  : (isDarkMode
+                        ? colorScheme.surfaceContainerHighest.darken(0.1)
+                        : colorScheme.surfaceContainerHighest.lighten(0.04)),
               child: Row(
                 children: [
                   Expanded(
@@ -98,7 +107,9 @@ class SubscriptionPricingCard extends ConsumerWidget {
                             style: theme.textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.bold,
                               letterSpacing: 0.2,
-                              color: isSelected ? headerTextColor : colorScheme.onSurfaceVariant,
+                              color: isSelected
+                                  ? headerTextColor
+                                  : colorScheme.onSurfaceVariant,
                             ),
                           ),
                         ),
@@ -106,7 +117,10 @@ class SubscriptionPricingCard extends ConsumerWidget {
                         if (displayDiscountText != null) ...[
                           const SizedBox(width: 8),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 3,
+                            ),
                             decoration: BoxDecoration(
                               color: headerBadgeBg,
                               borderRadius: BorderRadius.circular(6),
@@ -147,7 +161,9 @@ class SubscriptionPricingCard extends ConsumerWidget {
                         '₹',
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
-                          color: isSelected ? activeColor : colorScheme.onSurfaceVariant,
+                          color: isSelected
+                              ? activeColor
+                              : colorScheme.onSurfaceVariant,
                         ),
                       ),
                       const SizedBox(width: 2),
@@ -160,13 +176,15 @@ class SubscriptionPricingCard extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(width: 6),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 14),
-                        child: Text(
-                          '/ ${plan.durationText}',
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                            fontWeight: FontWeight.w600,
+                      Flexible(
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 14),
+                          child: Text(
+                            '/ ${plan.durationText}',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
                       ),
@@ -190,27 +208,35 @@ class SubscriptionPricingCard extends ConsumerWidget {
                     height: 46,
                     width: double.infinity,
                     child: OutlinedButton(
-                      onPressed: () => ref.read(doctorSubscriptionProvider.notifier).selectNewPlan(plan),
+                      onPressed: () => ref
+                          .read(doctorSubscriptionProvider.notifier)
+                          .selectNewPlan(plan),
                       style: OutlinedButton.styleFrom(
-                        backgroundColor: isSelected ? activeColor : Colors.transparent,
-                        foregroundColor: isSelected ? headerTextColor : activeColor,
+                        backgroundColor: isSelected
+                            ? activeColor
+                            : Colors.transparent,
+                        foregroundColor: isSelected
+                            ? headerTextColor
+                            : activeColor,
                         side: BorderSide(color: activeColor, width: 1.5),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
                       child: Text(
-                        isFree ? 'Start Free Trial' : (isSelected ? 'Selected' : 'Choose Plan'),
+                        isFree
+                            ? 'Start Free Trial'
+                            : (isSelected ? 'Selected' : 'Choose Plan'),
                         style: theme.textTheme.labelLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                           letterSpacing: 0.3,
                         ),
                       ),
                     ),
-                  )
+                  ),
                 ],
               ),
-            )
+            ),
           ],
         ),
       ),

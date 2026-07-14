@@ -28,7 +28,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(patientDashboardControllerProvider.notifier).refreshTokenStatus();
+      ref
+          .read(patientDashboardControllerProvider.notifier)
+          .refreshTokenStatus();
     });
   }
 
@@ -197,12 +199,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          title,
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.w800,
-            letterSpacing: -0.5,
-            color: colorScheme.onSurface,
+        Expanded(
+          child: Text(
+            title,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w800,
+              letterSpacing: -0.5,
+              color: colorScheme.onSurface,
+            ),
           ),
         ),
         TextButton.icon(

@@ -31,9 +31,9 @@ class HeroSection extends StatelessWidget {
       borderRadius: const BorderRadius.vertical(bottom: Radius.circular(32)),
       padding: EdgeInsets.fromLTRB(
         AppSpacing.xl,
-        topPadding + 70,
+        topPadding + 60,
         AppSpacing.xl,
-        AppSpacing.xxl,
+        AppSpacing.sm,
       ),
       child: Column(
         children: <Widget>[
@@ -41,10 +41,11 @@ class HeroSection extends StatelessWidget {
             'Your Doctor, Your Health',
             style: theme.textTheme.headlineMedium?.copyWith(
               color: colorScheme.onPrimary,
-              fontWeight: FontWeight.w900,
+              fontWeight: FontWeight.w800,
+              height: 1.10,
             ),
           ),
-          const SizedBox(height: AppSpacing.xl),
+          const SizedBox(height: AppSpacing.md),
 
           _buildSearchWrapper(
             colorScheme,
@@ -59,7 +60,7 @@ class HeroSection extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: AppSpacing.md),
+          const SizedBox(height: AppSpacing.sm),
 
           Row(
             children: [

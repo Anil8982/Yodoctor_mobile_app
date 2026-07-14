@@ -137,7 +137,7 @@ class _DoctorCertificateDashboardScreenState
                               CertificateListCards(
                                 certificates: filteredCerts,
                                 isIssuedTab:
-                                certificateState.activeTabIndex == 1,
+                                    certificateState.activeTabIndex == 1,
                               ),
                           ],
                         ),
@@ -154,10 +154,10 @@ class _DoctorCertificateDashboardScreenState
   }
 
   Widget _buildSummaryCards(
-      BuildContext context,
-      CertificateState state,
-      DoctorCertificateNotifier notifier,
-      ) {
+    BuildContext context,
+    CertificateState state,
+    DoctorCertificateNotifier notifier,
+  ) {
     final isIssuedTab = state.activeTabIndex == 1;
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -167,58 +167,58 @@ class _DoctorCertificateDashboardScreenState
       child: Row(
         children: isIssuedTab
             ? [
-          _buildCard(
-            context,
-            'Total Issued',
-            '${notifier.issuedCount}',
-            colorScheme.primary,
-            colorScheme.primaryContainer,
-          ),
-          const SizedBox(width: AppSpacing.md),
-          _buildCard(
-            context,
-            'This Month',
-            '${notifier.issuedCount}',
-            colorScheme.secondary,
-            colorScheme.secondaryContainer,
-          ),
-          const SizedBox(width: AppSpacing.md),
-          _buildCard(
-            context,
-            'Expiring Soon',
-            '1',
-            colorScheme.error,
-            colorScheme.errorContainer,
-          ),
-        ]
+                _buildCard(
+                  context,
+                  'Total Issued',
+                  '${notifier.issuedCount}',
+                  colorScheme.primary,
+                  colorScheme.primaryContainer,
+                ),
+                const SizedBox(width: AppSpacing.md),
+                _buildCard(
+                  context,
+                  'This Month',
+                  '${notifier.issuedCount}',
+                  colorScheme.secondary,
+                  colorScheme.secondaryContainer,
+                ),
+                const SizedBox(width: AppSpacing.md),
+                _buildCard(
+                  context,
+                  'Expiring Soon',
+                  '1',
+                  colorScheme.error,
+                  colorScheme.errorContainer,
+                ),
+              ]
             : [
-          _buildCard(
-            context,
-            'Pending Requests',
-            '${notifier.pendingCount}',
-            colorScheme.tertiary,
-            colorScheme.tertiaryContainer,
-          ),
-          const SizedBox(width: AppSpacing.md),
-          _buildCard(
-            context,
-            'Total Requests',
-            '${notifier.totalCount}',
-            colorScheme.primary,
-            colorScheme.primaryContainer,
-          ),
-        ],
+                _buildCard(
+                  context,
+                  'Pending Requests',
+                  '${notifier.pendingCount}',
+                  colorScheme.tertiary,
+                  colorScheme.tertiaryContainer,
+                ),
+                const SizedBox(width: AppSpacing.md),
+                _buildCard(
+                  context,
+                  'Total Requests',
+                  '${notifier.totalCount}',
+                  colorScheme.primary,
+                  colorScheme.primaryContainer,
+                ),
+              ],
       ),
     );
   }
 
   Widget _buildCard(
-      BuildContext context,
-      String title,
-      String count,
-      Color textColor,
-      Color containerColor,
-      ) {
+    BuildContext context,
+    String title,
+    String count,
+    Color textColor,
+    Color containerColor,
+  ) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -266,10 +266,10 @@ class _DoctorCertificateDashboardScreenState
   }
 
   Widget _buildToolbar(
-      BuildContext context,
-      CertificateState state,
-      DoctorCertificateNotifier notifier,
-      ) {
+    BuildContext context,
+    CertificateState state,
+    DoctorCertificateNotifier notifier,
+  ) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final isMobile = Responsive.isMobile(context);
@@ -340,6 +340,7 @@ class _DoctorCertificateDashboardScreenState
 
     final typeDropdown = DropdownButtonFormField<String>(
       initialValue: state.selectedTypeFilter,
+      isExpanded: true,
       decoration: dropdownDecoration,
       style: theme.textTheme.bodyMedium?.copyWith(
         fontWeight: FontWeight.w700,

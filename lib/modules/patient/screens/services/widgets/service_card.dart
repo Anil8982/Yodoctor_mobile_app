@@ -6,11 +6,7 @@ class ServiceCard extends StatelessWidget {
   final MedicalService service;
   final VoidCallback? onQrTap;
 
-  const ServiceCard({
-    super.key,
-    required this.service,
-    this.onQrTap,
-  });
+  const ServiceCard({super.key, required this.service, this.onQrTap});
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +70,10 @@ class ServiceCard extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -121,7 +120,7 @@ class ServiceCard extends StatelessWidget {
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
                               letterSpacing: 0.2,
-                              height: 1.25,
+                              height: 1.15,
                             ),
                           ),
                           const SizedBox(height: 4),
@@ -132,7 +131,7 @@ class ServiceCard extends StatelessWidget {
                             style: textTheme.bodySmall?.copyWith(
                               color: Colors.white.withValues(alpha: 0.8),
                               letterSpacing: 0.3,
-                              height: 1.25,
+                              height: 1.15,
                             ),
                           ),
                         ],

@@ -66,11 +66,10 @@ class StatusChipSelector extends StatelessWidget {
 
         Row(
           children: statusOptions.map((option) {
-            final selected = selectedStatus.toUpperCase();
-
-            final isSelected = option['label'] == 'TEMP UNFIT'
-                ? selected == 'TEMPORARILY UNFIT'
-                : selected == option['label'];
+            final isSelected =
+                selectedStatus.toUpperCase() == option['label'] ||
+                (option['label'] == 'TEMP UNFIT' &&
+                    selectedStatus.toUpperCase().contains('TEMPORARILY'));
 
             return Expanded(
               child: Container(
@@ -113,17 +112,19 @@ class StatusChipSelector extends StatelessWidget {
                                 ),
                         ),
                         const SizedBox(width: 6),
-                        Text(
-                          option['label'],
-                          style: theme.textTheme.labelMedium?.copyWith(
-                            fontWeight: isSelected
-                                ? FontWeight.w900
-                                : FontWeight.w800,
-                            color: isSelected
-                                ? colorScheme.onSurface
-                                : colorScheme.onSurfaceVariant,
-                            fontSize: 11,
-                            letterSpacing: 0.2,
+                        Flexible(
+                          child: Text(
+                            option['label'],
+                            style: theme.textTheme.labelMedium?.copyWith(
+                              fontWeight: isSelected
+                                  ? FontWeight.w900
+                                  : FontWeight.w800,
+                              color: isSelected
+                                  ? colorScheme.onSurface
+                                  : colorScheme.onSurfaceVariant,
+                              fontSize: 11,
+                              letterSpacing: 0.2,
+                            ),
                           ),
                         ),
                       ],
