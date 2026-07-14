@@ -63,7 +63,6 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
 
-    // 🎯 कीबोर्ड आधी बंद करा भाऊ, जेणेकरून स्पिनर स्मूथ दिसेल
     FocusManager.instance.primaryFocus?.unfocus();
 
     final email = _emailController.text.trim();
@@ -105,7 +104,7 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
     final bool isProcessing = authState is AsyncLoading;
 
     return Scaffold(
-      backgroundColor: const Color(0xffF8FBF8),
+      // backgroundColor: const Color(0xffF8FBF8),
       body: GestureDetector(
         behavior: HitTestBehavior.translucent,
         onTap: () {

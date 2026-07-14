@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:yodoctor/core/providers/app_role_provider.dart';
+import 'package:yodoctor/modules/widgets/logout_dialog.dart';
 
 import '../../../core/routes/app_routes.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/app_spacing.dart';
 import '../../../core/models/doctor/doctor_profile_model.dart';
 
-class DoctorDrawer extends StatelessWidget {
+class DoctorDrawer extends ConsumerWidget {
   const DoctorDrawer({super.key, required this.doctor});
 
   final DoctorProfileModel? doctor;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final String currentRoute = GoRouterState.of(context).uri.toString();
@@ -184,10 +187,9 @@ class DoctorDrawer extends StatelessWidget {
                     label: 'Logout',
                     foregroundColor: colorScheme.error,
                     onTap: () {
-                      if (context.mounted) {
-                        Navigator.pop(context);
-                        context.go(AppRoutes.landing);
-                      }
+                      Navigator.pop(context);
+
+                      LogoutDialog.show(context, role: AppRole.doctor);
                     },
                   ),
                 ],

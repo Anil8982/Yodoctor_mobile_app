@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../controllers/doctor_profile_controller.dart';
 import '../../widgets/doctor_sliver_app_bar.dart';
 import 'widgets/clinic_details_tab.dart';
@@ -112,32 +113,47 @@ class _DoctorProfileEditScreenState
           ),
         ),
       ),
+
       floatingActionButton: FloatingActionButton.extended(
         onPressed: profileState.isLoading
             ? null
             : () async {
-                final success = await notifier.saveProfileChanges();
-                if (success && context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Profile updated successfully! 🚀'),
-                    ),
-                  );
-                }
-              },
+          if (!notifier.hasUnsavedChanges()) {
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Profile is already up-to-date! 👌')),
+              );
+            }
+            return;
+          }
+
+          final success = await notifier.saveProfileChanges();
+
+          if (success && context.mounted) {
+            final messenger = ScaffoldMessenger.of(context);
+
+            messenger.showSnackBar(
+              const SnackBar(
+                content: Text('Profile updated successfully! 🚀'),
+              ),
+            );
+
+            context.pop();
+          }
+        },
         label: Text(
           profileState.isLoading ? 'Saving...' : 'Save Profile',
           style: const TextStyle(fontWeight: FontWeight.w800),
         ),
         icon: profileState.isLoading
             ? SizedBox(
-                width: 18,
-                height: 18,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: colorScheme.onPrimary,
-                ),
-              )
+          width: 18,
+          height: 18,
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            color: colorScheme.onPrimary,
+          ),
+        )
             : const Icon(Icons.check_rounded),
         backgroundColor: colorScheme.primary,
         foregroundColor: colorScheme.onPrimary,

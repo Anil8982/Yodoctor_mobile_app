@@ -190,6 +190,7 @@ class PatientAuthRepository implements AuthRepository {
       AppLogger.info('Initiating session cancellation request', tag: LogTags.auth, subTag: _subTag);
       await _storage.clearToken();
       await _storage.clearRole();
+      await _storage.clearAll();
 
       AppLogger.success(
         'Local token session and role blocks flushed cleanly',

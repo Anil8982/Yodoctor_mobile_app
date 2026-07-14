@@ -5,16 +5,15 @@ class ApiConstants {
 
   static String get baseUrl => EnvConfig.baseUrl;
 
+  static const login = '/auth/login';
   static const forgotPassword = '/auth/forgot-password';
   static const verifyReset = '/auth/verify-reset';
   static const resetPassword = '/auth/reset-password';
 
   // --- Patient Authentication & Registration ---
-  static const login = '/auth/login';
   static const patientRegister = '/patient/register';
 
   // --- Doctor Authentication & Registration ---
-  static const String doctorLogin = '/auth/login';
   static const String doctorRegisterStep1 = '/doctor/register';
   static const String doctorRegisterUpdateStep1 = '/doctor/registration/step-1';
   static const String doctorRegisterStep2 = '/doctor/registration/step-2';
@@ -23,7 +22,6 @@ class ApiConstants {
   static const String doctorRegisterStep5 = '/doctor/registration/step-5';
   static const String doctorRegisterStep6 = '/doctor/registration/step-6';
   static const String doctorRegisterSubmit = '/doctor/registration/submit';
-
 
   //---patient---
   static const String bookAppointment = '/patient/visit/appointments';
@@ -36,8 +34,9 @@ class ApiConstants {
   static const allDoctors = '/doctor/alldoctors';
 
   static const patientDashboard = '/patient/dashboard';
-  static const cancelAppointment = '/patient/visit/appointments'; // Base for /$id/cancel
-  static const tokenStatus = '/patient/visit/token-status';       // Base for /$id
+  static const cancelAppointment =
+      '/patient/visit/appointments'; // Base for /$id/cancel
+  static const tokenStatus = '/patient/visit/token-status'; // Base for /$id
 
   static const searchDoctors = '/patient/visit/doctors';
   static const doctorNames = '/patient/doctorname';
@@ -53,7 +52,8 @@ class ApiConstants {
 
   static const appointmentHistory = '/patient/visit/appointments/history';
   static const submitDoctorReview = '/patient/doctor-feedback';
-  static const getPrescription = '/patient/appointments'; // Base for /$id/prescription
+  static const getPrescription =
+      '/patient/appointments'; // Base for /$id/prescription
 
   static const getProfile = '/patient/getprofile';
   static const updateProfile = '/patient/updateProfile';
@@ -67,11 +67,9 @@ class ApiConstants {
   static const labPackages = '/patient/lab/packages';
   static const labBookings = '/patient/lab-bookings'; // Base for /$id if needed
 
-
   // ---Doctor---
 
   static const getDoctorByIdForPatient = '/doctor/getDoctorById';
-
 
   // appointment
   static const doctorHistory = '/doctor/appointments/history';
@@ -93,12 +91,13 @@ class ApiConstants {
   static const addVisitSummary = '/doctor/appointments';
 
   static const carryForwardAppointments = '/doctor/appointments/carry-forward';
-  static const cancelRemainingAppointments = '/doctor/appointments/cancel-remaining';
+  static const cancelRemainingAppointments =
+      '/doctor/appointments/cancel-remaining';
 
   static const certificateRequests = '/certificate/requests';
   static const issuedCertificates = '/certificate/issued';
   static const approveCertificate = '/certificate/approve'; // /$id
-  static const rejectCertificate = '/certificate/reject';   // /$id
+  static const rejectCertificate = '/certificate/reject'; // /$id
   static const certificateDocuments = '/certificate/documents'; // /$id
 
   static const String doctorDashboard = '/doctor/dashboard';
@@ -129,7 +128,4 @@ class ApiConstants {
   static const String subscriptionPlans = '/plans';
   static const String createSubscription = '/subscriptions/create';
   static const String verifySubscription = '/subscriptions/verify';
-
-
-
 }

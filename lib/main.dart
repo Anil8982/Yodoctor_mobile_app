@@ -40,7 +40,7 @@ class YoDoctorApp extends ConsumerWidget {
     final goRouter = ref.watch(routerProvider);
 
     return MaterialApp.router(
-      title: 'yoDoctor',
+      title: 'YoDoctor',
       debugShowCheckedModeBanner: false,
       routerConfig: goRouter,
       theme: _getThemeForRole(currentRole),

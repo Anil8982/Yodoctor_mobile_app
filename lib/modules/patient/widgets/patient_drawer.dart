@@ -2,10 +2,11 @@ import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:yodoctor/core/providers/app_role_provider.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
 import '../models/dashboard/dashboard_model.dart';
-import 'logout_dialog.dart';
+import '../../widgets/logout_dialog.dart';
 
 class PatientDrawer extends ConsumerWidget {
   const PatientDrawer({super.key, this.dashboard});
@@ -137,7 +138,7 @@ class PatientDrawer extends ConsumerWidget {
                   onTap: () {
                     Navigator.pop(context);
 
-                    LogoutDialog.show(context);
+                    LogoutDialog.show(context, role: AppRole.patient);
                   },
                 ),
               ],

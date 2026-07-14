@@ -173,9 +173,17 @@ class _DoctorRegisterScreenState extends ConsumerState<DoctorRegisterScreen>
                           child: Row(
                             children: [
                               GestureDetector(
-                                onTap: () => _currentStep == 0
-                                    ? Navigator.pop(context)
-                                    : _prevStep(),
+                                onTap: () {
+                                  if (_currentStep == 0) {
+                                    if (context.canPop()) {
+                                      context.pop();
+                                    } else {
+                                      context.go(AppRoutes.landing);
+                                    }
+                                  } else {
+                                    _prevStep();
+                                  }
+                                },
                                 child: Container(
                                   width: 38,
                                   height: 38,
