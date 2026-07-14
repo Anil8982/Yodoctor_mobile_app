@@ -352,6 +352,9 @@ class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
         final String name = value?.trim() ?? '';
         if (name.isEmpty) return 'Please enter full name';
         if (name.length < 2) return 'Name should have at least 2 characters';
+        if (!RegExp(r'^[A-Za-z]+(?: [A-Za-z]+)*$').hasMatch(name)) {
+          return 'Only alphabets are allowed';
+        }
         return null;
       },
     );

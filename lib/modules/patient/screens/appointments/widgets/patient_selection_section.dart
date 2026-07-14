@@ -25,7 +25,12 @@ class PatientSelectionSection extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
-
+    final currentSelectedFamilyMember =
+        familyMembers.any((member) => member.id == selectedFamilyMember?.id)
+        ? familyMembers.firstWhere(
+            (member) => member.id == selectedFamilyMember?.id,
+          )
+        : null;
     return Column(
       children: [
         Row(
@@ -36,7 +41,9 @@ class PatientSelectionSection extends StatelessWidget {
                 icon: Icons.person_rounded,
                 isSelected: isSelf,
                 // 🎯 जर वरून फंक्शन null आलं (Loading मुळे), तर क्लिक लॉक होईल
-                onTap: onProfileTypeChanged != null ? () => onProfileTypeChanged!(true) : null,
+                onTap: onProfileTypeChanged != null
+                    ? () => onProfileTypeChanged!(true)
+                    : null,
                 colorScheme: colorScheme,
                 textTheme: textTheme,
               ),
@@ -47,7 +54,9 @@ class PatientSelectionSection extends StatelessWidget {
                 label: 'Family Member',
                 icon: Icons.group_rounded,
                 isSelected: !isSelf,
-                onTap: onProfileTypeChanged != null ? () => onProfileTypeChanged!(false) : null,
+                onTap: onProfileTypeChanged != null
+                    ? () => onProfileTypeChanged!(false)
+                    : null,
                 colorScheme: colorScheme,
                 textTheme: textTheme,
               ),
@@ -70,11 +79,13 @@ class PatientSelectionSection extends StatelessWidget {
               children: [
                 Expanded(
                   child: DropdownButtonFormField<FamilyMemberModel>(
-                    initialValue: selectedFamilyMember,
+                    initialValue: currentSelectedFamilyMember,
                     hint: const Text("Choose Member"),
                     decoration: InputDecoration(
                       fillColor: onMemberChanged == null
-                          ? colorScheme.surfaceContainerHighest.transparency(0.3)
+                          ? colorScheme.surfaceContainerHighest.transparency(
+                              0.3,
+                            )
                           : colorScheme.surfaceContainerLow,
                       filled: true,
                       contentPadding: const EdgeInsets.symmetric(
@@ -123,7 +134,9 @@ class PatientSelectionSection extends StatelessWidget {
         decoration: BoxDecoration(
           color: onTap == null
               ? colorScheme.surfaceContainerHighest.transparency(0.2)
-              : (isSelected ? colorScheme.primaryContainer : colorScheme.surfaceContainerLow),
+              : (isSelected
+                    ? colorScheme.primaryContainer
+                    : colorScheme.surfaceContainerLow),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isSelected && onTap != null
@@ -140,7 +153,9 @@ class PatientSelectionSection extends StatelessWidget {
               size: 18,
               color: isSelected && onTap != null
                   ? colorScheme.primary
-                  : colorScheme.onSurfaceVariant.transparency(onTap == null ? 0.4 : 1.0),
+                  : colorScheme.onSurfaceVariant.transparency(
+                      onTap == null ? 0.4 : 1.0,
+                    ),
             ),
             const SizedBox(width: 8),
             Flexible(
@@ -151,7 +166,9 @@ class PatientSelectionSection extends StatelessWidget {
                   fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
                   color: isSelected && onTap != null
                       ? colorScheme.primary
-                      : colorScheme.onSurfaceVariant.transparency(onTap == null ? 0.4 : 1.0),
+                      : colorScheme.onSurfaceVariant.transparency(
+                          onTap == null ? 0.4 : 1.0,
+                        ),
                 ),
               ),
             ),
