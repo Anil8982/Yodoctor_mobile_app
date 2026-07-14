@@ -1,5 +1,6 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class AuthHeader extends StatelessWidget {
   final String role;
@@ -76,6 +77,7 @@ class YoTextField extends StatefulWidget {
   final bool isPassword;
   final TextInputType keyboardType;
   final TextEditingController? controller;
+  final List<TextInputFormatter>? inputFormatters;
   final String? Function(String?)? validator;
 
   const YoTextField({
@@ -86,6 +88,7 @@ class YoTextField extends StatefulWidget {
     this.isPassword = false,
     this.keyboardType = TextInputType.text,
     this.controller,
+    this.inputFormatters,
     this.validator,
   });
 
@@ -115,6 +118,7 @@ class _YoTextFieldState extends State<YoTextField> {
           controller: widget.controller,
           obscureText: widget.isPassword && _obscure,
           keyboardType: widget.keyboardType,
+          inputFormatters: widget.inputFormatters,
           validator: widget.validator,
           style: textTheme.bodyLarge?.copyWith(
             color: colorScheme.onSurface,
@@ -134,15 +138,15 @@ class _YoTextFieldState extends State<YoTextField> {
             ),
             suffixIcon: widget.isPassword
                 ? IconButton(
-              icon: Icon(
-                _obscure
-                    ? Icons.visibility_off_rounded
-                    : Icons.visibility_rounded,
-                color: colorScheme.onSurfaceVariant,
-                size: 20,
-              ),
-              onPressed: () => setState(() => _obscure = !_obscure),
-            )
+                    icon: Icon(
+                      _obscure
+                          ? Icons.visibility_off_rounded
+                          : Icons.visibility_rounded,
+                      color: colorScheme.onSurfaceVariant,
+                      size: 20,
+                    ),
+                    onPressed: () => setState(() => _obscure = !_obscure),
+                  )
                 : null,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
@@ -174,7 +178,6 @@ class _YoTextFieldState extends State<YoTextField> {
   }
 }
 
-
 class YoPrimaryButton extends StatelessWidget {
   final String label;
   final VoidCallback? onTap;
@@ -200,7 +203,6 @@ class YoPrimaryButton extends StatelessWidget {
       width: double.infinity,
       height: 54,
       child: ElevatedButton(
-
         onPressed: isLoading ? null : onTap,
         style: ElevatedButton.styleFrom(
           backgroundColor: btnColor,
@@ -212,25 +214,24 @@ class YoPrimaryButton extends StatelessWidget {
         ),
         child: isLoading
             ? SizedBox(
-          width: 22,
-          height: 22,
-          child: CircularProgressIndicator(
-            color: onButtonColor,
-            strokeWidth: 2.5,
-          ),
-        )
+                width: 22,
+                height: 22,
+                child: CircularProgressIndicator(
+                  color: onButtonColor,
+                  strokeWidth: 2.5,
+                ),
+              )
             : Text(
-          label,
-          style: textTheme.labelLarge?.copyWith(
-            fontWeight: FontWeight.w700,
-            color: onButtonColor,
-          ),
-        ),
+                label,
+                style: textTheme.labelLarge?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: onButtonColor,
+                ),
+              ),
       ),
     );
   }
 }
-
 
 class YoLogoBar extends StatelessWidget {
   const YoLogoBar({super.key});
@@ -243,22 +244,22 @@ class YoLogoBar extends StatelessWidget {
       children: [
         Navigator.canPop(context)
             ? GestureDetector(
-          onTap: () => Navigator.pop(context),
-          child: Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: colorScheme.surfaceContainerLow,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: colorScheme.outlineVariant),
-            ),
-            child: Icon(
-              Icons.arrow_back_rounded,
-              color: colorScheme.onSurface,
-              size: 20,
-            ),
-          ),
-        )
+                onTap: () => Navigator.pop(context),
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerLow,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: colorScheme.outlineVariant),
+                  ),
+                  child: Icon(
+                    Icons.arrow_back_rounded,
+                    color: colorScheme.onSurface,
+                    size: 20,
+                  ),
+                ),
+              )
             : const SizedBox(width: 40, height: 40),
         const Spacer(),
         RichText(

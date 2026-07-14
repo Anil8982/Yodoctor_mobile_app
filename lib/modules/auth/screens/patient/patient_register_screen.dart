@@ -1,5 +1,6 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
@@ -33,7 +34,11 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
   @override
   void initState() {
     super.initState();
-    AppLogger.info('PatientRegisterScreen Initialized', tag: LogTags.ui, subTag: _subTag);
+    AppLogger.info(
+      'PatientRegisterScreen Initialized',
+      tag: LogTags.ui,
+      subTag: _subTag,
+    );
     _animController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
@@ -44,7 +49,11 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
 
   @override
   void dispose() {
-    AppLogger.info('PatientRegisterScreen Disposed', tag: LogTags.ui, subTag: _subTag);
+    AppLogger.info(
+      'PatientRegisterScreen Disposed',
+      tag: LogTags.ui,
+      subTag: _subTag,
+    );
     _animController.dispose();
     _nameController.dispose();
     _emailController.dispose();
@@ -56,20 +65,30 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
 
   void _submitForm() {
     if (!_formKey.currentState!.validate()) {
-      AppLogger.warning('Form validation failed for patient registration', tag: LogTags.ui, subTag: _subTag);
+      AppLogger.warning(
+        'Form validation failed for patient registration',
+        tag: LogTags.ui,
+        subTag: _subTag,
+      );
       return;
     }
 
-    AppLogger.info('Form validation passed. Triggering patient registration flow...', tag: LogTags.ui, subTag: _subTag);
-
-    ref.read(patientRegisterControllerProvider.notifier).registerPatient(
-      context: context,
-      fullName: _nameController.text.trim(),
-      phone: _phoneController.text.trim(),
-      email: _emailController.text.trim(),
-      password: _passwordController.text,
-      confirmPassword: _confirmPasswordController.text,
+    AppLogger.info(
+      'Form validation passed. Triggering patient registration flow...',
+      tag: LogTags.ui,
+      subTag: _subTag,
     );
+
+    ref
+        .read(patientRegisterControllerProvider.notifier)
+        .registerPatient(
+          context: context,
+          fullName: _nameController.text.trim(),
+          phone: _phoneController.text.trim(),
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
+          confirmPassword: _confirmPasswordController.text,
+        );
   }
 
   @override
@@ -78,7 +97,9 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
     final textTheme = Theme.of(context).textTheme;
 
     final registerState = ref.watch(patientRegisterControllerProvider);
-    final controllerNotifier = ref.read(patientRegisterControllerProvider.notifier);
+    final controllerNotifier = ref.read(
+      patientRegisterControllerProvider.notifier,
+    );
 
     return Scaffold(
       backgroundColor: colorScheme.surfaceContainer,
@@ -114,7 +135,11 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                         children: [
                           GestureDetector(
                             onTap: () {
-                              AppLogger.info('Back arrow tapped, popping register screen', tag: LogTags.ui, subTag: _subTag);
+                              AppLogger.info(
+                                'Back arrow tapped, popping register screen',
+                                tag: LogTags.ui,
+                                subTag: _subTag,
+                              );
                               Navigator.pop(context);
                             },
                             child: Container(
@@ -212,7 +237,22 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                           label: 'Full Name',
                           hint: 'Enter your full name',
                           prefixIcon: Icons.person_rounded,
-                          validator: (v) => v!.isEmpty ? 'Enter name' : null,
+                          validator: (v) {
+                            if (v == null || v.trim().isEmpty) {
+                              return 'Enter name';
+                            }
+
+                            if (v.trim().length < 2)
+                              return 'Name should have at least 2 characters';
+
+                            if (!RegExp(
+                              r'^[A-Za-z]+(?: [A-Za-z]+)*$',
+                            ).hasMatch(v)) {
+                              return 'Only alphabets are allowed';
+                            }
+
+                            return null;
+                          },
                         ),
                         const SizedBox(height: 16),
                         YoTextField(
@@ -233,10 +273,24 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                         YoTextField(
                           controller: _phoneController,
                           label: 'Phone Number',
-                          hint: '+91 9876543210',
+                          hint: '9876543210',
                           prefixIcon: Icons.phone_rounded,
                           keyboardType: TextInputType.phone,
-                          validator: (v) => v!.isEmpty ? 'Enter phone' : null,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                            LengthLimitingTextInputFormatter(10),
+                          ],
+                          validator: (v) {
+                            if (v == null || v.trim().isEmpty) {
+                              return 'Enter phone number';
+                            }
+
+                            if (!RegExp(r'^[6-9]\d{9}$').hasMatch(v)) {
+                              return 'Enter a valid 10-digit mobile number';
+                            }
+
+                            return null;
+                          },
                         ),
                         const SizedBox(height: 16),
                         Column(
@@ -252,7 +306,11 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                             const SizedBox(height: 8),
                             GestureDetector(
                               onTap: () {
-                                AppLogger.info('Triggering Date of Birth picker bottom sheet/dialog', tag: LogTags.ui, subTag: _subTag);
+                                AppLogger.info(
+                                  'Triggering Date of Birth picker bottom sheet/dialog',
+                                  tag: LogTags.ui,
+                                  subTag: _subTag,
+                                );
                                 controllerNotifier.pickDateOfBirth(context);
                               },
                               child: Container(
@@ -278,12 +336,15 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                                     const SizedBox(width: 12),
                                     Text(
                                       registerState.selectedDOB != null
-                                          ? DateFormat('dd/MM/yyyy').format(registerState.selectedDOB!)
+                                          ? DateFormat(
+                                              'dd/MM/yyyy',
+                                            ).format(registerState.selectedDOB!)
                                           : 'Select date of birth',
                                       style: textTheme.bodyMedium?.copyWith(
                                         color: registerState.selectedDOB != null
                                             ? colorScheme.onSurface
-                                            : colorScheme.onSurfaceVariant.transparency(0.65),
+                                            : colorScheme.onSurfaceVariant
+                                                  .transparency(0.65),
                                       ),
                                     ),
                                     const Spacer(),
@@ -300,7 +361,9 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                                 padding: const EdgeInsets.only(top: 6),
                                 child: Text(
                                   registerState.dobError!,
-                                  style: textTheme.bodySmall?.copyWith(color: colorScheme.error),
+                                  style: textTheme.bodySmall?.copyWith(
+                                    color: colorScheme.error,
+                                  ),
                                 ),
                               ),
                           ],
@@ -319,9 +382,21 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                             const SizedBox(height: 10),
                             Row(
                               children: [
-                                _genderButton(context, 'Male', registerState.selectedGender),
-                                _genderButton(context, 'Female', registerState.selectedGender),
-                                _genderButton(context, 'Other', registerState.selectedGender),
+                                _genderButton(
+                                  context,
+                                  'Male',
+                                  registerState.selectedGender,
+                                ),
+                                _genderButton(
+                                  context,
+                                  'Female',
+                                  registerState.selectedGender,
+                                ),
+                                _genderButton(
+                                  context,
+                                  'Other',
+                                  registerState.selectedGender,
+                                ),
                               ],
                             ),
                             if (registerState.genderError != null)
@@ -329,7 +404,9 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                                 padding: const EdgeInsets.only(top: 6),
                                 child: Text(
                                   registerState.genderError!,
-                                  style: textTheme.bodySmall?.copyWith(color: colorScheme.error),
+                                  style: textTheme.bodySmall?.copyWith(
+                                    color: colorScheme.error,
+                                  ),
                                 ),
                               ),
                           ],
@@ -345,7 +422,8 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                           isPassword: true,
                           validator: (v) {
                             if (v == null || v.isEmpty) return 'Enter password';
-                            if (v.length < 8) return 'Password must be 8 characters';
+                            if (v.length < 8)
+                              return 'Password must be 8 characters';
                             return null;
                           },
                         ),
@@ -357,8 +435,10 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                           prefixIcon: Icons.lock_outline_rounded,
                           isPassword: true,
                           validator: (v) {
-                            if (v == null || v.isEmpty) return 'Confirm password';
-                            if (v != _passwordController.text) return 'Passwords do not match';
+                            if (v == null || v.isEmpty)
+                              return 'Confirm password';
+                            if (v != _passwordController.text)
+                              return 'Passwords do not match';
                             return null;
                           },
                         ),
@@ -366,7 +446,11 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                         GestureDetector(
                           onTap: () {
                             final targetValue = !registerState.agreedToTerms;
-                            AppLogger.info('Toggling terms checkbox selection path to: $targetValue', tag: LogTags.ui, subTag: _subTag);
+                            AppLogger.info(
+                              'Toggling terms checkbox selection path to: $targetValue',
+                              tag: LogTags.ui,
+                              subTag: _subTag,
+                            );
                             controllerNotifier.toggleTerms(targetValue);
                           },
                           child: Row(
@@ -388,10 +472,10 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                                 ),
                                 child: registerState.agreedToTerms
                                     ? Icon(
-                                  Icons.check,
-                                  color: colorScheme.onPrimary,
-                                  size: 14,
-                                )
+                                        Icons.check,
+                                        color: colorScheme.onPrimary,
+                                        size: 14,
+                                      )
                                     : null,
                               ),
                               const SizedBox(width: 10),
@@ -450,7 +534,11 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                               ),
                               GestureDetector(
                                 onTap: () {
-                                  AppLogger.info('Redirecting to login via navigation pop block', tag: LogTags.ui, subTag: _subTag);
+                                  AppLogger.info(
+                                    'Redirecting to login via navigation pop block',
+                                    tag: LogTags.ui,
+                                    subTag: _subTag,
+                                  );
                                   Navigator.pop(context);
                                 },
                                 child: Text(
@@ -478,7 +566,11 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
     );
   }
 
-  Widget _genderButton(BuildContext context, String gender, String? currentSelected) {
+  Widget _genderButton(
+    BuildContext context,
+    String gender,
+    String? currentSelected,
+  ) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final selected = currentSelected == gender;
@@ -486,14 +578,22 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
     return Expanded(
       child: GestureDetector(
         onTap: () {
-          AppLogger.info('Gender selected row state update ->: $gender', tag: LogTags.ui, subTag: _subTag);
-          ref.read(patientRegisterControllerProvider.notifier).selectGender(gender);
+          AppLogger.info(
+            'Gender selected row state update ->: $gender',
+            tag: LogTags.ui,
+            subTag: _subTag,
+          );
+          ref
+              .read(patientRegisterControllerProvider.notifier)
+              .selectGender(gender);
         },
         child: Container(
           margin: EdgeInsets.only(right: gender != 'Other' ? 10 : 0),
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
-            color: selected ? AppTheme.secondary : colorScheme.surfaceContainerLow,
+            color: selected
+                ? AppTheme.secondary
+                : colorScheme.surfaceContainerLow,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: selected ? AppTheme.secondary : colorScheme.outlineVariant,
@@ -505,7 +605,9 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
             textAlign: TextAlign.center,
             style: textTheme.labelLarge?.copyWith(
               fontWeight: FontWeight.w600,
-              color: selected ? colorScheme.onPrimary : colorScheme.onSurfaceVariant,
+              color: selected
+                  ? colorScheme.onPrimary
+                  : colorScheme.onSurfaceVariant,
             ),
           ),
         ),
