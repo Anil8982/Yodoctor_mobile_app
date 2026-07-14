@@ -8,7 +8,11 @@ class Step2MedicalInfo extends ConsumerWidget {
   final GlobalKey<FormState> formKey;
   final CertificateNotifier controller;
 
-  const Step2MedicalInfo({super.key, required this.formKey, required this.controller});
+  const Step2MedicalInfo({
+    super.key,
+    required this.formKey,
+    required this.controller,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -22,13 +26,30 @@ class Step2MedicalInfo extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const StepHeader(title: 'Medical Details', desc: 'Provide baseline biometrics to appear on your medical clearance.'),
+          const StepHeader(
+            title: 'Medical Details',
+            desc:
+                'Provide baseline biometrics to appear on your medical clearance.',
+          ),
           const SizedBox(height: 20),
           CustomCertificateTextField(
             controller: controller.fullNameController,
             labelText: 'Full Name *',
             prefixIcon: Icons.badge_rounded,
-            validator: (value) => value == null || value.trim().isEmpty ? 'Please enter name' : null,
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return 'Please enter name';
+              }
+
+              if (value.trim().length < 2)
+                return 'Name should have at least 2 characters';
+
+              if (!RegExp(r'^[A-Za-z]+(?: [A-Za-z]+)*$').hasMatch(value)) {
+                return 'Only alphabets are allowed';
+              }
+
+              return null;
+            },
           ),
           const SizedBox(height: 20),
           Row(
@@ -49,10 +70,11 @@ class Step2MedicalInfo extends ConsumerWidget {
                     );
                     if (picked != null) {
                       controller.dobController.text =
-                      '${picked.day.toString().padLeft(2, '0')}-${picked.month.toString().padLeft(2, '0')}-${picked.year}';
+                          '${picked.day.toString().padLeft(2, '0')}-${picked.month.toString().padLeft(2, '0')}-${picked.year}';
                     }
                   },
-                  validator: (value) => value == null || value.trim().isEmpty ? 'Required' : null,
+                  validator: (value) =>
+                      value == null || value.trim().isEmpty ? 'Required' : null,
                 ),
               ),
               const SizedBox(width: 16),
@@ -63,12 +85,22 @@ class Step2MedicalInfo extends ConsumerWidget {
                     labelText: 'Gender *',
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide(color: colorScheme.outlineVariant.withValues(alpha: 0.35)),
+                      borderSide: BorderSide(
+                        color: colorScheme.outlineVariant.withValues(
+                          alpha: 0.35,
+                        ),
+                      ),
                     ),
                   ),
                   validator: (value) => value == null ? 'Required' : null,
-                  items: const ['Male', 'Female', 'Other'].map((g) => DropdownMenuItem<String>(value: g, child: Text(g))).toList(),
-                  onChanged: (value) => value != null ? controller.setGender(value) : null,
+                  items: const ['Male', 'Female', 'Other']
+                      .map(
+                        (g) =>
+                            DropdownMenuItem<String>(value: g, child: Text(g)),
+                      )
+                      .toList(),
+                  onChanged: (value) =>
+                      value != null ? controller.setGender(value) : null,
                 ),
               ),
             ],
@@ -84,11 +116,24 @@ class Step2MedicalInfo extends ConsumerWidget {
                     labelText: 'Blood Group *',
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide(color: colorScheme.outlineVariant.withValues(alpha: 0.35)),
+                      borderSide: BorderSide(
+                        color: colorScheme.outlineVariant.withValues(
+                          alpha: 0.35,
+                        ),
+                      ),
                     ),
                   ),
-                  items: const ['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'].map((bg) => DropdownMenuItem<String>(value: bg, child: Text(bg))).toList(),
-                  onChanged: (value) => value != null ? controller.setBloodGroup(value) : null,
+                  items:
+                      const ['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-']
+                          .map(
+                            (bg) => DropdownMenuItem<String>(
+                              value: bg,
+                              child: Text(bg),
+                            ),
+                          )
+                          .toList(),
+                  onChanged: (value) =>
+                      value != null ? controller.setBloodGroup(value) : null,
                 ),
               ),
               const SizedBox(width: 16),

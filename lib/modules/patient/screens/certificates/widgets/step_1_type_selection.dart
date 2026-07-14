@@ -51,6 +51,14 @@ class Step1TypeSelection extends ConsumerWidget {
 
     // Watch current form state reactively from provider
     final formState = ref.watch(certificateProvider);
+    final selectedDoctor =
+        formState.doctors.any(
+          (doctor) => doctor.id == formState.assignedDoctor?.id,
+        )
+        ? formState.doctors.firstWhere(
+            (doctor) => doctor.id == formState.assignedDoctor?.id,
+          )
+        : null;
 
     return Form(
       key: formKey,
@@ -87,7 +95,7 @@ class Step1TypeSelection extends ConsumerWidget {
           const SizedBox(height: 28),
 
           DropdownButtonFormField<PatientDoctorModel>(
-            initialValue: formState.assignedDoctor,
+            initialValue: selectedDoctor,
             isExpanded: true,
             decoration: const InputDecoration(
               labelText: "Assigned Doctor *",
@@ -95,6 +103,12 @@ class Step1TypeSelection extends ConsumerWidget {
               border: OutlineInputBorder(),
               prefixIcon: Icon(Icons.person),
             ),
+            validator: (value) {
+              if (value == null) {
+                return 'Please select an assigned doctor';
+              }
+              return null;
+            },
             items: formState.doctors.map((doc) {
               return DropdownMenuItem(
                 value: doc,
