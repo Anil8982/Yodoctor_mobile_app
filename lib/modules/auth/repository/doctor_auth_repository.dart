@@ -30,7 +30,7 @@ class DoctorAuthRepository {
     AppLogger.info('Initiating doctor login request', tag: LogTags.auth, subTag: _subTag);
 
     try {
-      final response = await _dio.post(ApiConstants.doctorLogin, data: payload);
+      final response = await _dio.post(ApiConstants.login, data: payload);
       AppLogger.success('Doctor login request completed. Status: ${response.statusCode}', tag: LogTags.auth, subTag: _subTag);
       return response;
     } catch (e, st) {
@@ -270,5 +270,6 @@ class DoctorAuthRepository {
     await _storage.clearToken();
     await _storage.clearRegistrationToken();
     await _storage.clearRole();
+    await _storage.clearAll();
   }
 }

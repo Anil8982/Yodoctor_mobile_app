@@ -57,9 +57,9 @@ class ProfileFormState {
 }
 
 final doctorProfileProvider =
-NotifierProvider<DoctorProfileNotifier, ProfileFormState>(
-  DoctorProfileNotifier.new,
-);
+    NotifierProvider<DoctorProfileNotifier, ProfileFormState>(
+      DoctorProfileNotifier.new,
+    );
 
 class DoctorProfileNotifier extends Notifier<ProfileFormState> {
   static const String _subTag = 'DoctorProfileNotifier';
@@ -92,7 +92,11 @@ class DoctorProfileNotifier extends Notifier<ProfileFormState> {
 
   @override
   ProfileFormState build() {
-    AppLogger.info('DoctorProfileNotifier Initialized', tag: LogTags.doctor, subTag: _subTag);
+    AppLogger.info(
+      'DoctorProfileNotifier Initialized',
+      tag: LogTags.doctor,
+      subTag: _subTag,
+    );
     ref.onDispose(() {
       nameController.dispose();
       emailController.dispose();
@@ -118,10 +122,15 @@ class DoctorProfileNotifier extends Notifier<ProfileFormState> {
     return ProfileFormState();
   }
 
-  Future<bool> loadProfile() async {
-    if (state.isLoading) return false;
+  Future<bool> loadProfile({bool force = false}) async {
+    if (state.isLoading && !force) return false;
+
     state = state.copyWith(isLoading: true, clearError: true);
-    AppLogger.info('Loading doctor profile data matrix...', tag: LogTags.doctor, subTag: _subTag);
+    AppLogger.info(
+      'Loading doctor profile data matrix...',
+      tag: LogTags.doctor,
+      subTag: _subTag,
+    );
 
     try {
       final repository = ref.read(doctorProfileRepositoryProvider);
@@ -129,8 +138,16 @@ class DoctorProfileNotifier extends Notifier<ProfileFormState> {
       final statusCode = response.statusCode ?? 0;
 
       if (statusCode >= 200 && statusCode < 300) {
-        AppLogger.success('Doctor profile data fetched successfully', tag: LogTags.doctor, subTag: _subTag);
-        AppLogger.json(response.data, tag: LogTags.doctor, subTag: '$_subTag/ProfileFetchData');
+        AppLogger.success(
+          'Doctor profile data fetched successfully',
+          tag: LogTags.doctor,
+          subTag: _subTag,
+        );
+        AppLogger.json(
+          response.data,
+          tag: LogTags.doctor,
+          subTag: '$_subTag/ProfileFetchData',
+        );
 
         final profile = DoctorProfileModel.fromJson(response.data["doctor"]);
         initProfile(profile);
@@ -138,12 +155,25 @@ class DoctorProfileNotifier extends Notifier<ProfileFormState> {
       } else {
         final msg = response.data["message"] ?? "Failed to fetch profile info";
         state = state.copyWith(isLoading: false, errorMessage: msg);
-        AppLogger.warning('Profile fetch failed with status: $statusCode. Message: $msg', tag: LogTags.doctor, subTag: _subTag);
+        AppLogger.warning(
+          'Profile fetch failed with status: $statusCode. Message: $msg',
+          tag: LogTags.doctor,
+          subTag: _subTag,
+        );
         return false;
       }
     } catch (e, st) {
-      state = state.copyWith(isLoading: false, errorMessage: "Runtime crash loading profile");
-      AppLogger.exception(e, st, message: 'Fatal crash in profile load pipeline', tag: LogTags.doctor, subTag: _subTag);
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: "Runtime crash loading profile",
+      );
+      AppLogger.exception(
+        e,
+        st,
+        message: 'Fatal crash in profile load pipeline',
+        tag: LogTags.doctor,
+        subTag: _subTag,
+      );
       return false;
     }
   }
@@ -181,17 +211,29 @@ class DoctorProfileNotifier extends Notifier<ProfileFormState> {
   }
 
   void updateGender(String gender) {
-    AppLogger.info('Gender updated to: $gender', tag: LogTags.doctor, subTag: _subTag);
+    AppLogger.info(
+      'Gender updated to: $gender',
+      tag: LogTags.doctor,
+      subTag: _subTag,
+    );
     state = state.copyWith(selectedGender: gender);
   }
 
   void updatePracticeType(String type) {
-    AppLogger.info('Practice type updated to: $type', tag: LogTags.doctor, subTag: _subTag);
+    AppLogger.info(
+      'Practice type updated to: $type',
+      tag: LogTags.doctor,
+      subTag: _subTag,
+    );
     state = state.copyWith(selectedPracticeType: type);
   }
 
   void updateDuration(int value) {
-    AppLogger.info('Consultation duration updated to: $value mins', tag: LogTags.doctor, subTag: _subTag);
+    AppLogger.info(
+      'Consultation duration updated to: $value mins',
+      tag: LogTags.doctor,
+      subTag: _subTag,
+    );
     state = state.copyWith(avgDuration: value);
   }
 
@@ -202,7 +244,11 @@ class DoctorProfileNotifier extends Notifier<ProfileFormState> {
     } else {
       days.add(day);
     }
-    AppLogger.info('Toggled available day: $day. Active days roster: $days', tag: LogTags.doctor, subTag: _subTag);
+    AppLogger.info(
+      'Toggled available day: $day. Active days roster: $days',
+      tag: LogTags.doctor,
+      subTag: _subTag,
+    );
     state = state.copyWith(activeDays: days);
   }
 
@@ -235,8 +281,16 @@ class DoctorProfileNotifier extends Notifier<ProfileFormState> {
       "availableDays": state.activeDays,
     };
 
-    AppLogger.info('Submitting doctor profile revision batch...', tag: LogTags.doctor, subTag: _subTag);
-    AppLogger.json(payload, tag: LogTags.doctor, subTag: '$_subTag/UpdatePayload');
+    AppLogger.info(
+      'Submitting doctor profile revision batch...',
+      tag: LogTags.doctor,
+      subTag: _subTag,
+    );
+    AppLogger.json(
+      payload,
+      tag: LogTags.doctor,
+      subTag: '$_subTag/UpdatePayload',
+    );
 
     try {
       final repository = ref.read(doctorProfileRepositoryProvider);
@@ -244,19 +298,70 @@ class DoctorProfileNotifier extends Notifier<ProfileFormState> {
       final statusCode = response.statusCode ?? 0;
 
       if (statusCode >= 200 && statusCode < 300) {
-        AppLogger.success('Doctor profile changes saved successfully on backend', tag: LogTags.doctor, subTag: _subTag);
-        final syncSuccess = await loadProfile();
+        AppLogger.success(
+          'Doctor profile changes saved successfully on backend',
+          tag: LogTags.doctor,
+          subTag: _subTag,
+        );
+        final syncSuccess = await loadProfile(force: true);
         return syncSuccess;
       } else {
-        final msg = response.data["message"] ?? "Failed to save profile changes";
+        final msg =
+            response.data["message"] ?? "Failed to save profile changes";
         state = state.copyWith(isLoading: false, errorMessage: msg);
-        AppLogger.warning('Failed to save profile updates. Backend rejected with status: $statusCode', tag: LogTags.doctor, subTag: _subTag);
+        AppLogger.warning(
+          'Failed to save profile updates. Backend rejected with status: $statusCode',
+          tag: LogTags.doctor,
+          subTag: _subTag,
+        );
         return false;
       }
     } catch (e, st) {
-      state = state.copyWith(isLoading: false, errorMessage: "Profile mutation failure");
-      AppLogger.exception(e, st, message: 'Profile save execution failure', tag: LogTags.doctor, subTag: _subTag);
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: "Profile mutation failure",
+      );
+      AppLogger.exception(
+        e,
+        st,
+        message: 'Profile save execution failure',
+        tag: LogTags.doctor,
+        subTag: _subTag,
+      );
       return false;
     }
+  }
+
+  bool hasUnsavedChanges() {
+    final current = state.profile;
+    if (current == null) return true;
+
+    final isSame = nameController.text == current.doctorName &&
+        emailController.text == current.email &&
+        mobileController.text == current.mobile &&
+        aboutController.text == current.bio &&
+        qualificationController.text == current.degree &&
+        specializationController.text == current.specialization &&
+        (int.tryParse(expController.text) ?? 0) == current.experienceYears &&
+        regNoController.text == current.licenseNumber &&
+        councilController.text == current.stateCouncil &&
+        regValidTillController.text == current.validTill &&
+        clinicNameController.text == current.clinicName &&
+        cityController.text == current.city &&
+        stateController.text == current.state &&
+        pincodeController.text == current.pincode &&
+        landmarkController.text == current.landmark &&
+        mapsLinkController.text == current.mapsLink &&
+        addressController.text == current.address &&
+        hospitalNameController.text == (current.hospitalName ?? '') &&
+        (int.tryParse(feeController.text) ?? 0) == current.consultationFee &&
+        state.selectedGender == current.gender &&
+        state.selectedPracticeType == current.practiceType &&
+        state.avgDuration == current.consultationDuration &&
+        // List Elements Equality Check
+        state.activeDays.length == current.availableDays.length &&
+        state.activeDays.every((day) => current.availableDays.contains(day));
+
+    return !isSame;
   }
 }

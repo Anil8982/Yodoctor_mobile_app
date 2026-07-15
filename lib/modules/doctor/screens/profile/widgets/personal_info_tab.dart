@@ -63,8 +63,12 @@ class PersonalInfoTab extends ConsumerWidget {
             ),
             const SizedBox(height: AppSpacing.xs),
             DropdownButtonFormField<String>(
-              initialValue: formState.selectedGender,
-              dropdownColor: colorScheme.surfaceContainerHigh,
+              initialValue: switch (formState.selectedGender.toUpperCase()) {
+                'MALE' => 'Male',
+                'FEMALE' => 'Female',
+                'OTHER' => 'Other',
+                _ => null,
+              },              dropdownColor: colorScheme.surfaceContainerHigh,
               style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700, color: colorScheme.onSurface),
               icon: Icon(Icons.keyboard_arrow_down_rounded, color: colorScheme.onSurfaceVariant),
               decoration: InputDecoration(

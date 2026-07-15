@@ -7,17 +7,19 @@ import 'package:yodoctor/core/debug/app_logger.dart';
 import 'package:yodoctor/core/providers/app_role_provider.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
+import 'package:yodoctor/modules/auth/controllers/doctor_login_controller.dart';
 import 'package:yodoctor/modules/auth/repository/patient_auth_repository.dart';
 
 class LogoutDialog extends ConsumerWidget {
-  const LogoutDialog({super.key});
+  const LogoutDialog({super.key, required this.role});
 
-  static void show(BuildContext context) {
+  final AppRole role;
+
+  static void show(BuildContext context, {required AppRole role}) {
     showDialog(
       context: context,
       barrierDismissible: true,
-      // backgroundColor: Colors.transparent,
-      builder: (context) => const LogoutDialog(),
+      builder: (context) => LogoutDialog(role: role),
     );
   }
 
@@ -25,6 +27,7 @@ class LogoutDialog extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final isDoctor = role == AppRole.doctor;
 
     return Center(
       child: Container(
@@ -53,7 +56,6 @@ class LogoutDialog extends ConsumerWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // कडक आयकॉन 
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -71,8 +73,6 @@ class LogoutDialog extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: AppSpacing.xl),
-
-                  // टायटल
                   Text(
                     'Ending Session?',
                     style: theme.textTheme.titleLarge?.copyWith(
@@ -82,7 +82,6 @@ class LogoutDialog extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: AppSpacing.xs),
-
                   Text(
                     'Are you sure you want to log out? You will need to re-authenticate to access your medical dashboard.',
                     textAlign: TextAlign.center,
@@ -92,7 +91,6 @@ class LogoutDialog extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: AppSpacing.xl),
-
                   Row(
                     children: [
                       // Cancel Button
@@ -122,14 +120,18 @@ class LogoutDialog extends ConsumerWidget {
                             Navigator.pop(context);
 
                             AppLogger.info(
-                              'Patient confirmed logout from glassmorphic dialog gate',
+                              '${isDoctor ? "Doctor" : "Patient"} confirmed logout from glassmorphic dialog gate',
                               tag: LogTags.auth,
                               subTag: 'LogoutDialog',
                             );
 
                             try {
-                              await ref.read(patientAuthRepositoryProvider).signOut();
-                              await ref.read(appRoleProvider.notifier).clearRole();
+                              if (isDoctor) {
+                                await ref.read(doctorLoginControllerProvider.notifier).logout();
+                              } else {
+                                await ref.read(patientAuthRepositoryProvider).signOut();
+                                await ref.read(appRoleProvider.notifier).clearRole();
+                              }
 
                               AppLogger.success('Flushed session context. Dropping core router anchor.');
 
