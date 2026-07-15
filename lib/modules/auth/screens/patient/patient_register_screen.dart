@@ -147,7 +147,11 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                         children: [
                           GestureDetector(
                             onTap: () {
-                              AppLogger.info('Back arrow tapped, popping register screen', tag: LogTags.ui, subTag: _subTag);
+                              AppLogger.info(
+                                'Back arrow tapped, popping register screen',
+                                tag: LogTags.ui,
+                                subTag: _subTag,
+                              );
                               Navigator.pop(context);
                             },
                             child: Container(
@@ -443,8 +447,10 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                           prefixIcon: Icons.lock_outline_rounded,
                           isPassword: true,
                           validator: (v) {
-                            if (v == null || v.isEmpty) return 'Confirm password';
-                            if (v != _passwordController.text) return 'Passwords do not match';
+                            if (v == null || v.isEmpty)
+                              return 'Confirm password';
+                            if (v != _passwordController.text)
+                              return 'Passwords do not match';
                             return null;
                           },
                         ),

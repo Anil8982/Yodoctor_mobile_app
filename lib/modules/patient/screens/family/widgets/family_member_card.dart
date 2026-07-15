@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'member_info_tag.dart';
 import '../../../models/family/family_member_model.dart';
 
@@ -224,7 +225,9 @@ class FamilyMemberCard extends StatelessWidget {
                       modalContext,
                       Icons.calendar_month_rounded,
                       'Date of Birth',
-                      member.dob,
+                      DateFormat(
+                        'dd MMM yyyy',
+                      ).format(DateTime.parse(member.dob)),
                       itemWidth,
                     ),
                   ],

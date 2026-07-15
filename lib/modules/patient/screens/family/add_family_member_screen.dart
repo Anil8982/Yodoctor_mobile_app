@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/app_button.dart';
@@ -87,7 +88,9 @@ class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
     _selectedGender = member.gender;
     _selectedBloodGroup = member.bloodGroup;
     _selectedRelation = member.relation;
-    _dobController.text = member.dob;
+    _dobController.text = DateFormat(
+      'dd MMM yyyy',
+    ).format(DateTime.parse(member.dob));
     _selectedDob = DateTime.tryParse(member.dob);
     _heightController.text = member.heightCm.toString();
     _weightController.text = member.weightKg.toString();
