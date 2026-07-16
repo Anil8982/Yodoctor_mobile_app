@@ -1,3 +1,5 @@
+import 'package:yodoctor/core/constants/log_tags.dart';
+import 'package:yodoctor/core/debug/app_logger.dart';
 import 'package:yodoctor/core/providers/app_role_provider.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/waiting_approval_screen.dart';
 import 'package:yodoctor/modules/doctor/screens/qr/doctor_qr_screen.dart';
@@ -66,32 +68,60 @@ final routerProvider = Provider<GoRouter>((ref) {
     refreshListenable: refreshListenable,
 
     redirect: (context, state) {
-      final token = ref.read(storageProvider).getToken();
-      final role = ref.read(storageProvider).getRole();
+      final storage = ref.read(storageProvider);
+
+      final token = storage.getToken();
+      final role = storage.getRole();
+      final status = storage.getStatus();
 
       final isLoggedIn = token != null && token.isNotEmpty;
       final matchedPath = state.matchedLocation;
 
-      final isAuthScreen = matchedPath == AppRoutes.landing ||
-          matchedPath == AppRoutes.patientLogin ||
-          matchedPath == AppRoutes.patientRegister ||
-          matchedPath == AppRoutes.doctorLogin ||
-          matchedPath == AppRoutes.doctorRegister;
+      AppLogger.info(
+        'Router Check → '
+            'TOKEN=$token | '
+            'ROLE=$role | '
+            'STATUS=$status | '
+            'PATH=$matchedPath',
+        tag: LogTags.auth,
+        subTag: 'Router',
+      );
+
+
+      final isAuthScreen =
+          matchedPath == AppRoutes.landing ||
+              matchedPath == AppRoutes.patientLogin ||
+              matchedPath == AppRoutes.patientRegister ||
+              matchedPath == AppRoutes.doctorLogin ||
+              matchedPath == AppRoutes.doctorRegister;
 
       if (!isLoggedIn && !isAuthScreen) {
         return AppRoutes.landing;
       }
 
-      if (isLoggedIn && isAuthScreen) {
-        if (role == 'doctor') {
-          return AppRoutes.doctorDashboard;
-        } else if (role == 'patient') {
-          return AppRoutes.dashboard;
+      if (isLoggedIn && role == 'doctor') {
+        // Only APPROVED doctors can access dashboard
+        if (status == 'APPROVED') {
+          if (isAuthScreen ||
+              matchedPath == AppRoutes.waitingApproval) {
+            return AppRoutes.doctorDashboard;
+          }
+        } else {
+          // PENDING / REJECTED / null
+          if (matchedPath != AppRoutes.waitingApproval) {
+            return AppRoutes.waitingApproval;
+          }
         }
+      }
+
+      if (isLoggedIn && isAuthScreen && role == 'patient') {
+        return AppRoutes.dashboard;
       }
 
       return null;
     },
+
+
     routes: <RouteBase>[
       GoRoute(
         parentNavigatorKey: AppRouter.rootNavigatorKey,

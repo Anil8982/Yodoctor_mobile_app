@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 import '../../../controllers/profile_controller.dart';
+import 'profile_date_picker_field.dart';
+import 'profile_dropdown_field.dart';
 import 'profile_text_field.dart';
 
 class ProfileInfoCard extends StatelessWidget {
@@ -98,23 +100,36 @@ class ProfileInfoCard extends StatelessWidget {
 
             buildDivider(),
 
-            ProfileTextField(
-              label: "Gender",
+            // ProfileTextField(
+            //   label: "Gender",
+            //   icon: Icons.wc_rounded,
+            //   controller: controller.genderController,
+            //   isEditing: isEditing,
+            //   validator: (value) {
+            //     final gender = value?.trim().toLowerCase();
+            //
+            //     if (gender == null || gender.isEmpty) {
+            //       return "Enter gender";
+            //     }
+            //
+            //     if (!['male', 'female', 'other'].contains(gender)) {
+            //       return "Enter Male, Female or Other";
+            //     }
+            //
+            //     return null;
+            //   },
+            //
+
+            ProfileDropdownField(
+              label: "GENDER",
               icon: Icons.wc_rounded,
-              controller: controller.genderController,
+              value: controller.genderController.text.toUpperCase(),
+              items: const ["MALE", "FEMALE", "OTHER"],
               isEditing: isEditing,
-              validator: (value) {
-                final gender = value?.trim().toLowerCase();
-
-                if (gender == null || gender.isEmpty) {
-                  return "Enter gender";
+              onChanged: (val) {
+                if (val != null) {
+                  controller.genderController.text = val;
                 }
-
-                if (!['male', 'female', 'other'].contains(gender)) {
-                  return "Enter Male, Female or Other";
-                }
-
-                return null;
               },
             ),
 

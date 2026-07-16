@@ -265,11 +265,20 @@ class DoctorAuthRepository {
     return _storage.getRole();
   }
 
+  Future<void> saveStatus(String status) async {
+    await _storage.saveStatus(status);
+  }
+
+  String? getStatus() {
+    return _storage.getStatus();
+  }
+
   Future<void> clearAuthSession() async {
     AppLogger.info('Flushing auth session local records and clearing identifiers', tag: LogTags.auth, subTag: _subTag);
     await _storage.clearToken();
     await _storage.clearRegistrationToken();
     await _storage.clearRole();
+    await _storage.clearStatus();
     await _storage.clearAll();
   }
 }

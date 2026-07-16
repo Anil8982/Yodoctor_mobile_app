@@ -74,4 +74,20 @@ class StorageService {
   Future<void> clearAll() async {
     await _box.clear();
   }
+
+  // ----------------------------
+  // Doctor Status Management
+  // ----------------------------
+
+  Future<void> saveStatus(String status) async {
+    await _box.put(HiveKeys.doctorStatus, status);
+  }
+
+  String? getStatus() {
+    return _box.get(HiveKeys.doctorStatus);
+  }
+
+  Future<void> clearStatus() async {
+    await _box.delete(HiveKeys.doctorStatus);
+  }
 }

@@ -9,4 +9,6 @@ class LogTags {
   static const String admin = "ADMIN";
   static const String router = "ROUTER";
   static const String ui = "UI";
+  static const String profile = "PROFILE";
+  static const String notifications = "NOTIFICATIONS";
 }

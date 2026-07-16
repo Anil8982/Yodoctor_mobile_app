@@ -209,6 +209,31 @@ class PatientAuthRepository implements AuthRepository {
     }
   }
 
+
+  Future<LoginResponse> signInWithGoogle({
+    required String firebaseToken,
+  }) async {
+    final response = await _dio.post(
+      ApiConstants.googleLogin,
+      data: {
+        'token': firebaseToken,
+        'portal': 'USER',
+      },
+    );
+
+    final loginResponse = LoginResponse.fromJson(
+      Map<String, dynamic>.from(response.data),
+    );
+
+    if (loginResponse.success &&
+        loginResponse.token?.isNotEmpty == true) {
+      await _storage.saveToken(loginResponse.token!);
+      await _storage.saveRole('patient');
+    }
+
+    return loginResponse;
+  }
+
   @override
   Future<bool> isAuthenticated() async {
     final token = _storage.getToken();

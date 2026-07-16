@@ -6,25 +6,32 @@ class ApiConstants {
   static String get baseUrl => EnvConfig.baseUrl;
 
   static const login = '/auth/login';
+  static const googleLogin = '/auth/google-login';
   static const forgotPassword = '/auth/forgot-password';
   static const verifyReset = '/auth/verify-reset';
   static const resetPassword = '/auth/reset-password';
+
+  // --- Profile ---
+  static const uploadProfileImage = '/auth/upload-profile-image';
+  static const updateProfileImage = '/auth/updateprofile-image';
+  static const getProfileImage = '/auth/getprofile-image';
+  static const deleteProfileImage = '/auth/deleteprofile-image';
 
   // --- Patient Authentication & Registration ---
   static const patientRegister = '/patient/register';
 
   // --- Doctor Authentication & Registration ---
-  static const String doctorRegisterStep1 = '/doctor/register';
-  static const String doctorRegisterUpdateStep1 = '/doctor/registration/step-1';
-  static const String doctorRegisterStep2 = '/doctor/registration/step-2';
-  static const String doctorRegisterStep3 = '/doctor/registration/step-3';
-  static const String doctorRegisterStep4 = '/doctor/registration/step-4';
-  static const String doctorRegisterStep5 = '/doctor/registration/step-5';
-  static const String doctorRegisterStep6 = '/doctor/registration/step-6';
-  static const String doctorRegisterSubmit = '/doctor/registration/submit';
+  static const doctorRegisterStep1 = '/doctor/register';
+  static const doctorRegisterUpdateStep1 = '/doctor/registration/step-1';
+  static const doctorRegisterStep2 = '/doctor/registration/step-2';
+  static const doctorRegisterStep3 = '/doctor/registration/step-3';
+  static const doctorRegisterStep4 = '/doctor/registration/step-4';
+  static const doctorRegisterStep5 = '/doctor/registration/step-5';
+  static const doctorRegisterStep6 = '/doctor/registration/step-6';
+  static const doctorRegisterSubmit = '/doctor/registration/submit';
 
   //---patient---
-  static const String bookAppointment = '/patient/visit/appointments';
+  static const bookAppointment = '/patient/visit/appointments';
 
   static const createCertificate = '/certificate/create';
   static const uploadCertificateDocuments = '/certificate/upload';
@@ -100,32 +107,32 @@ class ApiConstants {
   static const rejectCertificate = '/certificate/reject'; // /$id
   static const certificateDocuments = '/certificate/documents'; // /$id
 
-  static const String doctorDashboard = '/doctor/dashboard';
-  static const String doctorAvailability = '/doctor/availability';
+  static const doctorDashboard = '/doctor/dashboard';
+  static const doctorAvailability = '/doctor/availability';
 
   // --- Doctor Profile ---
-  static const String getDoctorProfile = '/doctor/profile';
-  static const String updateDoctorProfile = '/doctor/profile';
+  static const getDoctorProfile = '/doctor/profile';
+  static const updateDoctorProfile = '/doctor/profile';
 
   // --- Doctor QR ---
-  static const String getDoctorQr = '/doctor/my-qr';
-  static const String downloadDoctorQr = '/download-qr';
+  static const getDoctorQr = '/doctor/my-qr';
+  static const downloadDoctorQr = '/download-qr';
 
   // --- Doctor Reviews ---
-  static const String doctorReviews = '/doctor/reviews';
+  static const doctorReviews = '/doctor/reviews';
 
   // --- Doctor Manual Booking ---
-  static const String manualBooking = '/doctor/manualbooking';
+  static const manualBooking = '/doctor/manualbooking';
 
   // --- Notifications ---
-  static const String notifications = '/notifications';
-  static const String unreadNotifications = '/notifications/unread-count';
-  static const String readAllNotifications = '/notifications/read-all';
+  static const notifications = '/notifications';
+  static const unreadNotifications = '/notifications/unread-count';
+  static const readAllNotifications = '/notifications/read-all';
 
   // --- Doctor Subscription & Billing ---
-  static const String activeSubscription = '/subscriptions/active';
-  static const String billingHistory = '/billing/history';
-  static const String subscriptionPlans = '/plans';
-  static const String createSubscription = '/subscriptions/create';
-  static const String verifySubscription = '/subscriptions/verify';
+  static const activeSubscription = '/subscriptions/active';
+  static const billingHistory = '/billing/history';
+  static const subscriptionPlans = '/plans';
+  static const createSubscription = '/subscriptions/create';
+  static const verifySubscription = '/subscriptions/verify';
 }

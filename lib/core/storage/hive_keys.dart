@@ -8,4 +8,6 @@ class HiveKeys {
 
   // Future use
   static const String patientProfile = 'patient_profile';
+
+  static const String doctorStatus = 'doctor_status';
 }

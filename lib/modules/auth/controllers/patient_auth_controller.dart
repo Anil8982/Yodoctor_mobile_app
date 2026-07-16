@@ -14,9 +14,9 @@ final googleAuthServiceProvider = Provider<GoogleAuthService>((ref) {
 });
 
 final patientAuthControllerProvider =
-AsyncNotifierProvider<PatientAuthController, PatientUser?>(
-  PatientAuthController.new,
-);
+    AsyncNotifierProvider<PatientAuthController, PatientUser?>(
+      PatientAuthController.new,
+    );
 
 class PatientAuthController extends AsyncNotifier<PatientUser?> {
   static const String _subTag = 'PatientAuthController';
@@ -97,20 +97,36 @@ class PatientAuthController extends AsyncNotifier<PatientUser?> {
 
     state = const AsyncLoading();
     final googleAuthService = ref.read(googleAuthServiceProvider);
-    final storage = ref.read(storageProvider);
+    // final storage = ref.read(storageProvider);
 
     state = await AsyncValue.guard(() async {
       final PatientUser? patient = await googleAuthService.signInWithGoogle();
 
       if (patient != null) {
-        await storage.saveRole('patient');
+        final firebaseToken = await googleAuthService.getIdToken();
+
+        if (firebaseToken == null || firebaseToken.isEmpty) {
+          throw Exception('Firebase token not found');
+        }
+
+        final repository = ref.read(patientAuthRepositoryProvider);
+
+        final response = await repository.signInWithGoogle(
+          firebaseToken: firebaseToken,
+        );
+
+        if (!response.success) {
+          throw Exception(response.message);
+        }
+
         ref.read(appRoleProvider.notifier).setRole(AppRole.patient);
 
         AppLogger.success(
-          'Google OAuth session tokens and patient role successfully synced to context state',
+          'Google OAuth authenticated and backend JWT session established',
           tag: LogTags.auth,
           subTag: _subTag,
         );
+
         onSuccess(patient);
         return patient;
       } else {

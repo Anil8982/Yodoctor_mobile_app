@@ -7,9 +7,9 @@ import 'package:yodoctor/core/providers/app_role_provider.dart';
 import 'package:yodoctor/modules/auth/repository/doctor_auth_repository.dart';
 
 final doctorLoginControllerProvider =
-AsyncNotifierProvider<DoctorLoginController, Map<String, dynamic>?>(
-  DoctorLoginController.new,
-);
+    AsyncNotifierProvider<DoctorLoginController, Map<String, dynamic>?>(
+      DoctorLoginController.new,
+    );
 
 class DoctorLoginController extends AsyncNotifier<Map<String, dynamic>?> {
   static const String _subTag = 'DoctorLoginController';
@@ -42,24 +42,42 @@ class DoctorLoginController extends AsyncNotifier<Map<String, dynamic>?> {
         final token = data["data"]?["token"];
 
         if (token != null) {
+          final status = data["status"];
+
+          AppLogger.info(
+            'Login API Response Status: $status',
+            tag: LogTags.auth,
+            subTag: _subTag,
+          );
+
           if (redirect == "resume") {
             await repository.saveRegistrationToken(token);
+
             AppLogger.success(
-              'Temporary Registration Token captured and cached natively for onboarding steps',
+              'Temporary Registration Token captured',
               tag: LogTags.auth,
               subTag: _subTag,
             );
           } else {
             await repository.saveSessionToken(token);
             await repository.saveUserRole('doctor');
+            await repository.saveStatus(status);
 
             ref.read(appRoleProvider.notifier).setRole(AppRole.doctor);
 
-            AppLogger.success(
-              'JWT Master active session token and role cached',
-              tag: LogTags.auth,
-              subTag: _subTag,
-            );
+            if (status == "APPROVED") {
+              AppLogger.success(
+                'JWT Master active session token and role cached',
+                tag: LogTags.auth,
+                subTag: _subTag,
+              );
+            } else {
+              AppLogger.warning(
+                'Login allowed but account status is: $status',
+                tag: LogTags.auth,
+                subTag: _subTag,
+              );
+            }
           }
         }
 

@@ -65,8 +65,11 @@ class ProfileActionBar extends ConsumerWidget {
                       if (!formKey.currentState!.validate()) {
                         return;
                       }
-                      // final success = await notifier.updateProfile();
-                      onComplete();
+                      final success = await notifier.updateProfile();
+
+                      if (success) {
+                        onComplete();
+                      }
 
                       if (context.mounted) {
                         final currentState = ref.read(
@@ -76,10 +79,12 @@ class ProfileActionBar extends ConsumerWidget {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
-                              currentState.errorMessage ??
-                                  "Profile Updated Successfully!",
+                              success
+                                  ? "Profile Updated Successfully!"
+                                  : (currentState.errorMessage ??
+                                        "Failed to update profile"),
                             ),
-                            backgroundColor: currentState.errorMessage == null
+                            backgroundColor: success
                                 ? Colors.green
                                 : Colors.red,
                             behavior: SnackBarBehavior.floating,
