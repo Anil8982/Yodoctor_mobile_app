@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
+
 import '../repositories/patient_profile_repository.dart';
 import '../screens/profile/models/profile_model.dart';
 import '../screens/profile/models/patient_model.dart';
@@ -85,6 +87,27 @@ class ProfileController extends Notifier<ProfileState> {
         genderController.text != state.user!.gender;
 
     state = state.copyWith(hasChanges: changesDetected);
+  }
+
+  Future<void> pickDateOfBirth(BuildContext context) async {
+    final DateTime now = DateTime.now();
+
+    final DateTime initialDate =
+        DateTime.tryParse(dobController.text) ?? DateTime(now.year - 25, 1, 1);
+
+    final pickedDate = await showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: DateTime(1900),
+      lastDate: now,
+    );
+
+    if (pickedDate == null) return;
+
+    final formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
+
+    // Store API format
+    dobController.text = formattedDate;
   }
 
   Future<void> loadProfile() async {

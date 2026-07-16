@@ -3,10 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/modules/patient/controllers/profile_controller.dart';
 
 class ProfileActionBar extends ConsumerWidget {
+  final GlobalKey<FormState> formKey;
   final VoidCallback onComplete;
 
   const ProfileActionBar({
     super.key,
+    required this.formKey,
     required this.onComplete,
   });
 
@@ -60,25 +62,31 @@ class ProfileActionBar extends ConsumerWidget {
               onPressed: profileState.isLoading
                   ? null
                   : () async {
-                // final success = await notifier.updateProfile();
-                onComplete();
+                      if (!formKey.currentState!.validate()) {
+                        return;
+                      }
+                      // final success = await notifier.updateProfile();
+                      onComplete();
 
-                if (context.mounted) {
-                  final currentState = ref.read(profileControllerProvider);
+                      if (context.mounted) {
+                        final currentState = ref.read(
+                          profileControllerProvider,
+                        );
 
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        currentState.errorMessage ?? "Profile Updated Successfully!",
-                      ),
-                      backgroundColor: currentState.errorMessage == null
-                          ? Colors.green
-                          : Colors.red,
-                      behavior: SnackBarBehavior.floating,
-                    ),
-                  );
-                }
-              },
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              currentState.errorMessage ??
+                                  "Profile Updated Successfully!",
+                            ),
+                            backgroundColor: currentState.errorMessage == null
+                                ? Colors.green
+                                : Colors.red,
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                      }
+                    },
               style: FilledButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
@@ -87,17 +95,17 @@ class ProfileActionBar extends ConsumerWidget {
               ),
               child: profileState.isLoading
                   ? SizedBox(
-                height: 20,
-                width: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: colorScheme.onPrimary,
-                ),
-              )
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: colorScheme.onPrimary,
+                      ),
+                    )
                   : const Text(
-                "Save Changes",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
+                      "Save Changes",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
             ),
           ),
         ],

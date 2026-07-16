@@ -1,5 +1,7 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 
 import '../../../controllers/profile_controller.dart';
 import 'profile_text_field.dart';
@@ -41,6 +43,22 @@ class ProfileInfoCard extends StatelessWidget {
               icon: Icons.person_rounded,
               controller: controller.nameController,
               isEditing: isEditing,
+              validator: (value) {
+                if (!isEditing) return null;
+
+                if (value == null || value.trim().isEmpty) {
+                  return "Enter name";
+                }
+
+                if (value.trim().length < 2) {
+                  return "Name should have at least 2 characters";
+                }
+                if (!RegExp(r'^[A-Za-z]+(?: [A-Za-z]+)*$').hasMatch(value)) {
+                  return 'Only alphabets are allowed';
+                }
+
+                return null;
+              },
             ),
 
             buildDivider(),
@@ -59,6 +77,23 @@ class ProfileInfoCard extends StatelessWidget {
               icon: Icons.phone_android_rounded,
               controller: controller.mobileController,
               isEditing: isEditing,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(10),
+              ],
+              validator: (value) {
+                if (!isEditing) return null;
+
+                if (value == null || value.isEmpty) {
+                  return "Enter phone number";
+                }
+
+                if (!RegExp(r'^[6-9]\d{9}$').hasMatch(value)) {
+                  return "Enter a valid 10-digit mobile number";
+                }
+
+                return null;
+              },
             ),
 
             buildDivider(),
@@ -68,15 +103,31 @@ class ProfileInfoCard extends StatelessWidget {
               icon: Icons.wc_rounded,
               controller: controller.genderController,
               isEditing: isEditing,
+              validator: (value) {
+                final gender = value?.trim().toLowerCase();
+
+                if (gender == null || gender.isEmpty) {
+                  return "Enter gender";
+                }
+
+                if (!['male', 'female', 'other'].contains(gender)) {
+                  return "Enter Male, Female or Other";
+                }
+
+                return null;
+              },
             ),
 
             buildDivider(),
 
-            ProfileTextField(
+            ProfileDatePickerField(
               label: "Date of Birth",
               icon: Icons.cake_rounded,
-              controller: controller.dobController,
+              value: DateFormat(
+                'dd MMM yyyy',
+              ).format(DateTime.parse(controller.dobController.text)),
               isEditing: isEditing,
+              onTap: () => controller.pickDateOfBirth(context),
             ),
           ],
         ),
