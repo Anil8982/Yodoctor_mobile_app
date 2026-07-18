@@ -149,7 +149,7 @@ class CertificateNotifier extends Notifier<CertificateFormState> {
         state = state.copyWith(doctors: list);
       }
     } catch (e, st) {
-      AppLogger.exception(e, st, message: 'Failed fetching secure repository doctor list', tag: LogTags.patient, subTag: _subTag);
+      AppLogger.exception(e, st, message: 'Failed fetching secure repositories doctor list', tag: LogTags.patient, subTag: _subTag);
     }
   }
 

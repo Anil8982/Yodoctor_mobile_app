@@ -79,7 +79,7 @@ class BookAppointmentController extends Notifier<BookAppointmentState> {
 
   /// Handles the execution of appointment booking safely
   Future<bool> book(String doctorId) async {
-    AppLogger.info('Initiating appointment booking flow in repository', tag: LogTags.patient, subTag: _subTag);
+    AppLogger.info('Initiating appointment booking flow in repositories', tag: LogTags.patient, subTag: _subTag);
 
     // Set loading state safely
     state = state.copyWith(bookingStatus: const AsyncLoading());

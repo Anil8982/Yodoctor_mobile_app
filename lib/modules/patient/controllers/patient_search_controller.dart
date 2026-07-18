@@ -164,7 +164,7 @@ class PatientSearchController extends Notifier<PatientSearchState> {
       AppLogger.exception(
         e,
         st,
-        message: 'City repository query failed',
+        message: 'City repositories query failed',
         tag: LogTags.patient,
         subTag: _subTag,
       );

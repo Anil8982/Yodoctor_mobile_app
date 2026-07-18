@@ -8,7 +8,7 @@ import 'package:yodoctor/core/debug/app_logger.dart';
 import 'package:yodoctor/core/providers/app_role_provider.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
-import 'package:yodoctor/modules/auth/repository/patient_auth_repository.dart';
+import 'package:yodoctor/modules/auth/repositories/patient_auth_repository.dart';
 
 class PatientRegisterState {
   final bool isLoading;
