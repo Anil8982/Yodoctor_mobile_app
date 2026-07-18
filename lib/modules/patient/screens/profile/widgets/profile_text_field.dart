@@ -41,13 +41,21 @@ class ProfileTextField extends StatelessWidget {
           ),
           errorStyle: const TextStyle(fontSize: 12, color: Colors.red),
           prefixIcon: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Icon(
-              icon,
-              size: 22,
-              color: !isEditing
-                  ? colorScheme.primary
-                  : colorScheme.secondary.transparency(0.9),
+            padding: const EdgeInsets.fromLTRB(2, 2, 10, 2),
+            child: Container(
+              height: 30,
+              width: 30,
+              decoration: BoxDecoration(
+                color: !isEditing
+                    ? colorScheme.primary.transparency(0.1)
+                    : colorScheme.secondary.transparency(0.1),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Icon(
+                icon,
+                color: !isEditing ? colorScheme.primary : colorScheme.secondary,
+                size: 22,
+              ),
             ),
           ),
 
