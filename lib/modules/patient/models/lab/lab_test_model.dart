@@ -52,9 +52,9 @@ class LabPackage {
   });
 
   factory LabPackage.fromJson(Map<String, dynamic> json) {
-    final original = (json["price"] ?? 0).toDouble();
+    final original = double.tryParse(json["mrp"]?.toString() ?? "0") ?? 0.0;
 
-    final offer = (json["offer_price"] ?? original).toDouble();
+    final offer = double.tryParse(json["price"]?.toString() ?? "0") ?? original;
 
     final discount = original == 0
         ? 0

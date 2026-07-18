@@ -267,7 +267,7 @@ class _LiveQueueViewState extends ConsumerState<LiveQueueView> {
             },
           ),
         ),
-        const SizedBox(width: 16),
+        const SizedBox(width: AppSpacing.sm),
         Expanded(
           child: _actionCard(
             title: "Skip Appointment",
@@ -281,7 +281,7 @@ class _LiveQueueViewState extends ConsumerState<LiveQueueView> {
                   },
           ),
         ),
-        const SizedBox(width: 16),
+        const SizedBox(width: AppSpacing.sm),
         Expanded(
           child: _actionCard(
             title: "Mark No Show",
@@ -310,7 +310,8 @@ class _LiveQueueViewState extends ConsumerState<LiveQueueView> {
       borderRadius: BorderRadius.circular(20),
       onTap: onTap,
       child: Container(
-        height: 110,
+        height: 120,
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
         decoration: BoxDecoration(
           color: color,
           borderRadius: BorderRadius.circular(20),
@@ -319,14 +320,15 @@ class _LiveQueueViewState extends ConsumerState<LiveQueueView> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 34, color: iconColor),
+            Icon(icon, size: 26, color: iconColor),
             const SizedBox(height: 10),
             Text(
               title,
               textAlign: TextAlign.center,
+              maxLines: 2,
               style: TextStyle(
                 fontWeight: FontWeight.w700,
-                fontSize: 16,
+                fontSize: 14,
                 color: iconColor,
               ),
             ),
