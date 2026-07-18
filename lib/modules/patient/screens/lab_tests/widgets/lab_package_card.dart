@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:yodoctor/core/models/patient/lab_test_model.dart';
+import 'package:yodoctor/modules/patient/models/lab/lab_test_model.dart';
 
 class LabPackageCard extends StatelessWidget {
   final LabPackage package;

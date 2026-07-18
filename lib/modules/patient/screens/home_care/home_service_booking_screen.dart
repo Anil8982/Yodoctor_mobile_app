@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/modules/patient/controllers/home_service_controller.dart';
 import 'package:yodoctor/modules/patient/screens/home_care/widgets/booking_header.dart';
-import '../../../../core/models/patient/home_service_booking_model.dart';
+import '../../models/home_care/home_service_booking_model.dart';
 import '../../../../core/utils/input_decoration_helper.dart';
 import 'widgets/booking_personal_details.dart';
 import 'widgets/booking_urgency_section.dart';

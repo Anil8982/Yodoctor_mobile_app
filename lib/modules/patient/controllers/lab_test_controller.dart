@@ -3,10 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
 import '../../../modules/patient/models/lab/lab_category_model.dart';
-import '../../../core/models/patient/lab_test_model.dart';
+import '../models/lab/lab_test_model.dart';
 import '../repositories/patient_lab_repository.dart';
 import '../../../modules/patient/models/lab/lab_test_detail_model.dart';
-import '../../../core/models/patient/booking_state_model.dart';
+import '../models/lab/booking_state_model.dart';
 
 class LabState {
   final bool isLoading;

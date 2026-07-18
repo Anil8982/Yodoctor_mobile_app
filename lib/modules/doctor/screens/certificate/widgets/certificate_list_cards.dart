@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:yodoctor/core/models/doctor/doctor_certificate_request_model.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
 import 'package:yodoctor/core/utils/responsive.dart';
+import 'package:yodoctor/modules/doctor/models/certificate/doctor_certificate_request_model.dart';
 
 // 🎯 CHANGED: Refactored to a clean design wrapper to work inside CustomScrollView
 class CertificateListCards extends StatelessWidget {

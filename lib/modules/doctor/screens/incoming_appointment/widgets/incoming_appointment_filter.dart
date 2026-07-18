@@ -1,5 +1,6 @@
+import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
-import '../../../../../core/models/doctor/incoming_appointment_model.dart';
+import '../../../../patient/models/appointment/incoming_appointment_model.dart';
 
 class IncomingAppointmentCard extends StatelessWidget {
   final IncomingAppointmentModel appointment;
@@ -26,7 +27,7 @@ class IncomingAppointmentCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(.05),
+            color: Colors.black.transparency(.05),
             blurRadius: 18,
             offset: const Offset(0, 8),
           ),

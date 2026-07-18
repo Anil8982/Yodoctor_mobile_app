@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
 import '../../../doctor/controllers/live_queue_controller.dart';
-import '../../../../core/models/doctor/prescription_model.dart';
 
 class AddPrescriptionScreen extends ConsumerStatefulWidget {
   const AddPrescriptionScreen({

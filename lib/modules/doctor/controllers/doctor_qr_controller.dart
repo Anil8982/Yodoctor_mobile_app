@@ -5,7 +5,7 @@ import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
-import '../../../../core/models/doctor/doctor_qr_model.dart';
+import '../models/qr/doctor_qr_model.dart';
 import '../repositories/doctor_qr_repository.dart';
 
 class DoctorQrState {

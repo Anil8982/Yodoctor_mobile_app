@@ -1,9 +1,9 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
+import 'package:yodoctor/modules/doctor/models/certificate/doctor_certificate_detail_model.dart';
+import 'package:yodoctor/modules/doctor/models/certificate/doctor_document_model.dart';
 import 'document_preview_tile.dart';
-import '../../../../../core/models/doctor/doctor_certificate_detail_model.dart';
-import '../../../../../core/models/doctor/doctor_document_model.dart';
 
 class PatientInfoPanel extends StatelessWidget {
   const PatientInfoPanel({

@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
-import '../../../core/models/doctor/doctor_certificate_request_model.dart';
+import 'package:yodoctor/modules/doctor/models/certificate/doctor_certificate_request_model.dart';
 import '../repositories/doctor_certificate_repository.dart';
 
 class CertificateState {

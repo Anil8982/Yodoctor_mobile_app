@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
-import '../../../../core/models/doctor/doctor_profile_model.dart';
+import '../models/dashboard/doctor_profile_model.dart';
 import '../repositories/doctor_profile_repository.dart';
 
 class ProfileFormState {

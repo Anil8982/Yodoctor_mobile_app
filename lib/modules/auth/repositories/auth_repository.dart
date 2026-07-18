@@ -1,4 +1,4 @@
-import 'package:yodoctor/core/models/auth/login_response.dart';
+import 'package:yodoctor/modules/auth/models/login_response.dart';
 
 abstract class AuthRepository {
   Future<LoginResponse> signInWithEmail({

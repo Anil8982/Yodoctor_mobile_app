@@ -2,6 +2,7 @@ import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:yodoctor/modules/doctor/models/appointment/appointment_history_item.dart';
 
 import '../../../../core/utils/app_spacing.dart';
 import '../../../../core/utils/responsive.dart';
@@ -13,7 +14,6 @@ import 'widgets/history_toolbar.dart';
 import 'widgets/appointment_history_table.dart';
 import 'widgets/mobile_appointment_list.dart';
 import 'package:yodoctor/modules/doctor/controllers/doctor_profile_controller.dart';
-import '../../../../core/models/appointment_history_item.dart';
 
 class DoctorAppointmentHistoryScreen extends ConsumerStatefulWidget {
   const DoctorAppointmentHistoryScreen({super.key});

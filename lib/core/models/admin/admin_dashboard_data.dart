@@ -1,4 +1,4 @@
-import 'package:yodoctor/core/models/patient/patient_appointment.dart';
+import 'package:yodoctor/core/models/admin/patient_appointment.dart';
 
 import 'admin_user.dart';
 

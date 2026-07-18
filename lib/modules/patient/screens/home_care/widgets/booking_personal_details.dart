@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:yodoctor/core/models/patient/home_service_booking_model.dart';
+import 'package:yodoctor/modules/patient/models/home_care/home_service_booking_model.dart';
 import 'package:yodoctor/core/utils/input_decoration_helper.dart';
 import 'package:yodoctor/modules/patient/controllers/home_service_controller.dart';
 

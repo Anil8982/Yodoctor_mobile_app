@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
-import '../../../core/models/doctor/doctor_certificate_detail_model.dart';
-import '../../../core/models/doctor/doctor_document_model.dart';
+import 'package:yodoctor/modules/doctor/models/certificate/doctor_certificate_detail_model.dart';
+import 'package:yodoctor/modules/doctor/models/certificate/doctor_document_model.dart';
 import '../repositories/doctor_certificate_repository.dart';
 
 class DoctorCertificateReviewState {

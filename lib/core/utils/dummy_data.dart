@@ -1,19 +1,16 @@
-export '../models/appointment_history_item.dart';
-export '../models/patient/doctor_profile.dart';
-export '../models/patient/family_member.dart';
-export '../models/patient/patient_appointment.dart';
-export '../models/patient/patient_dashboard_data.dart';
-export '../models/patient/patient_token.dart';
-export '../models/patient/patient_user.dart';
-import 'package:flutter/material.dart';
+export '../models/admin/doctor_profile.dart';
+export '../models/admin/patient_appointment.dart';
+export '../models/admin/patient_dashboard_data.dart';
+export '../models/admin/patient_token.dart';
+export '../../modules/auth/models/patient_user.dart';
 import 'package:yodoctor/core/models/admin/admin_dashboard_data.dart';
 import 'package:yodoctor/core/models/admin/admin_user.dart';
 import 'package:yodoctor/core/models/admin/home_care_booking_model.dart';
-import 'package:yodoctor/core/models/notification_item.dart';
 import 'package:yodoctor/core/models/admin/enquiry_model.dart';
 
-import '../models/patient/doctor_profile.dart';
-import '../models/patient/patient_appointment.dart';
+import '../../modules/notifications/models/notification_model.dart';
+import '../models/admin/doctor_profile.dart';
+import '../models/admin/patient_appointment.dart';
 
 class DummyData {
   const DummyData._();
@@ -53,16 +50,6 @@ class DummyData {
     ];
   }
 
-  static final List<NotificationItem> dummyNotifications = <NotificationItem>[
-    NotificationItem(
-      id: 'NOTIF-1',
-      title: 'New Booking Request',
-      description: 'Aditya Patil has booked an appointment for Morning Shift.',
-      timestamp: DateTime.now(),
-      icon: Icons.calendar_today_rounded,
-      iconColor: Colors.blue,
-    ),
-  ];
 
   // ================= ADMIN DASHBOARD =================
 
@@ -155,5 +142,104 @@ class DummyData {
   static Future<List<HomeCareBookingModel>> refreshHomeCareBookings() async {
     await Future<void>.delayed(const Duration(milliseconds: 800));
     return List<HomeCareBookingModel>.from(homeCareBookings);
+  }
+}
+
+
+class DummyNotifications {
+  DummyNotifications._();
+
+  static List<NotificationModel> getNotifications() {
+    final now = DateTime.now();
+
+    return [
+      // Today - Unread
+      NotificationModel(
+        id: 1,
+        title: 'Appointment Confirmed',
+        message: 'Your appointment with Dr. Sharma has been confirmed for tomorrow at 10:30 AM.',
+        appointmentId: 120,
+        isRead: false,
+        createdAt: now.subtract(const Duration(hours: 2)),
+      ),
+      NotificationModel(
+        id: 2,
+        title: 'New Patient Assigned',
+        message: 'A new patient Rajesh Kumar has been assigned to your queue.',
+        appointmentId: 121,
+        isRead: false,
+        createdAt: now.subtract(const Duration(hours: 5)),
+      ),
+
+      // Today - Read
+      NotificationModel(
+        id: 3,
+        title: 'Certificate Approved',
+        message: 'Your medical certificate request #45 has been approved.',
+        appointmentId: null,
+        isRead: true,
+        createdAt: now.subtract(const Duration(hours: 8)),
+      ),
+      NotificationModel(
+        id: 4,
+        title: 'Profile Updated',
+        message: 'Your profile information has been successfully updated.',
+        appointmentId: null,
+        isRead: true,
+        createdAt: now.subtract(const Duration(hours: 12)),
+      ),
+
+      // Older - Unread
+      NotificationModel(
+        id: 5,
+        title: 'Subscription Expiring',
+        message: 'Your premium subscription will expire in 3 days. Renew now to continue.',
+        appointmentId: null,
+        isRead: false,
+        createdAt: now.subtract(const Duration(days: 1, hours: 4)),
+      ),
+      NotificationModel(
+        id: 6,
+        title: 'Payment Received',
+        message: 'Payment of ₹500 received for appointment #120.',
+        appointmentId: 120,
+        isRead: false,
+        createdAt: now.subtract(const Duration(days: 1, hours: 10)),
+      ),
+
+      // Older - Read
+      NotificationModel(
+        id: 7,
+        title: 'System Update',
+        message: 'YoDoctor app has been updated to version 2.1.0 with new features.',
+        appointmentId: null,
+        isRead: true,
+        createdAt: now.subtract(const Duration(days: 2)),
+      ),
+      NotificationModel(
+        id: 8,
+        title: 'Weekly Report',
+        message: 'Your weekly consultation report is now available.',
+        appointmentId: null,
+        isRead: true,
+        createdAt: now.subtract(const Duration(days: 3)),
+      ),
+      NotificationModel(
+        id: 9,
+        title: 'Appointment Cancelled',
+        message: 'Patient Priya Patel cancelled appointment #115.',
+        appointmentId: 115,
+        isRead: true,
+        createdAt: now.subtract(const Duration(days: 4)),
+      ),
+      NotificationModel(
+        id: 10,
+        title: 'New Review',
+        message: 'You received a 5-star review from patient Amit Verma.',
+        appointmentId: null,
+        isRead: true,
+        createdAt: now.subtract(const Duration(days: 5)),
+      ),
+    ];
   }
 }

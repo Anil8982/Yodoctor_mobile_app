@@ -127,9 +127,10 @@ class ApiConstants {
   static const manualBooking = '/doctor/manualbooking';
 
   // --- Notifications ---
-  static const notifications = '/notifications';
-  static const unreadNotifications = '/notifications/unread-count';
-  static const readAllNotifications = '/notifications/read-all';
+  static const String getNotifications = '/notifications';
+  static const String unreadCount = '/notifications/unread-count';
+  static const String readNotification = '/notifications/'; // :id/read
+  static const String readAllNotifications = '/notifications/read-all';
 
   // --- Doctor Subscription & Billing ---
   static const activeSubscription = '/subscriptions/active';

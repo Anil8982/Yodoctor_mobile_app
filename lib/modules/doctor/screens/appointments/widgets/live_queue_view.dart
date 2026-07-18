@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
 
 import '../../../controllers/live_queue_controller.dart';
-import '../../../../../core/models/doctor/live_queue_model.dart';
+import '../../../models/appointment/live_queue_model.dart';
 import '../../../screens/appointments/add_prescription_screen.dart';
 import '../../../../doctor/screens/incoming_appointment/incoming_appointment_screen.dart';
 
@@ -597,7 +597,7 @@ class _LiveQueueViewState extends ConsumerState<LiveQueueView> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(.12),
+        color: color.transparency(.12),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(

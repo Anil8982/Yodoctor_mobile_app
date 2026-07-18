@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:chroma_kit/chroma_kit.dart';
-import 'package:yodoctor/core/models/doctor/subscription_model.dart';
+import 'package:yodoctor/modules/doctor/models/subscription/subscription_model.dart';
 
 class MainPlanCard extends StatelessWidget {
   final SubscriptionPlan plan;

@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:yodoctor/core/models/patient/doctor_profile.dart';
+import 'package:yodoctor/core/models/admin/doctor_profile.dart';
 import 'package:yodoctor/core/utils/dummy_data.dart';
 
 class DoctorsManagementState {

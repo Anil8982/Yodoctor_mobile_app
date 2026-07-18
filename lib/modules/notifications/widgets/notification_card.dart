@@ -1,7 +1,7 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
-import '../../../../../core/models/doctor/notification_model.dart';
+import '../models/notification_model.dart';
 
 class NotificationCard extends StatelessWidget {
   const NotificationCard({
@@ -42,7 +42,9 @@ class NotificationCard extends StatelessWidget {
               radius: 20,
               backgroundColor: colorScheme.primaryContainer,
               child: Icon(
-                Icons.notifications_rounded,
+                notification.appointmentId != null
+                    ? Icons.calendar_today_rounded
+                    : Icons.notifications_rounded,
                 color: colorScheme.primary,
                 size: 20,
               ),
@@ -71,7 +73,7 @@ class NotificationCard extends StatelessWidget {
                         Container(
                           width: 10,
                           height: 10,
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             color: Colors.red,
                             shape: BoxShape.circle,
                           ),

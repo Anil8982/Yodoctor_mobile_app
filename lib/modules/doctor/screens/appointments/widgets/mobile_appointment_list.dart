@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:yodoctor/core/models/appointment_history_item.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
+import 'package:yodoctor/modules/doctor/models/appointment/appointment_history_item.dart';
 
 class MobileAppointmentList extends StatelessWidget {
   const MobileAppointmentList({

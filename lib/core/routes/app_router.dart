@@ -474,7 +474,7 @@ import 'package:yodoctor/modules/doctor/screens/certificate/certificate_review_s
 import 'package:yodoctor/modules/doctor/screens/certificate/doctor_certificate_dashboard_screen.dart';
 import 'package:yodoctor/modules/doctor/screens/dashboard/doctor_dashboard_screen.dart';
 import 'package:yodoctor/modules/doctor/screens/manual_booking/manual_booking_screen.dart';
-import 'package:yodoctor/modules/doctor/screens/notifications/notification_screen.dart';
+import 'package:yodoctor/modules/notifications/screens/notification_screen.dart';
 import 'package:yodoctor/modules/doctor/screens/profile/doctor_profile_edit_screen.dart';
 import 'package:yodoctor/modules/doctor/screens/profile/doctor_profile_screen.dart';
 import 'package:yodoctor/modules/doctor/screens/qr/doctor_qr_screen.dart';
@@ -838,7 +838,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         parentNavigatorKey: AppRouter.rootNavigatorKey,
-        path: AppRoutes.doctorNotifications,
+        path: AppRoutes.notifications,
         builder: (context, state) => const NotificationScreen(),
       ),
       GoRoute(

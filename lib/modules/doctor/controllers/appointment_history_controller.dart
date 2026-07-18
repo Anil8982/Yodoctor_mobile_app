@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
-import '../../../../core/models/appointment_history_item.dart';
+import 'package:yodoctor/modules/doctor/models/appointment/appointment_history_item.dart';
 import '../repositories/doctor_appointment_repository.dart';
 
 enum DoctorAppointmentFilter { today, lastSevenDays, all }

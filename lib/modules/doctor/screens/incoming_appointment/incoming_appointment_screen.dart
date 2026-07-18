@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../controllers/incoming_appointment_controller.dart';
-import '../../../../core/models/doctor/incoming_appointment_model.dart';
+import '../../../patient/models/appointment/incoming_appointment_model.dart';
 import '../incoming_appointment/widgets/incoming_appointment_filter.dart';
 
 class IncomingAppointmentScreen extends ConsumerStatefulWidget {

@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
-import 'package:yodoctor/core/models/patient/booking_state_model.dart';
+import 'package:yodoctor/modules/patient/models/lab/booking_state_model.dart';
 
 class LabBookingNotifier extends Notifier<BookingStateModel> {
   static const String _subTag = 'LabBookingNotifier';

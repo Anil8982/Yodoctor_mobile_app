@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:chroma_kit/chroma_kit.dart';
-import 'package:yodoctor/core/models/doctor/available_plan_model.dart';
+import 'package:yodoctor/modules/doctor/models/subscription/available_plan_model.dart';
 import '../../../controllers/subscription_controller.dart';
 
 class SubscriptionPricingCard extends ConsumerWidget {

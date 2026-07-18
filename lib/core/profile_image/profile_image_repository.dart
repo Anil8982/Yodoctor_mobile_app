@@ -5,7 +5,7 @@ import 'package:mime/mime.dart';
 import 'package:yodoctor/core/constants/api_constants.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
 import 'package:yodoctor/core/network/dio_provider.dart';
-import 'package:yodoctor/core/models/profile_image_response.dart';
+import 'package:yodoctor/core/profile_image/profile_image_response.dart';
 
 final profileImageRepoProvider = Provider<ProfileImageRepository>((ref) {
   return ProfileImageRepository(ref.read(dioProvider));

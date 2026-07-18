@@ -2,8 +2,8 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
-import 'package:yodoctor/core/models/doctor/subscription_model.dart';
-import 'package:yodoctor/core/models/doctor/available_plan_model.dart';
+import 'package:yodoctor/modules/doctor/models/subscription/available_plan_model.dart';
+import 'package:yodoctor/modules/doctor/models/subscription/subscription_model.dart';
 import '../repositories/subscription_repository.dart';
 
 class DoctorSubscriptionState {

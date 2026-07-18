@@ -1,6 +1,6 @@
 import 'patient_appointment.dart';
 import 'patient_token.dart';
-import 'patient_user.dart';
+import '../../../modules/auth/models/patient_user.dart';
 
 class PatientDashboardData {
   const PatientDashboardData({

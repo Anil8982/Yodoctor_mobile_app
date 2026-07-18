@@ -7,7 +7,7 @@ import 'package:yodoctor/modules/widgets/logout_dialog.dart';
 import '../../../core/routes/app_routes.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/app_spacing.dart';
-import '../../../core/models/doctor/doctor_profile_model.dart';
+import '../models/dashboard/doctor_profile_model.dart';
 
 class DoctorDrawer extends ConsumerWidget {
   const DoctorDrawer({super.key, required this.doctor});

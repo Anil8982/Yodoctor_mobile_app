@@ -5,7 +5,7 @@ import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/network/dio_provider.dart';
 import 'package:yodoctor/core/providers/storage_provider.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
-import 'package:yodoctor/core/models/auth/login_response.dart';
+import 'package:yodoctor/modules/auth/models/login_response.dart';
 import 'package:yodoctor/core/storage/storage_service.dart';
 import 'auth_repository.dart';
 

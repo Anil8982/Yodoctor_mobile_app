@@ -2,8 +2,8 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
-import '../../../core/models/doctor/prescription_model.dart';
-import '../../../core/models/doctor/live_queue_model.dart';
+import '../models/appointment/prescription_model.dart';
+import '../models/appointment/live_queue_model.dart';
 import '../repositories/doctor_appointment_repository.dart';
 
 class LiveQueueState {

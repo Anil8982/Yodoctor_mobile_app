@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
-import 'package:yodoctor/core/models/patient/patient_user.dart';
+import 'package:yodoctor/modules/auth/models/patient_user.dart';
 
 class GoogleAuthService {
   GoogleAuthService({

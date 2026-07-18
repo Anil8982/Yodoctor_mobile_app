@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
-import '../../../core/models/doctor/doctor_dashboard_data.dart';
+import '../models/dashboard/doctor_dashboard_data.dart';
 import '../repositories/doctor_dashboard_repository.dart';
 
 final doctorDashboardProvider =

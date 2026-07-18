@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:yodoctor/core/models/patient/booking_state_model.dart';
+import 'package:yodoctor/modules/patient/models/lab/booking_state_model.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/core/utils/input_decoration_helper.dart';
 import 'package:yodoctor/modules/patient/controllers/booking_controller.dart';

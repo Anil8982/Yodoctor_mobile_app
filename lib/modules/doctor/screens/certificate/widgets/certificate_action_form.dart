@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
-import '../../../../../core/models/doctor/doctor_certificate_detail_model.dart';
+import 'package:yodoctor/modules/doctor/models/certificate/doctor_certificate_detail_model.dart';
 import 'status_chip_selector.dart';
 
 class CertificateActionForm extends StatelessWidget {
