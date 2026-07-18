@@ -23,45 +23,33 @@ class HeroSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final topPadding = MediaQuery.of(context).padding.top;
 
     return GradientBackground(
-      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(32)),
-      padding: EdgeInsets.fromLTRB(
-        AppSpacing.xl,
-        topPadding + 60,
-        AppSpacing.xl,
-        AppSpacing.sm,
-      ),
+      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(0)),
+      padding: EdgeInsets.fromLTRB(AppSpacing.xl, topPadding + 70, AppSpacing.xl, AppSpacing.xxl),
       child: Column(
         children: <Widget>[
-          Text(
-            'Your Doctor, Your Health',
-            style: theme.textTheme.headlineMedium?.copyWith(
-              color: colorScheme.onPrimary,
-              fontWeight: FontWeight.w800,
-              height: 1.10,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.md),
-
+          // Text(
+          //   'Your Doctor, Your Health',
+          //   style: theme.textTheme.headlineMedium?.copyWith(
+          //     color: colorScheme.onPrimary,
+          //     fontWeight: FontWeight.w900,
+          //   ),
+          // ),
+          // const SizedBox(height: AppSpacing.xl),
           _buildSearchWrapper(
             colorScheme,
             child: AppSearchField(
               controller: locationController,
-              hintText: 'Search city',
+              hintText: 'Location',
               onChanged: onLocationChanged,
-              prefixIcon: Icon(
-                Icons.location_on_rounded,
-                color: colorScheme.primary,
-              ),
+              prefixIcon: Icon(Icons.location_on_rounded, color: colorScheme.primary),
             ),
           ),
-
-          const SizedBox(height: AppSpacing.sm),
-
+          const SizedBox(height: AppSpacing.md),
           Row(
             children: [
               Expanded(
@@ -71,14 +59,9 @@ class HeroSection extends StatelessWidget {
                     colorScheme,
                     child: AppSearchField(
                       controller: searchController,
-                      hintText: 'Search doctor, specialty, clinic',
-                      textInputAction: TextInputAction.search,
+                      hintText: 'Search doctors...',
                       onChanged: onQueryChanged,
-                      onSubmitted: (_) => onSearchTap(),
-                      prefixIcon: Icon(
-                        Icons.search_rounded,
-                        color: colorScheme.primary,
-                      ),
+                      prefixIcon: Icon(Icons.search_rounded, color: colorScheme.primary),
                     ),
                   ),
                 ),
@@ -103,10 +86,7 @@ class HeroSection extends StatelessWidget {
           color: colorScheme.primaryContainer,
           borderRadius: BorderRadius.circular(16),
         ),
-        child: Icon(
-          Icons.arrow_forward_rounded,
-          color: colorScheme.onPrimaryContainer,
-        ),
+        child: Icon(Icons.arrow_forward_rounded, color: colorScheme.onPrimaryContainer),
       ),
     );
   }
