@@ -78,7 +78,7 @@ class ProfileInfoCard extends StatelessWidget {
               label: "Phone Number",
               icon: Icons.phone_android_rounded,
               controller: controller.mobileController,
-              isEditing: isEditing,
+              isEditing: false,
               inputFormatters: [
                 FilteringTextInputFormatter.digitsOnly,
                 LengthLimitingTextInputFormatter(10),
@@ -99,26 +99,6 @@ class ProfileInfoCard extends StatelessWidget {
             ),
 
             buildDivider(),
-
-            // ProfileTextField(
-            //   label: "Gender",
-            //   icon: Icons.wc_rounded,
-            //   controller: controller.genderController,
-            //   isEditing: isEditing,
-            //   validator: (value) {
-            //     final gender = value?.trim().toLowerCase();
-            //
-            //     if (gender == null || gender.isEmpty) {
-            //       return "Enter gender";
-            //     }
-            //
-            //     if (!['male', 'female', 'other'].contains(gender)) {
-            //       return "Enter Male, Female or Other";
-            //     }
-            //
-            //     return null;
-            //   },
-            //
 
             ProfileDropdownField(
               label: "GENDER",

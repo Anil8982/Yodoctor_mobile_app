@@ -37,7 +37,15 @@ class ProfileDropdownField extends StatelessWidget {
             items: items.map((String item) {
               return DropdownMenuItem<String>(
                 value: item,
-                child: Text(item, style: const TextStyle(fontWeight: FontWeight.w700)),
+                child: Text(
+                  item,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    color: colorScheme.onSurface.transparency(
+                      isEditing ? 1.0 : 0.9,
+                    ),
+                  ),
+                ),
               );
             }).toList(),
             decoration: InputDecoration(
@@ -48,17 +56,34 @@ class ProfileDropdownField extends StatelessWidget {
                 fontSize: 12,
               ),
               prefixIcon: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Icon(
-                  icon,
-                  size: 22,
-                  color: !isEditing ? colorScheme.primary : colorScheme.secondary.transparency(0.9),
+                padding: const EdgeInsets.fromLTRB(2, 2, 10, 2),
+                child: Container(
+                  height: 30,
+                  width: 30,
+                  decoration: BoxDecoration(
+                    color: !isEditing
+                        ? colorScheme.primary.transparency(0.1)
+                        : colorScheme.secondary.transparency(0.1),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Icon(
+                    icon,
+                    color: !isEditing
+                        ? colorScheme.primary
+                        : colorScheme.secondary,
+                    size: 26,
+                  ),
                 ),
               ),
               border: InputBorder.none,
               enabledBorder: InputBorder.none,
               focusedBorder: isEditing
-                  ? UnderlineInputBorder(borderSide: BorderSide(color: colorScheme.primary, width: 2))
+                  ? UnderlineInputBorder(
+                      borderSide: BorderSide(
+                        color: colorScheme.primary,
+                        width: 2,
+                      ),
+                    )
                   : InputBorder.none,
               contentPadding: const EdgeInsets.fromLTRB(50, 16, 30, 16),
             ),

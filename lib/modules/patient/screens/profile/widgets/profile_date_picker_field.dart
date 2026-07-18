@@ -40,34 +40,48 @@ class _ProfileDatePickerFieldState extends State<ProfileDatePickerField> {
       child: InkWell(
         onTap: widget.isEditing
             ? () async {
-          setState(() => _isFocused = true);
+                setState(() => _isFocused = true);
 
-          await widget.onTap?.call();
+                await widget.onTap?.call();
 
-          setState(() => _isFocused = false);
-        }
+                setState(() => _isFocused = false);
+              }
             : null,
         borderRadius: BorderRadius.circular(12),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.fromLTRB(2, 12, 12, 12),
           decoration: BoxDecoration(
             border: _isFocused
                 ? Border(
-              bottom: BorderSide(color: colorScheme.primary, width: 2),
-            )
+                    bottom: BorderSide(color: colorScheme.primary, width: 2),
+                  )
                 : null,
           ),
           child: Row(
             children: [
-              Icon(
-                widget.icon,
-                size: 22,
-                color: !widget.isEditing
-                    ? colorScheme.primary
-                    : colorScheme.secondary.transparency(0.9),
+              SizedBox(
+                width: 36,
+                height: 44,
+                child: Container(
+                  height: 30,
+                  width: 30,
+                  decoration: BoxDecoration(
+                    color: !widget.isEditing
+                        ? colorScheme.primary.transparency(0.1)
+                        : colorScheme.secondary.transparency(0.1),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Icon(
+                    widget.icon,
+                    color: !widget.isEditing
+                        ? colorScheme.primary
+                        : colorScheme.secondary,
+                    size: 26,
+                  ),
+                ),
               ),
 
-              const SizedBox(width: 18),
+              const SizedBox(width: 16),
 
               Expanded(
                 child: Column(
@@ -100,7 +114,7 @@ class _ProfileDatePickerFieldState extends State<ProfileDatePickerField> {
 
               if (widget.isEditing)
                 Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
+                  padding: const EdgeInsets.only(right: 10.0),
                   child: Icon(
                     Icons.edit_note_rounded,
                     color: colorScheme.primary,
