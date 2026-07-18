@@ -1,3 +1,4 @@
+import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 
 class SpecialtyCardList extends StatelessWidget {
@@ -43,10 +44,7 @@ class SpecialtyCardList extends StatelessWidget {
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [
-                    baseColor.withValues(alpha: 0.9),
-                    baseColor,
-                  ],
+                  colors: [baseColor.withValues(alpha: 0.9), baseColor],
                 ),
                 boxShadow: [
                   BoxShadow(
@@ -124,38 +122,110 @@ class SpecialtyCardList extends StatelessWidget {
     );
   }
 
+  // Map<String, dynamic> _getStyle(String name, ColorScheme colorScheme) {
+  //   final n = name.toLowerCase();
+  //   if (n.contains('cardi')) {
+  //     return {
+  //       'icon': Icons.favorite_rounded,
+  //       'color': colorScheme.error,
+  //       'onColor': colorScheme.onError,
+  //     };
+  //   } else if (n.contains('neuro')) {
+  //     return {
+  //       'icon': Icons.psychology_rounded,
+  //       'color': colorScheme.primary,
+  //       'onColor': colorScheme.onPrimary,
+  //     };
+  //   } else if (n.contains('pedia')) {
+  //     return {
+  //       'icon': Icons.child_care_rounded,
+  //       'color': colorScheme.secondary,
+  //       'onColor': colorScheme.onSecondary,
+  //     };
+  //   } else if (n.contains('dent')) {
+  //     return {
+  //       'icon': Icons.health_and_safety_rounded,
+  //       'color': colorScheme.tertiary,
+  //       'onColor': colorScheme.onTertiary,
+  //     };
+  //   } else {
+  //     return {
+  //       'icon': Icons.medical_services_rounded,
+  //       'color': colorScheme.primary,
+  //       'onColor': colorScheme.onPrimary,
+  //     };
+  //   }
+  // }
+
+  // Map<String, dynamic> _getStyle(String name, ColorScheme colorScheme) {
+  //
+  //   final Color baseColor = ChromaKitUtils.fromString(name);
+  //
+  //   final Color onColor = baseColor.contrastColor;
+  //
+  //   IconData icon = Icons.medical_services_rounded;
+  //   if (name.toLowerCase().contains('cardi')) icon = Icons.favorite_rounded;
+  //   else if (name.toLowerCase().contains('neuro')) icon = Icons.psychology_rounded;
+  //   else if (name.toLowerCase().contains('pedia')) icon = Icons.child_care_rounded;
+  //   else if (name.toLowerCase().contains('dent')) icon = Icons.health_and_safety_rounded;
+  //
+  //   return {
+  //     'icon': icon,
+  //     'color': baseColor,
+  //     'onColor': onColor,
+  //   };
+  // }
+
+  // Map<String, dynamic> _getStyle(String name, ColorScheme colorScheme) {
+  //   final String n = name.toLowerCase();
+  //
+  //   final Map<String, IconData> iconMap = {
+  //     'cardi': Icons.favorite_rounded,
+  //     'neuro': Icons.psychology_rounded,
+  //     'pedia': Icons.child_care_rounded,
+  //     'dent': Icons.health_and_safety_rounded,
+  //   };
+  //
+  //   IconData icon = Icons.medical_services_rounded;
+  //   for (final key in iconMap.keys) {
+  //     if (n.contains(key)) {
+  //       icon = iconMap[key]!;
+  //       break;
+  //     }
+  //   }
+  //
+  //   final Color baseColor = ChromaKitUtils.fromString(name).pastel(0.2);
+  //
+  //   final Color onColor = baseColor.contrastColor;
+  //
+  //   return {
+  //     'icon': icon,
+  //     'color': baseColor,
+  //     'onColor': onColor,
+  //   };
+  // }
+
   Map<String, dynamic> _getStyle(String name, ColorScheme colorScheme) {
-    final n = name.toLowerCase();
-    if (n.contains('cardi')) {
-      return {
-        'icon': Icons.favorite_rounded,
-        'color': colorScheme.error,
-        'onColor': colorScheme.onError,
-      };
-    } else if (n.contains('neuro')) {
-      return {
-        'icon': Icons.psychology_rounded,
-        'color': colorScheme.primary,
-        'onColor': colorScheme.onPrimary,
-      };
-    } else if (n.contains('pedia')) {
-      return {
-        'icon': Icons.child_care_rounded,
-        'color': colorScheme.secondary,
-        'onColor': colorScheme.onSecondary,
-      };
-    } else if (n.contains('dent')) {
-      return {
-        'icon': Icons.health_and_safety_rounded,
-        'color': colorScheme.tertiary,
-        'onColor': colorScheme.onTertiary,
-      };
-    } else {
-      return {
-        'icon': Icons.medical_services_rounded,
-        'color': colorScheme.primary,
-        'onColor': colorScheme.onPrimary,
-      };
-    }
+    final String n = name.toLowerCase();
+
+    final Map<String, IconData> iconMap = {
+      'cardi': Icons.favorite_rounded,
+      'neuro': Icons.psychology_rounded,
+      'pedia': Icons.child_care_rounded,
+      'dent': Icons.health_and_safety_rounded,
+    };
+
+    final icon = iconMap.entries
+        .firstWhere(
+          (entry) => n.contains(entry.key),
+          orElse: () => const MapEntry('', Icons.medical_services_rounded),
+        )
+        .value;
+
+    final Color baseColor = ChromaKitUtils.avatarColor(name).pastel(0.1);
+
+    final Color onColor = baseColor.contrastColor;
+
+    return {'icon': icon, 'color': baseColor, 'onColor': onColor};
   }
 }

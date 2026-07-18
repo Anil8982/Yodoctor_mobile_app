@@ -3,6 +3,7 @@ class AppRoutes {
 
   static const String root = '/';
   static const String landing = root;
+  static const String splash = "/splash";
 
   static const String patientLogin = '/auth/patient/login';
   static const String patientRegister = '/auth/patient/register';
@@ -32,7 +33,6 @@ class AppRoutes {
   static const String labSlotBooking = '/lab-test/lab-cart/lab-slot-booking';
 
   static const String notifications = '/notifications';
-
 
   static const String homeServiceBooking = '/home-service-booking';
 
