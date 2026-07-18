@@ -33,9 +33,9 @@ class HomeServiceBookingState {
 }
 
 final homeServiceBookingProvider =
-NotifierProvider<HomeServiceBookingNotifier, HomeServiceBookingState>(
-  HomeServiceBookingNotifier.new,
-);
+    NotifierProvider<HomeServiceBookingNotifier, HomeServiceBookingState>(
+      HomeServiceBookingNotifier.new,
+    );
 
 class HomeServiceBookingNotifier extends Notifier<HomeServiceBookingState> {
   static const String _subTag = 'HomeServiceBookingNotifier';
@@ -112,7 +112,11 @@ class HomeServiceBookingNotifier extends Notifier<HomeServiceBookingState> {
       "notes": model.additionalNotes,
     };
 
-    AppLogger.info('Submitting home care request pipeline', tag: LogTags.patient, subTag: _subTag);
+    AppLogger.info(
+      'Submitting home care request pipeline',
+      tag: LogTags.patient,
+      subTag: _subTag,
+    );
 
     try {
       final repository = ref.read(patientHomeCareRepositoryProvider);
@@ -123,21 +127,37 @@ class HomeServiceBookingNotifier extends Notifier<HomeServiceBookingState> {
       // 🎯 FIXED FINAL: Removed redundant null-check condition to resolve dead code matching contract analyzer flawlessly
       if (statusCode! >= 200 && statusCode < 300) {
         state = state.copyWith(isLoading: false);
-        AppLogger.success('Home care service instance deployed successfully', tag: LogTags.patient, subTag: _subTag);
+        AppLogger.success(
+          'Home care service instance deployed successfully',
+          tag: LogTags.patient,
+          subTag: _subTag,
+        );
         return response.data["success"] == true;
       } else {
-        final msg = response.data["message"] ?? "Booking failed from server edge";
+        final msg =
+            response.data["message"] ?? "Booking failed from server edge";
         state = state.copyWith(errorMessage: msg, isLoading: false);
         return false;
       }
     } catch (e, st) {
-      state = state.copyWith(errorMessage: "Booking runtime failure. Retry setup.", isLoading: false);
-      AppLogger.exception(e, st, message: 'Home care booking fatal execution failure', tag: LogTags.patient, subTag: _subTag);
+      state = state.copyWith(
+        errorMessage: "Booking runtime failure. Retry setup.",
+        isLoading: false,
+      );
+      AppLogger.exception(
+        e,
+        st,
+        message: 'Home care booking fatal execution failure',
+        tag: LogTags.patient,
+        subTag: _subTag,
+      );
       return false;
     }
   }
 
-  Future<void> fetchCurrentLocation(TextEditingController addressController) async {
+  Future<void> fetchCurrentLocation(
+    TextEditingController addressController,
+  ) async {
     if (state.isLoading) return;
     state = state.copyWith(isLoading: true, clearError: true);
 
@@ -148,7 +168,9 @@ class HomeServiceBookingNotifier extends Notifier<HomeServiceBookingState> {
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) throw Exception("Location permission denied.");
+        if (permission == LocationPermission.denied) {
+          throw Exception("Location permission denied.");
+        }
       }
 
       if (permission == LocationPermission.deniedForever) {
@@ -156,7 +178,9 @@ class HomeServiceBookingNotifier extends Notifier<HomeServiceBookingState> {
       }
 
       final Position position = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+        ),
       );
 
       // 🎯 FIXED OPTIMIZATION: Utilizing pre-allocated instance reference context cleanly
@@ -168,7 +192,14 @@ class HomeServiceBookingNotifier extends Notifier<HomeServiceBookingState> {
 
       if (placemarks.isNotEmpty) {
         final place = placemarks.first;
-        address = "${place.street}, ${place.subLocality}, ${place.locality}, ${place.administrativeArea}, ${place.postalCode}";
+
+        address = [
+          place.street,
+          place.subLocality,
+          place.locality,
+          place.administrativeArea,
+          place.postalCode,
+        ].where((value) => value != null && value.trim().isNotEmpty).join(', ');
       }
 
       addressController.text = address;
@@ -182,8 +213,17 @@ class HomeServiceBookingNotifier extends Notifier<HomeServiceBookingState> {
         ),
       );
     } catch (e, st) {
-      state = state.copyWith(errorMessage: e.toString().replaceFirst("Exception: ", ""), isLoading: false);
-      AppLogger.exception(e, st, message: 'Location hardware link telemetry failure', tag: LogTags.patient, subTag: _subTag);
+      state = state.copyWith(
+        errorMessage: e.toString().replaceFirst("Exception: ", ""),
+        isLoading: false,
+      );
+      AppLogger.exception(
+        e,
+        st,
+        message: 'Location hardware link telemetry failure',
+        tag: LogTags.patient,
+        subTag: _subTag,
+      );
     }
   }
 }

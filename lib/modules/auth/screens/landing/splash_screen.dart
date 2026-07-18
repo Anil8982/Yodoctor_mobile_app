@@ -64,8 +64,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     // Only doctors need verification flow trigger
     // Patients and unauthenticated users rely on GoRouter redirect
     if (token != null && token.isNotEmpty && role == 'doctor') {
-      AppLogger.info('Splash: Triggering doctor verification',
-          tag: LogTags.app, subTag: 'Splash');
+      AppLogger.info(
+        'Splash: Triggering doctor verification',
+        tag: LogTags.app,
+        subTag: 'Splash',
+      );
       await ref.read(doctorStatusProvider.notifier).initialize();
     }
 
@@ -88,7 +91,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     final colorScheme = theme.colorScheme;
     final screenWidth = MediaQuery.of(context).size.width;
 
-
     return Scaffold(
       backgroundColor: colorScheme.surface,
       body: Center(
@@ -97,10 +99,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
           builder: (context, child) {
             return FadeTransition(
               opacity: _fadeAnimation,
-              child: ScaleTransition(
-                scale: _scaleAnimation,
-                child: child,
-              ),
+              child: ScaleTransition(scale: _scaleAnimation, child: child),
             );
           },
           child: Column(

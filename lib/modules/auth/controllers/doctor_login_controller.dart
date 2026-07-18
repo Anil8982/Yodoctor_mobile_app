@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
 import 'package:yodoctor/core/providers/app_role_provider.dart';
-import 'package:yodoctor/modules/auth/repository/doctor_auth_repository.dart';
+import 'package:yodoctor/modules/auth/repositories/doctor_auth_repository.dart';
 
 import 'doctor_status_controller.dart';
 

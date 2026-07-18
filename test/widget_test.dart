@@ -9,7 +9,7 @@
 //   testWidgets('Search landing renders', (WidgetTester tester) async {
 //     await tester.pumpWidget(
 //       YoDoctorApp(
-//         repository: PatientRepositoryImpl(const PatientLocalDataSource()),
+//         repositories: PatientRepositoryImpl(const PatientLocalDataSource()),
 //       ),
 //     );
 //     await tester.pumpAndSettle();

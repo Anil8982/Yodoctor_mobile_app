@@ -8,7 +8,7 @@ import 'package:yodoctor/core/providers/app_role_provider.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
 import 'package:yodoctor/modules/auth/controllers/doctor_login_controller.dart';
-import 'package:yodoctor/modules/auth/repository/patient_auth_repository.dart';
+import 'package:yodoctor/modules/auth/repositories/patient_auth_repository.dart';
 
 class LogoutDialog extends ConsumerWidget {
   const LogoutDialog({super.key, required this.role});

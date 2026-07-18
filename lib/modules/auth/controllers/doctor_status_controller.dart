@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
 import 'package:yodoctor/core/providers/storage_provider.dart';
-import 'package:yodoctor/modules/auth/repository/doctor_verification_repository.dart';
+import 'package:yodoctor/modules/auth/repositories/doctor_verification_repository.dart';
 
 // Doctor verification state model
 class DoctorStatusState {
