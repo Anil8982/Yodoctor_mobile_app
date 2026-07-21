@@ -106,7 +106,7 @@ class HomeServiceBookingNotifier extends Notifier<HomeServiceBookingState> {
       "service_type": model.selectedServiceType,
       "medical_condition": model.medicalCondition,
       "duration_type": model.durationType,
-      "number_of_days": int.tryParse(model.numberOfDays) ?? 0,
+      "number_of_days": int.tryParse(model.numberOfDays) ?? 1,
       "preferred_date": model.startDate?.toIso8601String().split("T").first,
       "time_slot": model.timePreference,
       "notes": model.additionalNotes,
@@ -225,5 +225,15 @@ class HomeServiceBookingNotifier extends Notifier<HomeServiceBookingState> {
         subTag: _subTag,
       );
     }
+  }
+
+  void resetBooking() {
+    state = const HomeServiceBookingState();
+
+    AppLogger.info(
+      'Home service booking state reset',
+      tag: LogTags.patient,
+      subTag: _subTag,
+    );
   }
 }

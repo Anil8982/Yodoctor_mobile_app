@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+import 'package:yodoctor/core/enums/auth_type.dart';
 import 'hive_boxes.dart';
 import 'hive_keys.dart';
 
@@ -53,6 +54,29 @@ class StorageService {
 
   Future<void> clearRole() async {
     await _box.delete(HiveKeys.appRole);
+  }
+
+  // ----------------------------
+  // Authentication Type
+  // ----------------------------
+
+  Future<void> saveAuthType(AuthType authType) async {
+    await _box.put(HiveKeys.authType, authType.name);
+  }
+
+  AuthType? getAuthType() {
+    final value = _box.get(HiveKeys.authType);
+
+    if (value == null) return null;
+
+    return AuthType.values.cast<AuthType?>().firstWhere(
+          (type) => type?.name == value,
+      orElse: () => null,
+    );
+  }
+
+  Future<void> clearAuthType() async {
+    await _box.delete(HiveKeys.authType);
   }
 
   // ----------------------------

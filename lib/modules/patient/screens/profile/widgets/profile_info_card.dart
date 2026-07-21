@@ -1,7 +1,6 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
 
 import '../../../controllers/profile_controller.dart';
 import 'profile_date_picker_field.dart';
@@ -69,7 +68,7 @@ class ProfileInfoCard extends StatelessWidget {
               label: "Email Address",
               icon: Icons.alternate_email_rounded,
               controller: controller.emailController,
-              isEditing: false, // Email edit नहीं होगा
+              isEditing: false,
             ),
 
             buildDivider(),
@@ -78,19 +77,24 @@ class ProfileInfoCard extends StatelessWidget {
               label: "Phone Number",
               icon: Icons.phone_android_rounded,
               controller: controller.mobileController,
-              isEditing: false,
+
+              isEditing: isEditing && controller.canEditMobile,
+
               inputFormatters: [
                 FilteringTextInputFormatter.digitsOnly,
                 LengthLimitingTextInputFormatter(10),
               ],
-              validator: (value) {
-                if (!isEditing) return null;
 
-                if (value == null || value.isEmpty) {
+              validator: (value) {
+                if (!isEditing || !controller.canEditMobile) {
+                  return null;
+                }
+
+                if (value == null || value.trim().isEmpty) {
                   return "Enter phone number";
                 }
 
-                if (!RegExp(r'^[6-9]\d{9}$').hasMatch(value)) {
+                if (!RegExp(r'^[6-9]\d{9}$').hasMatch(value.trim())) {
                   return "Enter a valid 10-digit mobile number";
                 }
 
@@ -118,9 +122,7 @@ class ProfileInfoCard extends StatelessWidget {
             ProfileDatePickerField(
               label: "Date of Birth",
               icon: Icons.cake_rounded,
-              value: DateFormat(
-                'dd MMM yyyy',
-              ).format(DateTime.parse(controller.dobController.text)),
+              value: controller.formatDob(controller.dobController.text),
               isEditing: isEditing,
               onTap: () => controller.pickDateOfBirth(context),
             ),
