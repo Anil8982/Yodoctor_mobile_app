@@ -34,6 +34,9 @@ class ProfileTextField extends StatelessWidget {
         validator: validator,
         decoration: InputDecoration(
           labelText: label,
+          hintText: controller.text.trim().isEmpty
+              ? (isEditing ? 'Enter $label' : 'Not provided')
+              : null,
           labelStyle: TextStyle(
             color: !isEditing ? colorScheme.primary : colorScheme.secondary,
             fontWeight: FontWeight.w800,

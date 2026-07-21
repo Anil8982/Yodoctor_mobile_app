@@ -95,7 +95,7 @@ class CustomSliverAppBar extends StatelessWidget {
 
   Widget _buildProfileAvatar(BuildContext context, ColorScheme colorScheme) {
     return InkWell(
-      onTap: () => context.push('/profile'),
+      onTap: () => context.push(AppRoutes.profile),
       borderRadius: BorderRadius.circular(20),
       child: Container(
         padding: const EdgeInsets.all(2),

@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:yodoctor/core/enums/auth_type.dart' show AuthType;
+import 'package:yodoctor/core/providers/storage_provider.dart';
 
 import '../repositories/patient_profile_repository.dart';
 import '../screens/profile/models/profile_model.dart';
@@ -50,6 +52,11 @@ class ProfileController extends Notifier<ProfileState> {
   final TextEditingController genderController = TextEditingController();
 
   bool _listenersInitialized = false;
+
+  bool get canEditMobile {
+    final storage = ref.read(storageProvider);
+    return storage.getAuthType() == AuthType.google;
+  }
 
   @override
   ProfileState build() {
@@ -108,6 +115,20 @@ class ProfileController extends Notifier<ProfileState> {
 
     // Store API format
     dobController.text = formattedDate;
+  }
+
+  String formatDob(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Not provided';
+    }
+
+    final date = DateTime.tryParse(value.trim());
+
+    if (date == null) {
+      return 'Not provided';
+    }
+
+    return DateFormat('dd MMM yyyy').format(date);
   }
 
   Future<void> loadProfile() async {

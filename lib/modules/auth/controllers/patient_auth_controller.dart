@@ -3,6 +3,8 @@ import 'dart:ui';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:yodoctor/core/enums/auth_type.dart';
+import 'package:yodoctor/core/providers/storage_provider.dart';
 import 'package:yodoctor/modules/auth/models/patient_user.dart';
 import 'package:yodoctor/core/providers/app_role_provider.dart';
 import 'package:yodoctor/modules/auth/repositories/patient_auth_repository.dart';
@@ -40,6 +42,7 @@ class PatientAuthController extends AsyncNotifier<PatientUser?> {
 
     state = const AsyncLoading();
     final repository = ref.read(patientAuthRepositoryProvider);
+    final storage = ref.read(storageProvider);
 
     try {
       final response = await repository.signInWithEmail(
@@ -67,6 +70,7 @@ class PatientAuthController extends AsyncNotifier<PatientUser?> {
 
       state = AsyncData(user);
 
+      await storage.saveAuthType(AuthType.email);
       ref.read(appRoleProvider.notifier).setRole(AppRole.patient);
 
       AppLogger.success(
@@ -96,7 +100,7 @@ class PatientAuthController extends AsyncNotifier<PatientUser?> {
 
     state = const AsyncLoading();
     final googleAuthService = ref.read(googleAuthServiceProvider);
-    // final storage = ref.read(storageProvider);
+    final storage = ref.read(storageProvider);
 
     state = await AsyncValue.guard(() async {
       final PatientUser? patient = await googleAuthService.signInWithGoogle();
@@ -117,6 +121,8 @@ class PatientAuthController extends AsyncNotifier<PatientUser?> {
         if (!response.success) {
           throw Exception(response.message);
         }
+
+        await storage.saveAuthType(AuthType.google);
 
         ref.read(appRoleProvider.notifier).setRole(AppRole.patient);
 

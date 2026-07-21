@@ -27,7 +27,7 @@ class HomeServiceBookingModel {
     this.needEmergencyService = false,
     this.selectedServiceType = '',
     this.durationType = '1 Day',
-    this.numberOfDays = '',
+    this.numberOfDays = '1',
     this.startDate,
     this.timePreference = '',
     this.medicalCondition = '',

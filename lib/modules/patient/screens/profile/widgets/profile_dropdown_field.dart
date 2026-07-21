@@ -30,6 +30,16 @@ class ProfileDropdownField extends StatelessWidget {
           ignoring: !isEditing,
           child: DropdownButtonFormField<String>(
             initialValue: items.contains(value) ? value : null,
+
+            hint: Text(
+              isEditing ? 'Select ${label.toLowerCase()}' : 'Not provided',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+
             onChanged: isEditing ? onChanged : null,
             dropdownColor: colorScheme.surface,
             icon: const SizedBox.shrink(),

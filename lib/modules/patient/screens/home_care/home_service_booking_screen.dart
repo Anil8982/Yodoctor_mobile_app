@@ -16,7 +16,8 @@ class HomeServiceBookingScreen extends ConsumerStatefulWidget {
       _HomeServiceBookingScreenState();
 }
 
-class _HomeServiceBookingScreenState extends ConsumerState<HomeServiceBookingScreen> {
+class _HomeServiceBookingScreenState
+    extends ConsumerState<HomeServiceBookingScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
@@ -102,11 +103,36 @@ class _HomeServiceBookingScreenState extends ConsumerState<HomeServiceBookingScr
                       mainAxisSpacing: 10,
                       childAspectRatio: 2.1,
                       children: [
-                        _buildServiceTile(context, 'General Nursing', Icons.local_hospital_rounded, currentModel),
-                        _buildServiceTile(context, 'Elderly Care', Icons.elderly_rounded, currentModel),
-                        _buildServiceTile(context, 'Post Surgery', Icons.wheelchair_pickup_rounded, currentModel),
-                        _buildServiceTile(context, 'ICU Nurse', Icons.masks_rounded, currentModel),
-                        _buildServiceTile(context, 'Attendant', Icons.hail_rounded, currentModel),
+                        _buildServiceTile(
+                          context,
+                          'General Nursing',
+                          Icons.local_hospital_rounded,
+                          currentModel,
+                        ),
+                        _buildServiceTile(
+                          context,
+                          'Elderly Care',
+                          Icons.elderly_rounded,
+                          currentModel,
+                        ),
+                        _buildServiceTile(
+                          context,
+                          'Post Surgery',
+                          Icons.wheelchair_pickup_rounded,
+                          currentModel,
+                        ),
+                        _buildServiceTile(
+                          context,
+                          'ICU Nurse',
+                          Icons.masks_rounded,
+                          currentModel,
+                        ),
+                        _buildServiceTile(
+                          context,
+                          'Attendant',
+                          Icons.hail_rounded,
+                          currentModel,
+                        ),
                       ],
                     ),
                   ),
@@ -147,10 +173,30 @@ class _HomeServiceBookingScreenState extends ConsumerState<HomeServiceBookingScr
                       spacing: 8,
                       runSpacing: 8,
                       children: [
-                        _buildTimeChip(context, 'Morning (6am - 12pm)', Icons.wb_sunny_rounded, currentModel),
-                        _buildTimeChip(context, 'Afternoon (12pm - 5pm)', Icons.sunny, currentModel),
-                        _buildTimeChip(context, 'Evening (5pm - 9pm)', Icons.wb_twilight_rounded, currentModel),
-                        _buildTimeChip(context, 'Night (9pm - 6am)', Icons.dark_mode_rounded, currentModel),
+                        _buildTimeChip(
+                          context,
+                          'Morning (6am - 12pm)',
+                          Icons.wb_sunny_rounded,
+                          currentModel,
+                        ),
+                        _buildTimeChip(
+                          context,
+                          'Afternoon (12pm - 5pm)',
+                          Icons.sunny,
+                          currentModel,
+                        ),
+                        _buildTimeChip(
+                          context,
+                          'Evening (5pm - 9pm)',
+                          Icons.wb_twilight_rounded,
+                          currentModel,
+                        ),
+                        _buildTimeChip(
+                          context,
+                          'Night (9pm - 6am)',
+                          Icons.dark_mode_rounded,
+                          currentModel,
+                        ),
                       ],
                     ),
                   ),
@@ -180,7 +226,9 @@ class _HomeServiceBookingScreenState extends ConsumerState<HomeServiceBookingScr
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
               decoration: BoxDecoration(
                 color: theme.cardColor,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(24),
+                ),
                 boxShadow: [
                   BoxShadow(
                     color: colorScheme.shadow.withValues(alpha: 0.04),
@@ -196,32 +244,58 @@ class _HomeServiceBookingScreenState extends ConsumerState<HomeServiceBookingScr
                   onPressed: bookingState.isLoading
                       ? null
                       : () async {
-                    if (!(_formKey.currentState?.validate() ?? false)) return;
+                          if (!(_formKey.currentState?.validate() ?? false)) {
+                            return;
+                          }
 
-                    final success = await ref
-                        .read(homeServiceBookingProvider.notifier)
-                        .createBooking();
+                          final success = await ref
+                              .read(homeServiceBookingProvider.notifier)
+                              .createBooking();
 
-                    // 🎯 FIXED: Resolved all context async gaps perfectly using safe checking cycles
-                    if (!context.mounted) return;
+                          if (!context.mounted) return;
 
-                    final currentContextState = ref.read(homeServiceBookingProvider);
+                          final currentContextState = ref.read(
+                            homeServiceBookingProvider,
+                          );
 
-                    if (success) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Booking submitted successfully")),
-                      );
-                      Navigator.pop(context);
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(currentContextState.errorMessage ?? "Booking request failed"),
-                          backgroundColor: Colors.red,
-                          behavior: SnackBarBehavior.floating,
-                        ),
-                      );
-                    }
-                  },
+                          if (success) {
+                            final messenger = ScaffoldMessenger.of(context);
+
+                            messenger.clearSnackBars();
+
+                            await messenger
+                                .showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      "Booking submitted successfully",
+                                    ),
+                                    duration: Duration(seconds: 2),
+                                  ),
+                                )
+                                .closed;
+
+                            if (!context.mounted) return;
+
+                            ref
+                                .read(homeServiceBookingProvider.notifier)
+                                .resetBooking();
+
+                            Navigator.pop(context);
+                          } else {
+                            ScaffoldMessenger.of(context)
+                              ..clearSnackBars()
+                              ..showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    currentContextState.errorMessage ??
+                                        "Booking request failed",
+                                  ),
+                                  backgroundColor: Colors.red,
+                                  behavior: SnackBarBehavior.floating,
+                                ),
+                              );
+                          }
+                        },
                   icon: const Icon(Icons.send_rounded, size: 16),
                   label: const Text(
                     'Submit Booking Request',
@@ -230,7 +304,9 @@ class _HomeServiceBookingScreenState extends ConsumerState<HomeServiceBookingScr
                   style: ElevatedButton.styleFrom(
                     backgroundColor: colorScheme.primary,
                     foregroundColor: colorScheme.onPrimary,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
                     elevation: 0,
                   ),
                 ),
@@ -244,18 +320,20 @@ class _HomeServiceBookingScreenState extends ConsumerState<HomeServiceBookingScr
 
   // (... _buildCardSection, _buildServiceTile and _buildTimeChip retain completely preserved logic)
   Widget _buildCardSection(
-      BuildContext context, {
-        required String title,
-        required IconData icon,
-        required Widget child,
-      }) {
+    BuildContext context, {
+    required String title,
+    required IconData icon,
+    required Widget child,
+  }) {
     final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: theme.cardColor,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4)),
+        border: Border.all(
+          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -264,10 +342,18 @@ class _HomeServiceBookingScreenState extends ConsumerState<HomeServiceBookingScr
             children: [
               Icon(icon, size: 18, color: theme.colorScheme.primary),
               const SizedBox(width: 8),
-              Text(title, style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)),
+              Text(
+                title,
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ],
           ),
-          const Padding(padding: EdgeInsets.only(top: 12), child: Divider(height: 1)),
+          const Padding(
+            padding: EdgeInsets.only(top: 12),
+            child: Divider(height: 1),
+          ),
           const SizedBox(height: 14),
           child,
         ],
@@ -275,7 +361,12 @@ class _HomeServiceBookingScreenState extends ConsumerState<HomeServiceBookingScr
     );
   }
 
-  Widget _buildServiceTile(BuildContext context, String title, IconData icon, HomeServiceBookingModel state) {
+  Widget _buildServiceTile(
+    BuildContext context,
+    String title,
+    IconData icon,
+    HomeServiceBookingModel state,
+  ) {
     final colorScheme = Theme.of(context).colorScheme;
     final isSel = state.selectedServiceType == title;
     return InkWell(
@@ -286,18 +377,32 @@ class _HomeServiceBookingScreenState extends ConsumerState<HomeServiceBookingScr
       child: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: isSel ? colorScheme.primary : colorScheme.surfaceContainerHighest.withValues(alpha: 0.15),
+          color: isSel
+              ? colorScheme.primary
+              : colorScheme.surfaceContainerHighest.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: isSel ? Colors.transparent : colorScheme.outlineVariant.withValues(alpha: 0.3)),
+          border: Border.all(
+            color: isSel
+                ? Colors.transparent
+                : colorScheme.outlineVariant.withValues(alpha: 0.3),
+          ),
         ),
         child: Row(
           children: [
-            Icon(icon, size: 20, color: isSel ? colorScheme.onPrimary : colorScheme.primary),
+            Icon(
+              icon,
+              size: 20,
+              color: isSel ? colorScheme.onPrimary : colorScheme.primary,
+            ),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
                 title,
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isSel ? colorScheme.onPrimary : null),
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: isSel ? colorScheme.onPrimary : null,
+                ),
               ),
             ),
           ],
@@ -306,7 +411,12 @@ class _HomeServiceBookingScreenState extends ConsumerState<HomeServiceBookingScr
     );
   }
 
-  Widget _buildTimeChip(BuildContext context, String label, IconData icon, HomeServiceBookingModel state) {
+  Widget _buildTimeChip(
+    BuildContext context,
+    String label,
+    IconData icon,
+    HomeServiceBookingModel state,
+  ) {
     final colorScheme = Theme.of(context).colorScheme;
     final isSel = state.timePreference == label;
     return InkWell(
@@ -319,16 +429,26 @@ class _HomeServiceBookingScreenState extends ConsumerState<HomeServiceBookingScr
         decoration: BoxDecoration(
           color: isSel ? colorScheme.primary : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: isSel ? Colors.transparent : colorScheme.outlineVariant),
+          border: Border.all(
+            color: isSel ? Colors.transparent : colorScheme.outlineVariant,
+          ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 14, color: isSel ? colorScheme.onPrimary : colorScheme.outline),
+            Icon(
+              icon,
+              size: 14,
+              color: isSel ? colorScheme.onPrimary : colorScheme.outline,
+            ),
             const SizedBox(width: 6),
             Text(
               label,
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isSel ? colorScheme.onPrimary : null),
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: isSel ? colorScheme.onPrimary : null,
+              ),
             ),
           ],
         ),
