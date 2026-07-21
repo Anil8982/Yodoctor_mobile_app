@@ -7,11 +7,13 @@ import 'package:yodoctor/modules/patient/controllers/home_service_controller.dar
 class BookingServiceDuration extends ConsumerWidget {
   final HomeServiceBookingModel bookingState;
   final TextEditingController daysController;
+  final bool showDurationDateError;
 
   const BookingServiceDuration({
     super.key,
     required this.bookingState,
     required this.daysController,
+    required this.showDurationDateError,
   });
 
   @override
@@ -25,7 +27,9 @@ class BookingServiceDuration extends ConsumerWidget {
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
-            children: ['1 Day', 'Multiple Days', 'Weekly', 'Monthly'].map((type) {
+            children: ['1 Day', 'Multiple Days', 'Weekly', 'Monthly'].map((
+              type,
+            ) {
               final isSel = bookingState.durationType == type;
               return Padding(
                 padding: const EdgeInsets.only(right: 6),
@@ -73,7 +77,7 @@ class BookingServiceDuration extends ConsumerWidget {
                 child: InputDecorator(
                   decoration: AppInputDecoration.build(
                     context,
-                    label: 'Start Date',
+                    label: 'Start Date *',
                     prefixIcon: Icons.date_range_rounded,
                   ),
                   child: Text(
@@ -82,7 +86,9 @@ class BookingServiceDuration extends ConsumerWidget {
                         : 'Select Date',
                     style: TextStyle(
                       fontSize: 14,
-                      color: bookingState.startDate == null ? theme.hintColor : null,
+                      color: bookingState.startDate == null
+                          ? theme.hintColor
+                          : null,
                     ),
                   ),
                 ),
@@ -90,6 +96,18 @@ class BookingServiceDuration extends ConsumerWidget {
             ),
           ],
         ),
+        if (showDurationDateError)
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Text(
+              bookingState.durationType.trim().isEmpty
+                  ? 'Please select service duration'
+                  : bookingState.startDate == null
+                  ? 'Please select start date'
+                  : '',
+              style: const TextStyle(color: Colors.red, fontSize: 12),
+            ),
+          ),
       ],
     );
   }

@@ -26,6 +26,7 @@ class _HomeServiceBookingScreenState
   final _daysController = TextEditingController();
   final _conditionController = TextEditingController();
   final _notesController = TextEditingController();
+  bool _showDurationDateError = false;
 
   @override
   void dispose() {
@@ -162,6 +163,7 @@ class _HomeServiceBookingScreenState
                     child: BookingServiceDuration(
                       bookingState: currentModel,
                       daysController: _daysController,
+                      showDurationDateError: _showDurationDateError,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -245,6 +247,16 @@ class _HomeServiceBookingScreenState
                       ? null
                       : () async {
                           if (!(_formKey.currentState?.validate() ?? false)) {
+                            return;
+                          }
+                          setState(() {
+                            _showDurationDateError =
+                                currentModel.durationType == null ||
+                                currentModel.durationType!.isEmpty ||
+                                currentModel.startDate == null;
+                          });
+
+                          if (_showDurationDateError) {
                             return;
                           }
 

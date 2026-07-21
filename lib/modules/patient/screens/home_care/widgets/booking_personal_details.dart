@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/modules/patient/models/home_care/home_service_booking_model.dart';
 import 'package:yodoctor/core/utils/input_decoration_helper.dart';
@@ -34,6 +35,18 @@ class BookingPersonalDetails extends ConsumerWidget {
             prefixIcon: Icons.person_rounded,
           ),
           onChanged: (val) => notifier.updateField(fullName: val),
+          validator: (value) {
+            if (value == null || value.trim().isEmpty) {
+              return 'Full name is required';
+            }
+            if (value.trim().length < 2) {
+              return "Name should have at least 2 characters";
+            }
+            if (!RegExp(r'^[A-Za-z. ]+$').hasMatch(value.trim())) {
+              return 'Only alphabets are allowed';
+            }
+            return null;
+          },
         ),
         const SizedBox(height: 12),
         TextFormField(
@@ -45,6 +58,21 @@ class BookingPersonalDetails extends ConsumerWidget {
             prefixIcon: Icons.phone_android_rounded,
           ),
           onChanged: (val) => notifier.updateField(contactNumber: val),
+          inputFormatters: [
+            FilteringTextInputFormatter.digitsOnly,
+            LengthLimitingTextInputFormatter(10),
+          ],
+          validator: (value) {
+            if (value == null || value.trim().isEmpty) {
+              return 'Phone number is required';
+            }
+
+            if (!RegExp(r'^[6-9]\d{9}$').hasMatch(value.trim())) {
+              return 'Enter a valid phone number';
+            }
+
+            return null;
+          },
         ),
         const SizedBox(height: 12),
         Row(
@@ -59,6 +87,18 @@ class BookingPersonalDetails extends ConsumerWidget {
                   prefixIcon: Icons.calendar_today_rounded,
                 ),
                 onChanged: (val) => notifier.updateField(patientAge: val),
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Age is required';
+                  }
+
+                  final age = int.tryParse(value);
+
+                  if (age == null || age <= 0 || age > 120) {
+                    return 'Enter valid age';
+                  }
+                  return null;
+                },
               ),
             ),
             const SizedBox(width: 12),
@@ -76,6 +116,12 @@ class BookingPersonalDetails extends ConsumerWidget {
                     .map((g) => DropdownMenuItem(value: g, child: Text(g)))
                     .toList(),
                 onChanged: (val) => notifier.updateField(patientGender: val),
+                validator: (value) {
+                  if (value == null) {
+                    return 'Select gender';
+                  }
+                  return null;
+                },
               ),
             ),
           ],
@@ -90,6 +136,12 @@ class BookingPersonalDetails extends ConsumerWidget {
             prefixIcon: Icons.location_on_rounded,
           ),
           onChanged: (val) => notifier.updateField(address: val),
+          validator: (value) {
+            if (value == null || value.trim().isEmpty) {
+              return 'Address is required';
+            }
+            return null;
+          },
         ),
 
         const SizedBox(height: 10),

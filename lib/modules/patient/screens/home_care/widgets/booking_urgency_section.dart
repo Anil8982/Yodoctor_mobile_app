@@ -4,7 +4,6 @@ import 'package:yodoctor/modules/patient/models/home_care/home_service_booking_m
 import 'package:yodoctor/core/utils/input_decoration_helper.dart';
 import 'package:yodoctor/modules/patient/controllers/home_service_controller.dart';
 
-
 class BookingUrgencySection extends ConsumerWidget {
   final HomeServiceBookingModel bookingState;
 
@@ -24,10 +23,19 @@ class BookingUrgencySection extends ConsumerWidget {
             label: 'Preferred Caregiver Gender *',
             prefixIcon: Icons.face_rounded,
           ),
-          items: ['No Preference', 'Male', 'Female']
-              .map((g) => DropdownMenuItem(value: g, child: Text(g)))
-              .toList(),
-          onChanged: (val) => notifier.updateField(preferredCaregiverGender: val),
+          items: [
+            'No Preference',
+            'Male',
+            'Female',
+          ].map((g) => DropdownMenuItem(value: g, child: Text(g))).toList(),
+          onChanged: (val) =>
+              notifier.updateField(preferredCaregiverGender: val),
+          validator: (value) {
+            if (value == null) {
+              return 'Please select gender';
+            }
+            return null;
+          },
         ),
         const SizedBox(height: 10),
         CheckboxListTile(
@@ -36,7 +44,10 @@ class BookingUrgencySection extends ConsumerWidget {
             'Need Emergency Service',
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
           ),
-          subtitle: const Text('Within 2 hours', style: TextStyle(fontSize: 12)),
+          subtitle: const Text(
+            'Within 2 hours',
+            style: TextStyle(fontSize: 12),
+          ),
           value: bookingState.needEmergencyService,
           activeColor: colorScheme.primary,
           onChanged: (val) => notifier.updateField(needEmergencyService: val),
