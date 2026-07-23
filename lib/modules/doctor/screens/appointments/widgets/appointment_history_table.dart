@@ -63,7 +63,12 @@ class AppointmentHistoryTable extends StatelessWidget {
             DataColumn(label: Text('ACTION')),
           ],
           rows: appointments.map((appointment) {
-            final completed = appointment.status.toUpperCase() == 'COMPLETED';
+            final completed =
+                appointment.status.toUpperCase() == 'COMPLETED';
+
+            final canOpenPrescription =
+                completed && !appointment.isWalkIn;
+
             return DataRow(
               cells: [
                 DataCell(patientIdentityBuilder(appointment)),
@@ -71,17 +76,29 @@ class AppointmentHistoryTable extends StatelessWidget {
                 DataCell(tokenChipBuilder(appointment.tokenNumber)),
                 DataCell(
                   Text(
-                    DateFormat('dd MMM yyyy, hh:mm a').format(appointment.date),
+                    DateFormat(
+                      'dd MMM yyyy, hh:mm a',
+                    ).format(appointment.date),
                   ),
                 ),
                 DataCell(statusChipBuilder(appointment.status)),
                 DataCell(
-                  completed
+                  canOpenPrescription
                       ? FilledButton.icon(
-                          onPressed: () => onPrescriptionTap(appointment),
-                          icon: const Icon(Icons.add_rounded, size: 17),
-                          label: const Text('Prescription'),
-                        )
+                    onPressed: () =>
+                        onPrescriptionTap(appointment),
+                    icon: Icon(
+                      appointment.hasPrescription
+                          ? Icons.receipt_long_rounded
+                          : Icons.add_rounded,
+                      size: 17,
+                    ),
+                    label: Text(
+                      appointment.hasPrescription
+                          ? 'View Prescription'
+                          : 'Prescription',
+                    ),
+                  )
                       : const SizedBox(width: 120),
                 ),
               ],

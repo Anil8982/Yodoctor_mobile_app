@@ -3,10 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
+import 'widgets/doctor_dashboard_shimmer.dart';
 import 'widgets/doctor_header.dart';
 import 'widgets/dashboard_cards.dart';
 import '../../widgets/doctor_sliver_app_bar.dart';
-
 import '../../../../core/utils/app_spacing.dart';
 import '../../../../core/utils/responsive.dart';
 import '../../controllers/doctor_dashboard_controller.dart';
@@ -33,83 +33,97 @@ class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
     final colorScheme = theme.colorScheme;
     final dashboardAsync = ref.watch(doctorDashboardProvider);
 
-    return dashboardAsync.when(
-      loading: () => Scaffold(
-        backgroundColor: colorScheme.surfaceContainerLow,
-        body: const Center(child: CircularProgressIndicator()),
-      ),
-      error: (error, stackTrace) => Scaffold(
+    // Check if we have existing data
+    final hasData = dashboardAsync.hasValue;
+    final isFirstLoad = dashboardAsync.isLoading && !hasData;
+
+    // Show error only if no data exists
+    if (dashboardAsync.hasError && !hasData) {
+      return Scaffold(
         backgroundColor: colorScheme.surfaceContainerLow,
         body: Center(
-          child: Text('Error: $error', style: theme.textTheme.bodyMedium),
+          child: Text(
+            'Error: ${dashboardAsync.error}',
+            style: theme.textTheme.bodyMedium,
+          ),
         ),
-      ),
-      data: (data) {
-        final bool isMobile = Responsive.isMobile(context);
-        final double horizontalPadding = Responsive.horizontalPadding(context);
-        final bool isRefreshing = dashboardAsync.isRefreshing;
+      );
+    }
 
-        return Container(
-          color: colorScheme.surfaceContainerLow,
-          child: NestedScrollView(
-            headerSliverBuilder: (context, innerBoxIsScrolled) {
-              return [
-                DoctorSliverAppBar(
-                  expandedHeight: 180,
-                  background: DoctorHeader(
-                    name: data.doctor.doctorName,
-                    specialty: data.doctor.specialization,
-                    experienceYears: data.doctor.experienceYears,
-                    rating: 5.0,
-                    isAvailable: data.doctor.isAvailable,
-                    onToggleAvailable: (val) {
-                      HapticFeedback.lightImpact();
-                      ref
-                          .read(doctorDashboardProvider.notifier)
-                          .toggleAvailability(val);
-                    },
-                  ),
-                ),
-              ];
-            },
-            body: RefreshIndicator(
-              onRefresh: () =>
-                  ref.read(doctorDashboardProvider.notifier).loadDashboard(),
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: EdgeInsets.fromLTRB(
-                  horizontalPadding,
-                  AppSpacing.lg,
-                  horizontalPadding,
-                  AppSpacing.xl + 40,
-                ),
-                child: ResponsiveContainer(
-                  child: Column(
-                    children: [
-                      if (isRefreshing) ...[
-                        LinearProgressIndicator(
-                          color: colorScheme.primary,
-                          backgroundColor: colorScheme.primaryContainer,
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-                      ],
-                      _buildDashboardGrid(context, data, isMobile),
-                    ],
-                  ),
-                ),
+    // Get doctor data from profile provider or use dummy for first load
+    // Assuming you have a profile provider - adjust accordingly
+    final doctorName = hasData
+        ? dashboardAsync.value!.doctor.doctorName
+        : 'Dr. ';
+    final specialty = hasData
+        ? dashboardAsync.value!.doctor.specialization
+        : 'Specialist';
+    final experienceYears = hasData
+        ? dashboardAsync.value!.doctor.experienceYears
+        : 0;
+    final isAvailable = hasData
+        ? dashboardAsync.value!.doctor.isAvailable
+        : true;
+
+    return Container(
+      color: colorScheme.surfaceContainerLow,
+      child: NestedScrollView(
+        headerSliverBuilder: (context, innerBoxIsScrolled) {
+          return [
+            DoctorSliverAppBar(
+              expandedHeight: 180,
+              background: DoctorHeader(
+                name: doctorName,
+                specialty: specialty,
+                experienceYears: experienceYears,
+                rating: 5.0,
+                isAvailable: isAvailable,
+                onToggleAvailable: (val) {
+                  HapticFeedback.lightImpact();
+                  ref
+                      .read(doctorDashboardProvider.notifier)
+                      .toggleAvailability(val);
+                },
               ),
             ),
-          ),
-        );
-      },
+          ];
+        },
+        body: isFirstLoad
+            ? const DoctorDashboardBodyShimmer()
+            : RefreshIndicator(
+          onRefresh: () =>
+              ref.read(doctorDashboardProvider.notifier).loadDashboard(),
+          child: _buildDashboardContent(context),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDashboardContent(BuildContext context) {
+    final dashboardAsync = ref.watch(doctorDashboardProvider);
+    final data = dashboardAsync.value!;
+    final isMobile = Responsive.isMobile(context);
+    final double horizontalPadding = Responsive.horizontalPadding(context);
+
+    return SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: EdgeInsets.fromLTRB(
+        horizontalPadding,
+        AppSpacing.lg,
+        horizontalPadding,
+        AppSpacing.xl + 40,
+      ),
+      child: ResponsiveContainer(
+        child: _buildDashboardGrid(context, data, isMobile),
+      ),
     );
   }
 
   Widget _buildDashboardGrid(
-    BuildContext context,
-    dynamic data,
-    bool isMobile,
-  ) {
+      BuildContext context,
+      dynamic data,
+      bool isMobile,
+      ) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -311,7 +325,7 @@ class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
                 width: itemWidth,
                 child: DirectBookingCard(
                   onShowQR:
-                      widget.onShowQR ?? () => context.push(AppRoutes.doctorQr),
+                  widget.onShowQR ?? () => context.push(AppRoutes.doctorQr),
                 ),
               ),
               SizedBox(

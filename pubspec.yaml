@@ -2,7 +2,7 @@ name: yodoctor
 description: "A new Flutter project."
 publish_to: 'none'
 
-version: 1.0.0+1
+version: 1.0.0+5
 
 environment:
   sdk: ^3.11.1
@@ -47,6 +47,8 @@ dependencies:
 
   path_provider: ^2.1.6
 
+  shimmer: ^3.0.0
+
   # Maps
   geolocator: ^14.0.2
   geocoding: ^5.0.0
@@ -58,7 +60,6 @@ dependencies:
 
   flutter_dotenv: ^6.0.1
 
-  image_cropper: ^12.2.1
 
 dev_dependencies:
   flutter_test:

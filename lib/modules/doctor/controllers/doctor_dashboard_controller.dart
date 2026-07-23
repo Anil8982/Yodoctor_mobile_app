@@ -15,7 +15,11 @@ class DoctorDashboardNotifier extends AsyncNotifier<DoctorDashboardData> {
 
   @override
   Future<DoctorDashboardData> build() async {
-    AppLogger.info('Initializing Doctor Dashboard telemetry pipeline', tag: LogTags.doctor, subTag: _subTag);
+    AppLogger.info(
+      'Initializing Doctor Dashboard telemetry pipeline',
+      tag: LogTags.doctor,
+      subTag: _subTag,
+    );
     return await _fetchDashboard();
   }
 
@@ -24,10 +28,13 @@ class DoctorDashboardNotifier extends AsyncNotifier<DoctorDashboardData> {
     final response = await repository.getDashboard();
     final statusCode = response.statusCode ?? 0;
 
-    // 🎯 FIXED: Bulletproof status code check mapping with proper error logging
     if (statusCode < 200 || statusCode >= 300) {
       final errorMsg = response.data["message"] ?? "Failed to load dashboard metrics";
-      AppLogger.warning('Dashboard API error response. Status: $statusCode, Message: $errorMsg', tag: LogTags.doctor, subTag: _subTag);
+      AppLogger.warning(
+        'Dashboard API error response. Status: $statusCode, Message: $errorMsg',
+        tag: LogTags.doctor,
+        subTag: _subTag,
+      );
       throw Exception(errorMsg);
     }
 
@@ -35,21 +42,56 @@ class DoctorDashboardNotifier extends AsyncNotifier<DoctorDashboardData> {
   }
 
   Future<void> loadDashboard() async {
-    state = const AsyncLoading();
-    AppLogger.info('Triggering manual dashboard sync operation...', tag: LogTags.doctor, subTag: _subTag);
+    // Preserve existing data before refresh
+    final previous = state.value;
 
-    state = await AsyncValue.guard(() async {
+    AppLogger.info(
+      'Triggering manual dashboard sync operation...',
+      tag: LogTags.doctor,
+      subTag: _subTag,
+    );
+
+    try {
       final freshData = await _fetchDashboard();
-      AppLogger.success('Dashboard data synchronized seamlessly', tag: LogTags.doctor, subTag: _subTag);
-      return freshData;
-    });
+      state = AsyncData(freshData);
+      AppLogger.success(
+        'Dashboard data synchronized seamlessly',
+        tag: LogTags.doctor,
+        subTag: _subTag,
+      );
+    } catch (e, st) {
+      AppLogger.exception(
+        e,
+        st,
+        message: 'Dashboard refresh failed',
+        tag: LogTags.doctor,
+        subTag: _subTag,
+      );
+
+      if (previous != null) {
+        // Refresh failed → keep existing dashboard data
+        state = AsyncData(previous);
+        AppLogger.info(
+          'Preserved previous dashboard data during refresh failure',
+          tag: LogTags.doctor,
+          subTag: _subTag,
+        );
+      } else {
+        // No previous data → show error state
+        state = AsyncError(e, st);
+      }
+    }
   }
 
   Future<void> toggleAvailability(bool available) async {
     final previous = state.value;
     if (previous == null) return;
 
-    AppLogger.info('Toggling availability state checkpoint to: $available', tag: LogTags.doctor, subTag: _subTag);
+    AppLogger.info(
+      'Toggling availability state checkpoint to: $available',
+      tag: LogTags.doctor,
+      subTag: _subTag,
+    );
 
     try {
       final repository = ref.read(doctorDashboardRepositoryProvider);
@@ -62,10 +104,21 @@ class DoctorDashboardNotifier extends AsyncNotifier<DoctorDashboardData> {
 
       final fresh = await _fetchDashboard();
       state = AsyncData(fresh);
-      AppLogger.success('Availability state locked and saved successfully', tag: LogTags.doctor, subTag: _subTag);
+      AppLogger.success(
+        'Availability state locked and saved successfully',
+        tag: LogTags.doctor,
+        subTag: _subTag,
+      );
     } catch (e, st) {
-      AppLogger.exception(e, st, message: 'Availability toggle engine exception', tag: LogTags.doctor, subTag: _subTag);
+      AppLogger.exception(
+        e,
+        st,
+        message: 'Availability toggle engine exception',
+        tag: LogTags.doctor,
+        subTag: _subTag,
+      );
 
+      // Preserve previous data on error
       state = AsyncData(previous);
     }
   }

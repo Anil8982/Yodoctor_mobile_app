@@ -28,6 +28,8 @@ class MobileAppointmentList extends StatelessWidget {
     return Column(
       children: appointments.map((appointment) {
         final completed = appointment.status.toUpperCase() == 'COMPLETED';
+        final canOpenPrescription =
+            completed && !appointment.isWalkIn;
         return Container(
           width: double.infinity,
           margin: const EdgeInsets.only(bottom: AppSpacing.md),
@@ -68,7 +70,7 @@ class MobileAppointmentList extends StatelessWidget {
                   ),
                 ],
               ),
-              if (completed) ...[
+              if (canOpenPrescription) ...[
                 const SizedBox(height: AppSpacing.md),
                 SizedBox(
                   width: double.infinity,
@@ -76,8 +78,16 @@ class MobileAppointmentList extends StatelessWidget {
                     onPressed: () {
                       onPrescriptionTap(appointment);
                     },
-                    icon: const Icon(Icons.add_rounded),
-                    label: const Text('Prescription'),
+                    icon: Icon(
+                      appointment.hasPrescription
+                          ? Icons.receipt_long_rounded
+                          : Icons.add_rounded,
+                    ),
+                    label: Text(
+                      appointment.hasPrescription
+                          ? 'View Prescription'
+                          : 'Prescription',
+                    ),
                   ),
                 ),
               ],

@@ -26,8 +26,8 @@ final dioProvider = Provider<Dio>((ref) {
 
   // Register clean pipeline interceptors without duplicate LogInterceptors
   dio.interceptors.addAll([
-    AuthInterceptor(storage), // Automatically appends Bearer JWT safely
-    ApiInterceptor(),         // Uses AppLogger internally for professional mapping
+    AuthInterceptor(storage, ref), // Automatically appends Bearer JWT safely
+    ApiInterceptor(), // Uses AppLogger internally for professional mapping
   ]);
 
   return dio;

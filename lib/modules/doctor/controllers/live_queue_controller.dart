@@ -8,34 +8,42 @@ import '../repositories/doctor_appointment_repository.dart';
 
 class LiveQueueState {
   final bool loading;
+  final bool refreshing;
   final List<LiveQueueItem> queue;
   final LiveQueueItem? current;
   final LiveQueueItem? next;
+  final String selectedSlot;
   final String? errorMessage;
 
   const LiveQueueState({
     this.loading = false,
+    this.refreshing = false,
     this.queue = const [],
     this.current,
     this.next,
+    this.selectedSlot = "MORNING",
     this.errorMessage,
   });
 
   LiveQueueState copyWith({
     bool? loading,
+    bool? refreshing,
     List<LiveQueueItem>? queue,
     LiveQueueItem? current,
     bool clearCurrent = false,
     LiveQueueItem? next,
     bool clearNext = false,
+    String? selectedSlot,
     String? errorMessage,
     bool clearError = false,
   }) {
     return LiveQueueState(
       loading: loading ?? this.loading,
+      refreshing: refreshing ?? this.refreshing,
       queue: queue ?? this.queue,
       current: clearCurrent ? null : (current ?? this.current),
       next: clearNext ? null : (next ?? this.next),
+      selectedSlot: selectedSlot ?? this.selectedSlot,
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
     );
   }
@@ -48,6 +56,9 @@ final liveQueueProvider = NotifierProvider<LiveQueueNotifier, LiveQueueState>(
 class LiveQueueNotifier extends Notifier<LiveQueueState> {
   static const String _subTag = 'LiveQueueNotifier';
 
+  // Request ID guard for race condition
+  int _requestId = 0;
+
   @override
   LiveQueueState build() {
     AppLogger.info(
@@ -55,14 +66,39 @@ class LiveQueueNotifier extends Notifier<LiveQueueState> {
       tag: LogTags.doctor,
       subTag: _subTag,
     );
-    Future.microtask(() => loadQueue("MORNING"));
-    return const LiveQueueState();
+
+    const initialState = LiveQueueState();
+
+    Future.microtask(() => loadQueue(initialState.selectedSlot));
+
+    return initialState;
   }
 
-  Future<void> loadQueue(String slot) async {
-    state = state.copyWith(loading: true, clearError: true);
+  Future<void> changeSlot(String slot) async {
+    if (state.selectedSlot == slot) return;
+
+    state = state.copyWith(selectedSlot: slot);
+
+    await loadQueue(slot, isRefresh: false);
+  }
+
+  Future<void> refresh() async {
+    if (state.loading || state.refreshing) return;
+    await loadQueue(state.selectedSlot, isRefresh: true);
+  }
+
+  Future<void> loadQueue(String slot, {bool isRefresh = false}) async {
+    // Generate unique request ID
+    final requestId = ++_requestId;
+
+    if (isRefresh) {
+      state = state.copyWith(refreshing: true, clearError: true);
+    } else {
+      state = state.copyWith(loading: true, clearError: true);
+    }
+
     AppLogger.info(
-      'Initializing live queue stream pipeline for slot: $slot',
+      'Initializing live queue stream pipeline for slot: $slot (isRefresh: $isRefresh, requestId: $requestId)',
       tag: LogTags.doctor,
       subTag: _subTag,
     );
@@ -75,6 +111,19 @@ class LiveQueueNotifier extends Notifier<LiveQueueState> {
         repository.getCurrentPatient(slot: slot),
         repository.getNextPatient(slot: slot),
       ]);
+
+      // Race condition guard: ignore if this isn't the latest request
+      // OR if slot changed while awaiting
+      if (requestId != _requestId || state.selectedSlot != slot) {
+        AppLogger.warning(
+          'Stale queue response ignored for slot: $slot (requestId: $requestId, currentRequestId: $_requestId, currentSlot: ${state.selectedSlot})',
+          tag: LogTags.doctor,
+          subTag: _subTag,
+        );
+        // Important: Reset loading states before returning
+        state = state.copyWith(loading: false, refreshing: false);
+        return;
+      }
 
       final queueRes = results[0];
       final currentRes = results[1];
@@ -114,6 +163,7 @@ class LiveQueueNotifier extends Notifier<LiveQueueState> {
 
         state = state.copyWith(
           loading: false,
+          refreshing: false,
           queue: queue,
           current: current,
           clearCurrent: current == null,
@@ -128,12 +178,21 @@ class LiveQueueNotifier extends Notifier<LiveQueueState> {
         );
         state = state.copyWith(
           loading: false,
+          refreshing: false,
           errorMessage: "Failed to read live queue bounds",
         );
       }
     } catch (e, st) {
+      // Check if this is still the latest request
+      if (requestId != _requestId || state.selectedSlot != slot) {
+        // Reset loading states before returning
+        state = state.copyWith(loading: false, refreshing: false);
+        return;
+      }
+
       state = state.copyWith(
         loading: false,
+        refreshing: false,
         errorMessage: "Runtime synchronization pipeline crash",
       );
       AppLogger.exception(
@@ -146,160 +205,80 @@ class LiveQueueNotifier extends Notifier<LiveQueueState> {
     }
   }
 
-  Future<void> complete(String id, String slot) async {
+  // Helper method for actions - uses isRefresh: true for silent updates
+  Future<void> _performAction(
+    String actionName,
+    Future<void> Function() action,
+    String slot,
+  ) async {
     AppLogger.info(
-      'Completing appointment ID: $id',
+      'Performing action: $actionName for slot: $slot',
       tag: LogTags.doctor,
       subTag: _subTag,
     );
+
     try {
-      final repository = ref.read(doctorAppointmentRepositoryProvider);
-      await repository.completeAppointment(id);
+      await action();
       AppLogger.success(
-        'Appointment ID: $id marked completed',
+        'Action $actionName completed successfully',
         tag: LogTags.doctor,
         subTag: _subTag,
       );
-      await loadQueue(slot);
+      // Refresh silently - maintains existing UI without shimmer flash
+      await loadQueue(slot, isRefresh: true);
     } catch (e, st) {
       AppLogger.exception(
         e,
         st,
-        message: 'Complete transaction crashed',
+        message: 'Action $actionName failed',
         tag: LogTags.doctor,
         subTag: _subTag,
       );
+      // Still try to refresh to show consistent state
+      await loadQueue(slot, isRefresh: true);
     }
+  }
+
+  Future<void> complete(String id, String slot) async {
+    await _performAction('complete', () async {
+      final repository = ref.read(doctorAppointmentRepositoryProvider);
+      await repository.completeAppointment(id);
+    }, slot);
   }
 
   Future<void> recall(String id, String slot) async {
-    AppLogger.info(
-      'Recalling patient for appointment ID: $id',
-      tag: LogTags.doctor,
-      subTag: _subTag,
-    );
-    try {
+    await _performAction('recall', () async {
       final repository = ref.read(doctorAppointmentRepositoryProvider);
       await repository.recallPatient(id);
-      AppLogger.success(
-        'Patient recall broadcasted successfully for ID: $id',
-        tag: LogTags.doctor,
-        subTag: _subTag,
-      );
-      await loadQueue(slot);
-    } catch (e, st) {
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Recall execution crashed',
-        tag: LogTags.doctor,
-        subTag: _subTag,
-      );
-    }
+    }, slot);
   }
 
   Future<void> noShow(String slot) async {
-    AppLogger.info(
-      'Triggering no-show status updates for current token slot: $slot',
-      tag: LogTags.doctor,
-      subTag: _subTag,
-    );
-    try {
+    await _performAction('noShow', () async {
       final repository = ref.read(doctorAppointmentRepositoryProvider);
       await repository.noShow(slot);
-      AppLogger.success(
-        'No-show state updated on gateway branch',
-        tag: LogTags.doctor,
-        subTag: _subTag,
-      );
-      await loadQueue(slot);
-    } catch (e, st) {
-      AppLogger.exception(
-        e,
-        st,
-        message: 'No show event crash',
-        tag: LogTags.doctor,
-        subTag: _subTag,
-      );
-    }
+    }, slot);
   }
 
   Future<void> skip(String id, String slot) async {
-    AppLogger.info(
-      'Skipping appointment ID: $id',
-      tag: LogTags.doctor,
-      subTag: _subTag,
-    );
-    try {
+    await _performAction('skip', () async {
       final repository = ref.read(doctorAppointmentRepositoryProvider);
       await repository.skipAppointment(id);
-      AppLogger.success(
-        'Appointment ID: $id skipped successfully',
-        tag: LogTags.doctor,
-        subTag: _subTag,
-      );
-      await loadQueue(slot);
-    } catch (e, st) {
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Skip tracking faulted',
-        tag: LogTags.doctor,
-        subTag: _subTag,
-      );
-    }
+    }, slot);
   }
 
   Future<void> start(String id, String slot) async {
-    AppLogger.info(
-      'Starting consultation for appointment ID: $id, Slot: $slot',
-      tag: LogTags.doctor,
-      subTag: _subTag,
-    );
-    try {
+    await _performAction('start', () async {
       final repository = ref.read(doctorAppointmentRepositoryProvider);
       await repository.startAppointment(appointmentId: id, slot: slot);
-      AppLogger.success(
-        'Consultation started successfully for ID: $id',
-        tag: LogTags.doctor,
-        subTag: _subTag,
-      );
-      await loadQueue(slot);
-    } catch (e, st) {
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Start tracking faulted',
-        tag: LogTags.doctor,
-        subTag: _subTag,
-      );
-    }
+    }, slot);
   }
 
   Future<void> nextToken(String slot) async {
-    AppLogger.info(
-      'Calling next token sequentially for slot: $slot',
-      tag: LogTags.doctor,
-      subTag: _subTag,
-    );
-    try {
+    await _performAction('nextToken', () async {
       final repository = ref.read(doctorAppointmentRepositoryProvider);
       await repository.callNextToken(slot: slot);
-      AppLogger.success(
-        'Next token triggered over transmission wire',
-        tag: LogTags.doctor,
-        subTag: _subTag,
-      );
-      await loadQueue(slot);
-    } catch (e, st) {
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Next token trigger failure',
-        tag: LogTags.doctor,
-        subTag: _subTag,
-      );
-    }
+    }, slot);
   }
 
   Future<PrescriptionModel?> getPrescription(String appointmentId) async {

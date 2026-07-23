@@ -145,6 +145,16 @@ class _DoctorAppointmentHistoryScreenState
 
   Widget _buildPatientIdentity(AppointmentHistoryItem appointment) {
     final colorScheme = Theme.of(context).colorScheme;
+
+    // Safely resolve patient name
+    final parsedName = _patientName(appointment.patientLabel);
+    final displayName = parsedName.isNotEmpty ? parsedName : 'Unknown Patient';
+
+    // Safe initial - prevents RangeError on empty string
+    final initial = displayName.isNotEmpty
+        ? displayName.substring(0, 1).toUpperCase()
+        : '?';
+
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -152,9 +162,7 @@ class _DoctorAppointmentHistoryScreenState
           radius: 22,
           backgroundColor: colorScheme.primaryContainer,
           child: Text(
-            _patientName(
-              appointment.patientLabel,
-            ).substring(0, 1).toUpperCase(),
+            initial,
             style: TextStyle(
               color: colorScheme.primary,
               fontWeight: FontWeight.w900,
@@ -166,7 +174,7 @@ class _DoctorAppointmentHistoryScreenState
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              _patientName(appointment.patientLabel),
+              displayName,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurface,
                 fontWeight: FontWeight.w800,

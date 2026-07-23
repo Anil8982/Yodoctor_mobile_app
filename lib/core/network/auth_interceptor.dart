@@ -5,11 +5,15 @@ import 'package:yodoctor/core/debug/app_logger.dart';
 import 'package:yodoctor/core/routes/app_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/core/storage/storage_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/core/providers/app_role_provider.dart';
+import 'package:yodoctor/modules/auth/controllers/doctor_status_controller.dart';
 
 class AuthInterceptor extends Interceptor {
-  AuthInterceptor(this._storage);
+  AuthInterceptor(this._storage, this._ref);
 
   final StorageService _storage;
+  final Ref _ref;
   static const String _subTag = 'AuthInterceptor';
 
   static bool _isLoggingOut = false;
@@ -76,6 +80,10 @@ class AuthInterceptor extends Interceptor {
         );
 
         await _storage.clearAll();
+
+        // Clear runtime Riverpod authentication state
+        _ref.read(doctorStatusProvider.notifier).reset();
+        _ref.read(appRoleProvider.notifier).clearRole();
 
         final context = AppRouter.rootNavigatorKey.currentContext;
         if (context != null && context.mounted) {

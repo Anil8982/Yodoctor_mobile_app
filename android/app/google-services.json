@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "563822930417-c4k714op0ovlm1hee60j59bsaish02hb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.yodoctor.app",
+            "certificate_hash": "1598c1509370f53f93fc075a5ff67888fea168b1"
+          }
+        },
+        {
           "client_id": "563822930417-ffkki8m85h27edg7oadt9o6abv8l1eos.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
