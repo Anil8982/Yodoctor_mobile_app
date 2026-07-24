@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
+
 import '../models/dashboard/doctor_profile_model.dart';
 import '../repositories/doctor_profile_repository.dart';
 
@@ -16,17 +18,21 @@ class ProfileFormState {
   final Map<String, dynamic> timings;
   final List<Map<String, String>> uploadedDocs;
   final String? errorMessage;
+  final bool practiceTypeError;
+  final bool availableDaysError;
 
   ProfileFormState({
     this.isLoading = false,
     this.profile,
-    this.selectedGender = 'Male',
+    this.selectedGender = '',
     this.selectedPracticeType = 'Solo Practice',
     this.avgDuration = 20,
     this.activeDays = const [],
     this.timings = const {},
     this.uploadedDocs = const [],
     this.errorMessage,
+    this.practiceTypeError = false,
+    this.availableDaysError = false,
   });
 
   ProfileFormState copyWith({
@@ -41,6 +47,8 @@ class ProfileFormState {
     List<Map<String, String>>? uploadedDocs,
     String? errorMessage,
     bool clearError = false,
+    bool? practiceTypeError,
+    bool? availableDaysError,
   }) {
     return ProfileFormState(
       isLoading: isLoading ?? this.isLoading,
@@ -52,6 +60,8 @@ class ProfileFormState {
       timings: timings ?? this.timings,
       uploadedDocs: uploadedDocs ?? this.uploadedDocs,
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
+      practiceTypeError: practiceTypeError ?? this.practiceTypeError,
+      availableDaysError: availableDaysError ?? this.availableDaysError,
     );
   }
 }
@@ -179,6 +189,11 @@ class DoctorProfileNotifier extends Notifier<ProfileFormState> {
   }
 
   void initProfile(DoctorProfileModel currentProfile) {
+    final formattedRegistrationDate = currentProfile.validTill.isEmpty
+        ? ''
+        : DateFormat(
+            'dd MMM yyyy',
+          ).format(DateTime.parse(currentProfile.validTill));
     nameController.text = currentProfile.doctorName;
     emailController.text = currentProfile.email;
     mobileController.text = currentProfile.mobile;
@@ -188,7 +203,7 @@ class DoctorProfileNotifier extends Notifier<ProfileFormState> {
     expController.text = currentProfile.experienceYears.toString();
     regNoController.text = currentProfile.licenseNumber;
     councilController.text = currentProfile.stateCouncil;
-    regValidTillController.text = currentProfile.validTill;
+    regValidTillController.text = formattedRegistrationDate;
     clinicNameController.text = currentProfile.clinicName;
     cityController.text = currentProfile.city;
     stateController.text = currentProfile.state;
@@ -225,7 +240,10 @@ class DoctorProfileNotifier extends Notifier<ProfileFormState> {
       tag: LogTags.doctor,
       subTag: _subTag,
     );
-    state = state.copyWith(selectedPracticeType: type);
+    state = state.copyWith(
+      selectedPracticeType: type,
+      practiceTypeError: false,
+    );
   }
 
   void updateDuration(int value) {
@@ -249,11 +267,35 @@ class DoctorProfileNotifier extends Notifier<ProfileFormState> {
       tag: LogTags.doctor,
       subTag: _subTag,
     );
-    state = state.copyWith(activeDays: days);
+    state = state.copyWith(activeDays: days, availableDaysError: false);
+  }
+
+  Future<void> pickRegistrationValidTill(BuildContext context) async {
+    final DateTime now = DateTime.now();
+
+    final DateTime initialDate =
+        DateFormat('dd MMM yyyy').tryParse(regValidTillController.text) ??
+        DateTime.now().add(const Duration(days: 365));
+
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: now,
+      lastDate: DateTime(2100),
+    );
+    if (pickedDate == null) return;
+
+    final formattedDate = DateFormat('dd MMM yyyy').format(pickedDate);
+    regValidTillController.text = formattedDate;
   }
 
   Future<bool> saveProfileChanges() async {
     state = state.copyWith(isLoading: true, clearError: true);
+    final formattedRegistrationDate = regValidTillController.text.isEmpty
+        ? null
+        : DateFormat('yyyy-MM-dd').format(
+            DateFormat('dd MMM yyyy').parse(regValidTillController.text),
+          );
 
     final payload = {
       "doctorName": nameController.text,
@@ -266,7 +308,7 @@ class DoctorProfileNotifier extends Notifier<ProfileFormState> {
       "experience_years": int.tryParse(expController.text) ?? 0,
       "licenseNumber": regNoController.text,
       "state_council": councilController.text,
-      "valid_till": regValidTillController.text,
+      "valid_till": formattedRegistrationDate,
       "clinic_name": clinicNameController.text,
       "city": cityController.text,
       "state": stateController.text,
@@ -336,7 +378,8 @@ class DoctorProfileNotifier extends Notifier<ProfileFormState> {
     final current = state.profile;
     if (current == null) return true;
 
-    final isSame = nameController.text == current.doctorName &&
+    final isSame =
+        nameController.text == current.doctorName &&
         emailController.text == current.email &&
         mobileController.text == current.mobile &&
         aboutController.text == current.bio &&
@@ -363,5 +406,83 @@ class DoctorProfileNotifier extends Notifier<ProfileFormState> {
         state.activeDays.every((day) => current.availableDays.contains(day));
 
     return !isSame;
+  }
+
+  bool validatePracticeType() {
+    if (state.selectedPracticeType.isEmpty) {
+      state = state.copyWith(practiceTypeError: true);
+      return false;
+    }
+    return true;
+  }
+
+  bool validateAvailableDays() {
+    if (state.activeDays.isEmpty) {
+      state = state.copyWith(availableDaysError: true);
+      return false;
+    }
+    return true;
+  }
+
+  Future<bool> validateAllTabs(TabController tabController) async {
+    // Personal
+    tabController.animateTo(0);
+    await Future.delayed(const Duration(milliseconds: 250));
+
+    if (!(personalFormKey.currentState?.validate() ?? false)) {
+      return false;
+    }
+
+    // Professional
+    tabController.animateTo(1);
+    await Future.delayed(const Duration(milliseconds: 250));
+
+    if (!(professionalFormKey.currentState?.validate() ?? false)) {
+      return false;
+    }
+
+    // Clinic
+    tabController.animateTo(2);
+    await Future.delayed(const Duration(milliseconds: 250));
+
+    if (!(clinicFormKey.currentState?.validate() ?? false)) {
+      return false;
+    }
+
+    // Practice
+    tabController.animateTo(3);
+    await Future.delayed(const Duration(milliseconds: 250));
+
+    if (!(practiceFormKey.currentState?.validate() ?? false)) {
+      return false;
+    }
+    if (!validatePracticeType()) {
+      return false;
+    }
+
+    // Consultation
+    tabController.animateTo(4);
+    await Future.delayed(const Duration(milliseconds: 250));
+
+    if (!(consultationFormKey.currentState?.validate() ?? false)) {
+      return false;
+    }
+    if (!validateAvailableDays()) {
+      return false;
+    }
+
+    return true;
+  }
+
+  void clearPracticeTypeError() {
+    if (state.practiceTypeError) {
+      state = state.copyWith(practiceTypeError: false);
+    }
+  }
+
+  void clearAvailableDaysError() {
+    if (state.availableDaysError) {
+      state = state.copyWith(availableDaysError: false);
+    }
   }
 }

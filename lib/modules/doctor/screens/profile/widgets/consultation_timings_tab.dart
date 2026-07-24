@@ -57,6 +57,13 @@ class ConsultationTimingsTab extends ConsumerWidget {
                     hint: 'e.g. 500',
                     icon: Icons.currency_rupee_rounded,
                     keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'Enter fee';
+                      }
+
+                      return null;
+                    },
                   ),
                 ),
                 const SizedBox(width: AppSpacing.md),
@@ -158,6 +165,14 @@ class ConsultationTimingsTab extends ConsumerWidget {
                 );
               }).toList(),
             ),
+            if (formState.availableDaysError)
+              const Padding(
+                padding: EdgeInsets.only(top: 6, left: 4),
+                child: Text(
+                  'Please select at least one available day',
+                  style: TextStyle(color: Colors.red, fontSize: 12),
+                ),
+              ),
             const SizedBox(height: AppSpacing.xxxl),
           ],
         ),

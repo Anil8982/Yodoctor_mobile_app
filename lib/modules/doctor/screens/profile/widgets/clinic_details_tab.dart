@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
 import 'package:yodoctor/modules/doctor/controllers/doctor_profile_controller.dart';
+
 import 'profile_input_field.dart';
 
 class ClinicDetailsTab extends ConsumerWidget {
@@ -43,6 +45,17 @@ class ClinicDetailsTab extends ConsumerWidget {
               label: 'Clinic Name',
               hint: 'Enter clinic or hospital branch name',
               icon: Icons.local_hospital_outlined,
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return "Enter clinic name";
+                }
+
+                if (value.trim().length < 3) {
+                  return "Clinic name is too short";
+                }
+
+                return null;
+              },
             ),
             const SizedBox(height: AppSpacing.lg),
 
@@ -52,6 +65,17 @@ class ClinicDetailsTab extends ConsumerWidget {
               hint: 'Shop/Plot no, Building name, Street...',
               icon: Icons.home_work_outlined,
               maxLines: 3,
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return "Enter address";
+                }
+
+                if (value.trim().length < 10) {
+                  return "Address should be at least 10 characters";
+                }
+
+                return null;
+              },
             ),
             const SizedBox(height: AppSpacing.lg),
 
@@ -63,6 +87,17 @@ class ClinicDetailsTab extends ConsumerWidget {
                     label: 'City',
                     hint: 'e.g. Nashik',
                     icon: Icons.location_city_outlined,
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return "Enter city";
+                      }
+
+                      if (!RegExp(r'^[A-Za-z ]+$').hasMatch(value.trim())) {
+                        return "Only alphabets allowed";
+                      }
+
+                      return null;
+                    },
                   ),
                 ),
                 const SizedBox(width: AppSpacing.md),
@@ -73,6 +108,16 @@ class ClinicDetailsTab extends ConsumerWidget {
                     hint: 'e.g. 422001',
                     icon: Icons.pin_drop_outlined,
                     keyboardType: TextInputType.number,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                      LengthLimitingTextInputFormatter(6),
+                    ],
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Pincode is required";
+                      }
+                      return null;
+                    },
                   ),
                 ),
               ],
@@ -84,6 +129,12 @@ class ClinicDetailsTab extends ConsumerWidget {
               label: 'Landmark',
               hint: 'e.g. Near City Center Mall',
               icon: Icons.my_location_rounded,
+              validator: (value) {
+                if (value != null && value.length > 100) {
+                  return "Maximum 100 characters";
+                }
+                return null;
+              },
             ),
             const SizedBox(height: AppSpacing.lg),
 
@@ -92,6 +143,21 @@ class ClinicDetailsTab extends ConsumerWidget {
               label: 'State',
               hint: 'e.g. Madhya Pradesh',
               icon: Icons.location_on_outlined,
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return "Enter state";
+                }
+
+                if (!RegExp(r'^[A-Za-z ]+$').hasMatch(value.trim())) {
+                  return "Only alphabets are allowed";
+                }
+
+                if (value.trim().length < 2) {
+                  return "Enter a valid state name";
+                }
+
+                return null;
+              },
             ),
 
             const SizedBox(height: AppSpacing.lg),

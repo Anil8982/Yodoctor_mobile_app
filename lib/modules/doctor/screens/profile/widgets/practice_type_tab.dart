@@ -22,25 +22,43 @@ class PracticeTypeTab extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Practice Type', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+            Text(
+              'Practice Type',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w800,
+              ),
+            ),
             const SizedBox(height: AppSpacing.xxs),
-            Text('Select your primary mode of medical practice.', style: theme.textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant)),
+            Text(
+              'Select your primary mode of medical practice.',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
             const SizedBox(height: AppSpacing.xl),
 
             Card(
               elevation: 0,
               color: colorScheme.surfaceContainerHigh,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: AppSpacing.md, horizontal: AppSpacing.md),
+                padding: const EdgeInsets.symmetric(
+                  vertical: AppSpacing.md,
+                  horizontal: AppSpacing.md,
+                ),
                 child: Column(
                   children: [
                     // 🎯 Solo Practice Row (Material 3 Compliant)
                     InkWell(
-                      onTap: () => controller.updatePracticeType('Solo Practice'),
+                      onTap: () =>
+                          controller.updatePracticeType('Solo Practice'),
                       borderRadius: BorderRadius.circular(12),
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: AppSpacing.sm,
+                        ),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -48,16 +66,27 @@ class PracticeTypeTab extends ConsumerWidget {
                               value: 'Solo Practice',
                               groupValue: formState.selectedPracticeType,
                               activeColor: colorScheme.primary,
-                              onChanged: (val) => controller.updatePracticeType(val!),
+                              onChanged: (val) =>
+                                  controller.updatePracticeType(val!),
                             ),
                             const SizedBox(width: AppSpacing.sm),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('Solo Practice', style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700)),
+                                  Text(
+                                    'Solo Practice',
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
                                   const SizedBox(height: 2),
-                                  Text('Independent clinic owner or standalone consultant', style: theme.textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant)),
+                                  Text(
+                                    'Independent clinic owner or standalone consultant',
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: colorScheme.onSurfaceVariant,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -67,16 +96,26 @@ class PracticeTypeTab extends ConsumerWidget {
                     ),
 
                     Padding(
-                      padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
-                      child: Divider(height: 1, color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: AppSpacing.xs,
+                      ),
+                      child: Divider(
+                        height: 1,
+                        color: colorScheme.outlineVariant.withValues(
+                          alpha: 0.4,
+                        ),
+                      ),
                     ),
 
                     // 🎯 Hospital Affiliated Row (Material 3 Compliant)
                     InkWell(
-                      onTap: () => controller.updatePracticeType('Hospital Affiliated'),
+                      onTap: () =>
+                          controller.updatePracticeType('Hospital Affiliated'),
                       borderRadius: BorderRadius.circular(12),
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: AppSpacing.sm,
+                        ),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -84,16 +123,27 @@ class PracticeTypeTab extends ConsumerWidget {
                               value: 'Hospital Affiliated',
                               groupValue: formState.selectedPracticeType,
                               activeColor: colorScheme.primary,
-                              onChanged: (val) => controller.updatePracticeType(val!),
+                              onChanged: (val) =>
+                                  controller.updatePracticeType(val!),
                             ),
                             const SizedBox(width: AppSpacing.sm),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('Hospital Affiliated', style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700)),
+                                  Text(
+                                    'Hospital Affiliated',
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
                                   const SizedBox(height: 2),
-                                  Text('Practicing or visiting consultant inside a corporate hospital', style: theme.textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant)),
+                                  Text(
+                                    'Practicing or visiting consultant inside a corporate hospital',
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: colorScheme.onSurfaceVariant,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -113,6 +163,15 @@ class PracticeTypeTab extends ConsumerWidget {
                 label: 'Hospital Name',
                 hint: 'Enter full name of the hospital',
                 icon: Icons.corporate_fare_rounded,
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return "Hospital Name is required";
+                  }
+                  if (value.trim().length < 2) {
+                    return "Minimum 2 characters";
+                  }
+                  return null;
+                },
               ),
             ],
             const SizedBox(height: AppSpacing.xxxl),
