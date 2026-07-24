@@ -118,42 +118,46 @@ class _DoctorProfileEditScreenState
         onPressed: profileState.isLoading
             ? null
             : () async {
-          if (!notifier.hasUnsavedChanges()) {
-            if (context.mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Profile is already up-to-date! 👌')),
-              );
-            }
-            return;
-          }
+                final isValid = await notifier.validateAllTabs(_tabController);
+                if (!isValid) return;
 
-          final success = await notifier.saveProfileChanges();
+                if (!notifier.hasUnsavedChanges()) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Profile is already up-to-date! 👌'),
+                      ),
+                    );
+                  }
+                  return;
+                }
+                final success = await notifier.saveProfileChanges();
 
-          if (success && context.mounted) {
-            final messenger = ScaffoldMessenger.of(context);
+                if (success && context.mounted) {
+                  final messenger = ScaffoldMessenger.of(context);
 
-            messenger.showSnackBar(
-              const SnackBar(
-                content: Text('Profile updated successfully! 🚀'),
-              ),
-            );
+                  messenger.showSnackBar(
+                    const SnackBar(
+                      content: Text('Profile updated successfully! 🚀'),
+                    ),
+                  );
 
-            context.pop();
-          }
-        },
+                  context.pop();
+                }
+              },
         label: Text(
           profileState.isLoading ? 'Saving...' : 'Save Profile',
           style: const TextStyle(fontWeight: FontWeight.w800),
         ),
         icon: profileState.isLoading
             ? SizedBox(
-          width: 18,
-          height: 18,
-          child: CircularProgressIndicator(
-            strokeWidth: 2,
-            color: colorScheme.onPrimary,
-          ),
-        )
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: colorScheme.onPrimary,
+                ),
+              )
             : const Icon(Icons.check_rounded),
         backgroundColor: colorScheme.primary,
         foregroundColor: colorScheme.onPrimary,
