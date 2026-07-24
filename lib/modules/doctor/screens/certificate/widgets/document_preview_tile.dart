@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
+import 'package:yodoctor/modules/doctor/models/certificate/doctor_document_model.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class DocumentPreviewTile extends StatelessWidget {
-  const DocumentPreviewTile({super.key, required this.fileName});
+  const DocumentPreviewTile({
+    super.key,
+    required this.document,
+  });
 
-  final String fileName;
+  final DoctorDocumentModel document;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final isPdf = fileName.endsWith('.pdf');
 
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.sm),
@@ -25,17 +29,28 @@ class DocumentPreviewTile extends StatelessWidget {
       ),
       child: Row(
         children: [
+          // ✅ File icon based on type
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: isPdf
+              color: document.isPdf
                   ? colorScheme.errorContainer.withValues(alpha: 0.3)
-                  : colorScheme.primaryContainer.withValues(alpha: 0.3),
+                  : document.isImage
+                  ? colorScheme.primaryContainer.withValues(alpha: 0.3)
+                  : colorScheme.secondaryContainer.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
-              isPdf ? Icons.picture_as_pdf_rounded : Icons.image_rounded,
-              color: isPdf ? colorScheme.error : colorScheme.primary,
+              document.isPdf
+                  ? Icons.picture_as_pdf_rounded
+                  : document.isImage
+                  ? Icons.image_rounded
+                  : Icons.insert_drive_file_rounded,
+              color: document.isPdf
+                  ? colorScheme.error
+                  : document.isImage
+                  ? colorScheme.primary
+                  : colorScheme.secondary,
               size: 20,
             ),
           ),
@@ -46,7 +61,7 @@ class DocumentPreviewTile extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  fileName,
+                  document.fileName,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.bodyMedium?.copyWith(
@@ -55,32 +70,57 @@ class DocumentPreviewTile extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 2),
-                Text(
-                  isPdf ? 'PDF Document' : 'Image File',
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
-                    fontWeight: FontWeight.w600,
-                  ),
+                Row(
+                  children: [
+                    Text(
+                      document.isPdf
+                          ? 'PDF Document'
+                          : document.isImage
+                          ? 'Image File'
+                          : 'Document',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    if (document.createdAt != null) ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        width: 3,
+                        height: 3,
+                        decoration: BoxDecoration(
+                          color: colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        document.formattedDate,
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
               ],
             ),
           ),
           const SizedBox(width: AppSpacing.sm),
+          // ✅ View button with actual file opening
           SizedBox(
             height: 36,
             child: OutlinedButton.icon(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Opening $fileName preview...'),
-                    behavior: SnackBarBehavior.floating,
-                  ),
-                );
-              },
+              onPressed: () => _openFile(context, document.fullUrl),
               style: OutlinedButton.styleFrom(
                 foregroundColor: colorScheme.primary,
-                side: BorderSide(color: colorScheme.outlineVariant.withValues(alpha: 0.5)),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                side: BorderSide(
+                  color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 elevation: 0,
               ),
@@ -95,6 +135,45 @@ class DocumentPreviewTile extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Future<void> _openFile(BuildContext context, String path) async {
+    try {
+      if (path.isEmpty) {
+        _showError(context, 'No file URL available');
+        return;
+      }
+
+      // Normalize path (already done in model)
+      final normalizedPath = path.replaceAll('\\', '/');
+
+      // If it's a full URL, launch it
+      if (normalizedPath.startsWith('http://') || normalizedPath.startsWith('https://')) {
+        final uri = Uri.parse(normalizedPath);
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
+        } else {
+          if (!context.mounted) return;
+          _showError(context, 'Cannot open file: $normalizedPath');
+        }
+      } else {
+        // For relative paths, show message
+        _showError(context, 'File preview not available. Path: $normalizedPath');
+      }
+    } catch (e) {
+      if (!context.mounted) return;
+      _showError(context, 'Error opening file: $e');
+    }
+  }
+
+  void _showError(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Theme.of(context).colorScheme.error,
       ),
     );
   }

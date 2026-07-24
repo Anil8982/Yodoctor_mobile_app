@@ -1,3 +1,4 @@
+import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
 import 'package:yodoctor/modules/doctor/models/certificate/doctor_certificate_detail_model.dart';
@@ -10,6 +11,7 @@ class CertificateActionForm extends StatelessWidget {
     required this.notesController,
     required this.selectedFitnessStatus,
     required this.validityPeriod,
+    required this.isSubmitting,
     required this.onFitnessStatusChanged,
     required this.onValidityChanged,
     required this.onApprove,
@@ -20,6 +22,7 @@ class CertificateActionForm extends StatelessWidget {
   final TextEditingController notesController;
   final String selectedFitnessStatus;
   final String validityPeriod;
+  final bool isSubmitting;
   final ValueChanged<String> onFitnessStatusChanged;
   final ValueChanged<String?> onValidityChanged;
   final VoidCallback onApprove;
@@ -32,17 +35,14 @@ class CertificateActionForm extends StatelessWidget {
 
     return Column(
       children: [
-        // 🎯 PatientInfoPanel च्या डिझाईनशी १००% मॅच होणारे एकमेव मास्टर कार्ड
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: colorScheme.surfaceContainer, // 👈 सिंक केला बॅकग्राउंड रंग
-            borderRadius: BorderRadius.circular(24), // 👈 सिंक कॉर्नर्स
+            color: colorScheme.surfaceContainer,
+            borderRadius: BorderRadius.circular(24),
             border: Border.all(
-              color: colorScheme.outlineVariant.withValues(
-                alpha: 0.35,
-              ), // 👈 सिंक बॉर्डर अल्फा
+              color: colorScheme.outlineVariant.transparency(0.35),
               width: 1.2,
             ),
           ),
@@ -52,7 +52,7 @@ class CertificateActionForm extends StatelessWidget {
               Text(
                 'CERTIFICATE DETAILS',
                 style: theme.textTheme.labelSmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+                  color: colorScheme.onSurfaceVariant.transparency(0.6),
                   fontWeight: FontWeight.w800,
                   letterSpacing: 0.8,
                 ),
@@ -67,23 +67,20 @@ class CertificateActionForm extends StatelessWidget {
               _buildStaticField(
                 context,
                 "Patient's Request Notes",
-                certificate.notes.isEmpty ? "N/A" : certificate.notes,
+                certificate.notes.trim().isEmpty ? "N/A" : certificate.notes,
               ),
-
               const SizedBox(height: 20),
               Divider(
-                color: colorScheme.outlineVariant.withValues(alpha: 0.25),
+                color: colorScheme.outlineVariant.transparency(0.25),
                 height: 1,
               ),
               const SizedBox(height: 20),
-
               _buildDropdownField(context),
               const SizedBox(height: AppSpacing.lg),
-
               Text(
                 'FITNESS ASSESSMENT',
                 style: theme.textTheme.labelSmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+                  color: colorScheme.onSurfaceVariant.transparency(0.6),
                   fontWeight: FontWeight.w800,
                   letterSpacing: 0.8,
                 ),
@@ -99,15 +96,13 @@ class CertificateActionForm extends StatelessWidget {
           ),
         ),
         const SizedBox(height: AppSpacing.xl),
-
-        // खालचे ॲक्शन बटन्स आणि फूटर नोट पॅनेल (मास्टर कार्डच्या रचनेशी मॅचिंग)
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: colorScheme.surfaceContainer,
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
-              color: colorScheme.outlineVariant.withValues(alpha: 0.35),
+              color: colorScheme.outlineVariant.transparency(0.35),
               width: 1.2,
             ),
           ),
@@ -120,7 +115,7 @@ class CertificateActionForm extends StatelessWidget {
                 text: TextSpan(
                   text: 'Fields marked ',
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                    color: colorScheme.onSurfaceVariant.transparency(0.7),
                     fontSize: 11,
                     fontWeight: FontWeight.w500,
                   ),
@@ -132,13 +127,8 @@ class CertificateActionForm extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const TextSpan(
-                      text:
-                          'are required. Approval digitally signs the certificate with registration number ',
-                    ),
                     TextSpan(
-                      text: 'MCI-78234.',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      text: 'are required. Approval will generate the certificate.',
                     ),
                   ],
                 ),
@@ -160,7 +150,7 @@ class CertificateActionForm extends StatelessWidget {
         Text(
           label,
           style: theme.textTheme.labelSmall?.copyWith(
-            color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+            color: colorScheme.onSurfaceVariant.transparency(0.5),
             fontWeight: FontWeight.w800,
             fontSize: 10,
           ),
@@ -189,22 +179,35 @@ class CertificateActionForm extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
+    const validValues = ['7 days', '30 days', '90 days'];
+    final safeValue = validValues.contains(validityPeriod) ? validityPeriod : '30 days';
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'VALIDITY PERIOD',
-          style: theme.textTheme.labelSmall?.copyWith(
-            color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
-            fontWeight: FontWeight.w900,
-            fontSize: 10,
-            letterSpacing: 0.8,
+        RichText(
+          text: TextSpan(
+            text: 'VALIDITY PERIOD',
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: colorScheme.onSurfaceVariant.transparency(0.5),
+              fontWeight: FontWeight.w900,
+              fontSize: 10,
+              letterSpacing: 0.8,
+            ),
+            children: [
+              TextSpan(
+                text: ' *',
+                style: TextStyle(
+                  color: colorScheme.error,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
           ),
         ),
         const SizedBox(height: 8),
-
         DropdownButtonFormField<String>(
-          initialValue: validityPeriod,
+          initialValue: safeValue,
           style: theme.textTheme.bodyMedium?.copyWith(
             fontWeight: FontWeight.w700,
             color: colorScheme.onSurface,
@@ -212,7 +215,7 @@ class CertificateActionForm extends StatelessWidget {
           dropdownColor: colorScheme.surfaceContainerHigh,
           icon: Icon(
             Icons.keyboard_arrow_down_rounded,
-            color: colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
+            color: colorScheme.onSurfaceVariant.transparency(0.8),
           ),
           decoration: InputDecoration(
             filled: true,
@@ -256,7 +259,7 @@ class CertificateActionForm extends StatelessWidget {
           text: TextSpan(
             text: "DOCTOR'S CLINICAL NOTES",
             style: theme.textTheme.labelSmall?.copyWith(
-              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+              color: colorScheme.onSurfaceVariant.transparency(0.5),
               fontWeight: FontWeight.w900,
               fontSize: 10,
               letterSpacing: 0.8,
@@ -273,7 +276,6 @@ class CertificateActionForm extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-
         TextFormField(
           controller: notesController,
           maxLines: 4,
@@ -286,9 +288,9 @@ class CertificateActionForm extends StatelessWidget {
               : null,
           decoration: InputDecoration(
             hintText:
-                'Add your clinical findings, observations and recommendations...',
+            'Add your clinical findings, observations and recommendations...',
             hintStyle: theme.textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.45),
+              color: colorScheme.onSurfaceVariant.transparency(0.45),
               fontWeight: FontWeight.w500,
             ),
             filled: true,
@@ -331,7 +333,7 @@ class CertificateActionForm extends StatelessWidget {
           child: SizedBox(
             height: 46,
             child: FilledButton.icon(
-              onPressed: onApprove,
+              onPressed: isSubmitting ? null : onApprove,
               style: FilledButton.styleFrom(
                 backgroundColor: colorScheme.primary,
                 foregroundColor: colorScheme.onPrimary,
@@ -341,9 +343,18 @@ class CertificateActionForm extends StatelessWidget {
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),
-              icon: const Icon(Icons.check_rounded, size: 16),
+              icon: isSubmitting
+                  ? SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: colorScheme.onPrimary,
+                ),
+              )
+                  : const Icon(Icons.check_rounded, size: 16),
               label: Text(
-                'Approve & Generate',
+                isSubmitting ? 'Processing...' : 'Approve & Generate',
                 style: theme.textTheme.labelLarge?.copyWith(
                   fontWeight: FontWeight.w900,
                   color: colorScheme.onPrimary,
@@ -355,13 +366,12 @@ class CertificateActionForm extends StatelessWidget {
           ),
         ),
         const SizedBox(width: AppSpacing.md),
-
         Expanded(
           flex: 1,
           child: SizedBox(
             height: 46,
             child: OutlinedButton.icon(
-              onPressed: onReject,
+              onPressed: isSubmitting ? null : onReject,
               style: OutlinedButton.styleFrom(
                 foregroundColor: colorScheme.error,
                 backgroundColor: colorScheme.errorContainer.withValues(
@@ -369,16 +379,25 @@ class CertificateActionForm extends StatelessWidget {
                 ),
                 elevation: 0,
                 side: BorderSide(
-                  color: colorScheme.error.withValues(alpha: 0.25),
+                  color: colorScheme.error.transparency(0.25),
                   width: 1.2,
                 ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),
-              icon: const Icon(Icons.close_rounded, size: 16),
+              icon: isSubmitting
+                  ? SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: colorScheme.error,
+                ),
+              )
+                  : const Icon(Icons.close_rounded, size: 16),
               label: Text(
-                'Reject',
+                isSubmitting ? 'Processing...' : 'Reject',
                 style: theme.textTheme.labelLarge?.copyWith(
                   fontWeight: FontWeight.w900,
                   color: colorScheme.error,

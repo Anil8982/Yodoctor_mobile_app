@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/core/providers/app_role_provider.dart';
+import 'package:yodoctor/modules/auth/controllers/doctor_login_controller.dart';
+import 'package:yodoctor/modules/widgets/logout_dialog.dart';
 import '../../controllers/subscription_controller.dart';
 import 'widgets/available_plans_section.dart';
 import 'widgets/main_plan_card.dart';
@@ -18,15 +21,31 @@ class MySubscriptionScreen extends ConsumerWidget {
         state.currentPlan != null && state.currentPlan!.isActive;
 
     return Scaffold(
-      // 🎯 FIXED: Standardized M3 background container tokens natively
-      backgroundColor: colorScheme.surfaceContainerLow,
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
         title: const Text(
           'My Subscription',
-          style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18),
         ),
-        backgroundColor: colorScheme.surfaceContainerLow,
-        scrolledUnderElevation: 0,
+        // 🎯 Added Logout action button in AppBar
+        actions: [
+          IconButton(
+            icon: Icon(Icons.logout_rounded, color: colorScheme.error),
+            tooltip: 'Logout',
+            onPressed: () async {
+              // Confirm before logging out
+              final shouldLogout = await showDialog<bool>(
+                context: context,
+                builder: (context) => LogoutDialog(role: AppRole.doctor,)
+              );
+
+              if (shouldLogout == true) {
+                // Trigger logout from DoctorLoginController
+                await ref.read(doctorLoginControllerProvider.notifier).logout();
+              }
+            },
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       body: state.isLoading && state.currentPlan == null
           ? const Center(child: CircularProgressIndicator())

@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/api_constants.dart';
+import 'package:yodoctor/core/constants/log_tags.dart';
+import 'package:yodoctor/core/debug/app_logger.dart';
 import 'package:yodoctor/core/network/dio_provider.dart';
 
 final subscriptionRepositoryProvider = Provider<SubscriptionRepository>((ref) {
@@ -10,9 +12,16 @@ final subscriptionRepositoryProvider = Provider<SubscriptionRepository>((ref) {
 class SubscriptionRepository {
   SubscriptionRepository(this._dio);
   final Dio _dio;
+  static const String _subTag = 'SubscriptionRepository';
 
-  Future<Response> getActiveSubscription() {
-    return _dio.get(ApiConstants.activeSubscription);
+  Future<Response> getActiveSubscription() async {
+    AppLogger.info('Fetching active subscription status from server', tag: LogTags.doctor, subTag: _subTag);
+    try {
+      return await _dio.get(ApiConstants.activeSubscription);
+    } catch (e, st) {
+      AppLogger.error('Failed to fetch active subscription', tag: LogTags.doctor, subTag: _subTag, error: e, stackTrace: st);
+      rethrow;
+    }
   }
 
   Future<Response> getBillingHistory() {

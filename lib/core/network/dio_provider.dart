@@ -16,7 +16,7 @@ final dioProvider = Provider<Dio>((ref) {
       baseUrl: EnvConfig.baseUrl,
       connectTimeout: const Duration(seconds: 30),
       receiveTimeout: const Duration(seconds: 30),
-      sendTimeout: const Duration(seconds: 30),
+      sendTimeout: const Duration(minutes: 1),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',

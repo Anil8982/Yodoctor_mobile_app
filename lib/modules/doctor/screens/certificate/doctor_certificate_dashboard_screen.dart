@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/modules/doctor/controllers/doctor_certificate_controller.dart';
+import 'package:yodoctor/modules/doctor/screens/certificate/widgets/certificate_shimmer.dart';
 import '../../../../core/utils/app_spacing.dart';
 import '../../../../core/utils/responsive.dart';
 import '../../widgets/doctor_drawer.dart';
@@ -53,6 +54,12 @@ class _DoctorCertificateDashboardScreenState
     final notifier = ref.read(doctorCertificateProvider.notifier);
     final filteredCerts = notifier.filteredCertificates;
     final profileState = ref.watch(doctorProfileProvider);
+
+    // ✅ Check if loading (first load) - show shimmer
+    final isLoading = certificateState.loading &&
+        certificateState.pendingCertificates.isEmpty &&
+        certificateState.issuedCertificates.isEmpty;
+
 
     return Scaffold(
       key: _scaffoldKey,
@@ -110,40 +117,48 @@ class _DoctorCertificateDashboardScreenState
                 ),
               ),
               Expanded(
-                child: CustomScrollView(
-                  slivers: [
-                    SliverPadding(
-                      padding: EdgeInsets.fromLTRB(
-                        horizontalPadding,
-                        AppSpacing.xl,
-                        horizontalPadding,
-                        AppSpacing.xxxl,
-                      ),
-                      sliver: SliverToBoxAdapter(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildSummaryCards(
-                              context,
-                              certificateState,
-                              notifier,
-                            ),
-                            const SizedBox(height: AppSpacing.xl),
-                            _buildToolbar(context, certificateState, notifier),
-                            const SizedBox(height: AppSpacing.lg),
-                            if (filteredCerts.isEmpty)
-                              const _EmptyHistory()
-                            else
-                              CertificateListCards(
-                                certificates: filteredCerts,
-                                isIssuedTab:
+                child: RefreshIndicator(
+                  onRefresh: () => notifier.refresh(),
+                  child: CustomScrollView(
+                    slivers: [
+                      SliverPadding(
+                        padding: EdgeInsets.fromLTRB(
+                          horizontalPadding,
+                          AppSpacing.xl,
+                          horizontalPadding,
+                          AppSpacing.xxxl,
+                        ),
+                        sliver: SliverToBoxAdapter(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // ✅ Show shimmer on first load
+                              if (isLoading)
+                                const CertificateDashboardShimmer()
+                              else ...[
+                                _buildSummaryCards(
+                                  context,
+                                  certificateState,
+                                  notifier,
+                                ),
+                                const SizedBox(height: AppSpacing.xl),
+                                _buildToolbar(context, certificateState, notifier),
+                                const SizedBox(height: AppSpacing.lg),
+                                if (filteredCerts.isEmpty)
+                                  const _EmptyHistory()
+                                else
+                                  CertificateListCards(
+                                    certificates: filteredCerts,
+                                    isIssuedTab:
                                     certificateState.activeTabIndex == 1,
-                              ),
-                          ],
+                                  ),
+                              ],
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -154,10 +169,10 @@ class _DoctorCertificateDashboardScreenState
   }
 
   Widget _buildSummaryCards(
-    BuildContext context,
-    CertificateState state,
-    DoctorCertificateNotifier notifier,
-  ) {
+      BuildContext context,
+      CertificateState state,
+      DoctorCertificateNotifier notifier,
+      ) {
     final isIssuedTab = state.activeTabIndex == 1;
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -167,58 +182,58 @@ class _DoctorCertificateDashboardScreenState
       child: Row(
         children: isIssuedTab
             ? [
-                _buildCard(
-                  context,
-                  'Total Issued',
-                  '${notifier.issuedCount}',
-                  colorScheme.primary,
-                  colorScheme.primaryContainer,
-                ),
-                const SizedBox(width: AppSpacing.md),
-                _buildCard(
-                  context,
-                  'This Month',
-                  '${notifier.issuedCount}',
-                  colorScheme.secondary,
-                  colorScheme.secondaryContainer,
-                ),
-                const SizedBox(width: AppSpacing.md),
-                _buildCard(
-                  context,
-                  'Expiring Soon',
-                  '1',
-                  colorScheme.error,
-                  colorScheme.errorContainer,
-                ),
-              ]
+          _buildCard(
+            context,
+            'Total Issued',
+            '${notifier.issuedCount}',
+            colorScheme.primary,
+            colorScheme.primaryContainer,
+          ),
+          const SizedBox(width: AppSpacing.md),
+          _buildCard(
+            context,
+            'This Month',
+            '${notifier.issuedCount}',
+            colorScheme.secondary,
+            colorScheme.secondaryContainer,
+          ),
+          const SizedBox(width: AppSpacing.md),
+          _buildCard(
+            context,
+            'Expiring Soon',
+            '1',
+            colorScheme.error,
+            colorScheme.errorContainer,
+          ),
+        ]
             : [
-                _buildCard(
-                  context,
-                  'Pending Requests',
-                  '${notifier.pendingCount}',
-                  colorScheme.tertiary,
-                  colorScheme.tertiaryContainer,
-                ),
-                const SizedBox(width: AppSpacing.md),
-                _buildCard(
-                  context,
-                  'Total Requests',
-                  '${notifier.totalCount}',
-                  colorScheme.primary,
-                  colorScheme.primaryContainer,
-                ),
-              ],
+          _buildCard(
+            context,
+            'Pending Requests',
+            '${notifier.pendingCount}',
+            colorScheme.tertiary,
+            colorScheme.tertiaryContainer,
+          ),
+          const SizedBox(width: AppSpacing.md),
+          _buildCard(
+            context,
+            'Total Requests',
+            '${notifier.totalCount}',
+            colorScheme.primary,
+            colorScheme.primaryContainer,
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildCard(
-    BuildContext context,
-    String title,
-    String count,
-    Color textColor,
-    Color containerColor,
-  ) {
+      BuildContext context,
+      String title,
+      String count,
+      Color textColor,
+      Color containerColor,
+      ) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -266,10 +281,10 @@ class _DoctorCertificateDashboardScreenState
   }
 
   Widget _buildToolbar(
-    BuildContext context,
-    CertificateState state,
-    DoctorCertificateNotifier notifier,
-  ) {
+      BuildContext context,
+      CertificateState state,
+      DoctorCertificateNotifier notifier,
+      ) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final isMobile = Responsive.isMobile(context);

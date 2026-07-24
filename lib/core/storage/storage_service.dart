@@ -114,4 +114,21 @@ class StorageService {
   Future<void> clearStatus() async {
     await _box.delete(HiveKeys.doctorStatus);
   }
+
+
+  // ----------------------------
+  // Doctor Active Subscription Status Management
+  // ----------------------------
+
+  Future<void> saveActiveSubscription(bool hasSubscription) async {
+    await _box.put(HiveKeys.activeSubscription, hasSubscription);
+  }
+
+  bool? getActiveSubscription() {
+    return _box.get(HiveKeys.activeSubscription) as bool?;
+  }
+
+  Future<void> clearActiveSubscription() async {
+    await _box.delete(HiveKeys.activeSubscription);
+  }
 }

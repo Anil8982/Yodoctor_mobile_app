@@ -17,6 +17,7 @@ import 'package:yodoctor/modules/auth/screens/landing/landing_screen.dart';
 import 'package:yodoctor/modules/auth/screens/landing/splash_screen.dart';
 import 'package:yodoctor/modules/auth/screens/patient/patient_login_screen.dart';
 import 'package:yodoctor/modules/auth/screens/patient/patient_register_screen.dart';
+import 'package:yodoctor/modules/doctor/controllers/subscription_status_controller.dart';
 import 'package:yodoctor/modules/doctor/doctor_scaffold_shell.dart';
 import 'package:yodoctor/modules/doctor/screens/appointments/add_prescription_screen.dart';
 import 'package:yodoctor/modules/doctor/screens/appointments/doctor_appointment_history_screen.dart';
@@ -80,6 +81,13 @@ final routerProvider = Provider<GoRouter>((ref) {
     refreshRouter();
   });
 
+  // Listen: Doctor subscription status changes
+  ref.listen(subscriptionStatusProvider, (_, _) {
+    AppLogger.debug('Router: subscriptionStatusProvider changed, refreshing',
+        tag: LogTags.auth, subTag: 'Router');
+    refreshRouter();
+  });
+
   // Cleanup notifier when provider is disposed
   ref.onDispose(refreshListenable.dispose);
 
@@ -111,15 +119,17 @@ final routerProvider = Provider<GoRouter>((ref) {
       final isLoggedIn = token != null && token.isNotEmpty;
       final matchedPath = state.matchedLocation;
       final authType = storage.getAuthType();
-
+      final subState = ref.read(subscriptionStatusProvider).value ?? const SubscriptionStatusState();
 
       AppLogger.info(
         'Router → '
             'TOKEN=${token != null ? 'YES' : 'NO'} | '
             'ROLE=$role | '
             'AUTH_TYPE=${authType?.name ?? 'null'} | '
-            'STATUS=${ref.read(doctorStatusProvider).status} | '
-            'RESOLVED=${ref.read(doctorStatusProvider).isResolved} | '
+            'DOC_STATUS=${ref.read(doctorStatusProvider).status} | '
+            'DOC_RESOLVED=${ref.read(doctorStatusProvider).isResolved} | '
+            'SUB_RESOLVED=${subState.isResolved} | '
+            'HAS_SUB=${subState.hasSubscription} | '
             'PATH=$matchedPath',
         tag: LogTags.auth,
         subTag: 'Router',
@@ -153,46 +163,103 @@ final routerProvider = Provider<GoRouter>((ref) {
       }
 
       // ---- Doctor ----
+      // if (role == 'doctor') {
+      //   final doctorState = ref.read(doctorStatusProvider);
+      //
+      //   // While verification not resolved, stay on splash
+      //   if (!doctorState.isResolved) {
+      //     if (matchedPath != AppRoutes.splash) {
+      //       AppLogger.debug('Router: doctor unresolved → splash',
+      //           tag: LogTags.auth, subTag: 'Router');
+      //       return AppRoutes.splash;
+      //     }
+      //     return null; // Stay on splash
+      //   }
+      //
+      //   // APPROVED: redirect from splash/auth/waiting to dashboard
+      //   if (doctorState.status == 'APPROVED') {
+      //     if (matchedPath == AppRoutes.splash ||
+      //         isAuthScreen(matchedPath) ||
+      //         matchedPath == AppRoutes.waitingApproval) {
+      //       AppLogger.debug('Router: doctor approved → dashboard',
+      //           tag: LogTags.auth, subTag: 'Router');
+      //       return AppRoutes.doctorDashboard;
+      //     }
+      //     return null; // Approved doctor can go anywhere
+      //   }
+      //
+      //   // PENDING or REJECTED (or null with error)
+      //   // Block doctor protected routes
+      //   if (isDoctorProtectedRoute(matchedPath)) {
+      //     AppLogger.debug('Router: doctor not approved → waiting',
+      //         tag: LogTags.auth, subTag: 'Router');
+      //     return AppRoutes.waitingApproval;
+      //   }
+      //   // Redirect all other routes to waiting
+      //   if (matchedPath != AppRoutes.waitingApproval) {
+      //     AppLogger.debug('Router: doctor not approved → waiting',
+      //         tag: LogTags.auth, subTag: 'Router');
+      //     return AppRoutes.waitingApproval;
+      //   }
+      //   return null; // Stay on waiting approval
+      // }
+
+
+      // ---- Doctor ----
       if (role == 'doctor') {
         final doctorState = ref.read(doctorStatusProvider);
+        final subState = ref.read(subscriptionStatusProvider).value ?? const SubscriptionStatusState();
 
         // While verification not resolved, stay on splash
         if (!doctorState.isResolved) {
           if (matchedPath != AppRoutes.splash) {
-            AppLogger.debug('Router: doctor unresolved → splash',
-                tag: LogTags.auth, subTag: 'Router');
             return AppRoutes.splash;
           }
-          return null; // Stay on splash
+          return null;
         }
 
-        // APPROVED: redirect from splash/auth/waiting to dashboard
-        if (doctorState.status == 'APPROVED') {
-          if (matchedPath == AppRoutes.splash ||
-              isAuthScreen(matchedPath) ||
-              matchedPath == AppRoutes.waitingApproval) {
-            AppLogger.debug('Router: doctor approved → dashboard',
-                tag: LogTags.auth, subTag: 'Router');
-            return AppRoutes.doctorDashboard;
+        // If not approved, redirect to waiting approval
+        if (doctorState.status != 'APPROVED') {
+          if (isDoctorProtectedRoute(matchedPath) || matchedPath != AppRoutes.waitingApproval) {
+            return AppRoutes.waitingApproval;
           }
-          return null; // Approved doctor can go anywhere
+          return null;
         }
 
-        // PENDING or REJECTED (or null with error)
-        // Block doctor protected routes
-        if (isDoctorProtectedRoute(matchedPath)) {
-          AppLogger.debug('Router: doctor not approved → waiting',
-              tag: LogTags.auth, subTag: 'Router');
-          return AppRoutes.waitingApproval;
+        // If subscription not yet resolved, redirect to subscription screen safely
+        if (!subState.isResolved) {
+          if (matchedPath != AppRoutes.doctorSubscription) {
+            AppLogger.debug('Router: subscription status unresolved → redirecting to subscription screen',
+                tag: LogTags.auth, subTag: 'Router');
+            return AppRoutes.doctorSubscription;
+          }
+          return null;
         }
-        // Redirect all other routes to waiting
-        if (matchedPath != AppRoutes.waitingApproval) {
-          AppLogger.debug('Router: doctor not approved → waiting',
-              tag: LogTags.auth, subTag: 'Router');
-          return AppRoutes.waitingApproval;
+
+        // If approved but NO active subscription -> Force redirect to Subscription Screen
+        if (!subState.hasSubscription) {
+          if (matchedPath != AppRoutes.doctorSubscription) {
+            AppLogger.debug('Router: doctor approved but no subscription → subscription screen',
+                tag: LogTags.auth, subTag: 'Router');
+            return AppRoutes.doctorSubscription;
+          }
+          return null;
         }
-        return null; // Stay on waiting approval
+
+        // APPROVED + HAS SUBSCRIPTION:
+        // Only redirect to dashboard if they are landing on Splash, Auth screens, or Waiting Approval.
+        // DO NOT include AppRoutes.doctorSubscription here, so subscribed doctors can visit their subscription management page freely!
+        if (matchedPath == AppRoutes.splash ||
+            isAuthScreen(matchedPath) ||
+            matchedPath == AppRoutes.waitingApproval) {
+          AppLogger.debug('Router: doctor approved & subscribed from splash/auth → dashboard',
+              tag: LogTags.auth, subTag: 'Router');
+          return AppRoutes.doctorDashboard;
+        }
+
+        return null; // Allow subscribed doctor to access Dashboard, My Subscription, Profile, etc. freely!
       }
+
 
       return null; // Fallback
     },

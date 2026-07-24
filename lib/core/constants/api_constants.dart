@@ -133,9 +133,9 @@ class ApiConstants {
   static const String readAllNotifications = '/notifications/read-all';
 
   // --- Doctor Subscription & Billing ---
-  static const activeSubscription = '/subscriptions/active';
-  static const billingHistory = '/billing/history';
-  static const subscriptionPlans = '/plans';
-  static const createSubscription = '/subscriptions/create';
+  static const activeSubscription = '/razorpay/subscriptions/active';
+  static const billingHistory = '/razorpay/billing/history';
+  static const subscriptionPlans = '/razorpay/plans';
+  static const createSubscription = '/razorpay/subscriptions/create';
   static const verifySubscription = '/subscriptions/verify';
 }

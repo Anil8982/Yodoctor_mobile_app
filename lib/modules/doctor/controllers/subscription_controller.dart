@@ -79,7 +79,7 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
   Future<void> loadSubscriptionDetails() async {
     state = state.copyWith(isLoading: true, clearError: true);
     AppLogger.info(
-      'Initializing parallel subscription matrix and ledger sync streams',
+      'Loading subscription details sequentially to prevent rate limits',
       tag: LogTags.doctor,
       subTag: _subTag,
     );
@@ -87,18 +87,16 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
     try {
       final repository = ref.read(subscriptionRepositoryProvider);
 
-      final results = await Future.wait([
-        repository.getActiveSubscription(),
-        repository.getBillingHistory(),
-        repository.getPlans(),
-      ]);
-
-      final subRes = results[0];
-      final historyRes = results[1];
-      final plansRes = results[2];
-
+      // 1. Fetch active subscription sequentially
+      final subRes = await repository.getActiveSubscription();
       final subStatus = subRes.statusCode ?? 0;
+
+      // 2. Fetch billing history
+      final historyRes = await repository.getBillingHistory();
       final historyStatus = historyRes.statusCode ?? 0;
+
+      // 3. Fetch available plans
+      final plansRes = await repository.getPlans();
       final plansStatus = plansRes.statusCode ?? 0;
 
       if (subStatus >= 200 &&
@@ -107,8 +105,9 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
           historyStatus < 300 &&
           plansStatus >= 200 &&
           plansStatus < 300) {
+
         SubscriptionPlan? currentPlan;
-        final rawSubscription = subRes.data?["subscription"];
+        final rawSubscription = subRes.data?["subscription"] ?? subRes.data?["data"]?["subscription"];
 
         if (rawSubscription is Map && rawSubscription.isNotEmpty) {
           currentPlan = SubscriptionPlan.fromJson(
@@ -116,13 +115,15 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
           );
         }
 
-        final rawHistory = historyRes.data?["history"] as List? ?? [];
-        final billingHistory = rawHistory
+        // Safe parsing for invoices/history
+        final rawHistoryData = historyRes.data?["data"]?["invoices"] ?? historyRes.data?["history"] ?? [];
+        final billingHistory = (rawHistoryData as List? ?? [])
             .map((e) => BillingInvoice.fromJson(Map<String, dynamic>.from(e)))
             .toList();
 
-        final rawPlans = plansRes.data?["plans"] as List? ?? [];
-        final allPlans = rawPlans
+        // Safe parsing for available plans
+        final rawPlansData = plansRes.data?["data"]?["plans"] ?? plansRes.data?["plans"] ?? [];
+        final allPlans = (rawPlansData as List? ?? [])
             .map((e) => AvailablePlan.fromJson(Map<String, dynamic>.from(e)))
             .toList();
 
@@ -130,7 +131,7 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
             currentPlan == null || !currentPlan.isActive;
 
         AppLogger.success(
-          'Subscription data profile synchronized flawlessly',
+          'Subscription data profile synchronized flawlessly. Plans count: ${allPlans.length}',
           tag: LogTags.doctor,
           subTag: _subTag,
         );
@@ -177,7 +178,6 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
       );
     }
   }
-
   void toggleDuration(bool isYearly) {
     AppLogger.info(
       'Toggling duration filter boundary. IsYearly: $isYearly',
@@ -203,11 +203,27 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
   List<AvailablePlan> getAvailablePlans() {
     final targetCycle = state.isYearly ? "yearly" : "monthly";
     return state.allPlans.where((p) {
+      // 1. Direct category match from backend (Best & primary approach)
+      if (p.category.isNotEmpty) {
+        return p.category.toLowerCase() == targetCycle;
+      }
+
+      // 2. Fallback text search if category is empty
       final cleanDuration = p.durationText.toLowerCase();
+      final cleanTitle = p.title.toLowerCase();
+      final cleanSlug = p.slug.toLowerCase();
+
       if (targetCycle == "yearly") {
-        return cleanDuration.contains("year") || cleanDuration.contains("yr");
+        return cleanDuration.contains("year") ||
+            cleanDuration.contains("yr") ||
+            cleanTitle.contains("year");
       } else {
-        return cleanDuration.contains("month") || cleanDuration.contains("mo");
+        return cleanDuration.contains("month") ||
+            cleanDuration.contains("mo") ||
+            cleanDuration.contains("trial") ||
+            cleanTitle.contains("month") ||
+            cleanTitle.contains("trial") ||
+            cleanSlug.contains("trial");
       }
     }).toList();
   }

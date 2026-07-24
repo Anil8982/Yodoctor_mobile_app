@@ -5,6 +5,7 @@ import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
 import 'package:yodoctor/core/providers/app_role_provider.dart';
 import 'package:yodoctor/modules/auth/repositories/doctor_auth_repository.dart';
+import 'package:yodoctor/modules/doctor/controllers/subscription_status_controller.dart';
 
 import 'doctor_status_controller.dart';
 
@@ -136,6 +137,7 @@ class DoctorLoginController extends AsyncNotifier<Map<String, dynamic>?> {
 
       // Clear old doctor's runtime verification state
       ref.read(doctorStatusProvider.notifier).reset();
+      ref.read(subscriptionStatusProvider.notifier).reset(); // 🎯 Added clear
 
       ref.read(appRoleProvider.notifier).clearRole();
       state = const AsyncData(null);

@@ -18,6 +18,7 @@ class StatusChipSelector extends StatelessWidget {
     final List<Map<String, dynamic>> statusOptions = [
       {
         'label': 'FIT',
+        'value': 'FIT',
         'icon': Icons.check_circle_outline_rounded,
         'selectedIcon': Icons.check_circle_rounded,
         'color': colorScheme.primary,
@@ -25,6 +26,7 @@ class StatusChipSelector extends StatelessWidget {
       },
       {
         'label': 'UNFIT',
+        'value': 'UNFIT',
         'icon': Icons.cancel_outlined,
         'selectedIcon': Icons.cancel_rounded,
         'color': colorScheme.error,
@@ -32,6 +34,7 @@ class StatusChipSelector extends StatelessWidget {
       },
       {
         'label': 'TEMP UNFIT',
+        'value': 'TEMPORARILY UNFIT',
         'icon': Icons.hourglass_empty_rounded,
         'selectedIcon': Icons.hourglass_full_rounded,
         'color': colorScheme.tertiary,
@@ -63,14 +66,9 @@ class StatusChipSelector extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 10),
-
         Row(
           children: statusOptions.map((option) {
-            final isSelected =
-                selectedStatus.toUpperCase() == option['label'] ||
-                (option['label'] == 'TEMP UNFIT' &&
-                    selectedStatus.toUpperCase().contains('TEMPORARILY'));
-
+            final isSelected = selectedStatus.toUpperCase() == option['value'];
             return Expanded(
               child: Container(
                 margin: EdgeInsets.only(
@@ -78,11 +76,7 @@ class StatusChipSelector extends StatelessWidget {
                 ),
                 height: 46,
                 child: InkWell(
-                  onTap: () => onChanged(
-                    option['label'] == 'TEMP UNFIT'
-                        ? 'TEMPORARILY UNFIT'
-                        : option['label'],
-                  ),
+                  onTap: () => onChanged(option['value']),
                   borderRadius: BorderRadius.circular(14),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 180),
@@ -108,8 +102,8 @@ class StatusChipSelector extends StatelessWidget {
                           color: isSelected
                               ? option['color']
                               : colorScheme.onSurfaceVariant.withValues(
-                                  alpha: 0.8,
-                                ),
+                            alpha: 0.8,
+                          ),
                         ),
                         const SizedBox(width: 6),
                         Flexible(

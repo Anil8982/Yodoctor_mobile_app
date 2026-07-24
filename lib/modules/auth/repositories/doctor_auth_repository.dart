@@ -192,32 +192,65 @@ class DoctorAuthRepository {
     }
   }
 
-  Future<Response> registerStep6({required DoctorFormData data}) async {
-    AppLogger.info('Compiling and uploading registration multipart fields for step 6', tag: LogTags.auth, subTag: _subTag);
-    final token = _storage.getRegistrationToken() ?? _storage.getToken();
+  Future<Response> registerStep6({
+    required DoctorFormData data,
+  }) async {
+    AppLogger.info(
+      'Compiling and uploading registration multipart fields for step 6',
+      tag: LogTags.auth,
+      subTag: _subTag,
+    );
 
     try {
       final formData = FormData.fromMap({
-        "profile": await MultipartFile.fromFile(data.profileFile!.path, filename: p.basename(data.profileFile!.path)),
-        "certificate": await MultipartFile.fromFile(data.certificateFile!.path, filename: p.basename(data.certificateFile!.path)),
-        "idProof": await MultipartFile.fromFile(data.idProofFile!.path, filename: p.basename(data.idProofFile!.path)),
+        "profile": await MultipartFile.fromFile(
+          data.profileFile!.path,
+          filename: p.basename(data.profileFile!.path),
+        ),
+        "certificate": await MultipartFile.fromFile(
+          data.certificateFile!.path,
+          filename: p.basename(data.certificateFile!.path),
+        ),
+        "idProof": await MultipartFile.fromFile(
+          data.idProofFile!.path,
+          filename: p.basename(data.idProofFile!.path),
+        ),
         if (data.clinicProofFile != null)
-          "clinicProof": await MultipartFile.fromFile(data.clinicProofFile!.path, filename: p.basename(data.clinicProofFile!.path)),
+          "clinicProof": await MultipartFile.fromFile(
+            data.clinicProofFile!.path,
+            filename: p.basename(data.clinicProofFile!.path),
+          ),
       });
 
       final response = await _dio.patch(
         ApiConstants.doctorRegisterStep6,
         data: formData,
         options: Options(
-          headers: {
-            "Content-Type": "multipart/form-data",
-            if (token != null) "Authorization": "Bearer $token",
-          },
+          contentType: Headers.multipartFormDataContentType,
+          sendTimeout: const Duration(minutes: 2),
+          receiveTimeout: const Duration(minutes: 2),
         ),
       );
+
+      AppLogger.info(
+        'Step6 files → '
+            'profile=${data.profileFile?.path} | '
+            'certificate=${data.certificateFile?.path} | '
+            'idProof=${data.idProofFile?.path} | '
+            'clinicProof=${data.clinicProofFile?.path}',
+        tag: LogTags.auth,
+        subTag: _subTag,
+      );
+
       return response;
     } catch (e, st) {
-      AppLogger.error('Registration step 6 upload failure', tag: LogTags.auth, subTag: _subTag, error: e, stackTrace: st);
+      AppLogger.error(
+        'Registration step 6 upload failure',
+        tag: LogTags.auth,
+        subTag: _subTag,
+        error: e,
+        stackTrace: st,
+      );
       rethrow;
     }
   }
@@ -279,6 +312,7 @@ class DoctorAuthRepository {
     await _storage.clearRegistrationToken();
     await _storage.clearRole();
     await _storage.clearStatus();
+    await _storage.clearActiveSubscription();
     await _storage.clearAll();
   }
 }

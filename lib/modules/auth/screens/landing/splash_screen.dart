@@ -5,6 +5,7 @@ import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
 import 'package:yodoctor/core/providers/storage_provider.dart';
 import 'package:yodoctor/modules/auth/controllers/doctor_status_controller.dart';
+import 'package:yodoctor/modules/doctor/controllers/subscription_status_controller.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -69,7 +70,20 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
         tag: LogTags.app,
         subTag: 'Splash',
       );
+
+      // 1. First fetch verification status
       await ref.read(doctorStatusProvider.notifier).initialize();
+
+      // 2. Sequential Check: If approved, then check active subscription
+      final doctorState = ref.read(doctorStatusProvider);
+      if (doctorState.status == 'APPROVED') {
+        AppLogger.info(
+          'Splash: Doctor is APPROVED, checking active subscription status',
+          tag: LogTags.app,
+          subTag: 'Splash',
+        );
+        await ref.read(subscriptionStatusProvider.notifier).checkActiveSubscription();
+      }
     }
 
     // Navigation handled automatically by GoRouter redirect:
