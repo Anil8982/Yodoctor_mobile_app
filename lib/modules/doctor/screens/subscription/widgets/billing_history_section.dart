@@ -12,6 +12,10 @@ class BillingHistorySection extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
+    // 🎯 Sort by date (newest first)
+    final sortedHistory = List<BillingInvoice>.from(history)
+      ..sort((a, b) => b.date.compareTo(a.date));
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(10, 28, 10, 10),
@@ -22,33 +26,108 @@ class BillingHistorySection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Billing History',
-            style: textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.w900,
-              color: colorScheme.onSurface,
+          // 📋 Header with count badge
+          Row(
+            children: [
+              Icon(Icons.receipt_long_rounded, size: 22, color: colorScheme.primary),
+              const SizedBox(width: 8),
+              Text(
+                'Billing History',
+                style: textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w900,
+                  color: colorScheme.onSurface,
+                ),
+              ),
+              if (sortedHistory.isNotEmpty) ...[
+                const SizedBox(width: 12),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    '${sortedHistory.length}',
+                    style: textTheme.labelSmall?.copyWith(
+                      color: colorScheme.onPrimaryContainer,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+
+          const SizedBox(height: 24),
+
+          // 📭 Empty State
+          if (sortedHistory.isEmpty)
+            _buildEmptyState(context)
+          else
+            // 📋 Invoice List
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: sortedHistory.length,
+              separatorBuilder: (context, index) => const SizedBox(height: 14),
+              itemBuilder: (context, index) {
+                final invoice = sortedHistory[index];
+                return _buildModernInvoiceCard(context, invoice);
+              },
+            ),
+        ],
+      ),
+    );
+  }
+
+  // 📭 Empty State
+  Widget _buildEmptyState(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(40),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: colorScheme.outlineVariant.withValues(alpha: 0.2),
+        ),
+      ),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: colorScheme.primaryContainer.withValues(alpha: 0.3),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.receipt_long_rounded,
+              size: 40,
+              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
             ),
           ),
-          const SizedBox(height: 24),
-          history.isEmpty
-              ? Center(
-            child: Padding(
-              padding: const EdgeInsets.all(32.0),
-              child: Text(
-                'No billing history available',
-                style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
-              ),
+          const SizedBox(height: 16),
+          Text(
+            'No billing history yet',
+            style: textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: colorScheme.onSurfaceVariant,
             ),
-          )
-              : ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: history.length,
-            separatorBuilder: (context, index) => const SizedBox(height: 14),
-            itemBuilder: (context, index) {
-              final invoice = history[index];
-              return _buildModernInvoiceCard(context, invoice);
-            },
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Your payment invoices will appear here once you subscribe to a plan',
+            textAlign: TextAlign.center,
+            style: textTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+              height: 1.4,
+            ),
           ),
         ],
       ),
@@ -57,67 +136,80 @@ class BillingHistorySection extends StatelessWidget {
 
   Widget _buildModernInvoiceCard(BuildContext context, BillingInvoice invoice) {
     final colorScheme = Theme.of(context).colorScheme;
-    // final textTheme = Theme.of(context).textTheme;
     final isPaid = invoice.status.toLowerCase() == 'paid';
     final isMobile = MediaQuery.of(context).size.width < 600;
 
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerLow,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          // 🎯 Future: Navigate to invoice detail
+          // context.push('${AppRoutes.invoiceDetail}/${invoice.invoiceId}');
+        },
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: colorScheme.outlineVariant.withValues(alpha: 0.35),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: colorScheme.surfaceContainerLow,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: colorScheme.outlineVariant.withValues(alpha: 0.35),
+            ),
+          ),
+          child: isMobile
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        _buildInvoiceIcon(context),
+                        const SizedBox(width: 14),
+                        Expanded(child: _buildInvoiceDetails(context, invoice)),
+                      ],
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 14),
+                      child: Divider(height: 1, thickness: 0.5),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _buildStatusBadge(context, isPaid, invoice.status),
+                        _buildAmountText(context, invoice.amount),
+                      ],
+                    ),
+                  ],
+                )
+              : Row(
+                  children: [
+                    _buildInvoiceIcon(context),
+                    const SizedBox(width: 18),
+                    Expanded(
+                      flex: 4,
+                      child: _buildInvoiceDetails(context, invoice),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      flex: 2,
+                      child: Center(
+                        child: _buildStatusBadge(
+                          context,
+                          isPaid,
+                          invoice.status,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      flex: 2,
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: _buildAmountText(context, invoice.amount),
+                      ),
+                    ),
+                  ],
+                ),
         ),
-      ),
-      child: isMobile
-          ? Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              _buildInvoiceIcon(context),
-              const SizedBox(width: 14),
-              Expanded(child: _buildInvoiceDetails(context, invoice)),
-            ],
-          ),
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 14),
-            child: Divider(height: 1, thickness: 0.5),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _buildStatusBadge(context, isPaid, invoice.status),
-              _buildAmountText(context, invoice.amount),
-            ],
-          ),
-        ],
-      )
-          : Row(
-        children: [
-          _buildInvoiceIcon(context),
-          const SizedBox(width: 18),
-          Expanded(
-            flex: 4,
-            child: _buildInvoiceDetails(context, invoice),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            flex: 2,
-            child: Center(
-              child: _buildStatusBadge(context, isPaid, invoice.status),
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            flex: 2,
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: _buildAmountText(context, invoice.amount),
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -141,6 +233,7 @@ class BillingHistorySection extends StatelessWidget {
   Widget _buildInvoiceDetails(BuildContext context, BillingInvoice invoice) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -152,23 +245,42 @@ class BillingHistorySection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 4),
-        Row(
+        Column(
           children: [
-            Text(
-              invoice.planTitle,
-              style: textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: colorScheme.onSurfaceVariant,
-              ),
+            // Plan title with icon
+            Row(
+              children: [
+                Icon(
+                  Icons.card_membership_rounded,
+                  size: 14,
+                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  invoice.planTitle,
+                  style: textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
             ),
             const SizedBox(width: 8),
-            const CircleAvatar(radius: 2, backgroundColor: Colors.grey),
-            const SizedBox(width: 8),
-            Text(
-              DateFormat('dd MMM yyyy').format(invoice.date),
-              style: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
+            Row(
+              children: [
+                Icon(
+                  Icons.calendar_today_rounded,
+                  size: 12,
+                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  DateFormat('dd MMM yyyy').format(invoice.date),
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -179,21 +291,26 @@ class BillingHistorySection extends StatelessWidget {
   Widget _buildStatusBadge(BuildContext context, bool isPaid, String status) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final badgeColor = isPaid ? Colors.green : colorScheme.error;
+    final badgeColor = _getStatusColor(status, colorScheme);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: badgeColor.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: badgeColor.withValues(alpha: 0.25),
-        ),
+        border: Border.all(color: badgeColor.withValues(alpha: 0.25)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          CircleAvatar(radius: 3, backgroundColor: badgeColor),
+          Container(
+            width: 6,
+            height: 6,
+            decoration: BoxDecoration(
+              color: badgeColor,
+              shape: BoxShape.circle,
+            ),
+          ),
           const SizedBox(width: 8),
           Text(
             status.toUpperCase(),
@@ -211,6 +328,7 @@ class BillingHistorySection extends StatelessWidget {
   Widget _buildAmountText(BuildContext context, double amount) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+
     return Text(
       '₹${NumberFormat('#,##,##0').format(amount)}',
       style: textTheme.titleMedium?.copyWith(
@@ -218,5 +336,23 @@ class BillingHistorySection extends StatelessWidget {
         color: colorScheme.onSurface,
       ),
     );
+  }
+
+  // 🎯 Dynamic status color based on payment status
+  Color _getStatusColor(String status, ColorScheme colorScheme) {
+    switch (status.toLowerCase()) {
+      case 'paid':
+        return Colors.green;
+      case 'pending':
+        return Colors.orange;
+      case 'failed':
+        return colorScheme.error;
+      case 'refunded':
+        return Colors.blue;
+      case 'cancelled':
+        return Colors.grey;
+      default:
+        return colorScheme.onSurfaceVariant;
+    }
   }
 }

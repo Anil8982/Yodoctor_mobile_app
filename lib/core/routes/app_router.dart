@@ -26,6 +26,7 @@ import 'package:yodoctor/modules/doctor/screens/certificate/certificate_review_s
 import 'package:yodoctor/modules/doctor/screens/certificate/doctor_certificate_dashboard_screen.dart';
 import 'package:yodoctor/modules/doctor/screens/dashboard/doctor_dashboard_screen.dart';
 import 'package:yodoctor/modules/doctor/screens/manual_booking/manual_booking_screen.dart';
+import 'package:yodoctor/modules/doctor/screens/subscription/subscription_verification_page.dart';
 import 'package:yodoctor/modules/notifications/screens/notification_screen.dart';
 import 'package:yodoctor/modules/doctor/screens/profile/doctor_profile_edit_screen.dart';
 import 'package:yodoctor/modules/doctor/screens/profile/doctor_profile_screen.dart';
@@ -69,22 +70,31 @@ final routerProvider = Provider<GoRouter>((ref) {
 
   // Listen: Login / Logout / Role changes
   ref.listen(appRoleProvider, (_, _) {
-    AppLogger.debug('Router: appRoleProvider changed, refreshing',
-        tag: LogTags.auth, subTag: 'Router');
+    AppLogger.debug(
+      'Router: appRoleProvider changed, refreshing',
+      tag: LogTags.auth,
+      subTag: 'Router',
+    );
     refreshRouter();
   });
 
   // Listen: Doctor verification status changes
   ref.listen(doctorStatusProvider, (_, _) {
-    AppLogger.debug('Router: doctorStatusProvider changed, refreshing',
-        tag: LogTags.auth, subTag: 'Router');
+    AppLogger.debug(
+      'Router: doctorStatusProvider changed, refreshing',
+      tag: LogTags.auth,
+      subTag: 'Router',
+    );
     refreshRouter();
   });
 
   // Listen: Doctor subscription status changes
-  ref.listen(subscriptionStatusProvider, (_, _) {
-    AppLogger.debug('Router: subscriptionStatusProvider changed, refreshing',
-        tag: LogTags.auth, subTag: 'Router');
+  ref.listen(subscriptionStatusProvider, (previous, next) {
+    AppLogger.debug(
+      'Router: subscriptionStatusProvider changed, refreshing',
+      tag: LogTags.auth,
+      subTag: 'Router',
+    );
     refreshRouter();
   });
 
@@ -119,18 +129,18 @@ final routerProvider = Provider<GoRouter>((ref) {
       final isLoggedIn = token != null && token.isNotEmpty;
       final matchedPath = state.matchedLocation;
       final authType = storage.getAuthType();
-      final subState = ref.read(subscriptionStatusProvider).value ?? const SubscriptionStatusState();
+      final subState = ref.read(subscriptionStatusProvider);
 
       AppLogger.info(
         'Router → '
-            'TOKEN=${token != null ? 'YES' : 'NO'} | '
-            'ROLE=$role | '
-            'AUTH_TYPE=${authType?.name ?? 'null'} | '
-            'DOC_STATUS=${ref.read(doctorStatusProvider).status} | '
-            'DOC_RESOLVED=${ref.read(doctorStatusProvider).isResolved} | '
-            'SUB_RESOLVED=${subState.isResolved} | '
-            'HAS_SUB=${subState.hasSubscription} | '
-            'PATH=$matchedPath',
+        'TOKEN=${token != null ? 'YES' : 'NO'} | '
+        'ROLE=$role | '
+        'AUTH_TYPE=${authType?.name ?? 'null'} | '
+        'DOC_STATUS=${ref.read(doctorStatusProvider).status} | '
+        'DOC_RESOLVED=${ref.read(doctorStatusProvider).isResolved} | '
+        'SUB_RESOLVED=${subState.isResolved} | '
+        'HAS_SUB=${subState.hasSubscription} | '
+        'PATH=$matchedPath',
         tag: LogTags.auth,
         subTag: 'Router',
       );
@@ -139,8 +149,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       if (!isLoggedIn) {
         // Redirect everything except auth screens to landing
         if (!isAuthScreen(matchedPath) && matchedPath != AppRoutes.landing) {
-          AppLogger.debug('Router: unauthenticated → landing',
-              tag: LogTags.auth, subTag: 'Router');
+          AppLogger.debug(
+            'Router: unauthenticated → landing',
+            tag: LogTags.auth,
+            subTag: 'Router',
+          );
           return AppRoutes.landing;
         }
         return null; // Stay on current auth screen
@@ -150,8 +163,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       if (role == 'patient') {
         // Redirect from splash/auth to dashboard
         if (matchedPath == AppRoutes.splash || isAuthScreen(matchedPath)) {
-          AppLogger.debug('Router: patient → dashboard',
-              tag: LogTags.auth, subTag: 'Router');
+          AppLogger.debug(
+            'Router: patient → dashboard',
+            tag: LogTags.auth,
+            subTag: 'Router',
+          );
           return AppRoutes.dashboard;
         }
         return null; // Allow all other routes
@@ -204,13 +220,12 @@ final routerProvider = Provider<GoRouter>((ref) {
       //   return null; // Stay on waiting approval
       // }
 
-
       // ---- Doctor ----
       if (role == 'doctor') {
         final doctorState = ref.read(doctorStatusProvider);
-        final subState = ref.read(subscriptionStatusProvider).value ?? const SubscriptionStatusState();
+        // final subState = ref.read(subscriptionStatusProvider); // ✅ Direct read for Notifier
 
-        // While verification not resolved, stay on splash
+        // 1. While verification not resolved, stay on splash
         if (!doctorState.isResolved) {
           if (matchedPath != AppRoutes.splash) {
             return AppRoutes.splash;
@@ -218,49 +233,57 @@ final routerProvider = Provider<GoRouter>((ref) {
           return null;
         }
 
-        // If not approved, redirect to waiting approval
+        // 2. If not approved, redirect to waiting approval
         if (doctorState.status != 'APPROVED') {
-          if (isDoctorProtectedRoute(matchedPath) || matchedPath != AppRoutes.waitingApproval) {
+          if (isDoctorProtectedRoute(matchedPath) ||
+              matchedPath != AppRoutes.waitingApproval) {
             return AppRoutes.waitingApproval;
           }
           return null;
         }
 
-        // If subscription not yet resolved, redirect to subscription screen safely
+        // 3. If subscription not yet resolved → Verification Page
         if (!subState.isResolved) {
-          if (matchedPath != AppRoutes.doctorSubscription) {
-            AppLogger.debug('Router: subscription status unresolved → redirecting to subscription screen',
-                tag: LogTags.auth, subTag: 'Router');
-            return AppRoutes.doctorSubscription;
+          if (matchedPath != AppRoutes.doctorSubscriptionVerification) {
+            AppLogger.debug(
+              'Router: subscription status unresolved → verification page',
+              tag: LogTags.auth,
+              subTag: 'Router',
+            );
+            return AppRoutes.doctorSubscriptionVerification;
           }
           return null;
         }
 
-        // If approved but NO active subscription -> Force redirect to Subscription Screen
+        // 4. If approved but NO active subscription → Verification Page with plans
         if (!subState.hasSubscription) {
-          if (matchedPath != AppRoutes.doctorSubscription) {
-            AppLogger.debug('Router: doctor approved but no subscription → subscription screen',
-                tag: LogTags.auth, subTag: 'Router');
-            return AppRoutes.doctorSubscription;
+          if (matchedPath != AppRoutes.doctorSubscriptionVerification) {
+            AppLogger.debug(
+              'Router: doctor approved but no subscription → verification page',
+              tag: LogTags.auth,
+              subTag: 'Router',
+            );
+            return AppRoutes.doctorSubscriptionVerification;
           }
           return null;
         }
 
-        // APPROVED + HAS SUBSCRIPTION:
-        // Only redirect to dashboard if they are landing on Splash, Auth screens, or Waiting Approval.
-        // DO NOT include AppRoutes.doctorSubscription here, so subscribed doctors can visit their subscription management page freely!
+        // 5. APPROVED + HAS SUBSCRIPTION:
+        // Redirect from splash/auth/waiting/verification pages to dashboard
         if (matchedPath == AppRoutes.splash ||
             isAuthScreen(matchedPath) ||
-            matchedPath == AppRoutes.waitingApproval) {
-          AppLogger.debug('Router: doctor approved & subscribed from splash/auth → dashboard',
-              tag: LogTags.auth, subTag: 'Router');
+            matchedPath == AppRoutes.waitingApproval ||
+            matchedPath == AppRoutes.doctorSubscriptionVerification) {
+          AppLogger.debug(
+            'Router: doctor has active subscription → redirecting to dashboard',
+            tag: LogTags.auth,
+            subTag: 'Router',
+          );
           return AppRoutes.doctorDashboard;
         }
 
-        return null; // Allow subscribed doctor to access Dashboard, My Subscription, Profile, etc. freely!
+        return null; // Allow subscribed doctor to access all routes including MySubscriptionScreen
       }
-
-
       return null; // Fallback
     },
 
@@ -434,6 +457,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         parentNavigatorKey: AppRouter.rootNavigatorKey,
+        path: AppRoutes.doctorSubscriptionVerification,
+        builder: (context, state) => const SubscriptionVerificationPage(),
+      ),
+      GoRoute(
+        parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.doctorSubscription,
         builder: (context, state) => const MySubscriptionScreen(),
       ),
@@ -441,8 +469,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.doctorAddPrescription,
         builder: (context, state) {
-          final patientName =
-              state.uri.queryParameters['name'] ?? 'Patient';
+          final patientName = state.uri.queryParameters['name'] ?? 'Patient';
           var token = state.uri.queryParameters['token'] ?? '';
           if (token.isEmpty && state.uri.fragment.isNotEmpty) {
             token = state.uri.fragment;
@@ -500,30 +527,38 @@ final routerProvider = Provider<GoRouter>((ref) {
           return PatientScaffoldShell(navigationShell: navigationShell);
         },
         branches: [
-          StatefulShellBranch(routes: [
-            GoRoute(
-              path: AppRoutes.dashboard,
-              builder: (context, state) => DashboardScreen(),
-            ),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(
-              path: AppRoutes.certificateWallet,
-              builder: (context, state) => const CertificateWalletScreen(),
-            ),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(
-              path: AppRoutes.services,
-              builder: (context, state) => const ServicesScreen(),
-            ),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(
-              path: AppRoutes.history,
-              builder: (context, state) => const AppointmentsHistoryScreen(),
-            ),
-          ]),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.dashboard,
+                builder: (context, state) => DashboardScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.certificateWallet,
+                builder: (context, state) => const CertificateWalletScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.services,
+                builder: (context, state) => const ServicesScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.history,
+                builder: (context, state) => const AppointmentsHistoryScreen(),
+              ),
+            ],
+          ),
         ],
       ),
 
@@ -533,32 +568,40 @@ final routerProvider = Provider<GoRouter>((ref) {
           return DoctorScaffoldShell(navigationShell: navigationShell);
         },
         branches: [
-          StatefulShellBranch(routes: [
-            GoRoute(
-              path: AppRoutes.doctorDashboard,
-              builder: (context, state) => const DoctorDashboardScreen(),
-            ),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(
-              path: AppRoutes.doctorAppointments,
-              builder: (context, state) =>
-              const DoctorAppointmentHistoryScreen(),
-            ),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(
-              path: AppRoutes.doctorCertificates,
-              builder: (context, state) =>
-              const DoctorCertificateDashboardScreen(),
-            ),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(
-              path: AppRoutes.doctorReviews,
-              builder: (context, state) => const DoctorReviewsScreen(),
-            ),
-          ]),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.doctorDashboard,
+                builder: (context, state) => const DoctorDashboardScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.doctorAppointments,
+                builder: (context, state) =>
+                    const DoctorAppointmentHistoryScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.doctorCertificates,
+                builder: (context, state) =>
+                    const DoctorCertificateDashboardScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.doctorReviews,
+                builder: (context, state) => const DoctorReviewsScreen(),
+              ),
+            ],
+          ),
         ],
       ),
     ],
@@ -575,7 +618,7 @@ class AppRouter {
   const AppRouter._();
 
   static final GlobalKey<NavigatorState> _rootNavigatorKey =
-  GlobalKey<NavigatorState>();
+      GlobalKey<NavigatorState>();
   static GlobalKey<NavigatorState> get rootNavigatorKey => _rootNavigatorKey;
 
   // Always start from splash for proper initialization flow

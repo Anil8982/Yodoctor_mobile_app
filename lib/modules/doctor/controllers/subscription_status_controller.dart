@@ -33,83 +33,106 @@ class SubscriptionStatusState {
   }
 }
 
+// 🎯 NotifierProvider for immediate reactive updates
 final subscriptionStatusProvider =
-AsyncNotifierProvider<SubscriptionStatusNotifier, SubscriptionStatusState>(
+NotifierProvider<SubscriptionStatusNotifier, SubscriptionStatusState>(
   SubscriptionStatusNotifier.new,
 );
 
-class SubscriptionStatusNotifier extends AsyncNotifier<SubscriptionStatusState> {
+class SubscriptionStatusNotifier extends Notifier<SubscriptionStatusState> {
   static const String _subTag = 'SubscriptionStatusNotifier';
 
   @override
-  FutureOr<SubscriptionStatusState> build() async {
+  SubscriptionStatusState build() {
     final storage = ref.read(storageProvider);
-    final cachedSub = storage.getActiveSubscription();
+    final token = storage.getToken();
 
-    if (cachedSub != null) {
-      AppLogger.info('Loaded cached subscription from Hive: $cachedSub', tag: LogTags.doctor, subTag: _subTag);
-      return SubscriptionStatusState(
-        hasSubscription: cachedSub,
-        isResolved: true,
+    if (token == null || token.isEmpty) {
+      return const SubscriptionStatusState(isResolved: false);
+    }
+
+    final cachedSub = storage.getActiveSubscription() ?? false;
+    if (cachedSub) {
+      AppLogger.info(
+        'Loaded cached subscription from Hive: $cachedSub',
+        tag: LogTags.doctor,
+        subTag: _subTag,
       );
     }
 
-    return const SubscriptionStatusState(isResolved: false);
+    // Return cache immediately so app knows there's a subscription if cached
+    return SubscriptionStatusState(
+      hasSubscription: cachedSub,
+      isResolved: cachedSub,
+    );
   }
 
   Future<void> checkActiveSubscription() async {
-    AppLogger.info('Checking active subscription status from server...', tag: LogTags.doctor, subTag: _subTag);
+    AppLogger.info(
+      'Checking active subscription status from server...',
+      tag: LogTags.doctor,
+      subTag: _subTag,
+    );
 
-    // Keep current state as loading or retain cache while fetching
-    state = AsyncData((state.value ?? const SubscriptionStatusState()).copyWith(isLoading: true));
+    state = state.copyWith(isLoading: true);
 
     try {
       final repository = ref.read(subscriptionRepositoryProvider);
       final storage = ref.read(storageProvider);
 
       final response = await repository.getActiveSubscription();
-
       final statusCode = response.statusCode ?? 0;
+
       if (statusCode >= 200 && statusCode < 300) {
         final data = response.data;
         final hasSub = data["data"]?["hasSubscription"] ?? false;
 
-        // 🎯 Save to Hive cache
+        // Save fresh status to Hive cache
         await storage.saveActiveSubscription(hasSub);
 
-        AppLogger.success('Active subscription fetched & cached: hasSubscription=$hasSub', tag: LogTags.doctor, subTag: _subTag);
+        AppLogger.success(
+          'Active subscription fetched & cached: hasSubscription=$hasSub',
+          tag: LogTags.doctor,
+          subTag: _subTag,
+        );
 
-        state = AsyncData(SubscriptionStatusState(
+        // 🎯 STATE UPDATE: This will instantly trigger router listener!
+        state = SubscriptionStatusState(
           hasSubscription: hasSub,
           isLoading: false,
           isResolved: true,
-        ));
+        );
       } else {
-        // Fallback to cache if server fails but cache exists
         final cachedSub = storage.getActiveSubscription() ?? false;
-        state = AsyncData(SubscriptionStatusState(
+        state = SubscriptionStatusState(
           hasSubscription: cachedSub,
           isLoading: false,
           isResolved: true,
           errorMessage: 'Failed to verify subscription from server',
-        ));
+        );
       }
     } catch (e, st) {
-      AppLogger.exception(e, st, message: 'Error checking active subscription', tag: LogTags.doctor, subTag: _subTag);
+      AppLogger.exception(
+        e,
+        st,
+        message: 'Error checking active subscription',
+        tag: LogTags.doctor,
+        subTag: _subTag,
+      );
 
       final storage = ref.read(storageProvider);
       final cachedSub = storage.getActiveSubscription() ?? false;
 
-      state = AsyncData(SubscriptionStatusState(
+      state = SubscriptionStatusState(
         hasSubscription: cachedSub,
         isLoading: false,
         isResolved: true,
         errorMessage: 'Network error. Using cached subscription status.',
-      ));
+      );
     }
   }
 
   void reset() {
-    state = const AsyncData(SubscriptionStatusState(isResolved: false));
+    state = const SubscriptionStatusState(isResolved: false);
   }
 }
