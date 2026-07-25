@@ -133,9 +133,18 @@ class ApiConstants {
   static const String readAllNotifications = '/notifications/read-all';
 
   // --- Doctor Subscription & Billing ---
-  static const activeSubscription = '/razorpay/subscriptions/active';
-  static const billingHistory = '/razorpay/billing/history';
-  static const subscriptionPlans = '/razorpay/plans';
   static const createSubscription = '/razorpay/subscriptions/create';
-  static const verifySubscription = '/subscriptions/verify';
+  static const verifySubscription = '/razorpay/subscriptions/verify';
+  static const activeSubscription = '/razorpay/subscriptions/active';
+  static const allSubscriptions = '/razorpay/subscriptions';
+  static const subscriptionById = '/razorpay/subscriptions'; // + /:id
+  static const cancelSubscription = '/razorpay/subscriptions'; // + /:id/cancel
+  static const upgradeSubscription = '/razorpay/subscriptions'; // + /:id/upgrade
+  static const subscriptionPlans = '/razorpay/plans';
+  static const planById = '/razorpay/plans'; // + /:planId
+  static const billingHistory = '/razorpay/billing/history';
+  static const invoiceDetail = '/razorpay/billing/invoice'; // + /:invoiceId
+  static const createPaymentOrder = '/razorpay/payments/create-order';
+  static const verifyPayment = '/razorpay/payments/verify';
+
 }

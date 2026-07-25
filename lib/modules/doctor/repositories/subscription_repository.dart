@@ -24,12 +24,20 @@ class SubscriptionRepository {
     }
   }
 
-  Future<Response> getBillingHistory() {
-    return _dio.get(ApiConstants.billingHistory);
+  // Updated with optional page and limit parameters with backward compatibility
+  Future<Response> getBillingHistory({int page = 1, int limit = 20}) {
+    return _dio.get(
+      ApiConstants.billingHistory,
+      queryParameters: {"page": page, "limit": limit},
+    );
   }
 
   Future<Response> getPlans() {
     return _dio.get(ApiConstants.subscriptionPlans);
+  }
+
+  Future<Response> getPlanById(String planId) {
+    return _dio.get('${ApiConstants.planById}/$planId');
   }
 
   Future<Response> createSubscription({
@@ -45,5 +53,51 @@ class SubscriptionRepository {
 
   Future<Response> verifySubscription(Map<String, dynamic> body) {
     return _dio.post(ApiConstants.verifySubscription, data: body);
+  }
+
+  Future<Response> getAllSubscriptions() {
+    return _dio.get(ApiConstants.allSubscriptions);
+  }
+
+  Future<Response> getSubscriptionById(String id) {
+    return _dio.get('${ApiConstants.subscriptionById}/$id');
+  }
+
+  Future<Response> cancelSubscription({
+    required String id,
+    bool cancelAtPeriodEnd = true,
+  }) {
+    return _dio.post(
+      '${ApiConstants.cancelSubscription}/$id/cancel',
+      data: {"cancel_at_period_end": cancelAtPeriodEnd},
+    );
+  }
+
+  Future<Response> upgradeSubscriptionPlan({
+    required String id,
+    required String newPlanId,
+  }) {
+    return _dio.post(
+      '${ApiConstants.upgradeSubscription}/$id/upgrade',
+      data: {"newPlanId": newPlanId},
+    );
+  }
+
+  Future<Response> createPaymentOrder({
+    required double amount,
+    String currency = "INR",
+  }) {
+    return _dio.post(ApiConstants.createPaymentOrder, data: {
+      "amount": amount,
+      "currency": currency,
+    });
+  }
+
+  Future<Response> verifyPayment(Map<String, dynamic> body) {
+    return _dio.post(ApiConstants.verifyPayment, data: body);
+  }
+
+  Future<Response> getInvoiceById(String invoiceId) {
+    return _dio.get('${ApiConstants.invoiceDetail}/$invoiceId');
   }
 }

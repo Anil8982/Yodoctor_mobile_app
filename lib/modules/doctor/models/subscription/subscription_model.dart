@@ -1,138 +1,20 @@
-// import 'available_plan_model.dart';
-//
-// class SubscriptionPlan {
-//   final String title;
-//   final String type; // monthly, yearly, etc.
-//   final DateTime nextBillingDate;
-//   final bool isActive;
-//   final UpcomingPlan? upcomingPlan;
-//
-//   SubscriptionPlan({
-//     required this.title,
-//     required this.type,
-//     required this.nextBillingDate,
-//     this.isActive = false,
-//     this.upcomingPlan,
-//   });
-//
-//   // 🎯 FIXED: Factory initialization mapping for remote backend responses cleanly
-//   factory SubscriptionPlan.fromJson(Map<String, dynamic> json) {
-//     return SubscriptionPlan(
-//       title: json['title'] ?? '',
-//       type: json['type'] ?? 'monthly',
-//       nextBillingDate: json['nextBillingDate'] != null
-//           ? DateTime.parse(json['nextBillingDate'])
-//           : DateTime.now(),
-//       isActive: json['isActive'] ?? false,
-//       upcomingPlan: json['upcomingPlan'] != null
-//           ? UpcomingPlan.fromJson(Map<String, dynamic>.from(json['upcomingPlan']))
-//           : null,
-//     );
-//   }
-// }
-//
-// class UpcomingPlan {
-//   final String title;
-//   final DateTime startDate;
-//
-//   UpcomingPlan({required this.title, required this.startDate});
-//
-//   factory UpcomingPlan.fromJson(Map<String, dynamic> json) {
-//     return UpcomingPlan(
-//       title: json['title'] ?? '',
-//       startDate: json['startDate'] != null
-//           ? DateTime.parse(json['startDate'])
-//           : DateTime.now(),
-//     );
-//   }
-// }
-//
-// class BillingInvoice {
-//   final String invoiceId;
-//   final DateTime date;
-//   final String planTitle;
-//   final double amount;
-//   final String status; // paid, pending, failed
-//
-//   BillingInvoice({
-//     required this.invoiceId,
-//     required this.date,
-//     required this.planTitle,
-//     required this.amount,
-//     required this.status,
-//   });
-//
-//   factory BillingInvoice.fromJson(Map<String, dynamic> json) {
-//     return BillingInvoice(
-//       invoiceId: json['invoiceId'] ?? '',
-//       date: json['date'] != null ? DateTime.parse(json['date']) : DateTime.now(),
-//       planTitle: json['planTitle'] ?? '',
-//       // 🎯 FIXED ERROR 31: Type shield compilation guard converting safely from int/string to double
-//       amount: double.tryParse(json['amount'].toString()) ?? 0.0,
-//       status: json['status'] ?? 'unpaid',
-//     );
-//   }
-// }
-//
-// class DoctorSubscriptionState {
-//   final bool isLoading;
-//   final SubscriptionPlan? currentPlan;
-//   final List<BillingInvoice> billingHistory;
-//   final List<AvailablePlan> allPlans; // 🎯 FIXED: Added missing remote plans aggregate matrix
-//   final String? errorMessage;
-//   final bool isYearly;
-//   final AvailablePlan? selectedNewPlan;
-//   final bool showPlans;
-//
-//   const DoctorSubscriptionState({
-//     this.isLoading = false,
-//     this.currentPlan,
-//     this.billingHistory = const [],
-//     this.allPlans = const [], // 🎯 FIXED
-//     this.errorMessage,
-//     this.isYearly = false,
-//     this.selectedNewPlan,
-//     this.showPlans = false,
-//   });
-//
-//   DoctorSubscriptionState copyWith({
-//     bool? isLoading,
-//     SubscriptionPlan? currentPlan,
-//     bool clearCurrentPlan = false, // 🎯 FIXED: Support null reset tracking natively
-//     List<BillingInvoice>? billingHistory,
-//     List<AvailablePlan>? allPlans, // 🎯 FIXED
-//     bool? showPlans,
-//     bool? isYearly,
-//     AvailablePlan? selectedNewPlan,
-//     bool clearSelectedPlan = false,
-//     String? errorMessage,
-//     bool clearError = false, // 🎯 FIXED: Standard clear error standard boundary
-//   }) {
-//     return DoctorSubscriptionState(
-//       isLoading: isLoading ?? this.isLoading,
-//       currentPlan: clearCurrentPlan ? null : (currentPlan ?? this.currentPlan),
-//       billingHistory: billingHistory ?? this.billingHistory,
-//       allPlans: allPlans ?? this.allPlans, // 🎯 FIXED
-//       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
-//       isYearly: isYearly ?? this.isYearly,
-//       selectedNewPlan: clearSelectedPlan ? null : (selectedNewPlan ?? this.selectedNewPlan),
-//       showPlans: showPlans ?? this.showPlans,
-//     );
-//   }
-// }
-
-
-
-
 class SubscriptionPlan {
   final String id;
   final String planId;
   final String title;
-  final String type; // billing_cycle (monthly/yearly)
+  final String type;
   final String status;
   final DateTime nextBillingDate;
   final bool isActive;
   final UpcomingPlan? upcomingPlan;
+  final double amount;
+  final String currency;
+  final String? rzpSubscriptionId;
+  final DateTime? currentPeriodStart;
+  final DateTime? currentPeriodEnd;
+  final String? lastPaymentId;
+  final String? upgradeStatus;
+  final DateTime? scheduledActivationDate;
 
   SubscriptionPlan({
     required this.id,
@@ -143,6 +25,14 @@ class SubscriptionPlan {
     required this.nextBillingDate,
     this.isActive = false,
     this.upcomingPlan,
+    this.amount = 0,
+    this.currency = 'INR',
+    this.rzpSubscriptionId,
+    this.currentPeriodStart,
+    this.currentPeriodEnd,
+    this.lastPaymentId,
+    this.upgradeStatus,
+    this.scheduledActivationDate,
   });
 
   factory SubscriptionPlan.fromJson(Map<String, dynamic> json) {
@@ -155,11 +45,19 @@ class SubscriptionPlan {
       status: statusVal,
       nextBillingDate: json['next_billing_date'] != null
           ? DateTime.parse(json['next_billing_date'])
-          : (json['nextBillingDate'] != null ? DateTime.parse(json['nextBillingDate']) : DateTime.now()),
-      isActive: statusVal.toLowerCase() == 'active' || (json['isActive'] ?? false),
+          : DateTime.now(),
+      isActive: statusVal.toLowerCase() == 'active',
       upcomingPlan: json['upcomingPlan'] != null
-          ? UpcomingPlan.fromJson(Map<String, dynamic>.from(json['upcomingPlan']))
+          ? UpcomingPlan.fromJson(json['upcomingPlan'])
           : null,
+      amount: double.tryParse((json['amount'] ?? 0).toString()) ?? 0.0,
+      currency: json['currency'] ?? 'INR',
+      rzpSubscriptionId: json['rzp_subscription_id'],
+      currentPeriodStart: json['current_period_start'] != null ? DateTime.parse(json['current_period_start']) : null,
+      currentPeriodEnd: json['current_period_end'] != null ? DateTime.parse(json['current_period_end']) : null,
+      lastPaymentId: json['last_payment_id'],
+      upgradeStatus: json['upgrade_status'],
+      scheduledActivationDate: json['scheduled_activation_date'] != null ? DateTime.parse(json['scheduled_activation_date']) : null,
     );
   }
 }
@@ -173,9 +71,7 @@ class UpcomingPlan {
   factory UpcomingPlan.fromJson(Map<String, dynamic> json) {
     return UpcomingPlan(
       title: json['title'] ?? '',
-      startDate: json['startDate'] != null
-          ? DateTime.parse(json['startDate'])
-          : DateTime.now(),
+      startDate: json['startDate'] != null ? DateTime.parse(json['startDate']) : DateTime.now(),
     );
   }
 }
