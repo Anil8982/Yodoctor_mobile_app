@@ -61,6 +61,10 @@ class _ManualBookingScreenState extends ConsumerState<ManualBookingScreen> {
                       }
                     },
                     onSubmit: () async {
+                      if (!notifier.formKey.currentState!.validate()) {
+                        return;
+                      }
+
                       final success = await notifier.submit();
 
                       if (!context.mounted) return;

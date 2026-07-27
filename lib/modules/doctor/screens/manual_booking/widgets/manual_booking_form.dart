@@ -42,6 +42,14 @@ class ManualBookingForm extends StatelessWidget {
               if (value == null || value.trim().isEmpty) {
                 return 'Patient name is required';
               }
+              if (value.trim().length < 2) {
+                return 'Name should have at least 2 characters';
+              }
+
+              if (!RegExp(r'^[A-Za-z]+(?: [A-Za-z]+)*$').hasMatch(value)) {
+                return 'Only alphabets are allowed';
+              }
+
               return null;
             },
           ),
@@ -58,7 +66,7 @@ class ManualBookingForm extends StatelessWidget {
             validator: (value) {
               final normalized = value?.trim() ?? '';
               if (normalized.isEmpty) return 'Mobile number is required';
-              if (!RegExp(r'^[0-9]{10}$').hasMatch(normalized)) {
+              if (!RegExp(r'^[6-9]\d{9}$').hasMatch(normalized)) {
                 return 'Enter a valid 10-digit number';
               }
               return null;
