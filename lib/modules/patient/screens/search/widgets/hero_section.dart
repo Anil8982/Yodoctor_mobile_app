@@ -29,7 +29,12 @@ class HeroSection extends StatelessWidget {
 
     return GradientBackground(
       borderRadius: const BorderRadius.vertical(bottom: Radius.circular(0)),
-      padding: EdgeInsets.fromLTRB(AppSpacing.xl, topPadding + 70, AppSpacing.xl, AppSpacing.xxl),
+      padding: EdgeInsets.fromLTRB(
+        AppSpacing.xl,
+        topPadding + 70,
+        AppSpacing.xl,
+        AppSpacing.xl,
+      ),
       child: Column(
         children: <Widget>[
           // Text(
@@ -46,7 +51,10 @@ class HeroSection extends StatelessWidget {
               controller: locationController,
               hintText: 'Location',
               onChanged: onLocationChanged,
-              prefixIcon: Icon(Icons.location_on_rounded, color: colorScheme.primary),
+              prefixIcon: Icon(
+                Icons.location_on_rounded,
+                color: colorScheme.primary,
+              ),
             ),
           ),
           const SizedBox(height: AppSpacing.md),
@@ -61,7 +69,10 @@ class HeroSection extends StatelessWidget {
                       controller: searchController,
                       hintText: 'Search doctors...',
                       onChanged: onQueryChanged,
-                      prefixIcon: Icon(Icons.search_rounded, color: colorScheme.primary),
+                      prefixIcon: Icon(
+                        Icons.search_rounded,
+                        color: colorScheme.primary,
+                      ),
                     ),
                   ),
                 ),
@@ -86,7 +97,10 @@ class HeroSection extends StatelessWidget {
           color: colorScheme.primaryContainer,
           borderRadius: BorderRadius.circular(16),
         ),
-        child: Icon(Icons.arrow_forward_rounded, color: colorScheme.onPrimaryContainer),
+        child: Icon(
+          Icons.arrow_forward_rounded,
+          color: colorScheme.onPrimaryContainer,
+        ),
       ),
     );
   }
