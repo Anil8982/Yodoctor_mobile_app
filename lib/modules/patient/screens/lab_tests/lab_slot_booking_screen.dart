@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/modules/patient/models/lab/booking_state_model.dart';
@@ -21,6 +22,7 @@ class _LabSlotBookingScreenState extends ConsumerState<LabSlotBookingScreen> {
   final _ageController = TextEditingController();
   final _phoneController = TextEditingController();
   final _addressController = TextEditingController();
+  String? validationMessage;
 
   @override
   void dispose() {
@@ -124,6 +126,14 @@ class _LabSlotBookingScreenState extends ConsumerState<LabSlotBookingScreen> {
                 ),
               ),
             ),
+            if (validationMessage != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Text(
+                  validationMessage!,
+                  style: const TextStyle(color: Colors.red, fontSize: 12),
+                ),
+              ),
             _buildBottomBar(context, bookingState, totalPayable),
           ],
         ),
@@ -216,6 +226,21 @@ class _LabSlotBookingScreenState extends ConsumerState<LabSlotBookingScreen> {
                 onChanged: (val) => ref
                     .read(labBookingProvider.notifier)
                     .updatePatientDetails(name: val),
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Enter your full name';
+                  }
+
+                  if (!RegExp(r'^[a-zA-Z ]+$').hasMatch(value.trim())) {
+                    return 'Only alphabets are allowed';
+                  }
+
+                  if (value.trim().length < 3) {
+                    return 'Name must be at least 3 characters';
+                  }
+
+                  return null;
+                },
               ),
             ),
             const SizedBox(width: 10),
@@ -228,6 +253,23 @@ class _LabSlotBookingScreenState extends ConsumerState<LabSlotBookingScreen> {
                 onChanged: (val) => ref
                     .read(labBookingProvider.notifier)
                     .updatePatientDetails(age: val),
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Enter age';
+                  }
+
+                  final age = int.tryParse(value);
+
+                  if (age == null) {
+                    return 'Invalid age';
+                  }
+
+                  if (age < 1 || age > 120) {
+                    return 'Age must be between 1 and 120';
+                  }
+
+                  return null;
+                },
               ),
             ),
           ],
@@ -244,6 +286,21 @@ class _LabSlotBookingScreenState extends ConsumerState<LabSlotBookingScreen> {
           onChanged: (val) => ref
               .read(labBookingProvider.notifier)
               .updatePatientDetails(phone: val),
+          inputFormatters: [
+            FilteringTextInputFormatter.digitsOnly,
+            LengthLimitingTextInputFormatter(10),
+          ],
+          validator: (value) {
+            if (value == null || value.trim().isEmpty) {
+              return 'Enter phone number';
+            }
+
+            if (!RegExp(r'^[6-9]\d{9}$').hasMatch(value)) {
+              return 'Enter valid 10-digit number';
+            }
+
+            return null;
+          },
         ),
         const SizedBox(height: 14),
         Row(
@@ -301,7 +358,11 @@ class _LabSlotBookingScreenState extends ConsumerState<LabSlotBookingScreen> {
     return Column(
       children: [
         InkWell(
-          onTap: () {},
+          onTap: () async {
+            await ref
+                .read(labBookingProvider.notifier)
+                .fetchCurrentLocation(_addressController);
+          },
           borderRadius: BorderRadius.circular(14),
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
@@ -344,6 +405,17 @@ class _LabSlotBookingScreenState extends ConsumerState<LabSlotBookingScreen> {
           ),
           onChanged: (val) =>
               ref.read(labBookingProvider.notifier).updateAddress(val),
+          validator: (value) {
+            if (value == null || value.trim().isEmpty) {
+              return 'Enter address';
+            }
+
+            if (value.trim().length < 10) {
+              return 'Address is too short';
+            }
+
+            return null;
+          },
         ),
       ],
     );
@@ -589,11 +661,24 @@ class _LabSlotBookingScreenState extends ConsumerState<LabSlotBookingScreen> {
               child: ElevatedButton(
                 onPressed: isReady
                     ? () async {
-                        if (!(_formKey.currentState?.validate() ?? false)) {
+                        final booking = ref.read(labBookingProvider);
+                        if (booking.gender.isEmpty) {
+                          setState(() => validationMessage = "Select gender");
                           return;
                         }
 
-                        final booking = ref.read(labBookingProvider);
+                        if (booking.selectedTimeSlot.isEmpty) {
+                          setState(
+                            () => validationMessage = "Select a time slot",
+                          );
+                          return;
+                        }
+
+                        setState(() => validationMessage = null);
+
+                        if (!(_formKey.currentState?.validate() ?? false)) {
+                          return;
+                        }
 
                         final success = await ref
                             .read(labProvider.notifier)

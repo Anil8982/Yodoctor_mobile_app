@@ -70,7 +70,7 @@ class ApiConstants {
   static const bookHomeCare = '/patient/bookhomecare';
   static const getHomeCareBookings = '/patient/getbookhomecare';
 
-  static const labCategories = '/lab/categories';
+  static const labCategories = '/patient/lab/categories';
   static const labTests = '/patient/lab/tests';
   static const popularLabTests = '/patient/lab/tests/popular';
   static const labPackages = '/patient/lab/packages';
