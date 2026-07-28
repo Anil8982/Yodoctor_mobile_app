@@ -66,4 +66,10 @@ class AppRoutes {
   static const String doctorsManagement = '/admin/doctors-management';
   static const String enquiry = '/admin/enquiry';
   static const String homeCareBooking = '/admin/homecare-bookings';
+
+  // Payment
+  static const String paymentSuccess = '/payment/success';
+  static const String paymentProcessing = '/payment/processing';
+  static const String paymentFailure = '/payment/failure';
+  static const String invoiceDetail = '/payment/invoice-detail';
 }

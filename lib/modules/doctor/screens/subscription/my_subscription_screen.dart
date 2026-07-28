@@ -1,6 +1,8 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/modules/doctor/screens/subscription/widgets/my_subscription_shimmer.dart';
 import '../../controllers/subscription_controller.dart';
 import 'widgets/available_plans_section.dart';
@@ -16,66 +18,105 @@ class MySubscriptionScreen extends ConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final theme = Theme.of(context);
 
-    final bool hasActivePlan = state.currentPlan != null && state.currentPlan!.isActive;
+    final bool hasActivePlan =
+        state.currentPlan != null && state.currentPlan!.isActive;
+
+    ref.listen(doctorSubscriptionProvider, (previous, next) {
+      if (previous?.paymentFlow != next.paymentFlow) {
+        switch (next.paymentFlow) {
+          case PaymentFlowState.processing:
+            context.push(AppRoutes.paymentProcessing);
+            break;
+
+          case PaymentFlowState.success:
+            context.go(
+              AppRoutes.paymentSuccess,
+              extra: {
+                "paymentId": next.paymentId ?? '',
+                "planName": next.planName ?? next.currentPlan?.title,
+                "nextRoute": AppRoutes.doctorDashboard,
+              },
+            );
+            break;
+
+          case PaymentFlowState.failed:
+          case PaymentFlowState.idle:
+            break;
+        }
+      }
+    });
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
-      appBar: AppBar(
-        title: const Text('My Subscription'),
-        centerTitle: false,
-      ),
+      appBar: AppBar(title: const Text('My Subscription'), centerTitle: false),
       body: state.errorMessage != null && !state.isInitialized
-          ? _buildErrorView(context, ref, state.errorMessage!, colorScheme, theme)
+          ? _buildErrorView(
+              context,
+              ref,
+              state.errorMessage!,
+              colorScheme,
+              theme,
+            )
           : state.isLoading && !state.isInitialized
           ? const MySubscriptionShimmer()
           : RefreshIndicator(
-        onRefresh: () async {
-          await ref.read(doctorSubscriptionProvider.notifier).loadSubscriptionDetails();
-        },
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 800),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (state.isLoading) ...[
-                    LinearProgressIndicator(color: colorScheme.primary, minHeight: 3),
-                    const SizedBox(height: 24),
-                  ],
-                  SubscriptionPlanCard(
-                    plan: hasActivePlan ? state.currentPlan : null,
-                    onUpgradePressed: () => _showPlansSheet(context),
+              onRefresh: () async {
+                await ref
+                    .read(doctorSubscriptionProvider.notifier)
+                    .loadSubscriptionDetails();
+              },
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(
+                  parent: BouncingScrollPhysics(),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 24,
+                ),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 800),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (state.isLoading) ...[
+                          LinearProgressIndicator(
+                            color: colorScheme.primary,
+                            minHeight: 3,
+                          ),
+                          const SizedBox(height: 24),
+                        ],
+                        SubscriptionPlanCard(
+                          plan: hasActivePlan ? state.currentPlan : null,
+                          onUpgradePressed: () => _showPlansSheet(context),
+                        ),
+                        const SizedBox(height: 32),
+                        if (hasActivePlan) ...[
+                          _buildQuickStats(context, state, colorScheme, theme),
+                          const SizedBox(height: 32),
+                        ],
+                        _buildChangePlanButton(context, colorScheme),
+                        const SizedBox(height: 20),
+                        if (state.billingHistory.isNotEmpty)
+                          BillingHistorySection(history: state.billingHistory)
+                        else
+                          _buildEmptyHistory(theme, colorScheme),
+                        const SizedBox(height: 32),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 32),
-                  if (hasActivePlan) ...[
-                    _buildQuickStats(context, state, colorScheme, theme),
-                    const SizedBox(height: 32),
-                  ],
-                  _buildChangePlanButton(context, colorScheme),
-                  const SizedBox(height: 20),
-                  if (state.billingHistory.isNotEmpty)
-                    BillingHistorySection(history: state.billingHistory)
-                  else
-                    _buildEmptyHistory(theme, colorScheme),
-                  const SizedBox(height: 32),
-                ],
+                ),
               ),
             ),
-          ),
-        ),
-      ),
     );
   }
 
   Widget _buildQuickStats(
-      BuildContext context,
-      DoctorSubscriptionState state,
-      ColorScheme colorScheme,
-      ThemeData theme,
-      ) {
+    BuildContext context,
+    DoctorSubscriptionState state,
+    ColorScheme colorScheme,
+    ThemeData theme,
+  ) {
     final plan = state.currentPlan!;
 
     return Row(
@@ -144,7 +185,12 @@ class MySubscriptionScreen extends ConsumerWidget {
             overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 4),
-          Text(label, style: theme.textTheme.labelSmall?.copyWith(color: colorScheme.onSurfaceVariant)),
+          Text(
+            label,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
         ],
       ),
     );
@@ -161,7 +207,9 @@ class MySubscriptionScreen extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(vertical: 16),
           foregroundColor: colorScheme.primary,
           side: BorderSide(color: colorScheme.primary.transparency(0.5)),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
         ),
       ),
     );
@@ -178,13 +226,24 @@ class MySubscriptionScreen extends ConsumerWidget {
       ),
       child: Column(
         children: [
-          Icon(Icons.receipt_long_rounded, size: 48, color: colorScheme.onSurfaceVariant.transparency(0.5)),
+          Icon(
+            Icons.receipt_long_rounded,
+            size: 48,
+            color: colorScheme.onSurfaceVariant.transparency(0.5),
+          ),
           const SizedBox(height: 12),
-          Text('No billing history yet', style: theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant)),
+          Text(
+            'No billing history yet',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
           const SizedBox(height: 4),
           Text(
             'Your payment history will appear here',
-            style: theme.textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant.transparency(0.7)),
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurfaceVariant.transparency(0.7),
+            ),
           ),
         ],
       ),
@@ -192,12 +251,12 @@ class MySubscriptionScreen extends ConsumerWidget {
   }
 
   Widget _buildErrorView(
-      BuildContext context,
-      WidgetRef ref,
-      String errorMessage,
-      ColorScheme colorScheme,
-      ThemeData theme,
-      ) {
+    BuildContext context,
+    WidgetRef ref,
+    String errorMessage,
+    ColorScheme colorScheme,
+    ThemeData theme,
+  ) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -210,20 +269,43 @@ class MySubscriptionScreen extends ConsumerWidget {
                 color: colorScheme.errorContainer.transparency(0.3),
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.wifi_off_rounded, size: 48, color: colorScheme.error),
+              child: Icon(
+                Icons.wifi_off_rounded,
+                size: 48,
+                color: colorScheme.error,
+              ),
             ),
             const SizedBox(height: 24),
-            Text('Connection Error', style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold, color: colorScheme.onSurface)),
+            Text(
+              'Connection Error',
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: colorScheme.onSurface,
+              ),
+            ),
             const SizedBox(height: 8),
-            Text(errorMessage, textAlign: TextAlign.center, style: theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant)),
+            Text(
+              errorMessage,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
             const SizedBox(height: 24),
             FilledButton.icon(
-              onPressed: () => ref.read(doctorSubscriptionProvider.notifier).loadSubscriptionDetails(),
+              onPressed: () => ref
+                  .read(doctorSubscriptionProvider.notifier)
+                  .loadSubscriptionDetails(),
               icon: const Icon(Icons.refresh_rounded, size: 18),
               label: const Text('Try Again'),
               style: FilledButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 14,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
             ),
           ],
@@ -237,7 +319,9 @@ class MySubscriptionScreen extends ConsumerWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Theme.of(context).colorScheme.surface,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
       builder: (context) => const AvailablePlansSection(),
     );
   }
@@ -246,4 +330,3 @@ class MySubscriptionScreen extends ConsumerWidget {
     return '${date.day}/${date.month}/${date.year}';
   }
 }
-

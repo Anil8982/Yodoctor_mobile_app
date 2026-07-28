@@ -1,4 +1,4 @@
-import 'create_subscription_model.dart';
+import '../../doctor/models/subscription/create_subscription_model.dart';
 
 class PaymentOrderModel {
   final String orderId, currency, razorpayKey;

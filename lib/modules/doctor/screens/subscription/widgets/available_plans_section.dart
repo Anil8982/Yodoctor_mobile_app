@@ -17,6 +17,25 @@ class AvailablePlansSection extends ConsumerWidget {
     final colorScheme = theme.colorScheme;
     final plan = state.selectedNewPlan;
 
+    if (state.allPlans.isEmpty && !state.isLoading) {
+      Future.microtask(() => ref.read(doctorSubscriptionProvider.notifier).loadPlans());
+    }
+
+    ref.listen(doctorSubscriptionProvider, (previous, next) {
+      if (next.errorMessage != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(next.errorMessage!),
+            duration: const Duration(seconds: 5),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        );
+      }
+    });
+
     return Container(
       constraints: BoxConstraints(
         maxHeight: MediaQuery.of(context).size.height * 0.85,
