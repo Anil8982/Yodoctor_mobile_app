@@ -209,6 +209,8 @@ class ManualBookingForm extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final shifts = ['Morning Shift', 'Evening Shift'];
+    final now = DateTime.now();
+    final morningOpen = now.hour < 12;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -227,7 +229,9 @@ class ManualBookingForm extends StatelessWidget {
                   left: isMorning ? 0 : 6,
                 ),
                 child: InkWell(
-                  onTap: () => onShiftChanged(shift),
+                  onTap: () => morningOpen
+                      ? () => onShiftChanged("Morning Shift")
+                      : null,
                   borderRadius: BorderRadius.circular(14),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 180),

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
@@ -135,6 +136,25 @@ class ManualBookingNotifier extends Notifier<ManualBookingState> {
         state = state.copyWith(loading: false, errorMessage: msg);
         return false;
       }
+    } on DioException catch (e, st) {
+      String message = "Booking transaction failure";
+
+      if (e.response?.data != null &&
+          e.response!.data is Map<String, dynamic>) {
+        message = e.response!.data["message"] ?? message;
+      }
+
+      state = state.copyWith(loading: false, errorMessage: message);
+
+      AppLogger.exception(
+        e,
+        st,
+        message: message,
+        tag: LogTags.doctor,
+        subTag: _subTag,
+      );
+
+      return false;
     } catch (e, st) {
       state = state.copyWith(
         loading: false,
