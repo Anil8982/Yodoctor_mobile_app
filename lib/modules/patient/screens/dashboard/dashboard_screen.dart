@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/modules/patient/screens/dashboard/widgets/patient_header.dart';
 import 'package:yodoctor/modules/patient/widgets/custom_sliver_app_bar.dart';
 import 'package:yodoctor/modules/patient/widgets/patient_drawer.dart';
@@ -94,7 +96,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   ),
                   const SizedBox(height: AppSpacing.xs),
                   Text(
-                    controller.errorMessage ?? "Unable to connect to the server. Please check your internet connection.",
+                    controller.errorMessage ??
+                        "Unable to connect to the server. Please check your internet connection.",
                     textAlign: TextAlign.center,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: colorScheme.onSurfaceVariant,
@@ -103,7 +106,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   const SizedBox(height: AppSpacing.xl),
                   FilledButton.icon(
                     onPressed: () {
-                      ref.read(patientDashboardControllerProvider.notifier).loadDashboard();
+                      ref
+                          .read(patientDashboardControllerProvider.notifier)
+                          .loadDashboard();
                     },
                     icon: const Icon(Icons.refresh_rounded, size: 20),
                     label: const Text('Try Again'),
@@ -192,10 +197,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   }
 
   Widget _buildSectionHeader(
-      BuildContext context,
-      ColorScheme colorScheme,
-      String title,
-      ) {
+    BuildContext context,
+    ColorScheme colorScheme,
+    String title,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -235,10 +240,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         children: data.appointments
             .map<Widget>(
               (appointment) => Padding(
-            padding: const EdgeInsets.only(bottom: AppSpacing.md),
-            child: AppointmentCard(appointment: appointment),
-          ),
-        )
+                padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                child: AppointmentCard(appointment: appointment),
+              ),
+            )
             .toList(),
       );
     }
@@ -251,10 +256,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           children: data.appointments
               .map<Widget>(
                 (appointment) => SizedBox(
-              width: itemWidth,
-              child: AppointmentCard(appointment: appointment),
-            ),
-          )
+                  width: itemWidth,
+                  child: AppointmentCard(appointment: appointment),
+                ),
+              )
               .toList(),
         );
       },
@@ -270,7 +275,9 @@ class _EmptyAppointments extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    return Center(
+    return InkWell(
+      onTap: () => context.push(AppRoutes.search),
+      borderRadius: BorderRadius.circular(24),
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(
@@ -323,16 +330,29 @@ class _EmptyAppointments extends StatelessWidget {
               ),
             ),
             const SizedBox(height: AppSpacing.xl),
-            FilledButton.icon(
-              onPressed: () {},
-              icon: const Icon(Icons.add_rounded, size: 20),
-              label: const Text('Book New'),
-              style: FilledButton.styleFrom(
-                backgroundColor: colorScheme.primary,
-                foregroundColor: colorScheme.onPrimary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: colorScheme.primary,
+                borderRadius: BorderRadius.circular(99),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.add_rounded,
+                    size: 20,
+                    color: colorScheme.onPrimary,
+                  ),
+                  const SizedBox(width: 5),
+                  Text(
+                    'Book New',
+                    style: textTheme.labelLarge?.copyWith(
+                      color: colorScheme.onPrimary,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
