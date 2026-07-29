@@ -103,24 +103,12 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
 
     return Scaffold(
       backgroundColor: colorScheme.surfaceContainer,
-      appBar: AppBar(
-        elevation: 10,
-        title: Text(
-          'Patient Registration',
-          style: textTheme.titleLarge?.copyWith(
-            color: colorScheme.onPrimary,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        leadingWidth: 56,
-
-      ),
       body: FadeTransition(
         opacity: _fadeAnim,
         child: Column(
           children: [
             Container(
-              height: 100,
+              height: 120,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
@@ -254,8 +242,9 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                               return 'Enter name';
                             }
 
-                            if (v.trim().length < 2)
+                            if (v.trim().length < 2) {
                               return 'Name should have at least 2 characters';
+                            }
 
                             if (!RegExp(
                               r'^[A-Za-z]+(?: [A-Za-z]+)*$',
@@ -434,8 +423,9 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                           isPassword: true,
                           validator: (v) {
                             if (v == null || v.isEmpty) return 'Enter password';
-                            if (v.length < 8)
+                            if (v.length < 8) {
                               return 'Password must be 8 characters';
+                            }
                             return null;
                           },
                         ),
@@ -447,10 +437,12 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                           prefixIcon: Icons.lock_outline_rounded,
                           isPassword: true,
                           validator: (v) {
-                            if (v == null || v.isEmpty)
+                            if (v == null || v.isEmpty) {
                               return 'Confirm password';
-                            if (v != _passwordController.text)
+                            }
+                            if (v != _passwordController.text) {
                               return 'Passwords do not match';
+                            }
                             return null;
                           },
                         ),

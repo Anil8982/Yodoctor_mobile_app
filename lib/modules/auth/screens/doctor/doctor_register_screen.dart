@@ -14,7 +14,6 @@ import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import '../../controllers/doctor_register_controller.dart';
 
-// 🎯 FIXED: Migrated from legacy provider to Riverpod ConsumerStatefulWidget Spec
 class DoctorRegisterScreen extends ConsumerStatefulWidget {
   final int initialStep;
 
@@ -46,7 +45,6 @@ class _DoctorRegisterScreenState extends ConsumerState<DoctorRegisterScreen>
   @override
   void initState() {
     super.initState();
-    // 🎯 FIXED: Index bounds mapping correction (zero-indexed layout compliance)
     _currentStep = widget.initialStep - 1;
     _pageController = PageController(initialPage: _currentStep);
 
@@ -156,111 +154,99 @@ class _DoctorRegisterScreenState extends ConsumerState<DoctorRegisterScreen>
           children: [
             Column(
               children: [
-                Container(
-                  decoration: BoxDecoration(
-                    gradient: AppTheme.doctorGradient,
-                    borderRadius: const BorderRadius.only(
-                      bottomLeft: Radius.circular(28),
-                      bottomRight: Radius.circular(28),
+                Hero(
+                  tag: 'docAppBar',
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: AppTheme.doctorGradient,
+                      borderRadius: const BorderRadius.only(
+                        bottomLeft: Radius.circular(28),
+                        bottomRight: Radius.circular(28),
+                      ),
                     ),
-                  ),
-                  child: SafeArea(
-                    bottom: false,
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-                          child: Row(
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  if (_currentStep == 0) {
-                                    if (context.canPop()) {
+                    child: SafeArea(
+                      bottom: false,
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                            child: Row(
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    if (_currentStep == 0) {
                                       context.pop();
                                     } else {
-                                      context.go(AppRoutes.landing);
+                                      _prevStep();
                                     }
-                                  } else {
-                                    _prevStep();
-                                  }
-                                },
-                                child: Container(
-                                  width: 38,
-                                  height: 38,
-                                  decoration: BoxDecoration(
-                                    color: colorScheme.onPrimary.transparency(
-                                      0.2,
+                                  },
+                                  child: Container(
+                                    width: 40,
+                                    height: 40,
+                                    decoration: BoxDecoration(
+                                      color: colorScheme.onPrimary.transparency(0.25),
+                                      borderRadius: BorderRadius.circular(12),
                                     ),
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: Icon(
-                                    Icons.arrow_back_rounded,
-                                    color: colorScheme.onPrimary,
-                                    size: 20,
+                                    child: Icon(
+                                      Icons.arrow_back_rounded,
+                                      color: colorScheme.onPrimary,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              const Spacer(),
-                              RichText(
-                                text: TextSpan(
-                                  children: [
-                                    TextSpan(
-                                      text: 'yo',
-                                      style: textTheme.titleLarge?.copyWith(
-                                        fontWeight: FontWeight.w800,
+                                const Spacer(),
+                                RichText(
+                                  text: TextSpan(
+                                    children: [
+                                      TextSpan(
+                                        text: 'Yo',
+                                        style: textTheme.titleLarge?.copyWith(
+                                          fontWeight: FontWeight.w800,
+                                          color: colorScheme.onPrimary,
+                                        ),
+                                      ),
+                                      TextSpan(
+                                        text: 'Doctor',
+                                        style: textTheme.titleLarge?.copyWith(
+                                          fontWeight: FontWeight.w800,
+                                          color: colorScheme.onPrimary.withValues(alpha: 0.6),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const Spacer(),
+                                SizedBox(
+                                  width: 40,
+                                  child: Center(
+                                    child: Text(
+                                      '${_currentStep + 1}/${_stepLabels.length}',
+                                      style: textTheme.labelMedium?.copyWith(
                                         color: colorScheme.onPrimary,
+                                        fontWeight: FontWeight.w700,
                                       ),
                                     ),
-                                    TextSpan(
-                                      text: 'Doctor',
-                                      style: textTheme.titleLarge?.copyWith(
-                                        fontWeight: FontWeight.w800,
-                                        color: colorScheme.onPrimary
-                                            .transparency(0.5),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const Spacer(),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: colorScheme.onPrimary.transparency(
-                                    0.2,
-                                  ),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Text(
-                                  '${_currentStep + 1}/${_stepLabels.length}',
-                                  style: textTheme.labelMedium?.copyWith(
-                                    color: colorScheme.onPrimary,
-                                    fontWeight: FontWeight.w700,
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 14),
-                        AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 300),
-                          child: Text(
-                            _stepLabels[_currentStep],
-                            key: ValueKey(_currentStep),
-                            style: textTheme.titleMedium?.copyWith(
-                              color: colorScheme.onPrimary,
-                              fontWeight: FontWeight.w700,
+                              ],
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 14),
-                        _buildStepperDots(context),
-                        const SizedBox(height: 16),
-                      ],
+                          const SizedBox(height: 14),
+                          AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 300),
+                            child: Text(
+                              _stepLabels[_currentStep],
+                              key: ValueKey(_currentStep),
+                              style: textTheme.titleMedium?.copyWith(
+                                color: colorScheme.onPrimary,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+                          _buildStepperDots(context),
+                          const SizedBox(height: 16),
+                        ],
+                      ),
                     ),
                   ),
                 ),
