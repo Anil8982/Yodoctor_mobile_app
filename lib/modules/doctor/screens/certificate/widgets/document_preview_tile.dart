@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
 import 'package:yodoctor/modules/doctor/models/certificate/doctor_document_model.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:yodoctor/modules/widgets/document_viewer_screen.dart';
 
 class DocumentPreviewTile extends StatelessWidget {
   const DocumentPreviewTile({
@@ -29,7 +29,6 @@ class DocumentPreviewTile extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // ✅ File icon based on type
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
@@ -108,11 +107,22 @@ class DocumentPreviewTile extends StatelessWidget {
             ),
           ),
           const SizedBox(width: AppSpacing.sm),
-          // ✅ View button with actual file opening
           SizedBox(
             height: 36,
             child: OutlinedButton.icon(
-              onPressed: () => _openFile(context, document.fullUrl),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => DocumentViewerScreen(
+                      fileUrl: document.fullUrl,
+                      fileName: document.fileName,
+                      isImage: document.isImage,
+                      isPdf: document.isPdf,
+                    ),
+                  ),
+                );
+              },
               style: OutlinedButton.styleFrom(
                 foregroundColor: colorScheme.primary,
                 side: BorderSide(
@@ -135,45 +145,6 @@ class DocumentPreviewTile extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Future<void> _openFile(BuildContext context, String path) async {
-    try {
-      if (path.isEmpty) {
-        _showError(context, 'No file URL available');
-        return;
-      }
-
-      // Normalize path (already done in model)
-      final normalizedPath = path.replaceAll('\\', '/');
-
-      // If it's a full URL, launch it
-      if (normalizedPath.startsWith('http://') || normalizedPath.startsWith('https://')) {
-        final uri = Uri.parse(normalizedPath);
-        if (await canLaunchUrl(uri)) {
-          await launchUrl(uri, mode: LaunchMode.externalApplication);
-        } else {
-          if (!context.mounted) return;
-          _showError(context, 'Cannot open file: $normalizedPath');
-        }
-      } else {
-        // For relative paths, show message
-        _showError(context, 'File preview not available. Path: $normalizedPath');
-      }
-    } catch (e) {
-      if (!context.mounted) return;
-      _showError(context, 'Error opening file: $e');
-    }
-  }
-
-  void _showError(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: Theme.of(context).colorScheme.error,
       ),
     );
   }

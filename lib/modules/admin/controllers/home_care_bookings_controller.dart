@@ -33,7 +33,6 @@ class HomeCareBookingsState {
 class HomeCareBookingsNotifier extends AsyncNotifier<HomeCareBookingsState> {
   @override
   Future<HomeCareBookingsState> build() async {
-    // डमी डेटामधून डेटा लोड केला
     final rawList = await DummyData.getHomeCareBookings();
 
     return HomeCareBookingsState(

@@ -136,36 +136,39 @@ class _DoctorLoginScreenState extends ConsumerState<DoctorLoginScreen>
               SafeArea(
                 child: Column(
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                      child: Row(
-                        children: [
-                          GestureDetector(
-                            onTap: () => Navigator.pop(context),
-                            child: Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                color: colorScheme.onPrimary.transparency(0.25),
-                                borderRadius: BorderRadius.circular(12),
+                    Hero(
+                      tag: 'docAppBar',
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                        child: Row(
+                          children: [
+                            GestureDetector(
+                              onTap: () => Navigator.pop(context),
+                              child: Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: colorScheme.onPrimary.transparency(0.25),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Icon(
+                                  Icons.arrow_back_rounded,
+                                  color: colorScheme.onPrimary,
+                                ),
                               ),
-                              child: Icon(
-                                Icons.arrow_back_rounded,
+                            ),
+                            const Spacer(),
+                            Text(
+                              'Doctor Portal',
+                              style: textTheme.titleMedium?.copyWith(
                                 color: colorScheme.onPrimary,
+                                fontWeight: FontWeight.w700,
                               ),
                             ),
-                          ),
-                          const Spacer(),
-                          Text(
-                            'Doctor Portal',
-                            style: textTheme.titleMedium?.copyWith(
-                              color: colorScheme.onPrimary,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          const Spacer(),
-                          const SizedBox(width: 40),
-                        ],
+                            const Spacer(),
+                            const SizedBox(width: 40),
+                          ],
+                        ),
                       ),
                     ),
 
@@ -230,7 +233,7 @@ class _DoctorLoginScreenState extends ConsumerState<DoctorLoginScreen>
                   ),
                 ),
                 TextButton(
-                  onPressed: () => context.go(AppRoutes.doctorRegister),
+                  onPressed: () => context.push(AppRoutes.doctorRegister),
                   style: TextButton.styleFrom(
                     padding: const EdgeInsets.symmetric(horizontal: 6),
                     minimumSize: Size.zero,

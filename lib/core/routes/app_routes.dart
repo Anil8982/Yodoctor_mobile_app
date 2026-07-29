@@ -72,4 +72,6 @@ class AppRoutes {
   static const String paymentProcessing = '/payment/processing';
   static const String paymentFailure = '/payment/failure';
   static const String invoiceDetail = '/payment/invoice-detail';
+
+  static const String documentViewer = '/document-viewer';
 }

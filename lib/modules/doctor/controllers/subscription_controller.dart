@@ -88,9 +88,9 @@ class DoctorSubscriptionState {
 }
 
 final doctorSubscriptionProvider =
-    NotifierProvider<DoctorSubscriptionNotifier, DoctorSubscriptionState>(
-      DoctorSubscriptionNotifier.new,
-    );
+NotifierProvider<DoctorSubscriptionNotifier, DoctorSubscriptionState>(
+  DoctorSubscriptionNotifier.new,
+);
 
 class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
   static const String _subTag = 'DoctorSubscriptionNotifier';
@@ -113,15 +113,14 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
       _razorpaySubscription?.cancel();
     });
 
-    Future.microtask(() => _loadInitialData());
-    return const DoctorSubscriptionState(isLoading: true);
+    return const DoctorSubscriptionState(isLoading: false);
   }
 
   void _listenToRazorpayEvents() {
     final razorpayController = ref.read(razorpayControllerProvider);
 
     _razorpaySubscription = razorpayController.events.listen(
-      (event) {
+          (event) {
         switch (event) {
           case RazorpaySuccess(:final paymentId, :final signature):
             _handlePaymentSuccess(paymentId, signature);
@@ -148,22 +147,8 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
 
   // ============ Subscription Data Loading ============
 
-  Future<void> _loadInitialData() async {
-    try {
-      await loadSubscriptionDetails();
-    } catch (e, st) {
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Initial load failed',
-        tag: LogTags.doctor,
-        subTag: _subTag,
-      );
-    }
-  }
-
   Future<void> loadPlans() async {
-    if (state.allPlans.isNotEmpty) return; // Already loaded
+    if (state.allPlans.isNotEmpty) return;
 
     state = state.copyWith(isLoading: true, clearError: true);
 
@@ -203,17 +188,15 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
     }
   }
 
-
   Future<void> loadSubscriptionDetails() async {
     AppLogger.info(
       'Loading subscription details',
       tag: LogTags.doctor,
       subTag: _subTag,
     );
-    state = state.copyWith(isLoading: true, clearError: true);
+    state = state.copyWith(isLoading: true, clearError: true, currentPage: 1);
 
     try {
-      // ✅ Wait for subscription status to resolve first
       if (!ref.read(subscriptionStatusProvider).isResolved) {
         AppLogger.info(
           'Waiting for subscription status to resolve...',
@@ -242,11 +225,14 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
         return;
       }
 
-      // Only fetch full details if has active subscription
       final repository = ref.read(subscriptionRepositoryProvider);
-      final subRes = await repository.getActiveSubscription();
 
+      // Fetch active subscription details
+      final subRes = await repository.getActiveSubscription();
       final statusCode = subRes.statusCode ?? 0;
+
+      // Fetch billing history
+      final historyRes = await repository.getBillingHistory(page: 1, limit: 20);
 
       if (statusCode >= 200 && statusCode < 300) {
         SubscriptionPlan? currentPlan;
@@ -258,15 +244,27 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
           );
         }
 
+        final billingHistory =
+        (historyRes.data?["data"]?["invoices"] as List? ?? [])
+            .map((e) => BillingInvoice.fromJson(Map<String, dynamic>.from(e)))
+            .toList();
+
+        final totalPages = _parseTotalPages(
+          historyRes.data?["data"]?["totalPages"],
+        );
+
         final bool hasNoActivePlan = currentPlan == null || !currentPlan.isActive;
 
         state = state.copyWith(
           isLoading: false,
           currentPlan: currentPlan,
           clearCurrentPlan: currentPlan == null,
+          billingHistory: billingHistory,
           showPlans: hasNoActivePlan,
           isInitialized: true,
           clearError: true,
+          currentPage: 1,
+          hasMoreBilling: 1 < totalPages,
         );
       } else {
         state = state.copyWith(
@@ -310,11 +308,11 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
       if ((historyRes.statusCode ?? 0) >= 200 &&
           (historyRes.statusCode ?? 0) < 300) {
         final moreHistory =
-            (historyRes.data?["data"]?["invoices"] as List? ?? [])
-                .map(
-                  (e) => BillingInvoice.fromJson(Map<String, dynamic>.from(e)),
-                )
-                .toList();
+        (historyRes.data?["data"]?["invoices"] as List? ?? [])
+            .map(
+              (e) => BillingInvoice.fromJson(Map<String, dynamic>.from(e)),
+        )
+            .toList();
         final totalPages = _parseTotalPages(
           historyRes.data?["data"]?["totalPages"],
         );
@@ -356,10 +354,10 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
       return targetCycle == "yearly"
           ? d.contains("year") || d.contains("yr") || t.contains("year")
           : d.contains("month") ||
-                d.contains("mo") ||
-                d.contains("trial") ||
-                t.contains("month") ||
-                t.contains("trial");
+          d.contains("mo") ||
+          d.contains("trial") ||
+          t.contains("month") ||
+          t.contains("trial");
     }).toList();
   }
 
@@ -480,7 +478,7 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
 
         if (subId != null && key != null) {
           _pendingLocalSubscriptionId =
-              data["local_subscription_id"] as String?;
+          data["local_subscription_id"] as String?;
           _pendingRazorpaySubscriptionId = subId;
 
           final razorpayController = ref.read(razorpayControllerProvider);
@@ -505,7 +503,7 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
       state = state.copyWith(
         isLoading: false,
         errorMessage:
-            response.data?["message"] ?? "Subscription creation failed",
+        response.data?["message"] ?? "Subscription creation failed",
       );
       return false;
     } catch (e, st) {
@@ -558,9 +556,6 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
         );
 
         await loadSubscriptionDetails();
-
-        // ✅ FIX 2: Remove duplicate API call - loadSubscriptionDetails() already updated cache
-        // ref.read(subscriptionStatusProvider.notifier).checkActiveSubscription();
 
         state = state.copyWith(
           isLoading: false,

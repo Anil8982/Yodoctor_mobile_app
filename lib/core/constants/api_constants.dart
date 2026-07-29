@@ -4,6 +4,14 @@ class ApiConstants {
   ApiConstants._();
 
   static String get baseUrl => EnvConfig.baseUrl;
+  static String get fileBaseUrl => EnvConfig.fileUrl;
+
+  static String fileUrl(String path) {
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+      return path;
+    }
+    return '$fileBaseUrl/$path';
+  }
 
   static const login = '/auth/login';
   static const googleLogin = '/auth/google-login';

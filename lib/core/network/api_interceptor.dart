@@ -13,9 +13,9 @@ class ApiInterceptor extends Interceptor {
       subTag: _subTag,
     );
 
-    if (options.data is Map<String, dynamic>) {
+    if (options.data != null) {
       AppLogger.json(
-        options.data as Map<String, dynamic>,
+        options.data,
         tag: LogTags.api,
         subTag: _subTag,
       );
@@ -32,9 +32,10 @@ class ApiInterceptor extends Interceptor {
       subTag: _subTag,
     );
 
-    if (response.data is Map<String, dynamic>) {
+    // ✅ Print Map OR List responses
+    if (response.data != null) {
       AppLogger.json(
-        response.data as Map<String, dynamic>,
+        response.data,
         tag: LogTags.api,
         subTag: _subTag,
       );
@@ -51,7 +52,7 @@ class ApiInterceptor extends Interceptor {
       subTag: _subTag,
     );
 
-    if (err.response != null) {
+    if (err.response?.data != null) {
       AppLogger.json(
         err.response?.data,
         tag: LogTags.api,

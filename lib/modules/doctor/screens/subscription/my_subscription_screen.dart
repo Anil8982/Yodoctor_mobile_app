@@ -9,11 +9,26 @@ import 'widgets/available_plans_section.dart';
 import 'widgets/billing_history_section.dart';
 import 'widgets/subscription_plan_card.dart';
 
-class MySubscriptionScreen extends ConsumerWidget {
+class MySubscriptionScreen extends ConsumerStatefulWidget {
   const MySubscriptionScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MySubscriptionScreen> createState() => _MySubscriptionScreenState();
+}
+
+class _MySubscriptionScreenState extends ConsumerState<MySubscriptionScreen> {
+  @override
+  void initState() {
+    super.initState();
+
+    // ✅ Auto-load when screen opens
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(doctorSubscriptionProvider.notifier).loadSubscriptionDetails();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(doctorSubscriptionProvider);
     final colorScheme = Theme.of(context).colorScheme;
     final theme = Theme.of(context);
@@ -51,72 +66,71 @@ class MySubscriptionScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('My Subscription'), centerTitle: false),
       body: state.errorMessage != null && !state.isInitialized
           ? _buildErrorView(
-              context,
-              ref,
-              state.errorMessage!,
-              colorScheme,
-              theme,
-            )
+        context,
+        state.errorMessage!,
+        colorScheme,
+        theme,
+      )
           : state.isLoading && !state.isInitialized
           ? const MySubscriptionShimmer()
           : RefreshIndicator(
-              onRefresh: () async {
-                await ref
-                    .read(doctorSubscriptionProvider.notifier)
-                    .loadSubscriptionDetails();
-              },
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(
-                  parent: BouncingScrollPhysics(),
-                ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 24,
-                ),
-                child: Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 800),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (state.isLoading) ...[
-                          LinearProgressIndicator(
-                            color: colorScheme.primary,
-                            minHeight: 3,
-                          ),
-                          const SizedBox(height: 24),
-                        ],
-                        SubscriptionPlanCard(
-                          plan: hasActivePlan ? state.currentPlan : null,
-                          onUpgradePressed: () => _showPlansSheet(context),
-                        ),
-                        const SizedBox(height: 32),
-                        if (hasActivePlan) ...[
-                          _buildQuickStats(context, state, colorScheme, theme),
-                          const SizedBox(height: 32),
-                        ],
-                        _buildChangePlanButton(context, colorScheme),
-                        const SizedBox(height: 20),
-                        if (state.billingHistory.isNotEmpty)
-                          BillingHistorySection(history: state.billingHistory)
-                        else
-                          _buildEmptyHistory(theme, colorScheme),
-                        const SizedBox(height: 32),
-                      ],
+        onRefresh: () async {
+          await ref
+              .read(doctorSubscriptionProvider.notifier)
+              .loadSubscriptionDetails();
+        },
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(
+            parent: BouncingScrollPhysics(),
+          ),
+          padding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 24,
+          ),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 800),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (state.isLoading) ...[
+                    LinearProgressIndicator(
+                      color: colorScheme.primary,
+                      minHeight: 3,
                     ),
+                    const SizedBox(height: 24),
+                  ],
+                  SubscriptionPlanCard(
+                    plan: hasActivePlan ? state.currentPlan : null,
+                    onUpgradePressed: () => _showPlansSheet(context),
                   ),
-                ),
+                  const SizedBox(height: 32),
+                  if (hasActivePlan) ...[
+                    _buildQuickStats(context, state, colorScheme, theme),
+                    const SizedBox(height: 32),
+                  ],
+                  _buildChangePlanButton(context, colorScheme),
+                  const SizedBox(height: 20),
+                  if (state.billingHistory.isNotEmpty)
+                    BillingHistorySection(history: state.billingHistory)
+                  else
+                    _buildEmptyHistory(theme, colorScheme),
+                  const SizedBox(height: 32),
+                ],
               ),
             ),
+          ),
+        ),
+      ),
     );
   }
 
   Widget _buildQuickStats(
-    BuildContext context,
-    DoctorSubscriptionState state,
-    ColorScheme colorScheme,
-    ThemeData theme,
-  ) {
+      BuildContext context,
+      DoctorSubscriptionState state,
+      ColorScheme colorScheme,
+      ThemeData theme,
+      ) {
     final plan = state.currentPlan!;
 
     return Row(
@@ -250,13 +264,13 @@ class MySubscriptionScreen extends ConsumerWidget {
     );
   }
 
+  // ✅ FIXED: Removed WidgetRef ref parameter
   Widget _buildErrorView(
-    BuildContext context,
-    WidgetRef ref,
-    String errorMessage,
-    ColorScheme colorScheme,
-    ThemeData theme,
-  ) {
+      BuildContext context,
+      String errorMessage,
+      ColorScheme colorScheme,
+      ThemeData theme,
+      ) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
