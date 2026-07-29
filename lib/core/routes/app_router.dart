@@ -558,7 +558,7 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       // ---- Shared ----
       GoRoute(
-        path: '/document-viewer',
+        path: AppRoutes.documentViewer,
         name: 'documentViewer',
         builder: (context, state) {
           final extra = state.extra as Map<String, dynamic>;
