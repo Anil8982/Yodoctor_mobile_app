@@ -1,11 +1,14 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:yodoctor/modules/doctor/controllers/subscription_status_controller.dart';
+import 'package:yodoctor/modules/payment/controllers/razorpay_controller.dart';
 import 'package:yodoctor/modules/doctor/models/subscription/available_plan_model.dart';
 import 'package:yodoctor/modules/doctor/models/subscription/subscription_model.dart';
 import '../repositories/subscription_repository.dart';
+
+enum PaymentFlowState { idle, processing, success, failed }
 
 class DoctorSubscriptionState {
   final bool isLoading;
@@ -20,6 +23,9 @@ class DoctorSubscriptionState {
   final int currentPage;
   final bool hasMoreBilling;
   final bool isLoadingMore;
+  final PaymentFlowState paymentFlow;
+  final String? paymentId;
+  final String? planName;
 
   const DoctorSubscriptionState({
     this.isLoading = false,
@@ -34,6 +40,9 @@ class DoctorSubscriptionState {
     this.currentPage = 1,
     this.hasMoreBilling = true,
     this.isLoadingMore = false,
+    this.paymentFlow = PaymentFlowState.idle,
+    this.paymentId,
+    this.planName,
   });
 
   DoctorSubscriptionState copyWith({
@@ -52,6 +61,9 @@ class DoctorSubscriptionState {
     int? currentPage,
     bool? hasMoreBilling,
     bool? isLoadingMore,
+    PaymentFlowState? paymentFlow,
+    String? paymentId,
+    String? planName,
   }) {
     return DoctorSubscriptionState(
       isLoading: isLoading ?? this.isLoading,
@@ -68,6 +80,9 @@ class DoctorSubscriptionState {
       currentPage: currentPage ?? this.currentPage,
       hasMoreBilling: hasMoreBilling ?? this.hasMoreBilling,
       isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+      paymentFlow: paymentFlow ?? this.paymentFlow,
+      paymentId: paymentId ?? this.paymentId,
+      planName: planName ?? this.planName,
     );
   }
 }
@@ -80,10 +95,9 @@ final doctorSubscriptionProvider =
 class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
   static const String _subTag = 'DoctorSubscriptionNotifier';
 
-  late final Razorpay _razorpay;
-  bool _isCheckoutOpen = false;
-  String? _localSubscriptionId;
-  String? _razorpaySubscriptionId;
+  String? _pendingLocalSubscriptionId;
+  String? _pendingRazorpaySubscriptionId;
+  StreamSubscription<RazorpayEvent>? _razorpaySubscription;
 
   @override
   DoctorSubscriptionState build() {
@@ -93,20 +107,47 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
       subTag: _subTag,
     );
 
-    _razorpay = Razorpay();
-    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
-    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
-    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
+    _listenToRazorpayEvents();
 
     ref.onDispose(() {
-      _razorpay.clear();
+      _razorpaySubscription?.cancel();
     });
 
     Future.microtask(() => _loadInitialData());
     return const DoctorSubscriptionState(isLoading: true);
   }
 
-  // Defensive initial load with error handling
+  void _listenToRazorpayEvents() {
+    final razorpayController = ref.read(razorpayControllerProvider);
+
+    _razorpaySubscription = razorpayController.events.listen(
+      (event) {
+        switch (event) {
+          case RazorpaySuccess(:final paymentId, :final signature):
+            _handlePaymentSuccess(paymentId, signature);
+
+          case RazorpayFailure(:final message):
+            _handlePaymentFailure(message, cancelled: false);
+
+          case RazorpayCancelled():
+            _handlePaymentFailure('Payment cancelled', cancelled: true);
+
+          case RazorpayExternalWallet():
+            _clearPendingPaymentData();
+        }
+      },
+      onError: (error) {
+        AppLogger.error(
+          'Razorpay event stream error: $error',
+          tag: LogTags.doctor,
+          subTag: _subTag,
+        );
+      },
+    );
+  }
+
+  // ============ Subscription Data Loading ============
+
   Future<void> _loadInitialData() async {
     try {
       await loadSubscriptionDetails();
@@ -121,79 +162,111 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
     }
   }
 
+  Future<void> loadPlans() async {
+    if (state.allPlans.isNotEmpty) return; // Already loaded
+
+    state = state.copyWith(isLoading: true, clearError: true);
+
+    try {
+      final repository = ref.read(subscriptionRepositoryProvider);
+      final plansRes = await repository.getPlans();
+
+      if ((plansRes.statusCode ?? 0) >= 200 &&
+          (plansRes.statusCode ?? 0) < 300) {
+        final allPlans = (plansRes.data?["data"]?["plans"] as List? ?? [])
+            .map((e) => AvailablePlan.fromJson(Map<String, dynamic>.from(e)))
+            .toList();
+
+        state = state.copyWith(
+          isLoading: false,
+          allPlans: allPlans,
+          clearError: true,
+        );
+      } else {
+        state = state.copyWith(
+          isLoading: false,
+          errorMessage: "Failed to load plans",
+        );
+      }
+    } catch (e, st) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Network error loading plans.',
+      );
+      AppLogger.exception(
+        e,
+        st,
+        message: 'Load plans failed',
+        tag: LogTags.doctor,
+        subTag: _subTag,
+      );
+    }
+  }
+
+
   Future<void> loadSubscriptionDetails() async {
     AppLogger.info(
       'Loading subscription details',
       tag: LogTags.doctor,
       subTag: _subTag,
     );
-    state = state.copyWith(isLoading: true, clearError: true, currentPage: 1);
+    state = state.copyWith(isLoading: true, clearError: true);
 
     try {
+      // ✅ Wait for subscription status to resolve first
+      if (!ref.read(subscriptionStatusProvider).isResolved) {
+        AppLogger.info(
+          'Waiting for subscription status to resolve...',
+          tag: LogTags.doctor,
+          subTag: _subTag,
+        );
+        await ref.read(subscriptionStatusProvider.notifier).checkActiveSubscription();
+      }
+
+      final subStatus = ref.read(subscriptionStatusProvider);
+
+      if (!subStatus.hasSubscription) {
+        AppLogger.info(
+          'No active subscription (from cache), skipping duplicate API call',
+          tag: LogTags.doctor,
+          subTag: _subTag,
+        );
+        state = state.copyWith(
+          isLoading: false,
+          currentPlan: null,
+          clearCurrentPlan: true,
+          showPlans: true,
+          isInitialized: true,
+          clearError: true,
+        );
+        return;
+      }
+
+      // Only fetch full details if has active subscription
       final repository = ref.read(subscriptionRepositoryProvider);
-
       final subRes = await repository.getActiveSubscription();
-      await Future.delayed(const Duration(milliseconds: 250));
 
-      final historyRes = await repository.getBillingHistory(page: 1, limit: 20);
-      await Future.delayed(const Duration(milliseconds: 250));
+      final statusCode = subRes.statusCode ?? 0;
 
-      final plansRes = await repository.getPlans();
-
-      final subStatus = subRes.statusCode ?? 0;
-      final historyStatus = historyRes.statusCode ?? 0;
-      final plansStatus = plansRes.statusCode ?? 0;
-
-      if (subStatus >= 200 &&
-          subStatus < 300 &&
-          historyStatus >= 200 &&
-          historyStatus < 300 &&
-          plansStatus >= 200 &&
-          plansStatus < 300) {
+      if (statusCode >= 200 && statusCode < 300) {
         SubscriptionPlan? currentPlan;
         final rawSubscription =
-            subRes.data?["subscription"] ??
-            subRes.data?["data"]?["subscription"];
+            subRes.data?["subscription"] ?? subRes.data?["data"]?["subscription"];
         if (rawSubscription is Map && rawSubscription.isNotEmpty) {
           currentPlan = SubscriptionPlan.fromJson(
             Map<String, dynamic>.from(rawSubscription),
           );
         }
 
-        final billingHistory =
-            (historyRes.data?["data"]?["invoices"] as List? ?? [])
-                .map(
-                  (e) => BillingInvoice.fromJson(Map<String, dynamic>.from(e)),
-                )
-                .toList();
-
-        final allPlans = (plansRes.data?["data"]?["plans"] as List? ?? [])
-            .map((e) => AvailablePlan.fromJson(Map<String, dynamic>.from(e)))
-            .toList();
-
-        final bool hasNoActivePlan =
-            currentPlan == null || !currentPlan.isActive;
-        final totalPages = _parseTotalPages(
-          historyRes.data?["data"]?["totalPages"],
-        );
-
-        AppLogger.success(
-          'Subscription data loaded. Plans: ${allPlans.length}',
-          tag: LogTags.doctor,
-          subTag: _subTag,
-        );
+        final bool hasNoActivePlan = currentPlan == null || !currentPlan.isActive;
 
         state = state.copyWith(
           isLoading: false,
           currentPlan: currentPlan,
           clearCurrentPlan: currentPlan == null,
-          billingHistory: billingHistory,
-          allPlans: allPlans,
           showPlans: hasNoActivePlan,
           isInitialized: true,
           clearError: true,
-          currentPage: 1,
-          hasMoreBilling: 1 < totalPages,
         );
       } else {
         state = state.copyWith(
@@ -209,8 +282,7 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
         isInitialized: true,
       );
       AppLogger.exception(
-        e,
-        st,
+        e, st,
         message: 'Subscription load failed',
         tag: LogTags.doctor,
         subTag: _subTag,
@@ -266,10 +338,14 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
     }
   }
 
+  // ============ Plan Selection ============
+
   void toggleDuration(bool isYearly) =>
       state = state.copyWith(isYearly: isYearly, clearSelectedPlan: true);
+
   void selectNewPlan(AvailablePlan plan) =>
       state = state.copyWith(selectedNewPlan: plan);
+
   void showUpgradePlans() => state = state.copyWith(showPlans: true);
 
   List<AvailablePlan> getAvailablePlans() {
@@ -289,28 +365,82 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
 
   Future<void> refreshData() async => await loadSubscriptionDetails();
 
+  // ============ Plan Upgrade/Purchase Flow ============
+
   Future<bool> upgradePlan() async {
     if (state.selectedNewPlan == null || state.isLoading) return false;
+
+    if (state.currentPlan != null &&
+        state.currentPlan!.planId == state.selectedNewPlan!.id) {
+      state = state.copyWith(
+        errorMessage: "You are already subscribed to this plan.",
+      );
+      return false;
+    }
+
     final hasActiveSub =
         state.currentPlan != null && state.currentPlan!.isActive;
+
     return hasActiveSub
         ? await _upgradeExistingSubscription()
         : await _createNewSubscriptionFlow();
   }
 
+  Future<bool> cancelSubscription() async {
+    if (state.currentPlan == null || !state.currentPlan!.isActive) return false;
+
+    state = state.copyWith(isLoading: true, clearError: true);
+
+    try {
+      final repository = ref.read(subscriptionRepositoryProvider);
+      final response = await repository.cancelSubscription(
+        id: state.currentPlan!.id,
+      );
+
+      if ((response.statusCode ?? 0) >= 200 &&
+          (response.statusCode ?? 0) < 300) {
+        await loadSubscriptionDetails();
+        state = state.copyWith(isLoading: false, showPlans: true);
+        return true;
+      }
+
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: response.data?["message"] ?? "Cancellation failed",
+      );
+      return false;
+    } catch (e, st) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Failed to cancel subscription.',
+      );
+      AppLogger.exception(
+        e,
+        st,
+        message: 'Cancel failed',
+        tag: LogTags.doctor,
+        subTag: _subTag,
+      );
+      return false;
+    }
+  }
+
   Future<bool> _upgradeExistingSubscription() async {
     state = state.copyWith(isLoading: true, clearError: true);
+
     try {
       final repository = ref.read(subscriptionRepositoryProvider);
       final response = await repository.upgradeSubscriptionPlan(
         id: state.currentPlan!.id,
         newPlanId: state.selectedNewPlan!.id,
       );
+
       if ((response.statusCode ?? 0) >= 200 &&
           (response.statusCode ?? 0) < 300) {
         await loadSubscriptionDetails();
         return true;
       }
+
       state = state.copyWith(
         isLoading: false,
         errorMessage: response.data?["message"] ?? "Upgrade failed",
@@ -334,35 +464,44 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
 
   Future<bool> _createNewSubscriptionFlow() async {
     state = state.copyWith(isLoading: true, clearError: true);
+
     try {
       final repository = ref.read(subscriptionRepositoryProvider);
       final response = await repository.createSubscription(
         planId: state.selectedNewPlan!.id,
         billing: state.isYearly ? "yearly" : "monthly",
       );
+
       if ((response.statusCode ?? 0) >= 200 &&
           (response.statusCode ?? 0) < 300) {
         final data = response.data?["data"] ?? {};
         final subId = data["subscription_id"] as String?;
         final key = data["razorpay_key"] as String?;
+
         if (subId != null && key != null) {
-          _localSubscriptionId = data["local_subscription_id"] as String?;
+          _pendingLocalSubscriptionId =
+              data["local_subscription_id"] as String?;
+          _pendingRazorpaySubscriptionId = subId;
 
-          _razorpaySubscriptionId = subId;
-
-          _openCheckout(
-            razorpayKey: key,
+          final razorpayController = ref.read(razorpayControllerProvider);
+          razorpayController.openSubscriptionCheckout(
+            key: key,
             subscriptionId: subId,
-            prefill: data["prefill"] as Map<String, dynamic>? ?? {},
+            planName: state.selectedNewPlan?.title ?? 'Subscription Plan',
+            prefill: Map<String, String>.from(
+              data["prefill"] as Map<String, dynamic>? ?? {},
+            ),
           );
           return true;
         }
+
         state = state.copyWith(
           isLoading: false,
           errorMessage: "Invalid checkout configuration.",
         );
         return false;
       }
+
       state = state.copyWith(
         isLoading: false,
         errorMessage:
@@ -385,104 +524,65 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
     }
   }
 
-  void _openCheckout({
-    required String razorpayKey,
-    required String subscriptionId,
-    required Map<String, dynamic> prefill,
-  }) {
-    if (_isCheckoutOpen) return;
-    _isCheckoutOpen = true;
+  // ============ Payment Result Handlers ============
 
-    if (_localSubscriptionId == null) {
-      AppLogger.warning(
-        'localSubscriptionId is null during checkout',
-        tag: LogTags.doctor,
-        subTag: _subTag,
-      );
-    }
-
-    try {
-      _razorpay.open({
-        'key': razorpayKey,
-        'subscription_id': subscriptionId,
-        'name': 'YoDoctor',
-        'description': state.selectedNewPlan?.title ?? 'Subscription Plan',
-        'retry': {'enabled': true, 'max_count': 1},
-        'prefill': {
-          'contact': prefill['contact'] ?? '',
-          'email': prefill['email'] ?? '',
-          'name': prefill['name'] ?? '',
-        },
-        'send_sms_hash': true,
-      });
-    } catch (e, st) {
-      _isCheckoutOpen = false;
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: 'Failed to open payment gateway.',
-      );
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Checkout open error',
-        tag: LogTags.doctor,
-        subTag: _subTag,
-      );
-    }
-  }
-
-  void _handlePaymentSuccess(PaymentSuccessResponse response) async {
-    _isCheckoutOpen = false;
+  Future<void> _handlePaymentSuccess(
+      String? paymentId,
+      String? signature,
+      ) async {
     AppLogger.success(
-      'Payment Success: ${response.paymentId}',
+      'Processing payment success: $paymentId',
       tag: LogTags.doctor,
       subTag: _subTag,
     );
 
+    state = state.copyWith(paymentFlow: PaymentFlowState.processing);
+
     try {
       final repository = ref.read(subscriptionRepositoryProvider);
+
       final verifyRes = await repository.verifySubscription({
-        if (response.paymentId != null)
-          "razorpay_payment_id": response.paymentId,
-        if (_razorpaySubscriptionId != null)
-          "razorpay_subscription_id": _razorpaySubscriptionId,
-        if (response.signature != null)
-          "razorpay_signature": response.signature,
-        if (_localSubscriptionId != null)
-          "local_subscription_id": _localSubscriptionId,
+        ?paymentId: "razorpay_payment_id",
+        ?_pendingRazorpaySubscriptionId: "razorpay_subscription_id",
+        ?signature: "razorpay_signature",
+        ?_pendingLocalSubscriptionId: "local_subscription_id",
       });
 
-      if ((verifyRes.statusCode ?? 0) >= 200 &&
-          (verifyRes.statusCode ?? 0) < 300) {
+      _clearPendingPaymentData();
+
+      if ((verifyRes.statusCode ?? 0) >= 200 && (verifyRes.statusCode ?? 0) < 300) {
         AppLogger.success(
           'Subscription verified and activated',
           tag: LogTags.doctor,
           subTag: _subTag,
         );
-        _localSubscriptionId = null;
-        _razorpaySubscriptionId = null;
 
         await loadSubscriptionDetails();
+
+        // ✅ FIX 2: Remove duplicate API call - loadSubscriptionDetails() already updated cache
+        // ref.read(subscriptionStatusProvider.notifier).checkActiveSubscription();
+
         state = state.copyWith(
           isLoading: false,
           showPlans: false,
           clearSelectedPlan: true,
           clearError: true,
+          paymentFlow: PaymentFlowState.success,
+          paymentId: paymentId,
+          planName: state.selectedNewPlan?.title,
         );
       } else {
-        AppLogger.warning(
-          'Verification failed: ${verifyRes.data?["message"]}',
-          tag: LogTags.doctor,
-          subTag: _subTag,
-        );
-        _localSubscriptionId = null;
-        _razorpaySubscriptionId = null;
         state = state.copyWith(
           isLoading: false,
           errorMessage: verifyRes.data?["message"] ?? "Verification failed",
+          paymentFlow: PaymentFlowState.failed,
+          paymentId: null,
+          planName: null,
         );
       }
     } catch (e, st) {
+      _clearPendingPaymentData();
+
       AppLogger.exception(
         e,
         st,
@@ -490,199 +590,33 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
         tag: LogTags.doctor,
         subTag: _subTag,
       );
-      _localSubscriptionId = null;
-      _razorpaySubscriptionId = null;
 
       state = state.copyWith(
         isLoading: false,
         errorMessage: 'Payment verification failed.',
+        paymentFlow: PaymentFlowState.failed,
+        paymentId: null,
+        planName: null,
       );
     }
   }
 
-  void _handlePaymentError(PaymentFailureResponse response) {
-    _isCheckoutOpen = false;
-    _localSubscriptionId = null;
-    _razorpaySubscriptionId = null;
+  void _handlePaymentFailure(String message, {required bool cancelled}) {
+    _clearPendingPaymentData();
 
-    state = state.copyWith(isLoading: false);
-    final msg = response.message ?? 'Payment failed';
-    AppLogger.error(
-      'Payment Failed - Code: ${response.code}, Message: $msg, Error: ${response.error}',
-      tag: LogTags.doctor,
-      subTag: _subTag,
-    );
     state = state.copyWith(
-      errorMessage: response.code == Razorpay.PAYMENT_CANCELLED
+      isLoading: false,
+      errorMessage: cancelled
           ? 'Payment cancelled'
-          : 'Payment failed: $msg',
+          : 'Payment failed: $message',
+      paymentFlow: PaymentFlowState.failed,
+      paymentId: null,
+      planName: null,
     );
   }
 
-  void _handleExternalWallet(ExternalWalletResponse response) {
-    _isCheckoutOpen = false;
-    _localSubscriptionId = null;
-    _razorpaySubscriptionId = null;
-
-    state = state.copyWith(isLoading: false);
-    AppLogger.info(
-      'External Wallet: ${response.walletName}',
-      tag: LogTags.doctor,
-      subTag: _subTag,
-    );
-  }
-
-  // ─── DEBUG: Test All Endpoints ────────────────────────────
-  Future<Map<String, dynamic>> debugTestAllEndpoints() async {
-    final results = <String, dynamic>{};
-    final repository = ref.read(subscriptionRepositoryProvider);
-
-    AppLogger.info(
-      '🔍 DEBUG: Testing all endpoints...',
-      tag: LogTags.doctor,
-      subTag: '$_subTag/DEBUG',
-    );
-
-    // 1. Get Plans
-    try {
-      final plansRes = await repository.getPlans();
-      results['getPlans'] = {
-        'status': plansRes.statusCode,
-        'success': plansRes.statusCode == 200,
-      };
-      AppLogger.success(
-        '✅ getPlans: ${plansRes.statusCode}',
-        tag: LogTags.doctor,
-        subTag: 'DEBUG',
-      );
-    } catch (e) {
-      results['getPlans'] = {'error': e.toString()};
-      AppLogger.error('❌ getPlans: $e', tag: LogTags.doctor, subTag: 'DEBUG');
-    }
-
-    await Future.delayed(const Duration(milliseconds: 300));
-
-    // 2. Get Plan by ID
-    try {
-      final planRes = await repository.getPlanById('plan_trial');
-      results['getPlanById'] = {
-        'status': planRes.statusCode,
-        'success': planRes.statusCode == 200,
-      };
-      AppLogger.success(
-        '✅ getPlanById: ${planRes.statusCode}',
-        tag: LogTags.doctor,
-        subTag: 'DEBUG',
-      );
-    } catch (e) {
-      results['getPlanById'] = {'error': e.toString()};
-      AppLogger.error(
-        '❌ getPlanById: $e',
-        tag: LogTags.doctor,
-        subTag: 'DEBUG',
-      );
-    }
-
-    await Future.delayed(const Duration(milliseconds: 300));
-
-    // 3. Get Active Subscription
-    try {
-      final activeRes = await repository.getActiveSubscription();
-      results['getActiveSubscription'] = {
-        'status': activeRes.statusCode,
-        'success': activeRes.statusCode == 200,
-      };
-      AppLogger.success(
-        '✅ getActiveSubscription: ${activeRes.statusCode}',
-        tag: LogTags.doctor,
-        subTag: 'DEBUG',
-      );
-    } catch (e) {
-      results['getActiveSubscription'] = {'error': e.toString()};
-      AppLogger.error(
-        '❌ getActiveSubscription: $e',
-        tag: LogTags.doctor,
-        subTag: 'DEBUG',
-      );
-    }
-
-    await Future.delayed(const Duration(milliseconds: 300));
-
-    // 4. Get Billing History
-    try {
-      final billingRes = await repository.getBillingHistory(page: 1, limit: 5);
-      results['getBillingHistory'] = {
-        'status': billingRes.statusCode,
-        'success': billingRes.statusCode == 200,
-      };
-      AppLogger.success(
-        '✅ getBillingHistory: ${billingRes.statusCode}',
-        tag: LogTags.doctor,
-        subTag: 'DEBUG',
-      );
-    } catch (e) {
-      results['getBillingHistory'] = {'error': e.toString()};
-      AppLogger.error(
-        '❌ getBillingHistory: $e',
-        tag: LogTags.doctor,
-        subTag: 'DEBUG',
-      );
-    }
-
-    await Future.delayed(const Duration(milliseconds: 300));
-
-    // 5. Get All Subscriptions
-    try {
-      final allSubRes = await repository.getAllSubscriptions();
-      results['getAllSubscriptions'] = {
-        'status': allSubRes.statusCode,
-        'success': allSubRes.statusCode == 200,
-      };
-      AppLogger.success(
-        '✅ getAllSubscriptions: ${allSubRes.statusCode}',
-        tag: LogTags.doctor,
-        subTag: 'DEBUG',
-      );
-    } catch (e) {
-      results['getAllSubscriptions'] = {'error': e.toString()};
-      AppLogger.error(
-        '❌ getAllSubscriptions: $e',
-        tag: LogTags.doctor,
-        subTag: 'DEBUG',
-      );
-    }
-
-    await Future.delayed(const Duration(milliseconds: 300));
-
-    // 6. Create Payment Order
-    try {
-      final payRes = await repository.createPaymentOrder(amount: 1);
-      results['createPaymentOrder'] = {
-        'status': payRes.statusCode,
-        'success': payRes.statusCode == 200 || payRes.statusCode == 201,
-      };
-      AppLogger.success(
-        '✅ createPaymentOrder: ${payRes.statusCode}',
-        tag: LogTags.doctor,
-        subTag: 'DEBUG',
-      );
-    } catch (e) {
-      results['createPaymentOrder'] = {'error': e.toString()};
-      AppLogger.error(
-        '❌ createPaymentOrder: $e',
-        tag: LogTags.doctor,
-        subTag: 'DEBUG',
-      );
-    }
-
-    final passed = results.values.where((r) => r['success'] == true).length;
-    AppLogger.info(
-      '🔍 DEBUG SUMMARY: $passed/${results.length} endpoints passed',
-      tag: LogTags.doctor,
-      subTag: 'DEBUG',
-    );
-    AppLogger.json(results, tag: LogTags.doctor, subTag: 'DEBUG/RESULTS');
-
-    return results;
+  void _clearPendingPaymentData() {
+    _pendingLocalSubscriptionId = null;
+    _pendingRazorpaySubscriptionId = null;
   }
 }

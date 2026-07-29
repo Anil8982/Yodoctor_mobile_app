@@ -19,6 +19,7 @@ import 'package:yodoctor/modules/auth/screens/patient/patient_login_screen.dart'
 import 'package:yodoctor/modules/auth/screens/patient/patient_register_screen.dart';
 import 'package:yodoctor/modules/doctor/controllers/subscription_status_controller.dart';
 import 'package:yodoctor/modules/doctor/doctor_scaffold_shell.dart';
+import 'package:yodoctor/modules/doctor/models/subscription/subscription_model.dart';
 import 'package:yodoctor/modules/doctor/screens/appointments/add_prescription_screen.dart';
 import 'package:yodoctor/modules/doctor/screens/appointments/doctor_appointment_history_screen.dart';
 import 'package:yodoctor/modules/doctor/screens/appointments/live_queue_screen.dart';
@@ -55,6 +56,9 @@ import 'package:yodoctor/modules/patient/screens/lab_tests/lab_tests_screen.dart
 import 'package:yodoctor/modules/patient/screens/profile/profile_screen.dart';
 import 'package:yodoctor/modules/patient/screens/search/search_screen.dart';
 import 'package:yodoctor/modules/patient/screens/services/services_screen.dart';
+import 'package:yodoctor/modules/payment/screens/invoice_detail_screen.dart';
+import 'package:yodoctor/modules/payment/screens/payment_processing_screen.dart';
+import 'package:yodoctor/modules/payment/screens/payment_success_screen.dart';
 
 import 'app_routes.dart';
 
@@ -519,6 +523,35 @@ final routerProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.doctorsManagement,
         builder: (context, state) => DoctorsManagementScreen(),
+      ),
+
+      // ---- Payment Routes ----
+      GoRoute(
+        path: AppRoutes.paymentSuccess,
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>;
+
+          return PaymentSuccessScreen(
+            paymentId: extra['paymentId'] as String?,
+            planName: extra['planName'] as String?,
+            nextRoute: extra['nextRoute'] as String,
+          );
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.paymentProcessing,
+        builder: (context, state) {
+          return PaymentProcessingScreen(
+          );
+        },
+      ),
+      GoRoute(
+        parentNavigatorKey: AppRouter.rootNavigatorKey,
+        path: AppRoutes.invoiceDetail,
+        builder: (context, state) {
+          final invoice = state.extra as BillingInvoice;
+          return InvoiceDetailScreen(invoice: invoice);
+        },
       ),
 
       // ---- Patient Shell (Bottom Nav) ----

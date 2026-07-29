@@ -86,14 +86,7 @@ class SubscriptionVerificationPage extends ConsumerWidget {
           ? const SubscriptionVerificationShimmer()
           : RefreshIndicator(
               onRefresh: () async {
-                await Future.wait([
-                  ref
-                      .read(doctorSubscriptionProvider.notifier)
-                      .loadSubscriptionDetails(),
-                  ref
-                      .read(subscriptionStatusProvider.notifier)
-                      .checkActiveSubscription(),
-                ]);
+                await ref.read(subscriptionStatusProvider.notifier).checkActiveSubscription();
               },
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(
@@ -464,14 +457,7 @@ class SubscriptionVerificationPage extends ConsumerWidget {
       width: double.infinity,
       child: OutlinedButton.icon(
         onPressed: () async {
-          await Future.wait([
-            ref
-                .read(doctorSubscriptionProvider.notifier)
-                .loadSubscriptionDetails(),
-            ref
-                .read(subscriptionStatusProvider.notifier)
-                .checkActiveSubscription(),
-          ]);
+          await ref.read(subscriptionStatusProvider.notifier).checkActiveSubscription();
         },
         icon: const Icon(Icons.refresh_rounded, size: 18),
         label: const Text('Check Status Again'),
@@ -483,7 +469,11 @@ class SubscriptionVerificationPage extends ConsumerWidget {
     );
   }
 
-  void _showPlansBottomSheet(BuildContext context, WidgetRef ref) {
+  void _showPlansBottomSheet(BuildContext context, WidgetRef ref) async {
+    await ref.read(doctorSubscriptionProvider.notifier).loadPlans();
+
+    if (!context.mounted) return;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -520,9 +510,7 @@ class SubscriptionVerificationPage extends ConsumerWidget {
             ),
             const SizedBox(height: 20),
             FilledButton.icon(
-              onPressed: () => ref
-                  .read(doctorSubscriptionProvider.notifier)
-                  .loadSubscriptionDetails(),
+              onPressed: () => ref.read(subscriptionStatusProvider.notifier).checkActiveSubscription(),
               icon: const Icon(Icons.refresh_rounded, size: 18),
               label: const Text('Retry Connection'),
             ),
