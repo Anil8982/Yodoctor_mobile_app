@@ -51,17 +51,17 @@ class DoctorCertificateReviewState {
 }
 
 final doctorCertificateReviewProvider =
-NotifierProvider<DoctorCertificateReviewNotifier, DoctorCertificateReviewState>(
-  DoctorCertificateReviewNotifier.new,
-);
+    NotifierProvider<
+      DoctorCertificateReviewNotifier,
+      DoctorCertificateReviewState
+    >(DoctorCertificateReviewNotifier.new);
 
-class DoctorCertificateReviewNotifier extends Notifier<DoctorCertificateReviewState> {
+class DoctorCertificateReviewNotifier
+    extends Notifier<DoctorCertificateReviewState> {
   static const String _subTag = 'DoctorCertificateReviewNotifier';
 
-  // ✅ REMOVED: formKey - moved to UI
   final notesController = TextEditingController();
 
-  // ✅ Backward compatibility getters - UI expects these
   String get fitnessStatus => state.fitnessStatus;
   int get validity => state.validity;
 
@@ -73,22 +73,33 @@ class DoctorCertificateReviewNotifier extends Notifier<DoctorCertificateReviewSt
 
   @override
   DoctorCertificateReviewState build() {
-    AppLogger.info('DoctorCertificateReviewNotifier Initialized', tag: LogTags.doctor, subTag: _subTag);
+    AppLogger.info(
+      'DoctorCertificateReviewNotifier Initialized',
+      tag: LogTags.doctor,
+      subTag: _subTag,
+    );
     ref.onDispose(notesController.dispose);
     return const DoctorCertificateReviewState();
   }
 
   Future<void> load(int requestId) async {
     state = state.copyWith(loading: true, clearError: true, clearDetail: true);
-    AppLogger.info('Loading certificate review for ID: $requestId', tag: LogTags.doctor, subTag: _subTag);
+    AppLogger.info(
+      'Loading certificate review for ID: $requestId',
+      tag: LogTags.doctor,
+      subTag: _subTag,
+    );
 
     try {
       final repository = ref.read(doctorCertificateRepositoryProvider);
       final detailRes = await repository.getRequestDetails(requestId);
       final docsRes = await repository.getDocuments(requestId);
 
-      final detailOk = (detailRes.statusCode ?? 0) >= 200 && (detailRes.statusCode ?? 0) < 300;
-      final docsOk = (docsRes.statusCode ?? 0) >= 200 && (docsRes.statusCode ?? 0) < 300;
+      final detailOk =
+          (detailRes.statusCode ?? 0) >= 200 &&
+          (detailRes.statusCode ?? 0) < 300;
+      final docsOk =
+          (docsRes.statusCode ?? 0) >= 200 && (docsRes.statusCode ?? 0) < 300;
 
       if (detailOk && docsOk) {
         final detail = DoctorCertificateDetailModel.fromJson(detailRes.data);
@@ -96,19 +107,32 @@ class DoctorCertificateReviewNotifier extends Notifier<DoctorCertificateReviewSt
         final rawDocs = _parseDirectList(docsRes.data);
         final docs = rawDocs
             .map((e) {
-          try {
-            if (e is Map<String, dynamic>) {
-              return DoctorDocumentModel.fromJson(e);
-            }
-            return null;
-          } catch (_) {
-            return null;
-          }
-        })
+              try {
+                if (e is Map<String, dynamic>) {
+                  return DoctorDocumentModel.fromJson(e);
+                }
+                return null;
+              } catch (_) {
+                return null;
+              }
+            })
             .whereType<DoctorDocumentModel>()
             .toList();
 
-        AppLogger.success('Certificate loaded for ID: $requestId', tag: LogTags.doctor, subTag: _subTag);
+        // ✅ Log each document URL
+        for (final doc in docs) {
+          AppLogger.info(
+            'Document #${doc.id}: original=${doc.fileUrl} | normalized=${doc.normalizedUrl} | full=${doc.fullUrl}',
+            tag: LogTags.doctor,
+            subTag: '$_subTag/DocURL',
+          );
+        }
+
+        AppLogger.success(
+          'Certificate loaded for ID: $requestId. Documents: ${docs.length}',
+          tag: LogTags.doctor,
+          subTag: _subTag,
+        );
 
         if (detail.isFinalized) {
           notesController.text = detail.doctorNotes ?? '';
@@ -130,11 +154,28 @@ class DoctorCertificateReviewNotifier extends Notifier<DoctorCertificateReviewSt
           );
         }
       } else {
-        state = state.copyWith(loading: false, errorMessage: "Failed to load certificate details");
+        AppLogger.warning(
+          'Failed to load certificate details. Detail OK: $detailOk, Docs OK: $docsOk',
+          tag: LogTags.doctor,
+          subTag: _subTag,
+        );
+        state = state.copyWith(
+          loading: false,
+          errorMessage: "Failed to load certificate details",
+        );
       }
     } catch (e, st) {
-      state = state.copyWith(loading: false, errorMessage: "Failed to load certificate details");
-      AppLogger.exception(e, st, message: 'Load certificate failed', tag: LogTags.doctor, subTag: _subTag);
+      state = state.copyWith(
+        loading: false,
+        errorMessage: "Failed to load certificate details",
+      );
+      AppLogger.exception(
+        e,
+        st,
+        message: 'Load certificate failed',
+        tag: LogTags.doctor,
+        subTag: _subTag,
+      );
     }
   }
 
@@ -149,7 +190,11 @@ class DoctorCertificateReviewNotifier extends Notifier<DoctorCertificateReviewSt
   Future<bool> approve() async {
     if (state.detail == null || state.submitting) return false;
     if (state.detail!.isFinalized) {
-      AppLogger.warning('Cannot approve finalized certificate', tag: LogTags.doctor, subTag: _subTag);
+      AppLogger.warning(
+        'Cannot approve finalized certificate',
+        tag: LogTags.doctor,
+        subTag: _subTag,
+      );
       return false;
     }
 
@@ -175,10 +220,7 @@ class DoctorCertificateReviewNotifier extends Notifier<DoctorCertificateReviewSt
         errorMsg = response.data["message"].toString();
       }
 
-      state = state.copyWith(
-        submitting: false,
-        errorMessage: errorMsg,
-      );
+      state = state.copyWith(submitting: false, errorMessage: errorMsg);
       return false;
     } on DioException catch (e) {
       String errorMsg = "Approval action failed";
@@ -189,19 +231,29 @@ class DoctorCertificateReviewNotifier extends Notifier<DoctorCertificateReviewSt
             errorMsg = data["message"].toString();
           }
         }
-      } catch (_) {
-        // Use fallback
-      }
+      } catch (_) {}
 
-      state = state.copyWith(
-        submitting: false,
-        errorMessage: errorMsg,
+      state = state.copyWith(submitting: false, errorMessage: errorMsg);
+      AppLogger.exception(
+        e,
+        e.stackTrace,
+        message: 'Approve failed with DioException',
+        tag: LogTags.doctor,
+        subTag: _subTag,
       );
-      AppLogger.exception(e, e.stackTrace, message: 'Approve failed with DioException', tag: LogTags.doctor, subTag: _subTag);
       return false;
     } catch (e, st) {
-      state = state.copyWith(submitting: false, errorMessage: "Approval action failed");
-      AppLogger.exception(e, st, message: 'Approve failed', tag: LogTags.doctor, subTag: _subTag);
+      state = state.copyWith(
+        submitting: false,
+        errorMessage: "Approval action failed",
+      );
+      AppLogger.exception(
+        e,
+        st,
+        message: 'Approve failed',
+        tag: LogTags.doctor,
+        subTag: _subTag,
+      );
       return false;
     }
   }
@@ -209,7 +261,11 @@ class DoctorCertificateReviewNotifier extends Notifier<DoctorCertificateReviewSt
   Future<bool> reject() async {
     if (state.detail == null || state.submitting) return false;
     if (state.detail!.isFinalized) {
-      AppLogger.warning('Cannot reject finalized certificate', tag: LogTags.doctor, subTag: _subTag);
+      AppLogger.warning(
+        'Cannot reject finalized certificate',
+        tag: LogTags.doctor,
+        subTag: _subTag,
+      );
       return false;
     }
 
@@ -230,10 +286,7 @@ class DoctorCertificateReviewNotifier extends Notifier<DoctorCertificateReviewSt
         errorMsg = response.data["message"].toString();
       }
 
-      state = state.copyWith(
-        submitting: false,
-        errorMessage: errorMsg,
-      );
+      state = state.copyWith(submitting: false, errorMessage: errorMsg);
       return false;
     } on DioException catch (e) {
       String errorMsg = "Rejection action failed";
@@ -244,20 +297,31 @@ class DoctorCertificateReviewNotifier extends Notifier<DoctorCertificateReviewSt
             errorMsg = data["message"].toString();
           }
         }
-      } catch (_) {
-        // Use fallback
-      }
+      } catch (_) {}
 
-      state = state.copyWith(
-        submitting: false,
-        errorMessage: errorMsg,
+      state = state.copyWith(submitting: false, errorMessage: errorMsg);
+      AppLogger.exception(
+        e,
+        e.stackTrace,
+        message: 'Reject failed with DioException',
+        tag: LogTags.doctor,
+        subTag: _subTag,
       );
-      AppLogger.exception(e, e.stackTrace, message: 'Reject failed with DioException', tag: LogTags.doctor, subTag: _subTag);
       return false;
     } catch (e, st) {
-      state = state.copyWith(submitting: false, errorMessage: "Rejection action failed");
-      AppLogger.exception(e, st, message: 'Reject failed', tag: LogTags.doctor, subTag: _subTag);
+      state = state.copyWith(
+        submitting: false,
+        errorMessage: "Rejection action failed",
+      );
+      AppLogger.exception(
+        e,
+        st,
+        message: 'Reject failed',
+        tag: LogTags.doctor,
+        subTag: _subTag,
+      );
       return false;
     }
   }
+
 }

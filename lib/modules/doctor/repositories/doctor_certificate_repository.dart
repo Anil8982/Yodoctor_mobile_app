@@ -46,4 +46,13 @@ class DoctorCertificateRepository {
   Future<Response> getDocuments(int id) {
     return _dio.get('${ApiConstants.certificateDocuments}/$id');
   }
+
+  Future<Response> downloadDocument(String fileUrl) {
+    return _dio.get(
+      fileUrl,
+      options: Options(
+        responseType: ResponseType.bytes,
+      ),
+    );
+  }
 }

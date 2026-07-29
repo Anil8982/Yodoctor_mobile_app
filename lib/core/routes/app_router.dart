@@ -59,6 +59,7 @@ import 'package:yodoctor/modules/patient/screens/services/services_screen.dart';
 import 'package:yodoctor/modules/payment/screens/invoice_detail_screen.dart';
 import 'package:yodoctor/modules/payment/screens/payment_processing_screen.dart';
 import 'package:yodoctor/modules/payment/screens/payment_success_screen.dart';
+import 'package:yodoctor/modules/widgets/document_viewer_screen.dart';
 
 import 'app_routes.dart';
 
@@ -551,6 +552,22 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final invoice = state.extra as BillingInvoice;
           return InvoiceDetailScreen(invoice: invoice);
+        },
+      ),
+
+
+      // ---- Shared ----
+      GoRoute(
+        path: '/document-viewer',
+        name: 'documentViewer',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>;
+          return DocumentViewerScreen(
+            fileUrl: extra['fileUrl'],
+            fileName: extra['fileName'],
+            isImage: extra['isImage'] ?? false,
+            isPdf: extra['isPdf'] ?? false,
+          );
         },
       ),
 
