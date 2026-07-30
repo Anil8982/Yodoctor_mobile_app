@@ -41,8 +41,9 @@ class Step2MedicalInfo extends ConsumerWidget {
                 return 'Please enter name';
               }
 
-              if (value.trim().length < 2)
+              if (value.trim().length < 2) {
                 return 'Name should have at least 2 characters';
+              }
 
               if (!RegExp(r'^[A-Za-z]+(?: [A-Za-z]+)*$').hasMatch(value)) {
                 return 'Only alphabets are allowed';

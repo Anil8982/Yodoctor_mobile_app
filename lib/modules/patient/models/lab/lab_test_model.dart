@@ -10,31 +10,18 @@ class LabCategory {
 
 class LabPackage {
   final int id;
-
   final String title;
-
   final String subtitle;
-
   final double originalPrice;
-
   final double currentPrice;
-
   final int discountPercentage;
-
   final int parametersCount;
-
   final String reportDuration;
-
   final bool homeSampleAvailable;
-
-  final String categoryId;
-
+  final int categoryId;
   final String type;
-
   final String tier;
-
   final String? image;
-
   const LabPackage({
     required this.id,
     required this.title,
@@ -62,29 +49,18 @@ class LabPackage {
 
     return LabPackage(
       id: json["id"],
-
       title: json["name"] ?? "",
-
       subtitle: json["tagline"] ?? "",
-
       originalPrice: original,
-
       currentPrice: offer,
-
       discountPercentage: discount,
-
       parametersCount: json["parameters_count"] ?? 0,
-
       reportDuration: json["report_time"] ?? "",
-
       homeSampleAvailable: (json["home_collection"] ?? 0) == 1,
-
-      categoryId: (json["category_id"] ?? "").toString(),
-
-      type: json["type"] ?? "",
-
+      categoryId: json["category_id"] is int
+          ? json["category_id"]
+          : int.tryParse(json["category_id"]?.toString() ?? "0") ?? 0,      type: json["type"] ?? "",
       tier: json["tier"] ?? "",
-
       image: json["image"],
     );
   }

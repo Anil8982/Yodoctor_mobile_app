@@ -319,7 +319,7 @@ class LabTestDetailsScreen extends ConsumerWidget {
                                 parametersCount: test.includes.length,
                                 reportDuration: test.reportTime,
                                 homeSampleAvailable: true,
-                                categoryId: "",
+                                categoryId: test.categoryId,
                                 type: test.type,
                                 tier: test.tier,
                                 image: test.image,

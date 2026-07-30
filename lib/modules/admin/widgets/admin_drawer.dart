@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/models/admin/admin_user.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/core/providers/app_role_provider.dart';
-import 'package:yodoctor/core/theme/app_theme.dart' hide AppRole;
+import 'package:yodoctor/core/theme/app_theme.dart';
 
 class AdminDrawer extends ConsumerWidget {
   const AdminDrawer({super.key, required this.admin});

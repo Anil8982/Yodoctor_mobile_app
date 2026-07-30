@@ -19,7 +19,7 @@ class LabCategoriesList extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    IconData _getCategoryIcon(String name) {
+    IconData getCategoryIcon(String name) {
       switch (name.toLowerCase()) {
         case "blood":
           return Icons.bloodtype;
@@ -62,7 +62,7 @@ class LabCategoriesList extends StatelessWidget {
               label: Text(cat.name),
               showCheckmark: false,
               avatar: Icon(
-                _getCategoryIcon(cat.name),
+                getCategoryIcon(cat.name),
                 size: 16,
                 color: isSelected
                     ? colorScheme.onPrimary

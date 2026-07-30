@@ -251,8 +251,7 @@ class _HomeServiceBookingScreenState
                           }
                           setState(() {
                             _showDurationDateError =
-                                currentModel.durationType == null ||
-                                currentModel.durationType!.isEmpty ||
+                                currentModel.durationType.isEmpty ||
                                 currentModel.startDate == null;
                           });
 

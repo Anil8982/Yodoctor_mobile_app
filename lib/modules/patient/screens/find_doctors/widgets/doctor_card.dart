@@ -183,7 +183,7 @@ class DoctorCard extends StatelessWidget {
                 width: 60,
                 height: 60,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) {
+                errorBuilder: (_, _, _) {
                   return Center(
                     child: Text(
                       doctor.name.substring(0, 1),

@@ -242,7 +242,11 @@ class LabNotifier extends Notifier<LabState> {
 
   List<LabPackage> get filteredPackages {
     final source = state.packages;
-    if (state.selectedCategory == 0) return source;
+
+    if (state.selectedCategory == 0) {
+      return source;
+    }
+
     return source.where((e) {
       return e.categoryId == state.selectedCategory;
     }).toList();

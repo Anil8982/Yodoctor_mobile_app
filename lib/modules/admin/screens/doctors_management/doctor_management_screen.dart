@@ -111,7 +111,7 @@ class DoctorsManagementScreen extends ConsumerWidget {
                               ? const EmptyDoctorListWidget()
                               : ListView.separated(
                             itemCount: doctorsState.filteredDoctors.length,
-                            separatorBuilder: (_, __) => const SizedBox(height: 10),
+                            separatorBuilder: (_, _) => const SizedBox(height: 10),
                             itemBuilder: (context, index) {
                               final currentDoctor = doctorsState.filteredDoctors[index];
                               return DoctorCard(

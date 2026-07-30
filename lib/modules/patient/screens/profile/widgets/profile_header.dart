@@ -76,7 +76,7 @@ class ProfileHeader extends ConsumerWidget {
                         : null,
                   ),
                   loading: () => const CircleAvatar(radius: 65, child: CircularProgressIndicator()),
-                  error: (_, __) => const CircleAvatar(radius: 65, child: Icon(Icons.error, color: Colors.red)),
+                  error: (_, _) => const CircleAvatar(radius: 65, child: Icon(Icons.error, color: Colors.red)),
                 ),
               ),
 

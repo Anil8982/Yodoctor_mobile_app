@@ -439,8 +439,9 @@ class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
         if (text.isEmpty) return 'Please enter height';
         final double? parsed = double.tryParse(text);
         if (parsed == null) return 'Enter a valid height';
-        if (parsed < 30 || parsed > 250)
+        if (parsed < 30 || parsed > 250) {
           return 'Height should be between 30 and 250 cm';
+        }
         return null;
       },
     );
@@ -461,8 +462,9 @@ class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
         if (text.isEmpty) return 'Please enter weight';
         final double? parsed = double.tryParse(text);
         if (parsed == null) return 'Enter a valid weight';
-        if (parsed < 2 || parsed > 350)
+        if (parsed < 2 || parsed > 350) {
           return 'Weight should be between 2 and 350 kg';
+        }
         return null;
       },
     );

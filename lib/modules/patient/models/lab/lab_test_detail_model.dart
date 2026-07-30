@@ -7,8 +7,10 @@ class LabTestDetailModel {
   final String reportTime;
   final String type;
   final String tier;
+  final int categoryId;
   final String? image;
   final List<String> includes;
+
 
   const LabTestDetailModel({
     required this.id,
@@ -19,6 +21,7 @@ class LabTestDetailModel {
     required this.reportTime,
     required this.type,
     required this.tier,
+    required this.categoryId,
     this.image,
     required this.includes,
   });
@@ -32,6 +35,9 @@ class LabTestDetailModel {
       offerPrice: double.tryParse(json["price"].toString()) ?? 0.0,
       reportTime: json["report_time"] ?? "",
       type: json["type"] ?? "",
+      categoryId: json["category_id"] is int
+          ? json["category_id"]
+          : int.tryParse(json["category_id"]?.toString() ?? "0") ?? 0,
       tier: json["tier"] ?? "",
       image: json["image"],
       includes:

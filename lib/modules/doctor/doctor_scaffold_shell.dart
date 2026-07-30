@@ -19,7 +19,7 @@ class DoctorScaffoldShell extends ConsumerWidget {
       drawer: dashboard.when(
         data: (data) => DoctorDrawer(doctor: data.doctor),
         loading: () => const Drawer(),
-        error: (_, __) => const Drawer(),
+        error: (_, _) => const Drawer(),
       ),
 
       body: navigationShell,
