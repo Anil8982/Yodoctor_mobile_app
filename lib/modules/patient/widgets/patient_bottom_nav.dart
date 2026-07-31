@@ -40,12 +40,6 @@ class PatientBottomNav {
         activeColorPrimary: colorScheme.primary,
         inactiveColorPrimary: colorScheme.onSurfaceVariant,
       ),
-      // PersistentBottomNavBarItem(
-      //   icon: const Icon(Icons.people_rounded),
-      //   title: "Family",
-      //   activeColorPrimary: colorScheme.primary,
-      //   inactiveColorPrimary: colorScheme.onSurfaceVariant,
-      // ),
 
       PersistentBottomNavBarItem(
         icon: const Icon(Icons.medical_services_rounded),

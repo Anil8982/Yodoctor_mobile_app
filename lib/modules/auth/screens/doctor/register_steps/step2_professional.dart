@@ -2,10 +2,17 @@ import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:yodoctor/modules/auth/controllers/doctor_register_controller.dart';
 import 'package:yodoctor/modules/auth/models/doctor_register_model.dart';
-import 'nav_buttons.dart';
-import 'shared_widgets.dart';
+import 'package:yodoctor/modules/auth/screens/doctor/widgets/app_dropdown_field.dart';
+import 'package:yodoctor/modules/auth/screens/doctor/widgets/app_text_field.dart';
+import 'package:yodoctor/modules/auth/screens/doctor/widgets/info_box.dart';
+import 'package:yodoctor/modules/auth/screens/doctor/widgets/section_label.dart';
+import 'package:yodoctor/modules/auth/screens/doctor/widgets/step_card.dart';
+import 'package:yodoctor/modules/auth/screens/doctor/widgets/step_title.dart';
+
+import '../widgets/nav_buttons.dart';
 
 class Step2Professional extends ConsumerStatefulWidget {
   final DoctorFormData data;
@@ -30,6 +37,7 @@ class _Step2ProfessionalState extends ConsumerState<Step2Professional> {
   final _regCtrl = TextEditingController();
   final _councilCtrl = TextEditingController();
   String? _qualification;
+  bool _submittedOnce = false;
 
   @override
   void initState() {
@@ -54,10 +62,48 @@ class _Step2ProfessionalState extends ConsumerState<Step2Professional> {
 
   void _save() {
     widget.data.qualification = _qualification ?? '';
-    widget.data.specialization = _specCtrl.text;
-    widget.data.experience = _expCtrl.text;
-    widget.data.regNumber = _regCtrl.text;
-    widget.data.stateCouncil = _councilCtrl.text;
+    widget.data.specialization = _specCtrl.text.trim();
+    widget.data.experience = _expCtrl.text.trim();
+    widget.data.regNumber = _regCtrl.text.trim();
+    widget.data.stateCouncil = _councilCtrl.text.trim();
+  }
+
+  Future<void> _handleNext() async {
+    setState(() => _submittedOnce = true);
+
+    if (!_formKey.currentState!.validate()) return;
+
+    if (widget.data.validTill == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Please select registration validity date'),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+      return;
+    }
+
+    _save();
+
+    final success = await ref
+        .read(doctorRegisterControllerProvider.notifier)
+        .registerStep2(widget.data);
+
+    if (!mounted) return;
+
+    if (success) {
+      widget.onNext();
+    } else {
+      final errorMsg = ref.read(doctorRegisterControllerProvider).errorMessage;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(errorMsg ?? "Step 2 registration failed. Try again."),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+    }
   }
 
   @override
@@ -68,17 +114,24 @@ class _Step2ProfessionalState extends ConsumerState<Step2Professional> {
 
     return Form(
       key: _formKey,
+      autovalidateMode: _submittedOnce
+          ? AutovalidateMode.onUserInteraction
+          : AutovalidateMode.disabled,
       child: StepCard(
         children: [
           StepTitle(
             icon: Icons.school_rounded,
             title: 'Professional Details',
+            subtitle: 'Enter your medical qualifications and council credentials',
             color: colorScheme.primary,
           ),
           const SizedBox(height: 24),
-          DropdownField(
-            label: 'Primary Qualification',
-            icon: Icons.menu_book_rounded,
+
+          // Primary Qualification
+          AppDropdownField(
+            label: 'Primary Qualification *',
+            hint: 'Select primary qualification',
+            icon: Icons.menu_book_outlined,
             value: _qualification,
             items: const [
               'MBBS',
@@ -91,58 +144,98 @@ class _Step2ProfessionalState extends ConsumerState<Step2Professional> {
               'Other',
             ],
             onChanged: (v) => setState(() => _qualification = v),
+            validator: (v) => v == null ? 'Select qualification' : null,
           ),
           const SizedBox(height: 16),
-          YoField(
+
+          // Specialization
+          AppTextField(
             label: 'Specialization *',
-            hint: 'e.g. Cardiology',
-            icon: Icons.local_hospital_rounded,
+            hint: 'Enter your primary specialization',
+            icon: Icons.local_hospital_outlined,
             controller: _specCtrl,
-            validator: (v) => v!.isEmpty ? 'Required' : null,
+            validator: (v) =>
+            (v == null || v.trim().isEmpty) ? 'Specialization required' : null,
           ),
           const SizedBox(height: 16),
-          YoField(
-            label: 'Years of Experience',
-            hint: 'e.g. 8',
-            icon: Icons.workspace_premium_rounded,
+
+          // Years of Experience
+          AppTextField(
+            label: 'Years of Experience *',
+            hint: 'Enter total years of practice',
+            icon: Icons.workspace_premium_outlined,
             controller: _expCtrl,
-            validator: (v) {
-              if (v == null || v.isEmpty) return null;
-              if (int.parse(v) > 60) return 'Invalid experience';
-              return null;
-            },
             keyboardType: TextInputType.number,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            validator: (v) {
+              if (v == null || v.trim().isEmpty) return 'Experience required';
+              final exp = int.tryParse(v);
+              if (exp == null || exp > 60) return 'Enter valid experience';
+              return null;
+            },
           ),
           const SizedBox(height: 16),
-          YoField(
-            label: 'Medical Council Reg. Number *',
-            hint: 'Reg-12345678',
-            icon: Icons.badge_rounded,
+
+          // Medical Council Reg Number
+          AppTextField(
+            label: 'Medical Council Reg. Number',
+            isRequired: true,
+            hint: 'e.g., MMC/2018/12345 or MCI-12345',
+            icon: Icons.badge_outlined,
             controller: _regCtrl,
-            validator: (v) => v!.isEmpty ? 'Required' : null,
+            maxLength: 25, // Maximum limit
+            textCapitalization: TextCapitalization.characters,
+            inputFormatters: [
+              UpperCaseTextFormatter(),
+              // (A-Z, 0-9, /, - allowed)
+              FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9/-]')),
+            ],
+            validator: (v) {
+              if (v == null || v.trim().isEmpty) {
+                return 'Registration number required';
+              }
+
+              final cleaned = v.trim();
+              if (cleaned.length < 4) {
+                return 'Registration number too short';
+              }
+              if (cleaned.length > 25) {
+                return 'Registration number cannot exceed 25 characters';
+              }
+
+              return null;
+            },
           ),
+
           const SizedBox(height: 16),
-          YoField(
+
+          // Registering State Council
+          AppTextField(
             label: 'Registering State Council *',
-            hint: 'e.g. Maharashtra Medical Council',
-            icon: Icons.account_balance_rounded,
+            hint: 'Enter state medical council name',
+            icon: Icons.account_balance_outlined,
             controller: _councilCtrl,
-            validator: (v) => v!.isEmpty ? 'Required' : null,
+            validator: (v) =>
+            (v == null || v.trim().isEmpty) ? 'State council required' : null,
           ),
-          const SizedBox(height: 16),
-          const SectionLabel(label: 'Registration Valid Till'),
-          const SizedBox(height: 8),
+          const SizedBox(height: 24),
+
+          // Registration Validity Date
+          const SectionLabel(label: 'Registration Valid Till', isRequired: true),
+          const SizedBox(height: 10),
           GestureDetector(
             onTap: () async {
               final picked = await showDatePicker(
                 context: context,
-                initialDate: widget.data.validTill ?? DateTime.now().add(const Duration(days: 365)),
+                initialDate: widget.data.validTill ??
+                    DateTime.now().add(const Duration(days: 365)),
                 firstDate: DateTime.now(),
-                lastDate: DateTime(2040),
+                lastDate: DateTime(2045),
                 builder: (ctx, child) => Theme(
                   data: Theme.of(ctx).copyWith(
-                    colorScheme: Theme.of(ctx).colorScheme.copyWith(primary: colorScheme.primary),
+                    colorScheme: Theme.of(ctx).colorScheme.copyWith(
+                      primary: colorScheme.primary,
+                    ),
                   ),
                   child: child!,
                 ),
@@ -157,8 +250,10 @@ class _Step2ProfessionalState extends ConsumerState<Step2Professional> {
                 color: colorScheme.surfaceContainerLow,
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
-                  color: colorScheme.outlineVariant.transparency(0.4),
-                  width: 1.2,
+                  color: (_submittedOnce && widget.data.validTill == null)
+                      ? colorScheme.error
+                      : colorScheme.outlineVariant.transparency(0.5),
+                  width: (_submittedOnce && widget.data.validTill == null) ? 1.4 : 1.2,
                 ),
               ),
               child: Row(
@@ -169,15 +264,21 @@ class _Step2ProfessionalState extends ConsumerState<Step2Professional> {
                     size: 20,
                   ),
                   const SizedBox(width: 12),
-                  Text(
-                    widget.data.validTill != null
-                        ? '${widget.data.validTill!.day}/${widget.data.validTill!.month}/${widget.data.validTill!.year}'
-                        : 'Select date (must be future date)',
-                    style: textTheme.bodyMedium?.copyWith(
-                      color: widget.data.validTill != null
-                          ? colorScheme.onSurface
-                          : colorScheme.onSurfaceVariant,
+                  Expanded(
+                    child: Text(
+                      widget.data.validTill != null
+                          ? '${widget.data.validTill!.day.toString().padLeft(2, '0')}/${widget.data.validTill!.month.toString().padLeft(2, '0')}/${widget.data.validTill!.year}'
+                          : 'Select expiry date',
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: widget.data.validTill != null
+                            ? colorScheme.onSurface
+                            : colorScheme.onSurfaceVariant.transparency(0.7),
+                      ),
                     ),
+                  ),
+                  Icon(
+                    Icons.arrow_drop_down_rounded,
+                    color: colorScheme.onSurfaceVariant,
                   ),
                 ],
               ),
@@ -186,45 +287,42 @@ class _Step2ProfessionalState extends ConsumerState<Step2Professional> {
           Padding(
             padding: const EdgeInsets.only(top: 6, left: 4),
             child: Text(
-              'Must be a future date',
-              style: textTheme.bodySmall?.copyWith(
-                color: colorScheme.primary,
-                fontWeight: FontWeight.w600,
+              'Date must be in the future',
+              style: textTheme.labelSmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
               ),
             ),
           ),
           const SizedBox(height: 20),
+
+          // Compliance Note
           const InfoBox(
-            text: 'By submitting these details, we may verify your credentials with the relevant medical councils to maintain platform integrity.',
+            text:
+            'Your registration details will be verified with the official state medical council for authenticity.',
           ),
           const SizedBox(height: 28),
+
+          // Action Navigation
           NavButtons(
             onBack: widget.onBack,
-            onNext: registerState.isLoading ? null : () async {
-              if (!_formKey.currentState!.validate()) return;
-
-              _save();
-
-              final success = await ref
-                  .read(doctorRegisterControllerProvider.notifier)
-                  .registerStep2(widget.data);
-
-              if (!context.mounted) return;
-
-              if (success) {
-                widget.onNext();
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(ref.read(doctorRegisterControllerProvider).errorMessage ?? "Step 2 Failed"),
-                    behavior: SnackBarBehavior.floating,
-                  ),
-                );
-              }
-            },
+            onNext: registerState.isLoading ? null : _handleNext,
           ),
         ],
       ),
+    );
+  }
+}
+
+
+class UpperCaseTextFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue,
+      TextEditingValue newValue,
+      ) {
+    return TextEditingValue(
+      text: newValue.text.toUpperCase(),
+      selection: newValue.selection,
     );
   }
 }

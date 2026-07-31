@@ -4,11 +4,15 @@ import 'package:flutter/material.dart';
 class NavButtons extends StatelessWidget {
   final VoidCallback? onBack;
   final VoidCallback? onNext;
+  final String backText;
+  final String nextText;
 
   const NavButtons({
     super.key,
     required this.onBack,
     required this.onNext,
+    this.backText = 'Back',
+    this.nextText = 'Next',
   });
 
   @override
@@ -37,12 +41,24 @@ class NavButtons extends StatelessWidget {
                   borderRadius: BorderRadius.circular(14),
                 ),
               ),
-              child: Text(
-                '← Back',
-                style: textTheme.titleSmall?.copyWith(
-                  color: onBack == null ? null : colorScheme.onSurfaceVariant,
-                  fontWeight: FontWeight.w700,
-                ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.arrow_back_rounded,
+                    size: 18,
+                    color: onBack == null ? null : colorScheme.onSurfaceVariant,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    backText,
+                    style: textTheme.titleSmall?.copyWith(
+                      color: onBack == null ? null : colorScheme.onSurfaceVariant,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -63,13 +79,25 @@ class NavButtons extends StatelessWidget {
                 disabledBackgroundColor: colorScheme.onSurface.transparency(0.12),
                 disabledForegroundColor: colorScheme.onSurface.transparency(0.38),
               ),
-              child: Text(
-                'Next →',
-                style: textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  color: onNext == null ? null : dynamicOnNextColor,
-                  letterSpacing: 0.3,
-                ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    nextText,
+                    style: textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: onNext == null ? null : dynamicOnNextColor,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Icon(
+                    Icons.arrow_forward_rounded,
+                    size: 18,
+                    color: onNext == null ? null : dynamicOnNextColor,
+                  ),
+                ],
               ),
             ),
           ),

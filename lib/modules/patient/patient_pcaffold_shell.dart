@@ -6,6 +6,7 @@ import 'package:yodoctor/modules/patient/screens/certificates/certificate_wallet
 import 'package:yodoctor/modules/patient/screens/history/appointments_history_screen.dart';
 import 'package:yodoctor/modules/patient/screens/services/services_screen.dart';
 import 'package:yodoctor/modules/patient/widgets/patient_bottom_nav.dart';
+import 'package:yodoctor/modules/patient/widgets/qr_scanner.dart';
 
 class PatientScaffoldShell extends StatefulWidget {
   const PatientScaffoldShell({
@@ -52,25 +53,7 @@ class _PatientScaffoldShellState extends State<PatientScaffoldShell> {
   }
 
   void _openQRScanner() {
-    showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.black,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (context) {
-        return SizedBox(
-          height: MediaQuery.of(context).size.height * 0.85,
-          child: const Center(
-            child: Text(
-              'QR Scanner Camera Open Here',
-              style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-          ),
-        );
-      },
-    );
+    QrScannerSheet.show(context);
   }
 
   @override
