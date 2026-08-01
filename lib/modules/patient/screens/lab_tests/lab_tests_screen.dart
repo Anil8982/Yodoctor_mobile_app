@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/modules/patient/controllers/lab_test_controller.dart';
+import 'package:yodoctor/modules/widgets/app_header.dart';
 import 'widgets/lab_hero_section.dart';
 import 'widgets/lab_categories_list.dart';
 import 'widgets/lab_package_card.dart';
@@ -36,16 +37,13 @@ class _LabTestsScreenState extends ConsumerState<LabTestsScreen> {
 
     final selectedCategory = labState.selectedCategory;
 
-    final filteredPackages = notifier.filteredPackages;
     final popularTests = labState.popularTests;
     final cartItems = labState.cart;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppBar(
-        scrolledUnderElevation: 0,
-        title: const Text('Lab Tests'),
-        centerTitle: true,
+      appBar: AppHeader(
+        title: 'Lab Tests',
         actions: [
           Stack(
             alignment: Alignment.center,

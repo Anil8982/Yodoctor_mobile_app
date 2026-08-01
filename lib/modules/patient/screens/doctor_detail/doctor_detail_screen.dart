@@ -1,9 +1,9 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart'; // 🎯 Replaced legacy provider with Riverpod
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
-import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:yodoctor/modules/widgets/app_header.dart';
 import '../../../../core/utils/app_spacing.dart';
 import '../../../../core/utils/responsive.dart';
 import 'widgets/doctor_header_card.dart';
@@ -26,7 +26,9 @@ class _DoctorDetailScreenState extends ConsumerState<DoctorDetailScreen> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(doctorDetailControllerProvider.notifier).loadDoctor(widget.doctorId);
+      ref
+          .read(doctorDetailControllerProvider.notifier)
+          .loadDoctor(widget.doctorId);
     });
   }
 
@@ -46,21 +48,7 @@ class _DoctorDetailScreenState extends ConsumerState<DoctorDetailScreen> {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppBar(
-        scrolledUnderElevation: 0,
-        flexibleSpace: DecoratedBox(
-          decoration: BoxDecoration(gradient: AppTheme.patientGradient),
-        ),
-        title: Text(
-          'Doctor Details',
-          style: theme.textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.w900,
-            color: colorScheme.onPrimary,
-          ),
-        ),
-        centerTitle: false,
-        titleSpacing: 0,
-      ),
+      appBar: AppHeader(title: 'Doctor Details'),
       body: () {
         if (doctorState.isLoading) {
           return const Center(child: CircularProgressIndicator());
@@ -97,29 +85,29 @@ class _DoctorDetailScreenState extends ConsumerState<DoctorDetailScreen> {
       }(),
       bottomNavigationBar: isMobile && doctorState.doctor != null
           ? Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: colorScheme.surface,
-          border: Border(
-            top: BorderSide(
-              color: colorScheme.outlineVariant.transparency(0.3),
-              width: 1,
-            ),
-          ),
-        ),
-        child: _buildBookingButton(context, doctorState.doctor!),
-      )
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: colorScheme.surface,
+                border: Border(
+                  top: BorderSide(
+                    color: colorScheme.outlineVariant.transparency(0.3),
+                    width: 1,
+                  ),
+                ),
+              ),
+              child: _buildBookingButton(context, doctorState.doctor!),
+            )
           : null,
     );
   }
 
   Widget _buildContent(
-      BuildContext context,
-      bool isMobile,
-      bool isTablet,
-      bool isDesktop,
-      DoctorDetailModel doctor,
-      ) {
+    BuildContext context,
+    bool isMobile,
+    bool isTablet,
+    bool isDesktop,
+    DoctorDetailModel doctor,
+  ) {
     if (isDesktop || isTablet) {
       return Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -168,9 +156,9 @@ class _DoctorDetailScreenState extends ConsumerState<DoctorDetailScreen> {
                         '₹${doctor.consultationFee.toStringAsFixed(0)}',
                         style: Theme.of(context).textTheme.headlineSmall
                             ?.copyWith(
-                          color: Theme.of(context).colorScheme.primary,
-                          fontWeight: FontWeight.w900,
-                        ),
+                              color: Theme.of(context).colorScheme.primary,
+                              fontWeight: FontWeight.w900,
+                            ),
                       ),
                     ],
                   ),

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/modules/doctor/screens/subscription/widgets/my_subscription_shimmer.dart';
+import 'package:yodoctor/modules/widgets/app_header.dart';
 import '../../controllers/subscription_controller.dart';
 import 'widgets/available_plans_section.dart';
 import 'widgets/billing_history_section.dart';
@@ -63,7 +64,7 @@ class _MySubscriptionScreenState extends ConsumerState<MySubscriptionScreen> {
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
-      appBar: AppBar(title: const Text('My Subscription'), centerTitle: false),
+      appBar: AppHeader(title: 'My Subscription',),
       body: state.errorMessage != null && !state.isInitialized
           ? _buildErrorView(
         context,

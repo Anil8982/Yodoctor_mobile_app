@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:yodoctor/modules/widgets/app_header.dart';
 import '../../../../core/utils/app_spacing.dart';
 import '../../../../core/utils/responsive.dart';
 import 'widgets/certificate_action_form.dart';
@@ -47,22 +48,8 @@ class _CertificateReviewScreenState extends ConsumerState<CertificateReviewScree
 
     return Scaffold(
       backgroundColor: colorScheme.surfaceContainerLow,
-      appBar: AppBar(
-        title: Text(
-          isReadOnly ? 'Certificate Details' : 'Review Request',
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w900,
-            color: colorScheme.onSurface,
-          ),
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded),
-          onPressed: () => context.pop(),
-        ),
-        backgroundColor: colorScheme.surface,
-        foregroundColor: colorScheme.onSurface,
-        elevation: 0,
-        scrolledUnderElevation: 1,
+      appBar: AppHeader(
+        title: isReadOnly ? 'Certificate Details' : 'Review Request',
       ),
       body: reviewState.loading
           ? const CertificateReviewShimmer() // ✅ ADDED: Shimmer instead of spinner

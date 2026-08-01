@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:yodoctor/modules/widgets/app_header.dart';
 
 import '../../../../core/utils/responsive.dart';
 import '../../controllers/certificate_request.dart';
@@ -51,14 +52,9 @@ class _ApplyCertificateScreenState
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppBar(
-        title: const Text(
-          'Apply for Certificate',
-          style: TextStyle(fontWeight: FontWeight.w600),
-        ),
-        centerTitle: false,
-        elevation: 0,
-        scrolledUnderElevation: 1,
+
+      appBar: AppHeader(
+        title: 'Apply for Certificate',
       ),
       body: Column(
         children: [

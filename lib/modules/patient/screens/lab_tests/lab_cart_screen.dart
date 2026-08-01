@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/modules/patient/controllers/lab_test_controller.dart';
+import 'package:yodoctor/modules/widgets/app_header.dart';
 
 class LabCartScreen extends ConsumerWidget {
   const LabCartScreen({super.key});
@@ -31,13 +32,8 @@ class LabCartScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppBar(
-        scrolledUnderElevation: 0,
-        title: const Text(
-          'My Cart',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
+      appBar: AppHeader(
+        title: 'My Cart',
         actions: [
           if (cartItems.isNotEmpty)
             Padding(

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:yodoctor/modules/widgets/app_header.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/app_button.dart';
@@ -167,19 +168,8 @@ class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
     final TextTheme textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: AppBar(
-        scrolledUnderElevation: 0,
-        flexibleSpace: DecoratedBox(
-          decoration: BoxDecoration(gradient: AppTheme.patientGradient),
-        ),
-        centerTitle: true,
-        title: Text(
-          _isEditing ? 'Update Member' : 'Add New Member',
-          style: textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.w700,
-            color: colorScheme.onPrimary,
-          ),
-        ),
+      appBar: AppHeader(
+        title: _isEditing ? 'Update Member' : 'Add New Member',
       ),
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(

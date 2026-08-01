@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
+import 'package:yodoctor/modules/widgets/app_header.dart';
 import '../../../doctor/controllers/live_queue_controller.dart';
 
 class AddPrescriptionScreen extends ConsumerStatefulWidget {
@@ -77,19 +78,8 @@ class _AddPrescriptionScreenState extends ConsumerState<AddPrescriptionScreen> {
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
-      appBar: AppBar(
-        title: Text(
-          "Add Prescription",
-          style: theme.textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.w700,
-            color: colorScheme.onPrimary,
-          ),
-        ),
-        centerTitle: false,
-        backgroundColor: colorScheme.primary,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        iconTheme: IconThemeData(color: colorScheme.onPrimary),
+      appBar: AppHeader(
+        title: "Add Prescription",
       ),
       body: SafeArea(
         child: Align(

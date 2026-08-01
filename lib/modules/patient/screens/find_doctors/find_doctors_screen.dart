@@ -1,10 +1,9 @@
-import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:yodoctor/modules/widgets/app_header.dart';
 
 import '../../../../core/routes/app_routes.dart';
-import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/app_spacing.dart';
 import '../../models/search/doctor_search_model.dart';
 import '../../../../core/utils/responsive.dart';
@@ -59,34 +58,11 @@ class _FindDoctorsScreenState extends ConsumerState<FindDoctorsScreen> {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppBar(
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        flexibleSpace: DecoratedBox(
-          decoration: BoxDecoration(gradient: AppTheme.patientGradient),
-        ),
-        centerTitle: false,
-        leadingWidth: 72,
-        leading: Center(child: _buildBackButton(context, colorScheme)),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Find Doctors',
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: colorScheme.onPrimary,
-              ),
-            ),
-            if (listingState.activeQuery.isNotEmpty)
-              Text(
-                'Results for "${listingState.activeQuery}"',
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: colorScheme.onPrimary.transparency(0.8),
-                ),
-              ),
-          ],
-        ),
+      appBar: AppHeader(
+        title: 'Find Doctors',
+        subtitle: listingState.activeQuery.isNotEmpty
+            ? 'Results for "${listingState.activeQuery}"'
+            : null,
         actions: [
           _buildResultCounter(listingState.foundCount, colorScheme),
           const SizedBox(width: AppSpacing.md),
@@ -150,20 +126,6 @@ class _FindDoctorsScreenState extends ConsumerState<FindDoctorsScreen> {
                 ],
               ),
       ),
-    );
-  }
-
-  // --- Widgets: Back Button ---
-  Widget _buildBackButton(BuildContext context, ColorScheme colorScheme) {
-    return IconButton(
-      icon: Icon(Icons.arrow_back_rounded, color: colorScheme.onPrimary),
-      onPressed: () {
-        if (context.canPop()) {
-          context.pop();
-        } else {
-          context.go(AppRoutes.dashboard);
-        }
-      },
     );
   }
 

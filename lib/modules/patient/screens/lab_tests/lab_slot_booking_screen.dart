@@ -7,6 +7,7 @@ import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/core/utils/input_decoration_helper.dart';
 import 'package:yodoctor/modules/patient/controllers/booking_controller.dart';
 import 'package:yodoctor/modules/patient/controllers/lab_test_controller.dart';
+import 'package:yodoctor/modules/widgets/app_header.dart';
 
 class LabSlotBookingScreen extends ConsumerStatefulWidget {
   const LabSlotBookingScreen({super.key});
@@ -49,14 +50,7 @@ class _LabSlotBookingScreenState extends ConsumerState<LabSlotBookingScreen> {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppBar(
-        scrolledUnderElevation: 0,
-        title: const Text(
-          'Book a Slot',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-        ),
-        centerTitle: true,
-      ),
+      appBar: AppHeader(title: 'Book a Slot',),
       body: Form(
         key: _formKey,
         child: Column(

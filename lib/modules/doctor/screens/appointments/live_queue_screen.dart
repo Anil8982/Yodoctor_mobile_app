@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/modules/widgets/app_header.dart';
 import '../../../../core/utils/app_spacing.dart';
 import '../../../../core/utils/responsive.dart';
 import '../../controllers/live_queue_controller.dart';
@@ -24,21 +25,8 @@ class LiveQueueScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
-      appBar: AppBar(
-        title: Text(
-          "Today's Queue",
-          style: theme.textTheme.titleLarge?.copyWith(
-            color: colorScheme.onPrimary,
-            fontWeight: FontWeight.w800,
-          ),
-        ),
-        centerTitle: false,
-        backgroundColor: colorScheme.primary,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        iconTheme: IconThemeData(
-          color: colorScheme.onPrimary,
-        ),
+      appBar: AppHeader(
+        title: "Today's Queue",
         actions: [
           IconButton(
             tooltip: 'Refresh Queue',
@@ -47,17 +35,13 @@ class LiveQueueScreen extends ConsumerWidget {
                 ? SizedBox(
               width: 20,
               height: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: colorScheme.onPrimary,
-              ),
+              child: CircularProgressIndicator(strokeWidth: 2, color: colorScheme.onPrimary,),
             )
                 : const Icon(Icons.refresh_rounded),
           ),
           const SizedBox(width: 8),
         ],
-      ),
-      body: SafeArea(
+      ),      body: SafeArea(
         child: RefreshIndicator(
           onRefresh: refresh,
           child: LayoutBuilder(

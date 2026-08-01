@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/modules/widgets/app_header.dart';
 
 import '../../controllers/certificate_request.dart';
 
@@ -21,7 +22,8 @@ class PatientCertificateDetailScreen extends ConsumerWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Certificate Detail")),
+      appBar: AppHeader(title: 'Certificate Details'),
+
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [

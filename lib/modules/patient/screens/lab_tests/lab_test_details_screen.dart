@@ -4,6 +4,7 @@ import 'package:yodoctor/modules/patient/models/lab/lab_test_model.dart';
 import 'package:yodoctor/modules/patient/controllers/lab_test_controller.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
+import 'package:yodoctor/modules/widgets/app_header.dart';
 
 class LabTestDetailsScreen extends ConsumerWidget {
   const LabTestDetailsScreen({super.key});
@@ -29,14 +30,7 @@ class LabTestDetailsScreen extends ConsumerWidget {
     final isInCart = cartItems.any((item) => item.id == test.id);
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppBar(
-        scrolledUnderElevation: 0,
-        title: Text(
-          test.name,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
-      ),
+      appBar: AppHeader(title: test.name),
       body: Column(
         children: [
           Expanded(

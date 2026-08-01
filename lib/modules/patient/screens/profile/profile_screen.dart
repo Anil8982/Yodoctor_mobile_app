@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
-import '../../../../core/theme/app_theme.dart';
+import 'package:yodoctor/modules/widgets/app_header.dart';
 import '../../controllers/profile_controller.dart';
 import '../../../../core/utils/app_spacing.dart';
 import 'widgets/profile_header.dart';
@@ -48,18 +48,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppBar(
-        scrolledUnderElevation: 0,
-        flexibleSpace: DecoratedBox(
-          decoration: BoxDecoration(gradient: AppTheme.patientGradient),
-        ),
-        title: Text(
-          'Profile Settings',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: colorScheme.onPrimary,
-          ),
-        ),
+      appBar: AppHeader(
+        title: 'Profile Settings',
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 12.0),
@@ -85,7 +75,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
           ),
         ],
-        iconTheme: IconThemeData(color: colorScheme.onPrimary),
       ),
       body: profileState.user == null && profileState.isLoading
           ? const Center(child: CircularProgressIndicator())

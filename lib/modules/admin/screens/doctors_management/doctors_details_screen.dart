@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/models/admin/doctor_profile.dart';
 import 'package:yodoctor/modules/admin/controllers/doctors_management_controller.dart';
+import 'package:yodoctor/modules/widgets/app_header.dart';
 
 class DoctorDetailsScreen extends ConsumerWidget {
   const DoctorDetailsScreen({
@@ -16,7 +17,7 @@ class DoctorDetailsScreen extends ConsumerWidget {
     final doctorsStateAsync = ref.watch(doctorsManagementProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Doctor Details")),
+      appBar: AppHeader(title: "Doctor Details"),
       body: doctorsStateAsync.maybeWhen(
         data: (state) {
           final currentStatus = state.doctorStatuses[doctor.id] ?? 'Pending';

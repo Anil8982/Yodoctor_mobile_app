@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/modules/patient/controllers/lab_test_controller.dart';
+import 'package:yodoctor/modules/widgets/app_header.dart';
 import 'widgets/lab_categories_list.dart';
 import 'widgets/lab_package_card.dart';
 
@@ -26,13 +27,8 @@ class AllLabTestsScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppBar(
-        scrolledUnderElevation: 0,
-        title: const Text(
-          'All Packages & Tests',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
+      appBar: AppHeader(
+        title: 'All Packages & Tests',
         actions: [
           Stack(
             alignment: Alignment.center,

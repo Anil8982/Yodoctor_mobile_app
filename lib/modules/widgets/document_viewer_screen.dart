@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/network/dio_provider.dart';
+import 'package:yodoctor/modules/widgets/app_header.dart';
 
 class DocumentViewerScreen extends ConsumerStatefulWidget {
   final String fileUrl;
@@ -78,7 +79,7 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(title: Text(widget.fileName)),
+      appBar: AppHeader(title: widget.fileName),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _error != null

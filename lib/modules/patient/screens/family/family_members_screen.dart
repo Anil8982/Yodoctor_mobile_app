@@ -1,87 +1,65 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:yodoctor/modules/widgets/app_header.dart';
 
 import '../../../../core/routes/app_routes.dart';
-import '../../../../core/theme/app_theme.dart';
 import '../../controllers/family_controller.dart';
-import 'widgets/family_member_card.dart';
-import 'widgets/family_header.dart';
 import '../../models/family/family_member_model.dart';
+import 'widgets/family_header.dart';
+import 'widgets/family_member_card.dart';
 
 class FamilyMembersScreen extends ConsumerStatefulWidget {
   const FamilyMembersScreen({super.key});
 
   @override
-  ConsumerState<FamilyMembersScreen> createState() => _FamilyMembersScreenState();
+  ConsumerState<FamilyMembersScreen> createState() =>
+      _FamilyMembersScreenState();
 }
 
 class _FamilyMembersScreenState extends ConsumerState<FamilyMembersScreen> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final textTheme = theme.textTheme;
 
     final familyState = ref.watch(familyControllerProvider);
     final notifier = ref.read(familyControllerProvider.notifier);
 
     return Scaffold(
-      key: _scaffoldKey,
       backgroundColor: theme.scaffoldBackgroundColor,
-
-      appBar: AppBar(
-        scrolledUnderElevation: 0,
-        flexibleSpace: DecoratedBox(
-          decoration: BoxDecoration(gradient: AppTheme.patientGradient),
-        ),
-        centerTitle: true,
-        iconTheme: IconThemeData(color: colorScheme.onPrimary),
-        title: Text(
-          'Family Members',
-          style: textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.w700,
-            color: colorScheme.onPrimary,
-          ),
-        ),
-      ),
-
+      appBar: const AppHeader(title: 'Family Members'),
       body: familyState.members.isEmpty
           ? Column(
         children: [
-          FamilyHeader(membersCount: familyState.members.length),
+          const SizedBox(height: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: FamilyHeader(membersCount: 0),
+          ),
           Expanded(child: _buildEmptyState(context)),
         ],
       )
-          : ListView.separated(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 120),
-        itemCount: familyState.members.length + 1,
+          : ListView(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
         physics: const BouncingScrollPhysics(),
-        separatorBuilder: (context, index) {
-          if (index == 0) return const SizedBox.shrink();
-          return const SizedBox(height: 12);
-        },
-        itemBuilder: (context, index) {
-          if (index == 0) {
+        children: [
+          FamilyHeader(membersCount: familyState.members.length),
+          const SizedBox(height: 16),
+          ...familyState.members.map((member) {
             return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 16),
-              child: FamilyHeader(membersCount: familyState.members.length),
+              padding: const EdgeInsets.only(bottom: 12),
+              child: FamilyMemberCard(
+                member: member,
+                onDelete: () async {
+                  await notifier.deleteMember(member.id);
+                },
+                onEdit: () => _openEditMemberScreen(context, member),
+              ),
             );
-          }
-
-          final member = familyState.members[index - 1];
-          return FamilyMemberCard(
-            member: member,
-            onDelete: () async {
-              await notifier.deleteMember(member.id);
-            },
-            onEdit: () => _openEditMemberScreen(context, member),
-          );
-        },
+          }),
+        ],
       ),
-
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'family_members_screen_fab_tag',
@@ -139,27 +117,30 @@ class _FamilyMembersScreenState extends ConsumerState<FamilyMembersScreen> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Center(
-      child: Padding(
+      child: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: colorScheme.primaryContainer,
+                color: colorScheme.primaryContainer.withAlpha(120),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.group_add_rounded,
-                color: colorScheme.onPrimaryContainer,
-                size: 40,
+                color: colorScheme.primary,
+                size: 44,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             Text(
               'No family members yet',
-              style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900),
+              style: textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 8),
             Text(
@@ -167,7 +148,7 @@ class _FamilyMembersScreenState extends ConsumerState<FamilyMembersScreen> {
               textAlign: TextAlign.center,
               style: textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,
-                height: 1.5,
+                height: 1.4,
               ),
             ),
           ],

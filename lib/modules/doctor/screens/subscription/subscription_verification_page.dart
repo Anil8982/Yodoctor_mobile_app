@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/providers/app_role_provider.dart';
 import 'package:yodoctor/modules/auth/controllers/doctor_login_controller.dart';
 import 'package:yodoctor/modules/doctor/controllers/subscription_status_controller.dart';
+import 'package:yodoctor/modules/widgets/app_header.dart';
 import 'package:yodoctor/modules/widgets/logout_dialog.dart';
 import '../../controllers/subscription_controller.dart';
 import 'widgets/available_plans_section.dart';
@@ -26,9 +27,9 @@ class SubscriptionVerificationPage extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
-      appBar: AppBar(
-        title: const Text('Activate Your Account'),
-        automaticallyImplyLeading: false,
+      appBar: AppHeader(
+        title: 'Activate Your Account',
+        showBackButton: false,
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 12),

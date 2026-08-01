@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:yodoctor/modules/doctor/models/subscription/subscription_model.dart';
+import 'package:yodoctor/modules/widgets/app_header.dart';
 
 class InvoiceDetailScreen extends ConsumerStatefulWidget {
   final BillingInvoice invoice;
@@ -24,22 +25,26 @@ class _InvoiceDetailScreenState extends ConsumerState<InvoiceDetailScreen> {
     final invoice = widget.invoice;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Invoice Details'),
+      appBar: AppHeader(
+        title: 'Invoice Details',
         actions: [
           IconButton(
             onPressed: _isDownloading ? null : _downloadInvoice,
             icon: _isDownloading
-                ? const SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(strokeWidth: 2),
+                ? SizedBox(
+              width: 18,
+              height: 18,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: Theme.of(context).colorScheme.onPrimary,
+              ),
             )
                 : const Icon(Icons.download_rounded),
             tooltip: 'Download PDF',
           ),
         ],
       ),
+
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(
