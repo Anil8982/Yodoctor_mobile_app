@@ -41,4 +41,19 @@ class PatientLabRepository {
   Future<Response> createBooking(Map<String, dynamic> data) {
     return _dio.post(ApiConstants.labBookings, data: data);
   }
+
+  Future<Response> createLabPaymentOrder(int bookingId) {
+    return _dio.post(
+      '/razorpay/lab/payments/create-order',
+      data: {"booking_id": bookingId},
+    );
+  }
+
+  Future<Response> verifyLabPayment(Map<String, dynamic> body) {
+    return _dio.post(
+      '/razorpay/lab/payments/verify',
+      data: body,
+    );
+  }
+
 }

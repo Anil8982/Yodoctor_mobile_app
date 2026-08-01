@@ -43,7 +43,7 @@ class RazorpayExternalWallet extends RazorpayEvent {
 
 /// RazorpayController - Handles only Razorpay SDK interactions
 class RazorpayController {
-  static const String _tag = 'RazorpayController Doctor Subscription';
+  static const String _tag = 'RazorpayController';
 
   late final Razorpay _razorpay;
   bool _isCheckoutOpen = false;
@@ -120,6 +120,63 @@ class RazorpayController {
         e,
         st,
         message: 'Failed to open Razorpay checkout',
+        tag: LogTags.razorpay,
+        subTag: _tag,
+      );
+
+      _eventController.add(
+        RazorpayFailure(code: -1, message: 'Failed to open payment gateway'),
+      );
+    }
+  }
+
+  /// Open Razorpay checkout for orders (lab tests, home care, etc.)
+  void openOrderCheckout({
+    required String key,
+    required String orderId,
+    required double amount,
+    required String description,
+    Map<String, String> prefill = const {},
+  }) {
+    if (_isCheckoutOpen) {
+      AppLogger.warning(
+        'Checkout already open, ignoring duplicate call',
+        tag: LogTags.razorpay,
+        subTag: _tag,
+      );
+      return;
+    }
+
+    _isCheckoutOpen = true;
+
+    try {
+      final options = {
+        'key': key,
+        'order_id': orderId,
+        'name': 'YoDoctor',
+        'description': description,
+        'amount': (amount * 100).toInt(), // rupees to paise
+        'prefill': {
+          'contact': prefill['contact'] ?? '',
+          'email': prefill['email'] ?? '',
+          'name': prefill['name'] ?? '',
+        },
+      };
+
+      AppLogger.info(
+        'Opening Razorpay checkout for order: $orderId, amount: ₹$amount',
+        tag: LogTags.razorpay,
+        subTag: _tag,
+      );
+
+      _razorpay.open(options);
+    } catch (e, st) {
+      _isCheckoutOpen = false;
+
+      AppLogger.exception(
+        e,
+        st,
+        message: 'Failed to open Razorpay order checkout',
         tag: LogTags.razorpay,
         subTag: _tag,
       );
