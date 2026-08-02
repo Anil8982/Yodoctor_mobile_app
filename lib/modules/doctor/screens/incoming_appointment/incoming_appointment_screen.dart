@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-<<<<<<< Updated upstream
 import 'package:yodoctor/modules/widgets/app_header.dart';
-=======
 import 'package:yodoctor/core/utils/app_spacing.dart';
->>>>>>> Stashed changes
 import '../../controllers/incoming_appointment_controller.dart';
 import '../../../patient/models/appointment/incoming_appointment_model.dart';
 import '../incoming_appointment/widgets/incoming_appointment_filter.dart';
@@ -58,41 +55,8 @@ class _IncomingAppointmentScreenState
     }
 
     return Scaffold(
-<<<<<<< Updated upstream
       backgroundColor: colorScheme.surface,
       appBar: AppHeader(title: 'Incoming Appointments'),
-      body: state.loading && appointments.isEmpty
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                if (state.loading && appointments.isNotEmpty)
-                  LinearProgressIndicator(color: colorScheme.primary),
-
-                Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Wrap(
-                          spacing: 10,
-                          children: List.generate(filters.length, (index) {
-                            final selected = selectedFilter == index;
-
-                            return ChoiceChip(
-=======
-      backgroundColor: colorScheme.onPrimary,
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: colorScheme.primary,
-        foregroundColor: colorScheme.onPrimary,
-        title: Text(
-          "Incoming Appointments",
-          style: theme.textTheme.titleLarge?.copyWith(
-            color: colorScheme.onPrimary,
-            fontWeight: FontWeight.w800,
-          ),
-        ),
-      ),
       body: state.loading && appointments.isEmpty
           ? const Center(child: CircularProgressIndicator())
           : SafeArea(
@@ -151,7 +115,6 @@ class _IncomingAppointmentScreenState
                             return ChoiceChip(
                               showCheckmark: false,
                               avatar: Icon(icon, size: 16, color: Colors.black),
->>>>>>> Stashed changes
                               label: Text(
                                 index == 0
                                     ? "All (${state.appointments.length})"
@@ -163,115 +126,6 @@ class _IncomingAppointmentScreenState
                                   selectedFilter = index;
                                 });
                               },
-<<<<<<< Updated upstream
-                            );
-                          }),
-                        ),
-                      ),
-                      FilledButton.icon(
-                        onPressed: state.loading
-                            ? null
-                            : () async {
-                                final ok = await notifier.autoAcceptAll();
-                                if (!context.mounted) return;
-                                if (ok) {
-                                  _showSnackBar(
-                                    context,
-                                    "All appointments auto-accepted",
-                                    isError: false,
-                                  );
-                                } else {
-                                  _showSnackBar(
-                                    context,
-                                    state.errorMessage ?? "Auto-accept failed",
-                                    isError: true,
-                                  );
-                                }
-                              },
-                        icon: const Icon(Icons.done_all),
-                        label: const Text("Auto Accept All"),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: appointments.isEmpty
-                      ? const Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.calendar_today,
-                                size: 60,
-                                color: Colors.grey,
-                              ),
-                              SizedBox(height: 20),
-                              Text("No Incoming Appointments"),
-                            ],
-                          ),
-                        )
-                      : RefreshIndicator(
-                          onRefresh: () async {
-                            await notifier.loadAppointments();
-                          },
-                          child: ListView.separated(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 10,
-                            ),
-                            itemCount: appointments.length,
-                            separatorBuilder: (_, _) =>
-                                const SizedBox(height: 18),
-                            itemBuilder: (context, index) {
-                              final appointment = appointments[index];
-
-                              return IncomingAppointmentCard(
-                                appointment: appointment,
-                                onAccept: () async {
-                                  final ok = await notifier.accept(
-                                    appointment.id,
-                                  );
-                                  if (!context.mounted) return;
-                                  if (ok) {
-                                    _showSnackBar(
-                                      context,
-                                      "Appointment Accepted",
-                                      isError: false,
-                                    );
-                                  } else {
-                                    _showSnackBar(
-                                      context,
-                                      state.errorMessage ?? "Action failed",
-                                      isError: true,
-                                    );
-                                  }
-                                },
-                                onReject: () async {
-                                  final ok = await notifier.reject(
-                                    appointment.id,
-                                  );
-                                  if (!context.mounted) return;
-                                  if (ok) {
-                                    _showSnackBar(
-                                      context,
-                                      "Appointment Rejected",
-                                      isError: true,
-                                    );
-                                  } else {
-                                    _showSnackBar(
-                                      context,
-                                      state.errorMessage ?? "Action failed",
-                                      isError: true,
-                                    );
-                                  }
-                                },
-                              );
-                            },
-                          ),
-                        ),
-                ),
-              ],
-=======
                               backgroundColor: const Color(0xffF4F6FA),
                               selectedColor: Colors.blue.shade100,
                               side: BorderSide.none,
@@ -412,7 +266,6 @@ class _IncomingAppointmentScreenState
                   ),
                 ],
               ),
->>>>>>> Stashed changes
             ),
     );
   }
