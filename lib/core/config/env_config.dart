@@ -4,7 +4,7 @@ class EnvConfig {
   EnvConfig._();
 
   static String get baseUrl =>
-      dotenv.env['BASE_URL'] ?? '';
+      dotenv.env['BASE_URL_new'] ?? '';
 
   static String get fileUrl =>
       dotenv.env['FILE_URL'] ?? '';
