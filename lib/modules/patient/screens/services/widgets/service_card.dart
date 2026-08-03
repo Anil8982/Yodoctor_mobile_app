@@ -17,6 +17,14 @@ class ServiceCard extends StatelessWidget {
       onTap: () {
         if (service.isQrScanner && onQrTap != null) {
           onQrTap!();
+        } else if (service.title == 'Medicine Delivery') {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Medicine delivery coming soon'),
+              duration: Duration(seconds: 2),
+            ),
+          );
+          return;
         } else if (service.route != '#') {
           context.push(service.route);
         }

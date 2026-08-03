@@ -86,13 +86,6 @@ class _DoctorProfileScreenState extends ConsumerState<DoctorProfileScreen> {
                 const SizedBox(height: AppSpacing.xl),
               ],
 
-              ElevatedButton(
-                onPressed: () {
-                  context.go('/');
-                },
-                child: const Text('Go to /'),
-              )
-              ,
               Text(
                 'Profile Overview',
                 style: theme.textTheme.titleMedium?.copyWith(

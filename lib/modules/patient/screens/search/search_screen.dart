@@ -32,8 +32,13 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     _searchController = TextEditingController(text: searchState.query);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (ref.read(patientSearchControllerProvider).trendingSpecialties.isEmpty) {
-        ref.read(patientSearchControllerProvider.notifier).loadTrendingSpecialties();
+      if (ref
+          .read(patientSearchControllerProvider)
+          .trendingSpecialties
+          .isEmpty) {
+        ref
+            .read(patientSearchControllerProvider.notifier)
+            .loadTrendingSpecialties();
       }
     });
   }
@@ -94,8 +99,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: AppSpacing.xl),
-                  _buildQuickActions(colorScheme),
+                  // const SizedBox(height: AppSpacing.xl),
+                  // _buildQuickActions(colorScheme),
                   const SizedBox(height: AppSpacing.xxl),
                   _buildSectionHeader(theme, 'Featured Specialties'),
                   SpecialtyCardList(
@@ -104,7 +109,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                       await notifier.selectTrending(specialtyName);
                       _searchController.text = specialtyName;
                       if (context.mounted) {
-                        _onSearchTap(context, ref.read(patientSearchControllerProvider));
+                        _onSearchTap(
+                          context,
+                          ref.read(patientSearchControllerProvider),
+                        );
                       }
                     },
                   ),
@@ -115,7 +123,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           ),
           if (hasSuggestions)
             Positioned(
-              width: MediaQuery.of(context).size.width - (horizontalPadding * 2) - 64,
+              width:
+                  MediaQuery.of(context).size.width -
+                  (horizontalPadding * 2) -
+                  64,
               child: CompositedTransformFollower(
                 link: _searchLink,
                 showWhenUnlinked: false,
@@ -128,12 +139,17 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                     constraints: const BoxConstraints(maxHeight: 350),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(24),
-                      border: Border.all(color: colorScheme.outlineVariant.transparency(0.4)),
+                      border: Border.all(
+                        color: colorScheme.outlineVariant.transparency(0.4),
+                      ),
                     ),
                     child: SearchSuggestionsOverlay(
                       controller: searchState,
                       searchController: _searchController,
-                      onSearchTap: (ctx, state) => _onSearchTap(ctx, ref.read(patientSearchControllerProvider)),
+                      onSearchTap: (ctx, state) => _onSearchTap(
+                        ctx,
+                        ref.read(patientSearchControllerProvider),
+                      ),
                     ),
                   ),
                 ),
@@ -160,7 +176,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         _actionItem(Icons.near_me_rounded, 'Near Me', colorScheme),
         _actionItem(Icons.star_rounded, 'Top Rated', colorScheme),
         _actionItem(Icons.bolt_rounded, 'Available', colorScheme),
-        _actionItem(Icons.local_fire_department_rounded, 'Trending', colorScheme),
+        _actionItem(
+          Icons.local_fire_department_rounded,
+          'Trending',
+          colorScheme,
+        ),
       ],
     );
   }
@@ -177,7 +197,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           child: Icon(icon, color: colorScheme.primary, size: 24),
         ),
         const SizedBox(height: 8),
-        Text(label, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+        Text(
+          label,
+          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+        ),
       ],
     );
   }
@@ -185,7 +208,13 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   Widget _buildSectionHeader(ThemeData theme, String title) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
-      child: Text(title, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900, letterSpacing: -0.5)),
+      child: Text(
+        title,
+        style: theme.textTheme.titleMedium?.copyWith(
+          fontWeight: FontWeight.w900,
+          letterSpacing: -0.5,
+        ),
+      ),
     );
   }
 }
