@@ -87,7 +87,9 @@ class SubscriptionVerificationPage extends ConsumerWidget {
           ? const SubscriptionVerificationShimmer()
           : RefreshIndicator(
               onRefresh: () async {
-                await ref.read(subscriptionStatusProvider.notifier).checkActiveSubscription();
+                await ref
+                    .read(subscriptionStatusProvider.notifier)
+                    .checkActiveSubscription();
               },
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(
@@ -291,7 +293,7 @@ class SubscriptionVerificationPage extends ConsumerWidget {
             crossAxisCount: 2,
             crossAxisSpacing: 12,
             mainAxisSpacing: 12,
-            childAspectRatio: 1.5,
+            childAspectRatio: 1.25,
           ),
           itemCount: features.length,
           itemBuilder: (context, index) {
@@ -458,7 +460,9 @@ class SubscriptionVerificationPage extends ConsumerWidget {
       width: double.infinity,
       child: OutlinedButton.icon(
         onPressed: () async {
-          await ref.read(subscriptionStatusProvider.notifier).checkActiveSubscription();
+          await ref
+              .read(subscriptionStatusProvider.notifier)
+              .checkActiveSubscription();
         },
         icon: const Icon(Icons.refresh_rounded, size: 18),
         label: const Text('Check Status Again'),
@@ -511,7 +515,9 @@ class SubscriptionVerificationPage extends ConsumerWidget {
             ),
             const SizedBox(height: 20),
             FilledButton.icon(
-              onPressed: () => ref.read(subscriptionStatusProvider.notifier).checkActiveSubscription(),
+              onPressed: () => ref
+                  .read(subscriptionStatusProvider.notifier)
+                  .checkActiveSubscription(),
               icon: const Icon(Icons.refresh_rounded, size: 18),
               label: const Text('Retry Connection'),
             ),
