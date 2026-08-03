@@ -56,7 +56,12 @@ class ManualBookingNotifier extends Notifier<ManualBookingState> {
       mobileController.dispose();
       ageController.dispose();
     });
-    return const ManualBookingState();
+
+    return ManualBookingState(selectedShift: _getDefaultShift());
+  }
+
+  String _getDefaultShift() {
+    return DateTime.now().hour < 12 ? "Morning Shift" : "Evening Shift";
   }
 
   void changeShift(String shift) {
@@ -123,7 +128,7 @@ class ManualBookingNotifier extends Notifier<ManualBookingState> {
         mobileController.clear();
         ageController.clear();
 
-        state = const ManualBookingState();
+        state = ManualBookingState(selectedShift: _getDefaultShift());
         return true;
       } else {
         final msg =
