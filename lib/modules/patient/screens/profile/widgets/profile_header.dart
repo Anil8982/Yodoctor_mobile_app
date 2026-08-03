@@ -59,7 +59,6 @@ class ProfileHeader extends ConsumerWidget {
           child: Stack(
             alignment: Alignment.bottomRight,
             children: [
-              // मुख्य इमेज कंटेनर
               Container(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
@@ -80,7 +79,6 @@ class ProfileHeader extends ConsumerWidget {
                 ),
               ),
 
-              // एडिट मोडमध्ये असतानाचा प्रीमियम ओव्हरले
               if (isEditing)
                 Container(
                   padding: const EdgeInsets.all(10),

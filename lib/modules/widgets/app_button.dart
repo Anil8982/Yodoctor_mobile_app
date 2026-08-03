@@ -1,6 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 
-import '../utils/app_radius.dart';
+import '../../core/utils/app_radius.dart';
 
 enum AppButtonVariant { filled, outlined, text }
 

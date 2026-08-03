@@ -5,6 +5,7 @@ import '../../../../core/utils/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../controllers/doctor_profile_controller.dart';
 import '../../widgets/doctor_sliver_app_bar.dart';
+import 'widgets/profile_header_section.dart';
 
 class DoctorProfileScreen extends ConsumerStatefulWidget {
   const DoctorProfileScreen({super.key});
@@ -44,7 +45,7 @@ class _DoctorProfileScreenState extends ConsumerState<DoctorProfileScreen> {
             DoctorSliverAppBar(
               expandedHeight: 200,
               isNavBar: false,
-              background: _buildProfileSummaryHeader(context, doctor),
+              background: ProfileHeaderSection(doctor: doctor),
             ),
           ];
         },
@@ -230,101 +231,6 @@ class _DoctorProfileScreenState extends ConsumerState<DoctorProfileScreen> {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildProfileSummaryHeader(BuildContext context, dynamic doctor) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    return Container(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.xl,
-        kToolbarHeight + AppSpacing.lg,
-        AppSpacing.xl,
-        AppSpacing.sm,
-      ),
-      child: Row(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: colorScheme.onPrimary.withValues(alpha: 0.25),
-                width: 2.5,
-              ),
-            ),
-            child: CircleAvatar(
-              radius: 36,
-              backgroundColor: colorScheme.onPrimary.withValues(alpha: 0.12),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(36),
-                child: Image.asset(
-                  'assets/images/doctorLogo.jpg',
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => Icon(
-                    Icons.medical_services_rounded,
-                    color: colorScheme.onPrimary,
-                    size: 28,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: AppSpacing.md),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  doctor.doctorName,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: colorScheme.onPrimary,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 0.3,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  doctor.specialization,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onPrimary.withValues(alpha: 0.8),
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.sm,
-                    vertical: 3,
-                  ),
-                  decoration: BoxDecoration(
-                    color: colorScheme.onPrimary.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: colorScheme.onPrimary.withValues(alpha: 0.1),
-                    ),
-                  ),
-                  child: Text(
-                    doctor.degree,
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: colorScheme.onPrimary,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }

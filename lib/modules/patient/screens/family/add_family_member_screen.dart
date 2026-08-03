@@ -3,17 +3,17 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:yodoctor/modules/widgets/app_date_picker_field.dart';
+import 'package:yodoctor/modules/widgets/app_dropdown_field.dart';
+import 'package:yodoctor/modules/widgets/app_text_field.dart';
 import 'package:yodoctor/modules/widgets/app_header.dart';
 
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/widgets/app_button.dart';
+import '../../../widgets/app_button.dart';
 import '../../controllers/family_controller.dart';
-import 'widgets/member_form_dropdown_field.dart';
-import 'widgets/member_form_text_field.dart';
 import '../../models/family/family_member_model.dart';
 
 class AddFamilyMemberScreen extends ConsumerStatefulWidget {
-  // 🎯 Switched to ConsumerStatefulWidget
   const AddFamilyMemberScreen({super.key, this.initialMember});
 
   final FamilyMemberModel? initialMember;
@@ -24,7 +24,6 @@ class AddFamilyMemberScreen extends ConsumerStatefulWidget {
 }
 
 class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
-  // 🎯 Switched to ConsumerState
   static const List<String> _genderOptions = <String>[
     "MALE",
     "FEMALE",
@@ -97,30 +96,6 @@ class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
     _weightController.text = member.weightKg.toString();
   }
 
-  Future<void> _pickDateOfBirth() async {
-    final DateTime now = DateTime.now();
-    final DateTime initialDate = _selectedDob ?? DateTime(now.year - 25, 1, 1);
-
-    final DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: initialDate,
-      firstDate: DateTime(1900),
-      lastDate: now,
-    );
-
-    if (pickedDate == null) return;
-
-    // 🎯 Using formatting helper directly from controller logic stream
-    final formattedDate = ref
-        .read(familyControllerProvider.notifier)
-        .formatDate(pickedDate);
-
-    setState(() {
-      _selectedDob = pickedDate;
-      _dobController.text = formattedDate;
-    });
-  }
-
   Future<void> _saveMember() async {
     FocusScope.of(context).unfocus();
 
@@ -168,9 +143,7 @@ class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
     final TextTheme textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: AppHeader(
-        title: _isEditing ? 'Update Member' : 'Add New Member',
-      ),
+      appBar: AppHeader(title: _isEditing ? 'Update Member' : 'Add New Member'),
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
@@ -241,85 +214,231 @@ class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
                     elevation: 0,
                     child: Form(
                       key: _formKey,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
                       child: Padding(
                         padding: const EdgeInsets.all(20),
                         child: LayoutBuilder(
-                          builder:
-                              (
-                                BuildContext context,
-                                BoxConstraints constraints,
-                              ) {
-                                final bool isWideLayout =
-                                    constraints.maxWidth >= 760;
-                                final double fieldWidth = isWideLayout
-                                    ? (constraints.maxWidth - 16) / 2
-                                    : constraints.maxWidth;
+                          builder: (BuildContext context, BoxConstraints constraints) {
+                            final bool isWideLayout =
+                                constraints.maxWidth >= 760;
+                            final double fieldWidth = isWideLayout
+                                ? (constraints.maxWidth - 16) / 2
+                                : constraints.maxWidth;
 
-                                return Column(
+                            return Column(
+                              children: <Widget>[
+                                Wrap(
+                                  spacing: 16,
+                                  runSpacing: 16,
                                   children: <Widget>[
-                                    Wrap(
-                                      spacing: 16,
-                                      runSpacing: 16,
-                                      children: <Widget>[
-                                        SizedBox(
-                                          width: fieldWidth,
-                                          child: _buildNameField(),
-                                        ),
-                                        SizedBox(
-                                          width: fieldWidth,
-                                          child: _buildGenderField(),
-                                        ),
-                                        SizedBox(
-                                          width: fieldWidth,
-                                          child: _buildDobField(),
-                                        ),
-                                        SizedBox(
-                                          width: fieldWidth,
-                                          child: _buildBloodGroupField(),
-                                        ),
-                                        SizedBox(
-                                          width: fieldWidth,
-                                          child: _buildRelationField(),
-                                        ),
-                                        SizedBox(
-                                          width: fieldWidth,
-                                          child: _buildHeightField(),
-                                        ),
-                                        SizedBox(
-                                          width: fieldWidth,
-                                          child: _buildWeightField(),
-                                        ),
-                                      ],
+                                    SizedBox(
+                                      width: fieldWidth,
+                                      child: AppTextField(
+                                        label: 'Full Name',
+                                        isRequired: true,
+                                        hint: 'Enter full name',
+                                        maxLength: 50,
+                                        icon: Icons.person_rounded,
+                                        controller: _nameController,
+                                        textCapitalization:
+                                        TextCapitalization.words,
+                                        validator: (String? value) {
+                                          final String name =
+                                              value?.trim() ?? '';
+                                          if (name.isEmpty) {
+                                            return 'Please enter full name';
+                                          }
+                                          if (name.length < 2) {
+                                            return 'Name should have at least 2 characters';
+                                          }
+                                          if (!RegExp(
+                                            r'^[A-Za-z]+(?: [A-Za-z]+)*$',
+                                          ).hasMatch(name)) {
+                                            return 'Only alphabets are allowed';
+                                          }
+                                          return null;
+                                        },
+                                      ),
                                     ),
-                                    const SizedBox(height: 28),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: <Widget>[
-                                        AppButton(
-                                          label: 'Cancel',
-                                          variant: AppButtonVariant.outlined,
-                                          onPressed: () => context.pop(false),
+                                    SizedBox(
+                                      width: fieldWidth,
+                                      child: AppDropdownField(
+                                        label: 'Gender',
+                                        isRequired: true,
+                                        hint: 'Select gender',
+                                        icon: Icons.wc_rounded,
+                                        value: _selectedGender,
+                                        items: _genderOptions,
+                                        onChanged: (String? value) => setState(
+                                              () => _selectedGender = value,
                                         ),
-                                        const SizedBox(width: 12),
-                                        AppButton(
-                                          label: _isEditing
-                                              ? 'Save Changes'
-                                              : 'Save Member',
-                                          leading: Icon(
-                                            _isEditing
-                                                ? Icons
-                                                      .check_circle_outline_rounded
-                                                : Icons
-                                                      .person_add_alt_1_rounded,
+                                        validator: (String? value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Please select gender';
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: fieldWidth,
+                                      child: AppDatePickerField(
+                                        label: 'Date of Birth',
+                                        isRequired: true,
+                                        hint: 'Select date of birth',
+                                        icon: Icons.cake_rounded,
+                                        value: _selectedDob,
+                                        onChanged: (DateTime? date) {
+                                          if (date == null) return;
+                                          setState(() {
+                                            _selectedDob = date;
+                                          });
+                                        },
+                                        firstDate: DateTime(1900),
+                                        lastDate: DateTime.now(),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: fieldWidth,
+                                      child: AppDropdownField(
+                                        label: 'Blood Group',
+                                        isRequired: true,
+                                        hint: 'Select blood group',
+                                        icon: Icons.bloodtype_rounded,
+                                        value: _selectedBloodGroup,
+                                        items: _bloodGroupOptions,
+                                        onChanged: (String? value) => setState(
+                                              () => _selectedBloodGroup = value,
+                                        ),
+                                        validator: (String? value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Please select blood group';
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: fieldWidth,
+                                      child: AppDropdownField(
+                                        label: 'Relation',
+                                        isRequired: true,
+                                        hint: 'Select relation',
+                                        icon: Icons.people_alt_rounded,
+                                        value: _selectedRelation,
+                                        items: _relationOptions,
+                                        onChanged: (String? value) => setState(
+                                              () => _selectedRelation = value,
+                                        ),
+                                        validator: (String? value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Please select relation';
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: fieldWidth,
+                                      child: AppTextField(
+                                        label: 'Height (cm)',
+                                        isRequired: true,
+                                        hint: 'e.g. 170',
+                                        maxLength: 3,
+                                        icon: Icons.height_rounded,
+                                        controller: _heightController,
+                                        keyboardType:
+                                        const TextInputType.numberWithOptions(
+                                          decimal: true,
+                                        ),
+                                        inputFormatters: <TextInputFormatter>[
+                                          FilteringTextInputFormatter.allow(
+                                            RegExp(r'^\d*\.?\d?$'),
                                           ),
-                                          isLoading: _isSaving,
-                                          onPressed: _saveMember,
+                                        ],
+                                        validator: (String? value) {
+                                          final String text =
+                                              value?.trim() ?? '';
+                                          if (text.isEmpty) {
+                                            return 'Please enter height';
+                                          }
+                                          final double? parsed =
+                                          double.tryParse(text);
+                                          if (parsed == null) {
+                                            return 'Enter a valid height';
+                                          }
+                                          if (parsed < 30 || parsed > 250) {
+                                            return 'Height should be between 30 and 250 cm';
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: fieldWidth,
+                                      child: AppTextField(
+                                        label: 'Weight (kg)',
+                                        isRequired: true,
+                                        hint: 'e.g. 65',
+                                        maxLength: 3,
+                                        icon: Icons.monitor_weight_outlined,
+                                        controller: _weightController,
+                                        keyboardType:
+                                        const TextInputType.numberWithOptions(
+                                          decimal: true,
                                         ),
-                                      ],
+                                        inputFormatters: <TextInputFormatter>[
+                                          FilteringTextInputFormatter.allow(
+                                            RegExp(r'^\d*\.?\d?$'),
+                                          ),
+                                        ],
+                                        validator: (String? value) {
+                                          final String text =
+                                              value?.trim() ?? '';
+                                          if (text.isEmpty) {
+                                            return 'Please enter weight';
+                                          }
+                                          final double? parsed =
+                                          double.tryParse(text);
+                                          if (parsed == null) {
+                                            return 'Enter a valid weight';
+                                          }
+                                          if (parsed < 2 || parsed > 350) {
+                                            return 'Weight should be between 2 and 350 kg';
+                                          }
+                                          return null;
+                                        },
+                                      ),
                                     ),
                                   ],
-                                );
-                              },
+                                ),
+                                const SizedBox(height: 28),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: <Widget>[
+                                    AppButton(
+                                      label: 'Cancel',
+                                      variant: AppButtonVariant.outlined,
+                                      onPressed: () => context.pop(false),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    AppButton(
+                                      label: _isEditing
+                                          ? 'Save Changes'
+                                          : 'Save Member',
+                                      leading: Icon(
+                                        _isEditing
+                                            ? Icons.check_circle_outline_rounded
+                                            : Icons.person_add_alt_1_rounded,
+                                      ),
+                                      isLoading: _isSaving,
+                                      onPressed: _saveMember,
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            );
+                          },
                         ),
                       ),
                     ),
@@ -330,133 +449,6 @@ class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
           ),
         ),
       ),
-    );
-  }
-
-  // (Inputs rendering UI blocks remain unchanged and fully preserved)
-  Widget _buildNameField() {
-    return MemberFormTextField(
-      label: 'Full Name',
-      hintText: 'Enter full name',
-      prefixIcon: Icons.person_rounded,
-      controller: _nameController,
-      textCapitalization: TextCapitalization.words,
-      validator: (String? value) {
-        final String name = value?.trim() ?? '';
-        if (name.isEmpty) return 'Please enter full name';
-        if (name.length < 2) return 'Name should have at least 2 characters';
-        if (!RegExp(r'^[A-Za-z]+(?: [A-Za-z]+)*$').hasMatch(name)) {
-          return 'Only alphabets are allowed';
-        }
-        return null;
-      },
-    );
-  }
-
-  Widget _buildGenderField() {
-    return MemberFormDropdownField(
-      label: 'Gender',
-      hintText: 'Select gender',
-      prefixIcon: Icons.wc_rounded,
-      value: _selectedGender,
-      options: _genderOptions,
-      onChanged: (String? value) => setState(() => _selectedGender = value),
-      validator: (String? value) {
-        if (value == null || value.isEmpty) return 'Please select gender';
-        return null;
-      },
-    );
-  }
-
-  Widget _buildDobField() {
-    return MemberFormTextField(
-      label: 'Date of Birth',
-      hintText: 'Select date of birth',
-      prefixIcon: Icons.cake_rounded,
-      suffixIcon: const Icon(Icons.calendar_month_rounded),
-      controller: _dobController,
-      readOnly: true,
-      onTap: _pickDateOfBirth,
-      validator: (String? value) {
-        if (_selectedDob == null) return 'Please select date of birth';
-        return null;
-      },
-    );
-  }
-
-  Widget _buildBloodGroupField() {
-    return MemberFormDropdownField(
-      label: 'Blood Group',
-      hintText: 'Select blood group',
-      prefixIcon: Icons.bloodtype_rounded,
-      value: _selectedBloodGroup,
-      options: _bloodGroupOptions,
-      onChanged: (String? value) => setState(() => _selectedBloodGroup = value),
-      validator: (String? value) {
-        if (value == null || value.isEmpty) return 'Please select blood group';
-        return null;
-      },
-    );
-  }
-
-  Widget _buildRelationField() {
-    return MemberFormDropdownField(
-      label: 'Relation',
-      hintText: 'Select relation',
-      prefixIcon: Icons.people_alt_rounded,
-      value: _selectedRelation,
-      options: _relationOptions,
-      onChanged: (String? value) => setState(() => _selectedRelation = value),
-      validator: (String? value) {
-        if (value == null || value.isEmpty) return 'Please select relation';
-        return null;
-      },
-    );
-  }
-
-  Widget _buildHeightField() {
-    return MemberFormTextField(
-      label: 'Height (cm)',
-      hintText: 'e.g. 170',
-      prefixIcon: Icons.height_rounded,
-      controller: _heightController,
-      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-      inputFormatters: <TextInputFormatter>[
-        FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d?$')),
-      ],
-      validator: (String? value) {
-        final String text = value?.trim() ?? '';
-        if (text.isEmpty) return 'Please enter height';
-        final double? parsed = double.tryParse(text);
-        if (parsed == null) return 'Enter a valid height';
-        if (parsed < 30 || parsed > 250) {
-          return 'Height should be between 30 and 250 cm';
-        }
-        return null;
-      },
-    );
-  }
-
-  Widget _buildWeightField() {
-    return MemberFormTextField(
-      label: 'Weight (kg)',
-      hintText: 'e.g. 65',
-      prefixIcon: Icons.monitor_weight_outlined,
-      controller: _weightController,
-      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-      inputFormatters: <TextInputFormatter>[
-        FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d?$')),
-      ],
-      validator: (String? value) {
-        final String text = value?.trim() ?? '';
-        if (text.isEmpty) return 'Please enter weight';
-        final double? parsed = double.tryParse(text);
-        if (parsed == null) return 'Enter a valid weight';
-        if (parsed < 2 || parsed > 350) {
-          return 'Weight should be between 2 and 350 kg';
-        }
-        return null;
-      },
     );
   }
 }

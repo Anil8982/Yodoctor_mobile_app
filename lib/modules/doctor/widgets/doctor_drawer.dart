@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:yodoctor/core/profile_image/profile_image_controller.dart';
 import 'package:yodoctor/core/providers/app_role_provider.dart';
 import 'package:yodoctor/modules/widgets/logout_dialog.dart';
 
@@ -19,6 +20,9 @@ class DoctorDrawer extends ConsumerWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final String currentRoute = GoRouterState.of(context).uri.toString();
+
+    final imageState = ref.watch(profileImageController);
+
     return Drawer(
       backgroundColor: colorScheme.surface,
       surfaceTintColor: colorScheme.surfaceTint,
@@ -45,7 +49,6 @@ class DoctorDrawer extends ConsumerWidget {
                   Container(
                     width: 58,
                     height: 58,
-                    padding: const EdgeInsets.all(3),
                     decoration: BoxDecoration(
                       color: colorScheme.onPrimary.withValues(alpha: 0.18),
                       borderRadius: BorderRadius.circular(18),
@@ -55,16 +58,29 @@ class DoctorDrawer extends ConsumerWidget {
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(15),
-                      child: Image.asset(
-                        'assets/images/doctorLogo.jpg',
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Icon(
-                            Icons.medical_services_rounded,
-                            color: colorScheme.onPrimary,
-                            size: 30,
-                          );
+                      child: imageState.when(
+                        data: (imageUrl) {
+                          if (imageUrl != null && imageUrl.isNotEmpty) {
+                            return Image.network(
+                              imageUrl,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  _buildDefaultAvatar(colorScheme),
+                            );
+                          }
+                          return _buildDefaultAvatar(colorScheme);
                         },
+                        loading: () => Center(
+                          child: SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: colorScheme.onPrimary,
+                            ),
+                          ),
+                        ),
+                        error: (_, _) => _buildDefaultAvatar(colorScheme),
                       ),
                     ),
                   ),
@@ -119,7 +135,7 @@ class DoctorDrawer extends ConsumerWidget {
                     icon: Icons.person_outline_rounded,
                     label: 'Doctor Profile',
                     selected:
-                        currentRoute.contains('profile') ||
+                    currentRoute.contains('profile') ||
                         currentRoute.contains('doctorprofilesection'),
                     onTap: () {
                       Navigator.pop(context);
@@ -135,7 +151,6 @@ class DoctorDrawer extends ConsumerWidget {
                       context.go(AppRoutes.doctorAppointments);
                     },
                   ),
-
                   _DoctorDrawerItem(
                     icon: Icons.book_online_rounded,
                     label: 'Manual Booking',
@@ -154,7 +169,6 @@ class DoctorDrawer extends ConsumerWidget {
                       context.go(AppRoutes.doctorReviews);
                     },
                   ),
-
                   _DoctorDrawerItem(
                     icon: Icons.card_membership_rounded,
                     label: 'Medical Certificates',
@@ -211,11 +225,18 @@ class DoctorDrawer extends ConsumerWidget {
     );
   }
 
-  // void _showComingSoon(BuildContext context, String message) {
-  //   ScaffoldMessenger.of(
-  //     context,
-  //   ).showSnackBar(SnackBar(content: Text(message)));
-  // }
+  // 👤 Default Fallback Icon Component
+  Widget _buildDefaultAvatar(ColorScheme colorScheme) {
+    return Container(
+      color: colorScheme.onPrimary.withValues(alpha: 0.12),
+      alignment: Alignment.center,
+      child: Icon(
+        Icons.medical_services_rounded,
+        color: colorScheme.onPrimary,
+        size: 30,
+      ),
+    );
+  }
 }
 
 class _DoctorDrawerItem extends StatelessWidget {
@@ -238,7 +259,7 @@ class _DoctorDrawerItem extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final itemColor =
         foregroundColor ??
-        (selected ? colorScheme.primary : colorScheme.onSurfaceVariant);
+            (selected ? colorScheme.primary : colorScheme.onSurfaceVariant);
 
     return Padding(
       padding: const EdgeInsets.symmetric(
@@ -255,7 +276,7 @@ class _DoctorDrawerItem extends StatelessWidget {
           label,
           style: TextStyle(
             color:
-                foregroundColor ??
+            foregroundColor ??
                 (selected ? colorScheme.primary : colorScheme.onSurface),
             fontWeight: selected ? FontWeight.w900 : FontWeight.w700,
             fontSize: 14,

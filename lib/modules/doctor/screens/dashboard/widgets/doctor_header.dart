@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../../core/profile_image/profile_image_controller.dart';
 import '../../../../../core/theme/app_theme.dart';
 import '../../../../../core/utils/app_spacing.dart';
-import '../../../../../core/widgets/gradient_background.dart';
+import '../../../../widgets/gradient_background.dart';
 
-class DoctorHeader extends StatelessWidget {
+class DoctorHeader extends ConsumerWidget {
   const DoctorHeader({
     super.key,
     required this.name,
@@ -22,10 +24,12 @@ class DoctorHeader extends StatelessWidget {
   final ValueChanged<bool> onToggleAvailable;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final topPadding = MediaQuery.of(context).padding.top;
+
+    final imageState = ref.watch(profileImageController);
 
     return GradientBackground(
       borderRadius: const BorderRadius.vertical(bottom: Radius.circular(32)),
@@ -42,33 +46,43 @@ class DoctorHeader extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // 1. Doctor Avatar/Logo Container
               Container(
                 width: 64,
                 height: 64,
-                padding: const EdgeInsets.all(2),
                 decoration: BoxDecoration(
                   color: colorScheme.onPrimary.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(18),
-                  border: Border.all(color: colorScheme.onPrimary.withValues(alpha: 0.3)),
+                  border: Border.all(
+                    color: colorScheme.onPrimary.withValues(alpha: 0.3),
+                  ),
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(16),
-                  child: Image.asset(
-                    'assets/images/doctorLogo.jpg',
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return ColoredBox(
-                        color: colorScheme.primaryContainer,
-                        child: Icon(Icons.person_rounded, size: 36, color: colorScheme.primary),
-                      );
+                  child: imageState.when(
+                    data: (imageUrl) {
+                      if (imageUrl != null && imageUrl.isNotEmpty) {
+                        return Image.network(
+                          imageUrl,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) =>
+                              _buildDefaultAvatar(colorScheme),
+                        );
+                      }
+                      return _buildDefaultAvatar(colorScheme);
                     },
+                    loading: () => const Center(
+                      child: SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    ),
+                    error: (_, _) => _buildDefaultAvatar(colorScheme),
                   ),
                 ),
               ),
               const SizedBox(width: AppSpacing.md),
 
-              // 2. Doctor Details (Name, Specialty, Experience, Rating)
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -96,13 +110,18 @@ class DoctorHeader extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
 
-                    // Stats Row: Exp & Rating with a modern glassmorphism touch
+                    // Stats Row: Exp & Rating
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
-                            color: colorScheme.onPrimary.withValues(alpha: 0.15),
+                            color: colorScheme.onPrimary.withValues(
+                              alpha: 0.15,
+                            ),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
@@ -116,15 +135,24 @@ class DoctorHeader extends StatelessWidget {
                         ),
                         const SizedBox(width: AppSpacing.xs),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
-                            color: colorScheme.onPrimary.withValues(alpha: 0.15),
+                            color: colorScheme.onPrimary.withValues(
+                              alpha: 0.15,
+                            ),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.star_rounded, size: 12, color: Colors.amber.shade400),
+                              Icon(
+                                Icons.star_rounded,
+                                size: 12,
+                                color: Colors.amber.shade400,
+                              ),
                               const SizedBox(width: 2),
                               Text(
                                 rating > 0 ? rating.toStringAsFixed(1) : 'N/A',
@@ -153,6 +181,13 @@ class DoctorHeader extends StatelessWidget {
     );
   }
 
+  Widget _buildDefaultAvatar(ColorScheme colorScheme) {
+    return ColoredBox(
+      color: colorScheme.primaryContainer,
+      child: Icon(Icons.person_rounded, size: 36, color: colorScheme.primary),
+    );
+  }
+
   Widget _buildAvailabilityPill(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
@@ -171,7 +206,9 @@ class DoctorHeader extends StatelessWidget {
         height: 32,
         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
         decoration: BoxDecoration(
-          color: isAvailable ? colorScheme.primaryContainer : colorScheme.errorContainer,
+          color: isAvailable
+              ? colorScheme.primaryContainer
+              : colorScheme.errorContainer,
           borderRadius: BorderRadius.circular(100),
           boxShadow: [
             BoxShadow(
@@ -194,7 +231,9 @@ class DoctorHeader extends StatelessWidget {
               child: AnimatedAlign(
                 duration: const Duration(milliseconds: 220),
                 curve: Curves.easeInOut,
-                alignment: isAvailable ? Alignment.centerLeft : Alignment.centerRight,
+                alignment: isAvailable
+                    ? Alignment.centerLeft
+                    : Alignment.centerRight,
                 child: AnimatedDefaultTextStyle(
                   duration: const Duration(milliseconds: 180),
                   style: theme.textTheme.labelMedium!.copyWith(
@@ -208,11 +247,12 @@ class DoctorHeader extends StatelessWidget {
               ),
             ),
 
-            // ३. ॲनिमेटेड पिल थंब
             AnimatedAlign(
               duration: const Duration(milliseconds: 220),
               curve: const Cubic(0.2, 0.8, 0.2, 1.0),
-              alignment: isAvailable ? Alignment.centerRight : Alignment.centerLeft,
+              alignment: isAvailable
+                  ? Alignment.centerRight
+                  : Alignment.centerLeft,
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
                 width: 24,
@@ -231,9 +271,13 @@ class DoctorHeader extends StatelessWidget {
                 child: Center(
                   child: AnimatedSwitcher(
                     duration: const Duration(milliseconds: 180),
-                    transitionBuilder: (Widget child, Animation<double> animation) {
-                      return ScaleTransition(scale: animation, child: child);
-                    },
+                    transitionBuilder:
+                        (Widget child, Animation<double> animation) {
+                          return ScaleTransition(
+                            scale: animation,
+                            child: child,
+                          );
+                        },
                     key: ValueKey<bool>(isAvailable),
                     child: Icon(
                       isAvailable ? Icons.check_rounded : Icons.close_rounded,
@@ -250,5 +294,4 @@ class DoctorHeader extends StatelessWidget {
       ),
     );
   }
-
 }

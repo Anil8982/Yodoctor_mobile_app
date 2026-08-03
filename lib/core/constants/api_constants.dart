@@ -135,10 +135,10 @@ class ApiConstants {
   static const manualBooking = '/doctor/manualbooking';
 
   // --- Notifications ---
-  static const String getNotifications = '/notifications';
-  static const String unreadCount = '/notifications/unread-count';
-  static const String readNotification = '/notifications/'; // :id/read
-  static const String readAllNotifications = '/notifications/read-all';
+  static const getNotifications = '/notifications';
+  static const unreadCount = '/notifications/unread-count';
+  static const readNotification = '/notifications/'; // :id/read
+  static const readAllNotifications = '/notifications/read-all';
 
   // --- Doctor Subscription & Billing ---
   static const createSubscription = '/razorpay/subscriptions/create';
@@ -147,7 +147,8 @@ class ApiConstants {
   static const allSubscriptions = '/razorpay/subscriptions';
   static const subscriptionById = '/razorpay/subscriptions'; // + /:id
   static const cancelSubscription = '/razorpay/subscriptions'; // + /:id/cancel
-  static const upgradeSubscription = '/razorpay/subscriptions'; // + /:id/upgrade
+  static const upgradeSubscription =
+      '/razorpay/subscriptions'; // + /:id/upgrade
   static const subscriptionPlans = '/razorpay/plans';
   static const planById = '/razorpay/plans'; // + /:planId
   static const billingHistory = '/razorpay/billing/history';
@@ -155,4 +156,7 @@ class ApiConstants {
   static const createPaymentOrder = '/razorpay/payments/create-order';
   static const verifyPayment = '/razorpay/payments/verify';
 
+  // --- Lab Payments (Razorpay) ---
+  static const createLabPaymentOrder = '/razorpay/lab/payments/create-order';
+  static const verifyLabPayment = '/razorpay/lab/payments/verify';
 }

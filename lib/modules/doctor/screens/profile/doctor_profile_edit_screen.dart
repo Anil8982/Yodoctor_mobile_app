@@ -48,6 +48,8 @@ class _DoctorProfileEditScreenState
 
     final profileState = ref.watch(doctorProfileProvider);
     final notifier = ref.read(doctorProfileProvider.notifier);
+    final doctor = profileState.profile;
+
 
     return Scaffold(
       key: _scaffoldKey,
@@ -60,7 +62,7 @@ class _DoctorProfileEditScreenState
               expandedHeight: 200.0,
 
               isNavBar: false,
-              background: ProfileHeaderSection(controller: notifier),
+              background: ProfileHeaderSection(doctor: doctor, isEditMode: true),
             ),
             SliverPersistentHeader(
               pinned: true,

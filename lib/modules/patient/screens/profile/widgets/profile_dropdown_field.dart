@@ -22,99 +22,97 @@ class ProfileDropdownField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final activeColor = !isEditing
+        ? colorScheme.primary
+        : colorScheme.secondary;
 
-    return Stack(
-      alignment: Alignment.centerRight,
-      children: [
-        IgnorePointer(
-          ignoring: !isEditing,
-          child: DropdownButtonFormField<String>(
-            initialValue: items.contains(value) ? value : null,
-
-            hint: Text(
-              isEditing ? 'Select ${label.toLowerCase()}' : 'Not provided',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ),
-
-            onChanged: isEditing ? onChanged : null,
-            dropdownColor: colorScheme.surface,
-            icon: const SizedBox.shrink(),
-            isExpanded: true,
-            items: items.map((String item) {
-              return DropdownMenuItem<String>(
-                value: item,
-                child: Text(
-                  item,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                    color: colorScheme.onSurface.transparency(
-                      isEditing ? 1.0 : 0.9,
-                    ),
-                  ),
-                ),
-              );
-            }).toList(),
-            decoration: InputDecoration(
-              labelText: label,
-              labelStyle: TextStyle(
-                color: !isEditing ? colorScheme.primary : colorScheme.secondary,
-                fontWeight: FontWeight.w800,
-                fontSize: 12,
-              ),
-              prefixIcon: Padding(
-                padding: const EdgeInsets.fromLTRB(2, 2, 10, 2),
-                child: Container(
-                  height: 30,
-                  width: 30,
-                  decoration: BoxDecoration(
-                    color: !isEditing
-                        ? colorScheme.primary.transparency(0.1)
-                        : colorScheme.secondary.transparency(0.1),
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Icon(
-                    icon,
-                    color: !isEditing
-                        ? colorScheme.primary
-                        : colorScheme.secondary,
-                    size: 26,
-                  ),
-                ),
-              ),
-              border: InputBorder.none,
-              enabledBorder: InputBorder.none,
-              focusedBorder: isEditing
-                  ? UnderlineInputBorder(
-                      borderSide: BorderSide(
-                        color: colorScheme.primary,
-                        width: 2,
-                      ),
-                    )
-                  : InputBorder.none,
-              contentPadding: const EdgeInsets.fromLTRB(50, 16, 30, 16),
-            ),
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
-              color: colorScheme.onSurface.transparency(isEditing ? 1.0 : 0.9),
-            ),
+    return IgnorePointer(
+      ignoring: !isEditing,
+      child: DropdownButtonFormField<String>(
+        initialValue: items.contains(value) ? value : null,
+        hint: Text(
+          isEditing ? 'Select ${label.toLowerCase()}' : 'Not provided',
+          style: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w500,
+            color: colorScheme.onSurfaceVariant.transparency(0.5),
           ),
         ),
+        onChanged: isEditing ? onChanged : null,
+        dropdownColor: colorScheme.surface,
+        icon: isEditing
+            ? Icon(
+                Icons.edit_note_rounded,
+                color: colorScheme.primary,
+                size: 22,
+              )
+            : const SizedBox.shrink(),
+        isExpanded: true,
+        items: items.map((String item) {
+          return DropdownMenuItem<String>(
+            value: item,
+            child: Text(
+              item,
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+                color: colorScheme.onSurface.transparency(
+                  isEditing ? 1.0 : 0.85,
+                ),
+              ),
+            ),
+          );
+        }).toList(),
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: TextStyle(
+            color: activeColor,
+            fontWeight: FontWeight.w800,
+            fontSize: 12,
+          ),
 
-        if (isEditing)
-          Padding(
-            padding: const EdgeInsets.only(right: 22.0),
-            child: Icon(
-              Icons.edit_note_rounded,
-              color: colorScheme.primary,
-              size: 22,
+          prefixIcon: Padding(
+            padding: const EdgeInsets.only(right: 12.0),
+            child: Container(
+              height: 38,
+              width: 38,
+              decoration: BoxDecoration(
+                color: activeColor.transparency(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, color: activeColor, size: 20),
             ),
           ),
-      ],
+          prefixIconConstraints: const BoxConstraints(
+            minWidth: 40,
+            minHeight: 40,
+          ),
+
+          isDense: true,
+          contentPadding: const EdgeInsets.symmetric(vertical: 12),
+
+          // 🟢 Clean Underline Transitions
+          border: InputBorder.none,
+          enabledBorder: isEditing
+              ? UnderlineInputBorder(
+                  borderSide: BorderSide(
+                    color: colorScheme.outlineVariant.transparency(0.6),
+                    width: 1,
+                  ),
+                )
+              : InputBorder.none,
+          focusedBorder: isEditing
+              ? UnderlineInputBorder(
+                  borderSide: BorderSide(color: colorScheme.primary, width: 2),
+                )
+              : InputBorder.none,
+        ),
+        style: TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.w700,
+          color: colorScheme.onSurface.transparency(isEditing ? 1.0 : 0.85),
+        ),
+      ),
     );
   }
 }

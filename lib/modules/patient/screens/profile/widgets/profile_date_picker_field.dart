@@ -29,82 +29,82 @@ class _ProfileDatePickerFieldState extends State<ProfileDatePickerField> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final activeColor = !widget.isEditing ? colorScheme.primary : colorScheme.secondary;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       width: double.infinity,
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(12),
       ),
       child: InkWell(
         onTap: widget.isEditing
             ? () async {
-                setState(() => _isFocused = true);
-
-                await widget.onTap?.call();
-
-                setState(() => _isFocused = false);
-              }
+          setState(() => _isFocused = true);
+          await widget.onTap?.call();
+          if (mounted) {
+            setState(() => _isFocused = false);
+          }
+        }
             : null,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10),
         child: Container(
-          padding: const EdgeInsets.fromLTRB(2, 12, 12, 12),
+          padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
             border: _isFocused
                 ? Border(
-                    bottom: BorderSide(color: colorScheme.primary, width: 2),
-                  )
-                : null,
+              bottom: BorderSide(color: colorScheme.primary, width: 2),
+            )
+                : (widget.isEditing
+                ? Border(
+              bottom: BorderSide(
+                color: colorScheme.outlineVariant.transparency(0.6),
+                width: 1,
+              ),
+            )
+                : null),
           ),
           child: Row(
             children: [
-              SizedBox(
-                width: 36,
-                height: 44,
-                child: Container(
-                  height: 30,
-                  width: 30,
-                  decoration: BoxDecoration(
-                    color: !widget.isEditing
-                        ? colorScheme.primary.transparency(0.1)
-                        : colorScheme.secondary.transparency(0.1),
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Icon(
-                    widget.icon,
-                    color: !widget.isEditing
-                        ? colorScheme.primary
-                        : colorScheme.secondary,
-                    size: 26,
-                  ),
+              Container(
+                height: 38,
+                width: 38,
+                decoration: BoxDecoration(
+                  color: activeColor.transparency(0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  widget.icon,
+                  color: activeColor,
+                  size: 20,
                 ),
               ),
 
-              const SizedBox(width: 16),
+              const SizedBox(width: 12),
 
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       widget.label,
                       style: TextStyle(
-                        color: !widget.isEditing
-                            ? colorScheme.primary
-                            : colorScheme.secondary,
+                        color: activeColor,
                         fontWeight: FontWeight.w800,
-                        fontSize: 10,
+                        fontSize: 12,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 2),
                     Text(
-                      widget.value,
+                      widget.value.trim().isEmpty ? 'Select Date' : widget.value,
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 15,
                         fontWeight: FontWeight.w700,
-                        color: colorScheme.onSurface.transparency(
-                          widget.isEditing ? 1 : .9,
+                        color: widget.value.trim().isEmpty
+                            ? colorScheme.onSurfaceVariant.transparency(0.5)
+                            : colorScheme.onSurface.transparency(
+                          widget.isEditing ? 1.0 : 0.85,
                         ),
                       ),
                     ),
@@ -114,7 +114,7 @@ class _ProfileDatePickerFieldState extends State<ProfileDatePickerField> {
 
               if (widget.isEditing)
                 Padding(
-                  padding: const EdgeInsets.only(right: 10.0),
+                  padding: const EdgeInsets.only(right: 16.0),
                   child: Icon(
                     Icons.edit_note_rounded,
                     color: colorScheme.primary,

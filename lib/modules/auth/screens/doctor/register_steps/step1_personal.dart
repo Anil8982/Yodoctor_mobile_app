@@ -1,14 +1,12 @@
-import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:yodoctor/modules/auth/controllers/doctor_register_controller.dart';
 import 'package:yodoctor/modules/auth/models/doctor_register_model.dart';
-import 'package:yodoctor/modules/auth/screens/doctor/widgets/app_dropdown_field.dart';
-import 'package:yodoctor/modules/auth/screens/doctor/widgets/app_multi_select_field.dart';
-import 'package:yodoctor/modules/auth/screens/doctor/widgets/app_text_field.dart';
-import 'package:yodoctor/modules/auth/screens/doctor/widgets/section_label.dart';
+import 'package:yodoctor/modules/widgets/app_dropdown_field.dart';
+import 'package:yodoctor/modules/widgets/app_multi_select_field.dart';
+import 'package:yodoctor/modules/widgets/app_text_field.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/widgets/step_card.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/widgets/step_title.dart';
 
@@ -112,15 +110,12 @@ class _Step1PersonalState extends ConsumerState<Step1Personal> {
     widget.data.confirmPassword = _confirmCtrl.text;
   }
 
-  bool _validateLanguages() => widget.data.languages.isNotEmpty;
-
   Future<void> _handleNext() async {
     setState(() => _submittedOnce = true);
 
     final isFormValid = _formKey.currentState?.validate() ?? false;
-    final isLangValid = _validateLanguages();
 
-    if (!isFormValid || !isLangValid) return;
+    if (!isFormValid) return;
 
     _save();
 
@@ -150,9 +145,6 @@ class _Step1PersonalState extends ConsumerState<Step1Personal> {
     final textTheme = Theme.of(context).textTheme;
     final registerState = ref.watch(doctorRegisterControllerProvider);
 
-    final isLangInvalid = _submittedOnce && widget.data.languages.isEmpty;
-    final isBioInvalid = _submittedOnce && (_wordCount < 30 || _wordCount > 100);
-
     return Form(
       key: _formKey,
       autovalidateMode: _submittedOnce
@@ -170,7 +162,8 @@ class _Step1PersonalState extends ConsumerState<Step1Personal> {
 
           // Full Name
           AppTextField(
-            label: 'Full Name *',
+            label: 'Full Name',
+            isRequired: true,
             hint: 'Enter your full name',
             icon: Icons.person_outline_rounded,
             controller: _nameCtrl,
@@ -185,7 +178,8 @@ class _Step1PersonalState extends ConsumerState<Step1Personal> {
 
           // Email Address
           AppTextField(
-            label: 'Email Address *',
+            label: 'Email Address',
+            isRequired: true,
             hint: 'Enter your email address',
             icon: Icons.alternate_email_rounded,
             controller: _emailCtrl,
@@ -205,7 +199,8 @@ class _Step1PersonalState extends ConsumerState<Step1Personal> {
 
           // Mobile Number
           AppTextField(
-            label: 'Mobile Number *',
+            label: 'Mobile Number',
+            isRequired: true,
             hint: 'Enter 10-digit mobile number',
             icon: Icons.phone_android_rounded,
             controller: _mobileCtrl,
@@ -213,8 +208,11 @@ class _Step1PersonalState extends ConsumerState<Step1Personal> {
             maxLength: 10,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             validator: (v) {
-              if (v == null || v.isEmpty) return 'Mobile required';
-              if (v.length != 10) return 'Enter a valid 10-digit number';
+              if (v == null || v.trim().isEmpty) return 'Mobile required';
+              final indianPhoneRegExp = RegExp(r'^[6-9]\d{9}$');
+              if (!indianPhoneRegExp.hasMatch(v.trim())) {
+                return 'Enter a valid 10-digit mobile number';
+              }
               return null;
             },
           ),
@@ -222,7 +220,8 @@ class _Step1PersonalState extends ConsumerState<Step1Personal> {
 
           // Gender Selection
           AppDropdownField(
-            label: 'Gender *',
+            label: 'Gender',
+            isRequired: true,
             hint: 'Select gender',
             icon: Icons.wc_rounded,
             value: _gender,
@@ -234,7 +233,8 @@ class _Step1PersonalState extends ConsumerState<Step1Personal> {
 
           // Password
           AppTextField(
-            label: 'Password *',
+            label: 'Password',
+            isRequired: true,
             hint: 'Create password',
             icon: Icons.lock_outline_rounded,
             controller: _passCtrl,
@@ -249,7 +249,8 @@ class _Step1PersonalState extends ConsumerState<Step1Personal> {
 
           // Confirm Password
           AppTextField(
-            label: 'Confirm Password *',
+            label: 'Confirm Password',
+            isRequired: true,
             hint: 'Re-enter password',
             icon: Icons.lock_reset_rounded,
             controller: _confirmCtrl,
@@ -260,9 +261,9 @@ class _Step1PersonalState extends ConsumerState<Step1Personal> {
               return null;
             },
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
 
-          // 🎯 SEPARATE REUSABLE MULTI-SELECT COMPONENT
+          // Languages Spoken
           AppMultiSelectField(
             label: 'Languages Spoken',
             isRequired: true,
@@ -270,64 +271,26 @@ class _Step1PersonalState extends ConsumerState<Step1Personal> {
             icon: Icons.translate_rounded,
             selectedItems: widget.data.languages,
             options: _langs,
-            isInvalid: isLangInvalid,
-            errorText: 'Select at least one language',
+            validator: (list) {
+              if (list == null || list.isEmpty) {
+                return 'Select at least one language';
+              }
+              return null;
+            },
             onChanged: (updatedList) {
               setState(() {});
             },
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
 
           // Professional Bio
-          const SectionLabel(label: 'Professional Bio', isRequired: true),
-          const SizedBox(height: 10),
-          TextFormField(
+          AppTextField(
+            label: 'Professional Bio',
+            isRequired: true,
+            hint: 'Write a brief summary about your expertise and background...',
+            icon: Icons.notes_rounded,
             controller: _bioCtrl,
             maxLines: 4,
-            style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface),
-            decoration: InputDecoration(
-              hintText:
-              'Write a brief summary about your expertise and background...',
-              hintStyle: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant.transparency(0.7),
-              ),
-              prefixIcon: Padding(
-                padding: const EdgeInsets.only(bottom: 50),
-                child: Icon(
-                  Icons.notes_rounded,
-                  color: colorScheme.primary,
-                  size: 20,
-                ),
-              ),
-              filled: true,
-              fillColor: colorScheme.surfaceContainerLow,
-              contentPadding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide: BorderSide.none,
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide: BorderSide(
-                  color: isBioInvalid
-                      ? colorScheme.error
-                      : colorScheme.outlineVariant.transparency(0.5),
-                  width: isBioInvalid ? 1.4 : 1.2,
-                ),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide: BorderSide(
-                  color: colorScheme.primary,
-                  width: 1.8,
-                ),
-              ),
-              errorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide: BorderSide(color: colorScheme.error, width: 1.4),
-              ),
-            ),
             validator: (_) {
               if (_wordCount < 30) return 'Minimum 30 words required';
               if (_wordCount > 100) return 'Maximum 100 words allowed';

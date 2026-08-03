@@ -43,45 +43,50 @@ class ProfileTextField extends StatelessWidget {
             fontSize: 12,
           ),
           errorStyle: const TextStyle(fontSize: 12, color: Colors.red),
+
           prefixIcon: Padding(
-            padding: const EdgeInsets.fromLTRB(2, 2, 10, 2),
+            padding: const EdgeInsets.only(right: 12.0),
             child: Container(
-              height: 30,
-              width: 30,
+              height: 38,
+              width: 38,
               decoration: BoxDecoration(
                 color: !isEditing
                     ? colorScheme.primary.transparency(0.1)
                     : colorScheme.secondary.transparency(0.1),
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
                 icon,
                 color: !isEditing ? colorScheme.primary : colorScheme.secondary,
-                size: 22,
+                size: 20,
               ),
             ),
+          ),
+          prefixIconConstraints: const BoxConstraints(
+            minWidth: 40,
+            minHeight: 40,
           ),
 
           suffixIcon: isEditing
               ? Padding(
-                  padding: const EdgeInsets.only(right: 16.0),
-                  child: Icon(
-                    Icons.edit_note_rounded,
-                    color: colorScheme.primary,
-                    size: 22,
-                  ),
-                )
+            padding: const EdgeInsets.only(right: 16.0),
+            child: Icon(
+              Icons.edit_note_rounded,
+              color: colorScheme.primary,
+              size: 22,
+            ),
+          )
               : null,
 
           border: InputBorder.none,
           enabledBorder: InputBorder.none,
           focusedBorder: isEditing
               ? UnderlineInputBorder(
-                  borderSide: BorderSide(color: colorScheme.primary, width: 2),
-                )
+            borderSide: BorderSide(color: colorScheme.primary, width: 2),
+          )
               : InputBorder.none,
 
-          contentPadding: const EdgeInsets.fromLTRB(50, 16, 30, 16),
+          contentPadding: const EdgeInsets.symmetric(vertical: 12),
         ),
         style: TextStyle(
           fontSize: 16,

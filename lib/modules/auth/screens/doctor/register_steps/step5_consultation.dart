@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:yodoctor/modules/auth/controllers/doctor_register_controller.dart';
 import 'package:yodoctor/modules/auth/models/doctor_register_model.dart';
-import 'package:yodoctor/modules/auth/screens/doctor/widgets/app_text_field.dart';
+import 'package:yodoctor/modules/widgets/app_text_field.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/widgets/section_label.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/widgets/step_card.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/widgets/step_title.dart';

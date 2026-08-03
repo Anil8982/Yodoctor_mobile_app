@@ -1,6 +1,9 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 
+import 'app_field_wrapper.dart';
+import 'app_input_style.dart';
+
 class AppSearchSelectField extends StatelessWidget {
   final String label;
   final bool isRequired;
@@ -10,22 +13,33 @@ class AppSearchSelectField extends StatelessWidget {
   final List<String> items;
   final bool isInvalid;
   final String? errorText;
-  final ValueChanged<String> onChanged;
+  final ValueChanged<String?> onChanged;
+  final String? Function(String?)? validator;
+  final AutovalidateMode? autovalidateMode;
+  final bool enabled;
 
   const AppSearchSelectField({
     super.key,
     required this.label,
     this.isRequired = false,
-    required this.hint,
+    this.hint = 'Select item...',
     required this.icon,
     required this.value,
     required this.items,
     this.isInvalid = false,
     this.errorText,
     required this.onChanged,
+    this.validator,
+    this.autovalidateMode,
+    this.enabled = true,
   });
 
-  void _openSearchPicker(BuildContext context) {
+  void _openSearchPicker(
+      BuildContext context,
+      FormFieldState<String> state,
+      ) {
+    if (!enabled) return;
+
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
@@ -43,7 +57,6 @@ class AppSearchSelectField extends StatelessWidget {
         String searchQuery = '';
         return StatefulBuilder(
           builder: (context, setModalState) {
-            // Search query filter:
             final filteredItems = items
                 .where((item) =>
                 item.toLowerCase().contains(searchQuery.toLowerCase()))
@@ -155,6 +168,7 @@ class AppSearchSelectField extends StatelessWidget {
                           )
                               : null,
                           onTap: () {
+                            state.didChange(item);
                             onChanged(item);
                             Navigator.pop(context);
                           },
@@ -176,92 +190,50 @@ class AppSearchSelectField extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        RichText(
-          text: TextSpan(
-            text: label,
-            style: textTheme.labelMedium?.copyWith(
-              fontWeight: FontWeight.w700,
-              color: colorScheme.onSurface,
-            ),
-            children: [
-              if (isRequired)
-                TextSpan(
-                  text: ' *',
-                  style: textTheme.labelMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: colorScheme.error,
-                  ),
-                ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 8),
-        InkWell(
-          onTap: () => _openSearchPicker(context),
-          borderRadius: BorderRadius.circular(14),
-          child: Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 14,
-              vertical: 14,
-            ),
-            decoration: BoxDecoration(
-              color: colorScheme.surfaceContainerLow,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: isInvalid
-                    ? colorScheme.error
-                    : colorScheme.outlineVariant.transparency(0.5),
-                width: isInvalid ? 1.4 : 1.2,
-              ),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  icon,
-                  color: isInvalid ? colorScheme.error : colorScheme.primary,
-                  size: 20,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    (value == null || value!.isEmpty) ? hint : value!,
-                    style: textTheme.bodyMedium?.copyWith(
-                      fontWeight: (value == null || value!.isEmpty)
-                          ? FontWeight.normal
-                          : FontWeight.w600,
-                      color: (value == null || value!.isEmpty)
-                          ? colorScheme.onSurfaceVariant.transparency(0.7)
-                          : colorScheme.onSurface,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Icon(
-                  Icons.search_rounded, // Search icon for better UX
+    return FormField<String>(
+      initialValue: value,
+      autovalidateMode: autovalidateMode,
+      validator: validator,
+      builder: (state) {
+        final activeError =
+        isInvalid ? (errorText ?? 'Selection required') : state.errorText;
+        final hasError = activeError != null && activeError.isNotEmpty;
+
+        return AppFieldWrapper(
+          label: label,
+          isRequired: isRequired,
+          enabled: enabled,
+          hasError: hasError,
+          activeError: activeError,
+          child: InkWell(
+            onTap: () => _openSearchPicker(context, state),
+            borderRadius: BorderRadius.circular(14),
+            child: InputDecorator(
+              decoration: AppInputStyle.decoration(
+                context: context,
+                hint: hint,
+                icon: icon,
+                hasError: hasError,
+                suffixIcon: Icon(
+                  Icons.search_rounded,
                   color: colorScheme.onSurfaceVariant,
                   size: 20,
                 ),
-              ],
-            ),
-          ),
-        ),
-        if (isInvalid && errorText != null)
-          Padding(
-            padding: const EdgeInsets.only(top: 6, left: 12),
-            child: Text(
-              errorText!,
-              style: textTheme.labelSmall?.copyWith(
-                color: colorScheme.error,
-                fontWeight: FontWeight.w600,
+              ),
+              isEmpty: value == null || value!.isEmpty,
+              child: Text(
+                value ?? '',
+                style: textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurface,
+                  fontWeight: FontWeight.w500,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ),
-      ],
+        );
+      },
     );
   }
 }

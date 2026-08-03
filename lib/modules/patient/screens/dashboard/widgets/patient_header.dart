@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../core/utils/app_spacing.dart';
-import '../../../../../core/widgets/gradient_background.dart';
+import '../../../../widgets/gradient_background.dart';
 import '../../../models/dashboard/dashboard_model.dart';
 
 class PatientHeader extends StatelessWidget {

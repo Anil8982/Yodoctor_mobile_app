@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../../core/utils/app_spacing.dart';
-import '../../../../../core/widgets/app_search_field.dart';
-import '../../../../../core/widgets/gradient_background.dart';
+import '../../../../widgets/app_search_field.dart';
+import '../../../../widgets/gradient_background.dart';
 
 class HeroSection extends StatelessWidget {
   const HeroSection({

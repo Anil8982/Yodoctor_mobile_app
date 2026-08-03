@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
 import '../../../../../../core/utils/app_spacing.dart';
-import '../../../../../../core/widgets/gradient_background.dart';
+import '../../../../widgets/gradient_background.dart';
 
 class DoctorsManagementHeader extends StatelessWidget {
   const DoctorsManagementHeader({super.key});

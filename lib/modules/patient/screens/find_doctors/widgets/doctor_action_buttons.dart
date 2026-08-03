@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../core/utils/app_spacing.dart';
-import '../../../../../core/widgets/app_button.dart';
+import '../../../../widgets/app_button.dart';
 
 class DoctorActionButtons extends StatelessWidget {
   const DoctorActionButtons({

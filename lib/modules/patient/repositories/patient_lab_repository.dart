@@ -44,16 +44,15 @@ class PatientLabRepository {
 
   Future<Response> createLabPaymentOrder(int bookingId) {
     return _dio.post(
-      '/razorpay/lab/payments/create-order',
+      ApiConstants.createLabPaymentOrder,
       data: {"booking_id": bookingId},
     );
   }
 
   Future<Response> verifyLabPayment(Map<String, dynamic> body) {
     return _dio.post(
-      '/razorpay/lab/payments/verify',
+      ApiConstants.verifyLabPayment,
       data: body,
     );
   }
-
 }
