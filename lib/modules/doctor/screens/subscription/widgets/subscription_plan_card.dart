@@ -7,11 +7,7 @@ class SubscriptionPlanCard extends StatelessWidget {
   final SubscriptionPlan? plan; // Nullable to handle inactive state
   final VoidCallback? onUpgradePressed; // Required when plan is inactive
 
-  const SubscriptionPlanCard({
-    super.key,
-    this.plan,
-    this.onUpgradePressed,
-  });
+  const SubscriptionPlanCard({super.key, this.plan, this.onUpgradePressed});
 
   @override
   Widget build(BuildContext context) {
@@ -20,10 +16,18 @@ class SubscriptionPlanCard extends StatelessWidget {
 
     // Dynamic colors & content based on active/inactive state
     final List<Color> gradientColors = hasActivePlan
-        ? [const Color(0xFF1A52CD), const Color(0xFF0EA791)] // Active Blue/Green
-        : [const Color(0xFFE65100), const Color(0xFFF57C00)]; // Inactive Amber/Orange
+        ? [
+            const Color(0xFF1A52CD),
+            const Color(0xFF0EA791),
+          ] // Active Blue/Green
+        : [
+            const Color(0xFFE65100),
+            const Color(0xFFF57C00),
+          ]; // Inactive Amber/Orange
 
-    final shadowColor = hasActivePlan ? const Color(0xFF1A52CD) : const Color(0xFFF57C00);
+    final shadowColor = hasActivePlan
+        ? const Color(0xFF1A52CD)
+        : const Color(0xFFF57C00);
 
     return Container(
       width: double.infinity,
@@ -208,19 +212,24 @@ class SubscriptionPlanCard extends StatelessWidget {
   }
 
   // 2. INACTIVE PLAN CONTENT
-  Widget _buildInactiveContent(TextTheme textTheme, VoidCallback? onUpgradePressed) {
+  Widget _buildInactiveContent(
+    TextTheme textTheme,
+    VoidCallback? onUpgradePressed,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              'SUBSCRIPTION STATUS',
-              style: textTheme.labelMedium?.copyWith(
-                color: Colors.white.transparency(0.75),
-                fontWeight: FontWeight.w800,
-                letterSpacing: 1.5,
+            Expanded(
+              child: Text(
+                'SUBSCRIPTION STATUS',
+                style: textTheme.labelMedium?.copyWith(
+                  color: Colors.white.transparency(0.75),
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.5,
+                ),
               ),
             ),
             Container(
@@ -288,10 +297,7 @@ class SubscriptionPlanCard extends StatelessWidget {
             icon: const Icon(Icons.bolt_rounded, size: 20),
             label: const Text(
               'Explore Plans & Activate',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-              ),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
             ),
           ),
         ),

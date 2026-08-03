@@ -170,17 +170,17 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   colorScheme,
                   'Upcoming Appointments',
                 ),
-                const SizedBox(height: AppSpacing.sm),
-                AppointmentFilterChips(
-                  filters: PatientDashboardController.availableFilters,
-                  selectedFilter: controller.selectedFilter,
-                  onFilterSelected: (filter) {
-                    HapticFeedback.selectionClick();
-                    ref
-                        .read(patientDashboardControllerProvider.notifier)
-                        .setFilter(filter);
-                  },
-                ),
+                // const SizedBox(height: AppSpacing.sm),
+                // AppointmentFilterChips(
+                //   filters: PatientDashboardController.availableFilters,
+                //   selectedFilter: controller.selectedFilter,
+                //   onFilterSelected: (filter) {
+                //     HapticFeedback.selectionClick();
+                //     ref
+                //         .read(patientDashboardControllerProvider.notifier)
+                //         .setFilter(filter);
+                //   },
+                // ),
                 const SizedBox(height: AppSpacing.md),
                 if (loading)
                   LinearProgressIndicator(
@@ -214,21 +214,21 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             ),
           ),
         ),
-        TextButton.icon(
-          onPressed: () {},
-          icon: Text(
-            'View All',
-            style: TextStyle(
-              color: colorScheme.primary,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          label: Icon(
-            Icons.arrow_forward_rounded,
-            size: 16,
-            color: colorScheme.primary,
-          ),
-        ),
+        // TextButton.icon(
+        //   onPressed: () {},
+        //   icon: Text(
+        //     'View All',
+        //     style: TextStyle(
+        //       color: colorScheme.primary,
+        //       fontWeight: FontWeight.w700,
+        //     ),
+        //   ),
+        //   label: Icon(
+        //     Icons.arrow_forward_rounded,
+        //     size: 16,
+        //     color: colorScheme.primary,
+        //   ),
+        // ),
       ],
     );
   }

@@ -4,10 +4,7 @@ import 'package:yodoctor/modules/doctor/models/certificate/doctor_document_model
 import 'package:yodoctor/modules/widgets/document_viewer_screen.dart';
 
 class DocumentPreviewTile extends StatelessWidget {
-  const DocumentPreviewTile({
-    super.key,
-    required this.document,
-  });
+  const DocumentPreviewTile({super.key, required this.document});
 
   final DoctorDocumentModel document;
 
@@ -71,15 +68,19 @@ class DocumentPreviewTile extends StatelessWidget {
                 const SizedBox(height: 2),
                 Row(
                   children: [
-                    Text(
-                      document.isPdf
-                          ? 'PDF Document'
-                          : document.isImage
-                          ? 'Image File'
-                          : 'Document',
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
-                        fontWeight: FontWeight.w600,
+                    Flexible(
+                      child: Text(
+                        document.isPdf
+                            ? 'PDF Document'
+                            : document.isImage
+                            ? 'Image File'
+                            : 'Document',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant.withValues(
+                            alpha: 0.7,
+                          ),
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                     if (document.createdAt != null) ...[
@@ -88,16 +89,22 @@ class DocumentPreviewTile extends StatelessWidget {
                         width: 3,
                         height: 3,
                         decoration: BoxDecoration(
-                          color: colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
+                          color: colorScheme.onSurfaceVariant.withValues(
+                            alpha: 0.3,
+                          ),
                           shape: BoxShape.circle,
                         ),
                       ),
                       const SizedBox(width: 8),
-                      Text(
-                        document.formattedDate,
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
-                          fontWeight: FontWeight.w600,
+                      Flexible(
+                        child: Text(
+                          document.formattedDate,
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: colorScheme.onSurfaceVariant.withValues(
+                              alpha: 0.7,
+                            ),
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ],
