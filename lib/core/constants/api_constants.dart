@@ -126,7 +126,7 @@ class ApiConstants {
 
   // --- Doctor QR ---
   static const getDoctorQr = '/doctor/my-qr';
-  static const downloadDoctorQr = '/download-qr';
+  static const downloadDoctorQr = '/doctor/download-qr';
 
   // --- Doctor Reviews ---
   static const doctorReviews = '/doctor/reviews';

@@ -24,6 +24,26 @@ class ApiInterceptor extends Interceptor {
     handler.next(options);
   }
 
+  // @override
+  // void onResponse(Response response, ResponseInterceptorHandler handler) {
+  //   AppLogger.success(
+  //     '✅ ${response.statusCode} ${response.requestOptions.path}',
+  //     tag: LogTags.api,
+  //     subTag: _subTag,
+  //   );
+  //
+  //   // ✅ Print Map OR List responses
+  //   if (response.data != null) {
+  //     AppLogger.json(
+  //       response.data,
+  //       tag: LogTags.api,
+  //       subTag: _subTag,
+  //     );
+  //   }
+  //
+  //   handler.next(response);
+  // }
+
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
     AppLogger.success(
@@ -32,13 +52,24 @@ class ApiInterceptor extends Interceptor {
       subTag: _subTag,
     );
 
-    // ✅ Print Map OR List responses
     if (response.data != null) {
-      AppLogger.json(
-        response.data,
-        tag: LogTags.api,
-        subTag: _subTag,
-      );
+      if (response.requestOptions.responseType == ResponseType.bytes) {
+        final size = response.data is List<int>
+            ? (response.data as List<int>).length
+            : 0;
+
+        AppLogger.info(
+          '📥 File Download ($size bytes)',
+          tag: LogTags.api,
+          subTag: _subTag,
+        );
+      } else {
+        AppLogger.json(
+          response.data,
+          tag: LogTags.api,
+          subTag: _subTag,
+        );
+      }
     }
 
     handler.next(response);

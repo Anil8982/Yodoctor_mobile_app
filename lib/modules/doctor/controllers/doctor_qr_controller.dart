@@ -1,8 +1,9 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:file_saver/file_saver.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
 import '../models/qr/doctor_qr_model.dart';
@@ -10,26 +11,35 @@ import '../repositories/doctor_qr_repository.dart';
 
 class DoctorQrState {
   final bool loading;
+  final bool downloadLoading;
   final DoctorQrModel? qr;
   final String? errorMessage;
+  final String? downloadError;
 
   const DoctorQrState({
     this.loading = false,
+    this.downloadLoading = false,
     this.qr,
     this.errorMessage,
+    this.downloadError,
   });
 
   DoctorQrState copyWith({
     bool? loading,
+    bool? downloadLoading,
     DoctorQrModel? qr,
     bool clearQr = false,
     String? errorMessage,
     bool clearError = false,
+    String? downloadError,
+    bool clearDownloadError = false,
   }) {
     return DoctorQrState(
       loading: loading ?? this.loading,
+      downloadLoading: downloadLoading ?? this.downloadLoading,
       qr: clearQr ? null : (qr ?? this.qr),
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
+      downloadError: clearDownloadError ? null : (downloadError ?? this.downloadError),
     );
   }
 }
@@ -81,12 +91,22 @@ class DoctorQrNotifier extends Notifier<DoctorQrState> {
 
   Future<bool> downloadQr() async {
     if (state.qr == null) return false;
-    state = state.copyWith(clearError: true);
 
-    AppLogger.info('Triggering QR PDF compilation stream pipeline...', tag: LogTags.doctor, subTag: _subTag);
+    // ✅ Set download loading state
+    state = state.copyWith(
+      downloadLoading: true,
+      clearDownloadError: true,
+    );
+
+    AppLogger.info(
+      'Triggering QR PDF download...',
+      tag: LogTags.doctor,
+      subTag: _subTag,
+    );
 
     try {
       final repository = ref.read(doctorQrRepositoryProvider);
+
       final response = await repository.downloadQr(
         doctorName: state.qr!.doctorName,
         specialization: state.qr!.specialization,
@@ -96,24 +116,73 @@ class DoctorQrNotifier extends Notifier<DoctorQrState> {
       final statusCode = response.statusCode ?? 0;
 
       if (statusCode >= 200 && statusCode < 300) {
-        final dir = await getTemporaryDirectory();
-        final file = File("${dir.path}/doctor_qr.pdf");
+        final tempDir = await getTemporaryDirectory();
 
-        await file.writeAsBytes(response.data);
+        final tempFile = File(
+          '${tempDir.path}/doctor_qr_${DateTime.now().millisecondsSinceEpoch}.pdf',
+        );
 
-        AppLogger.success('QR PDF buffer compiled and saved successfully at: ${file.path}', tag: LogTags.doctor, subTag: _subTag);
-        await OpenFilex.open(file.path);
+        await tempFile.writeAsBytes(
+          Uint8List.fromList(response.data as List<int>),
+        );
+
+        AppLogger.info(
+          'QR PDF saved to temporary location',
+          tag: LogTags.doctor,
+          subTag: _subTag,
+        );
+
+        // Save file using file_saver
+        await FileSaver.instance.saveAs(
+          name: 'doctor_qr',
+          file: tempFile,
+          fileExtension: 'pdf',
+          mimeType: MimeType.pdf,
+        );
+
+        AppLogger.success(
+          'QR PDF saved successfully.',
+          tag: LogTags.doctor,
+          subTag: _subTag,
+        );
+
+        // ✅ Reset download loading state
+        state = state.copyWith(downloadLoading: false);
 
         return true;
-      } else {
-        final serverMsg = response.data?["message"] ?? "Download rejected by gateway infrastructure";
-        state = state.copyWith(errorMessage: serverMsg);
-        AppLogger.warning('QR PDF transmission download rejected. Status: $statusCode, Message: $serverMsg', tag: LogTags.doctor, subTag: _subTag);
-        return false;
       }
+
+      final serverMsg =
+          response.data?["message"] ?? "Download rejected by server";
+
+      // ✅ Reset download loading state with error
+      state = state.copyWith(
+        downloadLoading: false,
+        downloadError: serverMsg,
+      );
+
+      AppLogger.warning(
+        'QR download failed. Status: $statusCode',
+        tag: LogTags.doctor,
+        subTag: _subTag,
+      );
+
+      return false;
     } catch (e, st) {
-      state = state.copyWith(errorMessage: "Failed to compile and download QR document");
-      AppLogger.exception(e, st, message: 'QR document local generation cluster crash', tag: LogTags.doctor, subTag: _subTag);
+      // ✅ Reset download loading state with error
+      state = state.copyWith(
+        downloadLoading: false,
+        downloadError: "Failed to download QR PDF",
+      );
+
+      AppLogger.exception(
+        e,
+        st,
+        message: 'QR download failed',
+        tag: LogTags.doctor,
+        subTag: _subTag,
+      );
+
       return false;
     }
   }

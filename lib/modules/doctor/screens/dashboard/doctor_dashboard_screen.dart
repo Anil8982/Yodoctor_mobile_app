@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
+import '../../../widgets/app_snack_bar.dart';
 import 'widgets/doctor_dashboard_shimmer.dart';
 import 'widgets/doctor_header.dart';
 import 'widgets/dashboard_cards.dart';
@@ -51,7 +52,6 @@ class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
     }
 
     // Get doctor data from profile provider or use dummy for first load
-    // Assuming you have a profile provider - adjust accordingly
     final doctorName = hasData
         ? dashboardAsync.value!.doctor.doctorName
         : 'Dr. ';
@@ -218,10 +218,9 @@ class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
                   ),
                   foregroundColor: colorScheme.error,
                   onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Emergency cancellations initiated'),
-                      ),
+                    AppSnackBar.show(
+                      message: 'Emergency cancellations initiated',
+                      type: AppSnackBarType.warning,
                     );
                   },
                 ),
@@ -237,10 +236,9 @@ class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
                   ),
                   foregroundColor: colorScheme.secondary,
                   onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Reviews list panel coming soon'),
-                      ),
+                    AppSnackBar.show(
+                      message: 'Reviews list panel coming soon',
+                      type: AppSnackBarType.info,
                     );
                   },
                 ),
@@ -339,10 +337,9 @@ class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
                   ),
                   foregroundColor: colorScheme.error,
                   onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Emergency cancellations initiated'),
-                      ),
+                    AppSnackBar.show(
+                      message: 'Emergency cancellations initiated',
+                      type: AppSnackBarType.warning,
                     );
                   },
                 ),

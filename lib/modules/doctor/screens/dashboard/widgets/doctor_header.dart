@@ -192,7 +192,7 @@ class DoctorHeader extends ConsumerWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    final activeColor = colorScheme.primary;
+    final activeColor = colorScheme.secondary;
     final inactiveColor = colorScheme.error;
     final fgColor = isAvailable ? activeColor : inactiveColor;
     final textLabel = isAvailable ? 'Live' : 'Busy';
@@ -207,7 +207,7 @@ class DoctorHeader extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
         decoration: BoxDecoration(
           color: isAvailable
-              ? colorScheme.primaryContainer
+              ? colorScheme.secondaryContainer
               : colorScheme.errorContainer,
           borderRadius: BorderRadius.circular(100),
           boxShadow: [

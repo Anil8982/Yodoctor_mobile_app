@@ -8,6 +8,7 @@ import 'firebase_options.dart';
 import 'core/providers/app_role_provider.dart';
 import 'core/routes/app_router.dart';
 import 'core/theme/app_theme.dart';
+import 'modules/widgets/app_snack_bar.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,6 +41,7 @@ class YoDoctorApp extends ConsumerWidget {
     final goRouter = ref.watch(routerProvider);
 
     return MaterialApp.router(
+      scaffoldMessengerKey: appScaffoldMessengerKey,
       title: 'YoDoctor',
       debugShowCheckedModeBanner: false,
       routerConfig: goRouter,
