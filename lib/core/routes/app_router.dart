@@ -410,9 +410,14 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         parentNavigatorKey: AppRouter.rootNavigatorKey,
-        path: AppRoutes.labTestDetails,
-        builder: (context, state) => const LabTestDetailsScreen(),
+        path: '${AppRoutes.labTestDetails}/:testId',
+        name: 'labTestDetails',
+        builder: (context, state) {
+          final testId = int.parse(state.pathParameters['testId']!);
+          return LabTestDetailsScreen(testId: testId);
+        },
       ),
+
       GoRoute(
         parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.labCart,

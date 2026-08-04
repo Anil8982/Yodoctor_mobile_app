@@ -1,33 +1,126 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:yodoctor/modules/patient/models/lab/lab_test_model.dart';
-import 'package:yodoctor/modules/patient/controllers/lab_test_controller.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
+import 'package:yodoctor/modules/patient/controllers/lab_test_controller.dart';
+import 'package:yodoctor/modules/patient/models/lab/lab_test_model.dart';
 import 'package:yodoctor/modules/widgets/app_header.dart';
+import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
+import 'widgets/lab_shimmer.dart';
 
-class LabTestDetailsScreen extends ConsumerWidget {
-  const LabTestDetailsScreen({super.key});
+class LabTestDetailsScreen extends ConsumerStatefulWidget {
+  final int testId;
+  const LabTestDetailsScreen({super.key, required this.testId});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<LabTestDetailsScreen> createState() =>
+      _LabTestDetailsScreenState();
+}
+
+class _LabTestDetailsScreenState extends ConsumerState<LabTestDetailsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(labProvider.notifier).loadTestDetails(widget.testId);
+    });
+  }
+
+  void _handleCartToggle(LabPackage labPackage, bool isInCart) {
+    ref.read(labProvider.notifier).toggleCartItem(labPackage);
+    setState(() {});
+
+    if (isInCart) {
+      AppSnackBar.show(
+        message: '${labPackage.title} removed from cart',
+        type: AppSnackBarType.info,
+      );
+    } else {
+      AppSnackBar.show(
+        message: '${labPackage.title} added to cart',
+        type: AppSnackBarType.success,
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
     final state = ref.watch(labProvider);
+    final isLoading = state.isLoading;
 
-    if (state.isLoading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    if (isLoading) {
+      return Scaffold(
+        backgroundColor: theme.scaffoldBackgroundColor,
+        appBar: const AppHeader(title: 'Loading...'),
+        body: const SingleChildScrollView(
+          physics: AlwaysScrollableScrollPhysics(
+            parent: ClampingScrollPhysics(),
+          ),
+          padding: EdgeInsets.all(16),
+          child: LabTestDetailsShimmer(),
+        ),
+      );
     }
 
     final test = state.selectedTest;
 
     if (test == null) {
-      return const Scaffold(body: Center(child: Text("Test not found")));
+      return Scaffold(
+        appBar: const AppHeader(title: 'Test Details'),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.error_outline_rounded,
+                size: 48,
+                color: colorScheme.error,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                state.errorMessage ?? "Test not found",
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  ref
+                      .read(labProvider.notifier)
+                      .loadTestDetails(widget.testId);
+                },
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
+        ),
+      );
     }
 
     final cartItems = state.cart;
     final isInCart = cartItems.any((item) => item.id == test.id);
+
+    final labPackage = LabPackage(
+      id: test.id,
+      title: test.name,
+      subtitle: test.tagline,
+      originalPrice: test.price,
+      currentPrice: test.offerPrice,
+      discountPercentage: (((test.price - test.offerPrice) / test.price) * 100)
+          .round(),
+      parametersCount: test.includes.length,
+      reportDuration: test.reportTime,
+      homeSampleAvailable: true,
+      categoryId: test.categoryId,
+      type: test.type,
+      tier: test.tier,
+      image: test.image,
+    );
+
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppHeader(title: test.name),
@@ -35,7 +128,9 @@ class LabTestDetailsScreen extends ConsumerWidget {
         children: [
           Expanded(
             child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
+              physics: const AlwaysScrollableScrollPhysics(
+                parent: ClampingScrollPhysics(),
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -69,10 +164,9 @@ class LabTestDetailsScreen extends ConsumerWidget {
                             ),
                             child: Text(
                               test.type == 'fullbody' ? 'Package' : 'Essential',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
-                                color: colorScheme.onPrimaryContainer,
                               ),
                             ),
                           ),
@@ -80,7 +174,6 @@ class LabTestDetailsScreen extends ConsumerWidget {
                       ],
                     ),
                   ),
-
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Card(
@@ -137,7 +230,6 @@ class LabTestDetailsScreen extends ConsumerWidget {
                               ),
                             ),
                             const SizedBox(height: 16),
-
                             Wrap(
                               spacing: 8,
                               runSpacing: 8,
@@ -162,7 +254,6 @@ class LabTestDetailsScreen extends ConsumerWidget {
                               height: 1,
                             ),
                             const SizedBox(height: 16),
-
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.baseline,
                               textBaseline: TextBaseline.alphabetic,
@@ -171,9 +262,9 @@ class LabTestDetailsScreen extends ConsumerWidget {
                                   '₹${test.offerPrice.toInt()}',
                                   style: theme.textTheme.headlineMedium
                                       ?.copyWith(
-                                        fontWeight: FontWeight.w900,
-                                        color: colorScheme.primary,
-                                      ),
+                                    fontWeight: FontWeight.w900,
+                                    color: colorScheme.primary,
+                                  ),
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
@@ -199,7 +290,6 @@ class LabTestDetailsScreen extends ConsumerWidget {
                       ),
                     ),
                   ),
-
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
                     child: Wrap(
@@ -224,7 +314,6 @@ class LabTestDetailsScreen extends ConsumerWidget {
                       ],
                     ),
                   ),
-
                   Padding(
                     padding: const EdgeInsets.all(20),
                     child: Column(
@@ -240,18 +329,15 @@ class LabTestDetailsScreen extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const SizedBox(height: 20),
-
                             Text(
                               "Includes",
                               style: theme.textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-
                             const SizedBox(height: 10),
-
                             ...test.includes.map(
-                              (e) => ListTile(
+                                  (e) => ListTile(
                                 dense: true,
                                 leading: const Icon(
                                   Icons.check_circle,
@@ -277,7 +363,6 @@ class LabTestDetailsScreen extends ConsumerWidget {
               ),
             ),
           ),
-
           Container(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
             decoration: BoxDecoration(
@@ -299,27 +384,7 @@ class LabTestDetailsScreen extends ConsumerWidget {
                   child: SizedBox(
                     height: 48,
                     child: OutlinedButton.icon(
-                      onPressed: () {
-                        ref
-                            .read(labProvider.notifier)
-                            .toggleCartItem(
-                              LabPackage(
-                                id: test.id,
-                                title: test.name,
-                                subtitle: test.tagline,
-                                originalPrice: test.price,
-                                currentPrice: test.offerPrice,
-                                discountPercentage: 0,
-                                parametersCount: test.includes.length,
-                                reportDuration: test.reportTime,
-                                homeSampleAvailable: true,
-                                categoryId: test.categoryId,
-                                type: test.type,
-                                tier: test.tier,
-                                image: test.image,
-                              ),
-                            );
-                      },
+                      onPressed: () => _handleCartToggle(labPackage, isInCart),
                       style: OutlinedButton.styleFrom(
                         side: BorderSide(
                           color: isInCart
@@ -356,6 +421,9 @@ class LabTestDetailsScreen extends ConsumerWidget {
                     height: 48,
                     child: ElevatedButton(
                       onPressed: () {
+                        if (!isInCart) {
+                          _handleCartToggle(labPackage, isInCart);
+                        }
                         context.push(AppRoutes.labSlotBooking);
                       },
                       style: ElevatedButton.styleFrom(
@@ -365,9 +433,11 @@ class LabTestDetailsScreen extends ConsumerWidget {
                           borderRadius: BorderRadius.circular(16),
                         ),
                       ),
-                      child: const Text(
-                        'Book Now',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                      child: Text(
+                        isInCart ? 'Book Now' : 'Add & Book',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
@@ -406,10 +476,10 @@ class LabTestDetailsScreen extends ConsumerWidget {
   }
 
   Widget _buildVerificationPill(
-    BuildContext context,
-    IconData icon,
-    String text,
-  ) {
+      BuildContext context,
+      IconData icon,
+      String text,
+      ) {
     final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
