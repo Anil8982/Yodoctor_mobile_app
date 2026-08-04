@@ -10,6 +10,7 @@ import 'package:yodoctor/modules/auth/models/doctor_register_model.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/widgets/info_box.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/widgets/step_card.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/widgets/step_title.dart';
+import 'package:yodoctor/modules/widgets/app_snack_bar.dart'; // 👈 AppSnackBar Import
 
 import '../widgets/nav_buttons.dart';
 
@@ -98,21 +99,12 @@ class _Step6DocumentsState extends ConsumerState<Step6Documents> {
   }
 
   Future<void> _handleNext() async {
-    final colorScheme = Theme.of(context).colorScheme;
-
     if (widget.data.profileFile == null ||
         widget.data.certificateFile == null ||
         widget.data.idProofFile == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text(
-            "Please upload all required documents (Profile, Certificate & ID Proof)",
-            style: TextStyle(fontWeight: FontWeight.w600),
-          ),
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          backgroundColor: colorScheme.error,
-        ),
+      AppSnackBar.show(
+        message: 'Please upload all required documents (Profile, Certificate & ID Proof)',
+        type: AppSnackBarType.warning,
       );
       return;
     }
@@ -124,15 +116,16 @@ class _Step6DocumentsState extends ConsumerState<Step6Documents> {
     if (!mounted) return;
 
     if (success) {
+      AppSnackBar.show(
+        message: 'Documents uploaded successfully!',
+        type: AppSnackBarType.success,
+      );
       widget.onNext();
     } else {
       final errorMsg = ref.read(doctorRegisterControllerProvider).errorMessage;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(errorMsg ?? "Step 6 document upload failed. Try again."),
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: colorScheme.error,
-        ),
+      AppSnackBar.show(
+        message: errorMsg ?? "Step 6 document upload failed. Try again.",
+        type: AppSnackBarType.error,
       );
     }
   }

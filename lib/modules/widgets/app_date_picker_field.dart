@@ -142,7 +142,7 @@ class _AppDatePickerFieldState extends State<AppDatePickerField> {
                 icon: widget.icon,
                 hasError: hasError,
                 suffixIcon: Icon(
-                  Icons.calendar_month_rounded,
+                  Icons.arrow_drop_down_outlined,
                   color: colorScheme.onSurfaceVariant,
                   size: 22,
                 ),

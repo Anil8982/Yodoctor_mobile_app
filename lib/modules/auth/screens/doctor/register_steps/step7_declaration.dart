@@ -6,6 +6,7 @@ import 'package:yodoctor/modules/auth/controllers/doctor_register_controller.dar
 import 'package:yodoctor/modules/auth/models/doctor_register_model.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/widgets/step_card.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/widgets/step_title.dart';
+import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 
 class Step7Declaration extends ConsumerStatefulWidget {
   final DoctorFormData data;
@@ -82,6 +83,25 @@ class _Step7DeclarationState extends ConsumerState<Step7Declaration> {
           widget.data.declDisplay &&
           widget.data.declPrivacy &&
           widget.data.declTerms;
+
+  Future<void> _handleSubmit() async {
+    if (!_allChecked) {
+      AppSnackBar.show(
+        message: 'Please accept all declarations to proceed',
+        type: AppSnackBarType.warning,
+      );
+      return;
+    }
+
+    try {
+      await widget.onSubmit();
+    } catch (e) {
+      AppSnackBar.show(
+        message: 'Submission failed. Please try again.',
+        type: AppSnackBarType.error,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -175,18 +195,42 @@ class _Step7DeclarationState extends ConsumerState<Step7Declaration> {
           );
         }),
 
+        if (!_allChecked) ...[
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: BoxDecoration(
+              color: colorScheme.error.transparency(0.06),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: colorScheme.error.transparency(0.2),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.info_outline_rounded, color: colorScheme.error, size: 18),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'Please accept all 4 declarations above to submit your application',
+                    style: textTheme.bodySmall?.copyWith(
+                      color: colorScheme.error,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+
         const SizedBox(height: 20),
 
-        // Action Buttons
         SizedBox(
           width: double.infinity,
           height: 54,
           child: FilledButton(
-            onPressed: (_allChecked && !isSubmitting)
-                ? () async {
-              await widget.onSubmit();
-            }
-                : null,
+            onPressed: (_allChecked && !isSubmitting) ? _handleSubmit : null,
             style: FilledButton.styleFrom(
               backgroundColor: _allChecked
                   ? colorScheme.primary
@@ -242,35 +286,6 @@ class _Step7DeclarationState extends ConsumerState<Step7Declaration> {
             ),
           ),
         ),
-
-        if (!_allChecked) ...[
-          const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-            decoration: BoxDecoration(
-              color: colorScheme.error.transparency(0.06),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: colorScheme.error.transparency(0.2),
-              ),
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.info_outline_rounded, color: colorScheme.error, size: 18),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    'Please accept all 4 declarations above to submit your application',
-                    style: textTheme.bodySmall?.copyWith(
-                      color: colorScheme.error,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
       ],
     );
   }

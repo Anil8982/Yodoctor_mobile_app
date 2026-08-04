@@ -1,14 +1,14 @@
-import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:yodoctor/modules/auth/controllers/doctor_register_controller.dart';
 import 'package:yodoctor/modules/auth/models/doctor_register_model.dart';
+import 'package:yodoctor/modules/widgets/app_date_picker_field.dart';
 import 'package:yodoctor/modules/widgets/app_dropdown_field.dart';
+import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 import 'package:yodoctor/modules/widgets/app_text_field.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/widgets/info_box.dart';
-import 'package:yodoctor/modules/auth/screens/doctor/widgets/section_label.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/widgets/step_card.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/widgets/step_title.dart';
 
@@ -71,15 +71,10 @@ class _Step2ProfessionalState extends ConsumerState<Step2Professional> {
   Future<void> _handleNext() async {
     setState(() => _submittedOnce = true);
 
-    if (!_formKey.currentState!.validate()) return;
-
-    if (widget.data.validTill == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Please select registration validity date'),
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: Theme.of(context).colorScheme.error,
-        ),
+    if (!_formKey.currentState!.validate()) {
+      AppSnackBar.show(
+        message: 'Please resolve the highlighted errors',
+        type: AppSnackBarType.warning,
       );
       return;
     }
@@ -93,15 +88,16 @@ class _Step2ProfessionalState extends ConsumerState<Step2Professional> {
     if (!mounted) return;
 
     if (success) {
+      AppSnackBar.show(
+        message: 'Professional details saved successfully!',
+        type: AppSnackBarType.success,
+      );
       widget.onNext();
     } else {
       final errorMsg = ref.read(doctorRegisterControllerProvider).errorMessage;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(errorMsg ?? "Step 2 registration failed. Try again."),
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: Theme.of(context).colorScheme.error,
-        ),
+      AppSnackBar.show(
+        message: errorMsg ?? "Step 2 registration failed. Try again.",
+        type: AppSnackBarType.error,
       );
     }
   }
@@ -109,7 +105,6 @@ class _Step2ProfessionalState extends ConsumerState<Step2Professional> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
     final registerState = ref.watch(doctorRegisterControllerProvider);
 
     return Form(
@@ -127,9 +122,10 @@ class _Step2ProfessionalState extends ConsumerState<Step2Professional> {
           ),
           const SizedBox(height: 24),
 
-          // Primary Qualification
+          // Primary Qualification Dropdown
           AppDropdownField(
-            label: 'Primary Qualification *',
+            label: 'Primary Qualification',
+            isRequired: true,
             hint: 'Select primary qualification',
             icon: Icons.menu_book_outlined,
             value: _qualification,
@@ -148,9 +144,10 @@ class _Step2ProfessionalState extends ConsumerState<Step2Professional> {
           ),
           const SizedBox(height: 16),
 
-          // Specialization
+          // Specialization Field
           AppTextField(
-            label: 'Specialization *',
+            label: 'Specialization',
+            isRequired: true,
             hint: 'Enter your primary specialization',
             icon: Icons.local_hospital_outlined,
             controller: _specCtrl,
@@ -159,9 +156,10 @@ class _Step2ProfessionalState extends ConsumerState<Step2Professional> {
           ),
           const SizedBox(height: 16),
 
-          // Years of Experience
+          // Years of Experience Field
           AppTextField(
-            label: 'Years of Experience *',
+            label: 'Years of Experience',
+            isRequired: true,
             hint: 'Enter total years of practice',
             icon: Icons.workspace_premium_outlined,
             controller: _expCtrl,
@@ -176,25 +174,28 @@ class _Step2ProfessionalState extends ConsumerState<Step2Professional> {
           ),
           const SizedBox(height: 16),
 
-          // Medical Council Reg Number
+          // Medical Council Registration Number Field
           AppTextField(
             label: 'Medical Council Reg. Number',
             isRequired: true,
             hint: 'e.g., MMC/2018/12345 or MCI-12345',
             icon: Icons.badge_outlined,
             controller: _regCtrl,
-            maxLength: 25, // Maximum limit
+            maxLength: 25,
             textCapitalization: TextCapitalization.characters,
             inputFormatters: [
-              UpperCaseTextFormatter(),
-              // (A-Z, 0-9, /, - allowed)
+              TextInputFormatter.withFunction(
+                    (oldValue, newValue) => TextEditingValue(
+                  text: newValue.text.toUpperCase(),
+                  selection: newValue.selection,
+                ),
+              ),
               FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9/-]')),
             ],
             validator: (v) {
               if (v == null || v.trim().isEmpty) {
                 return 'Registration number required';
               }
-
               final cleaned = v.trim();
               if (cleaned.length < 4) {
                 return 'Registration number too short';
@@ -202,96 +203,40 @@ class _Step2ProfessionalState extends ConsumerState<Step2Professional> {
               if (cleaned.length > 25) {
                 return 'Registration number cannot exceed 25 characters';
               }
-
               return null;
             },
           ),
-
           const SizedBox(height: 16),
 
-          // Registering State Council
+          // Registering State Council Field
           AppTextField(
-            label: 'Registering State Council *',
+            label: 'Registering State Council',
+            isRequired: true,
             hint: 'Enter state medical council name',
             icon: Icons.account_balance_outlined,
             controller: _councilCtrl,
             validator: (v) =>
             (v == null || v.trim().isEmpty) ? 'State council required' : null,
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
 
-          // Registration Validity Date
-          const SectionLabel(label: 'Registration Valid Till', isRequired: true),
-          const SizedBox(height: 10),
-          GestureDetector(
-            onTap: () async {
-              final picked = await showDatePicker(
-                context: context,
-                initialDate: widget.data.validTill ??
-                    DateTime.now().add(const Duration(days: 365)),
-                firstDate: DateTime.now(),
-                lastDate: DateTime(2045),
-                builder: (ctx, child) => Theme(
-                  data: Theme.of(ctx).copyWith(
-                    colorScheme: Theme.of(ctx).colorScheme.copyWith(
-                      primary: colorScheme.primary,
-                    ),
-                  ),
-                  child: child!,
-                ),
-              );
-              if (picked != null) {
-                setState(() => widget.data.validTill = picked);
-              }
+          AppDatePickerField(
+            label: 'Registration Valid Till',
+            isRequired: true,
+            hint: 'Select expiry date',
+            icon: Icons.calendar_today_rounded,
+            value: widget.data.validTill,
+            firstDate: DateTime.now(),
+            lastDate: DateTime(2045),
+            onChanged: (date) {
+              setState(() => widget.data.validTill = date);
             },
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-              decoration: BoxDecoration(
-                color: colorScheme.surfaceContainerLow,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(
-                  color: (_submittedOnce && widget.data.validTill == null)
-                      ? colorScheme.error
-                      : colorScheme.outlineVariant.transparency(0.5),
-                  width: (_submittedOnce && widget.data.validTill == null) ? 1.4 : 1.2,
-                ),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.calendar_today_rounded,
-                    color: colorScheme.primary,
-                    size: 20,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      widget.data.validTill != null
-                          ? '${widget.data.validTill!.day.toString().padLeft(2, '0')}/${widget.data.validTill!.month.toString().padLeft(2, '0')}/${widget.data.validTill!.year}'
-                          : 'Select expiry date',
-                      style: textTheme.bodyMedium?.copyWith(
-                        color: widget.data.validTill != null
-                            ? colorScheme.onSurface
-                            : colorScheme.onSurfaceVariant.transparency(0.7),
-                      ),
-                    ),
-                  ),
-                  Icon(
-                    Icons.arrow_drop_down_rounded,
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 6, left: 4),
-            child: Text(
-              'Date must be in the future',
-              style: textTheme.labelSmall?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ),
+            validator: (date) {
+              if (date == null) {
+                return 'Registration validity date required';
+              }
+              return null;
+            },
           ),
           const SizedBox(height: 20),
 
@@ -309,20 +254,6 @@ class _Step2ProfessionalState extends ConsumerState<Step2Professional> {
           ),
         ],
       ),
-    );
-  }
-}
-
-
-class UpperCaseTextFormatter extends TextInputFormatter {
-  @override
-  TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue,
-      TextEditingValue newValue,
-      ) {
-    return TextEditingValue(
-      text: newValue.text.toUpperCase(),
-      selection: newValue.selection,
     );
   }
 }

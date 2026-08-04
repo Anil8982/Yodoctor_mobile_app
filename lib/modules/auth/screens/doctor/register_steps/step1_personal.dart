@@ -6,6 +6,7 @@ import 'package:yodoctor/modules/auth/controllers/doctor_register_controller.dar
 import 'package:yodoctor/modules/auth/models/doctor_register_model.dart';
 import 'package:yodoctor/modules/widgets/app_dropdown_field.dart';
 import 'package:yodoctor/modules/widgets/app_multi_select_field.dart';
+import 'package:yodoctor/modules/widgets/app_snack_bar.dart'; // 👈 AppSnackBar Import
 import 'package:yodoctor/modules/widgets/app_text_field.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/widgets/step_card.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/widgets/step_title.dart';
@@ -115,7 +116,13 @@ class _Step1PersonalState extends ConsumerState<Step1Personal> {
 
     final isFormValid = _formKey.currentState?.validate() ?? false;
 
-    if (!isFormValid) return;
+    if (!isFormValid) {
+      AppSnackBar.show(
+        message: 'Please resolve the highlighted errors',
+        type: AppSnackBarType.warning,
+      );
+      return;
+    }
 
     _save();
 
@@ -126,15 +133,16 @@ class _Step1PersonalState extends ConsumerState<Step1Personal> {
     if (!mounted) return;
 
     if (success) {
+      AppSnackBar.show(
+        message: 'Personal information saved successfully!',
+        type: AppSnackBarType.success,
+      );
       widget.onNext();
     } else {
       final errorMsg = ref.read(doctorRegisterControllerProvider).errorMessage;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(errorMsg ?? "Registration failed. Please try again."),
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: Theme.of(context).colorScheme.error,
-        ),
+      AppSnackBar.show(
+        message: errorMsg ?? "Registration failed. Please try again.",
+        type: AppSnackBarType.error,
       );
     }
   }

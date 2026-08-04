@@ -100,7 +100,7 @@ class AppTheme {
         elevation: 0,
         scrolledUnderElevation: 0,
         backgroundColor: colorScheme.primary,
-        foregroundColor: Colors.white,
+        foregroundColor: colorScheme.onPrimary,
         centerTitle: false,
         // flexibleSpace: _appBarGradient(gradient),
       ),

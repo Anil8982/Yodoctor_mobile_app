@@ -94,7 +94,7 @@ class _AppTimePickerFieldState extends State<AppTimePickerField> {
                 icon: widget.icon,
                 hasError: hasError,
                 suffixIcon: Icon(
-                  Icons.access_time_rounded,
+                  Icons.arrow_drop_down_outlined,
                   color: colorScheme.onSurfaceVariant,
                   size: 22,
                 ),

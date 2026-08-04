@@ -6,8 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/modules/auth/controllers/doctor_register_controller.dart';
 import 'package:yodoctor/modules/auth/models/doctor_register_model.dart';
 import 'package:yodoctor/modules/widgets/app_search_select_field.dart';
+import 'package:yodoctor/modules/widgets/app_snack_bar.dart'; // 👈 AppSnackBar Import
 import 'package:yodoctor/modules/widgets/app_text_field.dart';
-import 'package:yodoctor/modules/auth/screens/doctor/widgets/section_label.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/widgets/step_card.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/widgets/step_title.dart';
 
@@ -116,7 +116,13 @@ class _Step3ClinicState extends ConsumerState<Step3Clinic> {
   Future<void> _handleNext() async {
     setState(() => _hasAttemptedSubmit = true);
 
-    if (!_formKey.currentState!.validate() || _selectedState == null) return;
+    if (!_formKey.currentState!.validate() || _selectedState == null) {
+      AppSnackBar.show(
+        message: 'Please resolve the highlighted errors',
+        type: AppSnackBarType.warning,
+      );
+      return;
+    }
 
     _save();
 
@@ -127,15 +133,16 @@ class _Step3ClinicState extends ConsumerState<Step3Clinic> {
     if (!mounted) return;
 
     if (success) {
+      AppSnackBar.show(
+        message: 'Clinic details saved successfully!',
+        type: AppSnackBarType.success,
+      );
       widget.onNext();
     } else {
       final errorMsg = ref.read(doctorRegisterControllerProvider).errorMessage;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(errorMsg ?? "Step 3 registration failed. Try again."),
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: Theme.of(context).colorScheme.error,
-        ),
+      AppSnackBar.show(
+        message: errorMsg ?? "Step 3 registration failed. Try again.",
+        type: AppSnackBarType.error,
       );
     }
   }
@@ -187,53 +194,13 @@ class _Step3ClinicState extends ConsumerState<Step3Clinic> {
           ),
           const SizedBox(height: 16),
 
-          // Full Address
-          const SectionLabel(label: 'Full Address', isRequired: true),
-          const SizedBox(height: 10),
-          TextFormField(
+          AppTextField(
+            label: 'Full Address',
+            isRequired: true,
+            hint: 'Enter street, building, area, or locality details...',
+            icon: Icons.home_outlined,
             controller: _addrCtrl,
             maxLines: 3,
-            style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface),
-            decoration: InputDecoration(
-              hintText: 'Enter street, building, area, or locality details...',
-              hintStyle: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant.transparency(0.7),
-              ),
-              prefixIcon: Padding(
-                padding: const EdgeInsets.only(bottom: 36),
-                child: Icon(
-                  Icons.home_outlined,
-                  color: colorScheme.primary,
-                  size: 20,
-                ),
-              ),
-              filled: true,
-              fillColor: colorScheme.surfaceContainerLow,
-              contentPadding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide: BorderSide.none,
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide: BorderSide(
-                  color: colorScheme.outlineVariant.transparency(0.5),
-                  width: 1.2,
-                ),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide: BorderSide(
-                  color: colorScheme.primary,
-                  width: 1.8,
-                ),
-              ),
-              errorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide: BorderSide(color: colorScheme.error, width: 1.4),
-              ),
-            ),
             validator: (v) =>
             (v == null || v.trim().isEmpty) ? 'Address required' : null,
           ),

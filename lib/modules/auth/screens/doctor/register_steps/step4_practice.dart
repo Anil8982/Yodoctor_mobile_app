@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:yodoctor/modules/auth/controllers/doctor_register_controller.dart';
 import 'package:yodoctor/modules/auth/models/doctor_register_model.dart';
+import 'package:yodoctor/modules/widgets/app_snack_bar.dart'; // 👈 AppSnackBar Import
 import 'package:yodoctor/modules/widgets/app_text_field.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/widgets/step_card.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/widgets/step_title.dart';
@@ -76,7 +77,13 @@ class _Step4PracticeState extends ConsumerState<Step4Practice> {
   Future<void> _handleNext() async {
     setState(() => _submittedOnce = true);
 
-    if (_hospRequired && !_formKey.currentState!.validate()) return;
+    if (_hospRequired && !_formKey.currentState!.validate()) {
+      AppSnackBar.show(
+        message: 'Please resolve the highlighted errors',
+        type: AppSnackBarType.warning,
+      );
+      return;
+    }
 
     widget.data.hospitalName = _hospCtrl.text.trim();
 
@@ -87,15 +94,16 @@ class _Step4PracticeState extends ConsumerState<Step4Practice> {
     if (!mounted) return;
 
     if (success) {
+      AppSnackBar.show(
+        message: 'Practice details saved successfully!',
+        type: AppSnackBarType.success,
+      );
       widget.onNext();
     } else {
       final errorMsg = ref.read(doctorRegisterControllerProvider).errorMessage;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(errorMsg ?? "Step 4 registration failed. Try again."),
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: Theme.of(context).colorScheme.error,
-        ),
+      AppSnackBar.show(
+        message: errorMsg ?? "Step 4 registration failed. Try again.",
+        type: AppSnackBarType.error,
       );
     }
   }
@@ -212,8 +220,9 @@ class _Step4PracticeState extends ConsumerState<Step4Practice> {
           // Affiliated Hospital
           AppTextField(
             label: _hospRequired
-                ? 'Affiliated Hospital/Clinic Name *'
+                ? 'Affiliated Hospital/Clinic Name'
                 : 'Affiliated Hospital/Clinic Name (Optional)',
+            isRequired: _hospRequired,
             hint: 'Enter hospital or clinic name',
             icon: Icons.apartment_outlined,
             controller: _hospCtrl,

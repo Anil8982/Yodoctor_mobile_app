@@ -17,16 +17,7 @@ class SectionLabel extends StatelessWidget {
 
     return Row(
       children: [
-        Container(
-          width: 4,
-          height: 16,
-          decoration: BoxDecoration(
-            color: colorScheme.primary,
-            borderRadius: BorderRadius.circular(4),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Text(
+       Text(
           label,
           style: textTheme.labelLarge?.copyWith(
             fontWeight: FontWeight.w700,

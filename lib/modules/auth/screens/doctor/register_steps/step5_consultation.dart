@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:yodoctor/modules/auth/controllers/doctor_register_controller.dart';
 import 'package:yodoctor/modules/auth/models/doctor_register_model.dart';
+import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 import 'package:yodoctor/modules/widgets/app_text_field.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/widgets/section_label.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/widgets/step_card.dart';
@@ -96,15 +97,18 @@ class _Step5ConsultationState extends ConsumerState<Step5Consultation> {
   Future<void> _handleNext() async {
     setState(() => _submittedOnce = true);
 
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) {
+      AppSnackBar.show(
+        message: 'Please resolve the highlighted errors',
+        type: AppSnackBarType.warning,
+      );
+      return;
+    }
 
     if (widget.data.selectedDays.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Please select at least one available day'),
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: Theme.of(context).colorScheme.error,
-        ),
+      AppSnackBar.show(
+        message: 'Please select at least one available day',
+        type: AppSnackBarType.warning,
       );
       return;
     }
@@ -118,12 +122,9 @@ class _Step5ConsultationState extends ConsumerState<Step5Consultation> {
         widget.data.eveningStart.isNotEmpty && widget.data.eveningEnd.isNotEmpty;
 
     if (!widget.data.morningEnabled && !widget.data.eveningEnabled) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Please configure at least one slot timing'),
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: Theme.of(context).colorScheme.error,
-        ),
+      AppSnackBar.show(
+        message: 'Please configure at least one slot timing',
+        type: AppSnackBarType.warning,
       );
       return;
     }
@@ -135,15 +136,16 @@ class _Step5ConsultationState extends ConsumerState<Step5Consultation> {
     if (!mounted) return;
 
     if (success) {
+      AppSnackBar.show(
+        message: 'Consultation settings saved successfully!',
+        type: AppSnackBarType.success,
+      );
       widget.onNext();
     } else {
       final errorMsg = ref.read(doctorRegisterControllerProvider).errorMessage;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(errorMsg ?? "Step 5 registration failed. Try again."),
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: Theme.of(context).colorScheme.error,
-        ),
+      AppSnackBar.show(
+        message: errorMsg ?? "Step 5 registration failed. Try again.",
+        type: AppSnackBarType.error,
       );
     }
   }
@@ -171,7 +173,8 @@ class _Step5ConsultationState extends ConsumerState<Step5Consultation> {
 
           // Consultation Fee
           AppTextField(
-            label: 'Consultation Fee (₹) *',
+            label: 'Consultation Fee (₹)',
+            isRequired: true,
             hint: 'Enter consultation fee amount',
             icon: Icons.currency_rupee_rounded,
             controller: _feeCtrl,
