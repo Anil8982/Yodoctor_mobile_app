@@ -51,13 +51,11 @@ class DoctorCertificateReviewState {
 }
 
 final doctorCertificateReviewProvider =
-    NotifierProvider<
-      DoctorCertificateReviewNotifier,
-      DoctorCertificateReviewState
-    >(DoctorCertificateReviewNotifier.new);
+NotifierProvider<DoctorCertificateReviewNotifier, DoctorCertificateReviewState>(
+  DoctorCertificateReviewNotifier.new,
+);
 
-class DoctorCertificateReviewNotifier
-    extends Notifier<DoctorCertificateReviewState> {
+class DoctorCertificateReviewNotifier extends Notifier<DoctorCertificateReviewState> {
   static const String _subTag = 'DoctorCertificateReviewNotifier';
 
   final notesController = TextEditingController();
@@ -69,6 +67,12 @@ class DoctorCertificateReviewNotifier
     if (data == null) return [];
     if (data is List) return data;
     return [];
+  }
+
+  bool _checkIsFinalized(DoctorCertificateDetailModel detail) {
+    if (detail.isFinalized) return true;
+    final status = detail.status.trim().toUpperCase();
+    return ['APPROVED', 'ISSUED', 'REJECTED', 'CANCELLED'].contains(status);
   }
 
   @override
@@ -95,11 +99,8 @@ class DoctorCertificateReviewNotifier
       final detailRes = await repository.getRequestDetails(requestId);
       final docsRes = await repository.getDocuments(requestId);
 
-      final detailOk =
-          (detailRes.statusCode ?? 0) >= 200 &&
-          (detailRes.statusCode ?? 0) < 300;
-      final docsOk =
-          (docsRes.statusCode ?? 0) >= 200 && (docsRes.statusCode ?? 0) < 300;
+      final detailOk = (detailRes.statusCode ?? 0) >= 200 && (detailRes.statusCode ?? 0) < 300;
+      final docsOk = (docsRes.statusCode ?? 0) >= 200 && (docsRes.statusCode ?? 0) < 300;
 
       if (detailOk && docsOk) {
         final detail = DoctorCertificateDetailModel.fromJson(detailRes.data);
@@ -107,19 +108,18 @@ class DoctorCertificateReviewNotifier
         final rawDocs = _parseDirectList(docsRes.data);
         final docs = rawDocs
             .map((e) {
-              try {
-                if (e is Map<String, dynamic>) {
-                  return DoctorDocumentModel.fromJson(e);
-                }
-                return null;
-              } catch (_) {
-                return null;
-              }
-            })
+          try {
+            if (e is Map<String, dynamic>) {
+              return DoctorDocumentModel.fromJson(e);
+            }
+            return null;
+          } catch (_) {
+            return null;
+          }
+        })
             .whereType<DoctorDocumentModel>()
             .toList();
 
-        // ✅ Log each document URL
         for (final doc in docs) {
           AppLogger.info(
             'Document #${doc.id}: original=${doc.fileUrl} | normalized=${doc.normalizedUrl} | full=${doc.fullUrl}',
@@ -134,14 +134,16 @@ class DoctorCertificateReviewNotifier
           subTag: _subTag,
         );
 
-        if (detail.isFinalized) {
+        final isReadOnly = _checkIsFinalized(detail);
+
+        if (isReadOnly) {
           notesController.text = detail.doctorNotes ?? '';
           state = state.copyWith(
             loading: false,
             detail: detail,
             documents: docs,
             fitnessStatus: detail.fitnessStatus ?? '',
-            validity: detail.validityDays,
+            validity: detail.validityDays > 0 ? detail.validityDays : 30,
           );
         } else {
           notesController.clear();
@@ -189,11 +191,31 @@ class DoctorCertificateReviewNotifier
 
   Future<bool> approve() async {
     if (state.detail == null || state.submitting) return false;
-    if (state.detail!.isFinalized) {
+
+    if (_checkIsFinalized(state.detail!)) {
       AppLogger.warning(
         'Cannot approve finalized certificate',
         tag: LogTags.doctor,
         subTag: _subTag,
+      );
+      return false;
+    }
+
+    // ✅ Validate fitness status before proceeding
+    final fitnessStatusLower = state.fitnessStatus.trim().toLowerCase();
+    if (fitnessStatusLower.isEmpty) {
+      state = state.copyWith(
+        submitting: false,
+        errorMessage: "Please select fitness status",
+      );
+      return false;
+    }
+
+    // ✅ Validate fitness status values
+    if (!['fit', 'unfit'].contains(fitnessStatusLower)) {
+      state = state.copyWith(
+        submitting: false,
+        errorMessage: "Invalid fitness status selected",
       );
       return false;
     }
@@ -205,7 +227,7 @@ class DoctorCertificateReviewNotifier
       final response = await repository.approve(
         id: state.detail!.id,
         doctorNotes: notesController.text.trim(),
-        fitnessStatus: state.fitnessStatus,
+        fitnessStatus: fitnessStatusLower,
         validity: state.validity,
       );
 
@@ -260,7 +282,8 @@ class DoctorCertificateReviewNotifier
 
   Future<bool> reject() async {
     if (state.detail == null || state.submitting) return false;
-    if (state.detail!.isFinalized) {
+
+    if (_checkIsFinalized(state.detail!)) {
       AppLogger.warning(
         'Cannot reject finalized certificate',
         tag: LogTags.doctor,
@@ -324,4 +347,9 @@ class DoctorCertificateReviewNotifier
     }
   }
 
+  bool isFinalized() {
+    final detail = state.detail;
+    if (detail == null) return false;
+    return _checkIsFinalized(detail);
+  }
 }
