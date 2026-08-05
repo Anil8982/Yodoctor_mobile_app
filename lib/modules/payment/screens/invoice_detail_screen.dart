@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:yodoctor/modules/doctor/models/subscription/subscription_model.dart';
 import 'package:yodoctor/modules/widgets/app_header.dart';
+import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 
 class InvoiceDetailScreen extends ConsumerStatefulWidget {
   final BillingInvoice invoice;
@@ -12,7 +13,8 @@ class InvoiceDetailScreen extends ConsumerStatefulWidget {
   const InvoiceDetailScreen({super.key, required this.invoice});
 
   @override
-  ConsumerState<InvoiceDetailScreen> createState() => _InvoiceDetailScreenState();
+  ConsumerState<InvoiceDetailScreen> createState() =>
+      _InvoiceDetailScreenState();
 }
 
 class _InvoiceDetailScreenState extends ConsumerState<InvoiceDetailScreen> {
@@ -32,13 +34,13 @@ class _InvoiceDetailScreenState extends ConsumerState<InvoiceDetailScreen> {
             onPressed: _isDownloading ? null : _downloadInvoice,
             icon: _isDownloading
                 ? SizedBox(
-              width: 18,
-              height: 18,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: Theme.of(context).colorScheme.onPrimary,
-              ),
-            )
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    ),
+                  )
                 : const Icon(Icons.download_rounded),
             tooltip: 'Download PDF',
           ),
@@ -134,11 +136,11 @@ class _InvoiceDetailScreenState extends ConsumerState<InvoiceDetailScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: isPaid ? Colors.green.transparency(0.1) : Colors.orange.transparency(0.1),
+        color: isPaid
+            ? Colors.green.transparency(0.1)
+            : Colors.orange.transparency(0.1),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: isPaid ? Colors.green : Colors.orange,
-        ),
+        border: Border.all(color: isPaid ? Colors.green : Colors.orange),
       ),
       child: Text(
         status.toUpperCase(),
@@ -165,9 +167,9 @@ class _InvoiceDetailScreenState extends ConsumerState<InvoiceDetailScreen> {
           ),
           Text(
             value,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
         ],
       ),
@@ -181,25 +183,16 @@ class _InvoiceDetailScreenState extends ConsumerState<InvoiceDetailScreen> {
       await Future.delayed(const Duration(seconds: 2));
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Invoice downloaded successfully'),
-            backgroundColor: Colors.green,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
+        AppSnackBar.show(
+          message: 'Invoice downloaded successfully',
+          type: AppSnackBarType.success,
         );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Download failed: $e'),
-            backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
-          ),
+        AppSnackBar.show(
+          message: 'Download failed: $e',
+          type: AppSnackBarType.error,
         );
       }
     } finally {

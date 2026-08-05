@@ -2,11 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
 import 'package:yodoctor/modules/doctor/controllers/doctor_profile_controller.dart';
-import 'profile_input_field.dart';
+import 'package:yodoctor/modules/widgets/app_text_field.dart';
 
 class PracticeTypeTab extends ConsumerWidget {
-  const PracticeTypeTab({super.key, required this.controller});
+  const PracticeTypeTab({
+    super.key,
+    required this.controller,
+    required this.autovalidateMode,
+  });
   final DoctorProfileNotifier controller;
+  final AutovalidateMode autovalidateMode;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -19,6 +24,7 @@ class PracticeTypeTab extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSpacing.lg),
       child: Form(
         key: controller.practiceFormKey,
+        autovalidateMode: autovalidateMode,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -157,18 +163,20 @@ class PracticeTypeTab extends ConsumerWidget {
             ),
             const SizedBox(height: AppSpacing.xl),
 
-            if (formState.selectedPracticeType == 'Hospital Affiliated') ...[
-              ProfileInputField(
-                controller: controller.hospitalNameController,
+            if (formState.selectedPracticeType == 'Hospital Affiliated' ||
+                formState.selectedPracticeType == 'Government Hospital') ...[
+              const SizedBox(height: AppSpacing.lg),
+
+              AppTextField(
                 label: 'Hospital Name',
+                isRequired: true,
                 hint: 'Enter full name of the hospital',
-                icon: Icons.corporate_fare_rounded,
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return "Hospital Name is required";
-                  }
-                  if (value.trim().length < 2) {
-                    return "Minimum 2 characters";
+                icon: Icons.apartment_outlined,
+                controller: controller.hospitalNameController,
+                textCapitalization: TextCapitalization.words,
+                validator: (v) {
+                  if (v == null || v.trim().isEmpty) {
+                    return 'Hospital name required';
                   }
                   return null;
                 },

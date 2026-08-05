@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 import '../../controllers/doctor_profile_controller.dart';
 import '../../widgets/doctor_sliver_app_bar.dart';
 import 'widgets/clinic_details_tab.dart';
@@ -24,6 +25,7 @@ class _DoctorProfileEditScreenState
     with SingleTickerProviderStateMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   late TabController _tabController;
+  bool _submittedOnce = false;
 
   @override
   void initState() {
@@ -41,6 +43,12 @@ class _DoctorProfileEditScreenState
     super.dispose();
   }
 
+  void enableValidation() {
+    setState(() {
+      _submittedOnce = true;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -49,7 +57,6 @@ class _DoctorProfileEditScreenState
     final profileState = ref.watch(doctorProfileProvider);
     final notifier = ref.read(doctorProfileProvider.notifier);
     final doctor = profileState.profile;
-
 
     return Scaffold(
       key: _scaffoldKey,
@@ -62,7 +69,10 @@ class _DoctorProfileEditScreenState
               expandedHeight: 200.0,
 
               isNavBar: false,
-              background: ProfileHeaderSection(doctor: doctor, isEditMode: true),
+              background: ProfileHeaderSection(
+                doctor: doctor,
+                isEditMode: true,
+              ),
             ),
             SliverPersistentHeader(
               pinned: true,
@@ -105,11 +115,36 @@ class _DoctorProfileEditScreenState
           child: TabBarView(
             controller: _tabController,
             children: [
-              PersonalInfoTab(controller: notifier),
-              ProfessionalInfoTab(controller: notifier),
-              ClinicDetailsTab(controller: notifier),
-              PracticeTypeTab(controller: notifier),
-              ConsultationTimingsTab(controller: notifier),
+              PersonalInfoTab(
+                controller: notifier,
+                autovalidateMode: _submittedOnce
+                    ? AutovalidateMode.onUserInteraction
+                    : AutovalidateMode.disabled,
+              ),
+              ProfessionalInfoTab(
+                controller: notifier,
+                autovalidateMode: _submittedOnce
+                    ? AutovalidateMode.onUserInteraction
+                    : AutovalidateMode.disabled,
+              ),
+              ClinicDetailsTab(
+                controller: notifier,
+                autovalidateMode: _submittedOnce
+                    ? AutovalidateMode.onUserInteraction
+                    : AutovalidateMode.disabled,
+              ),
+              PracticeTypeTab(
+                controller: notifier,
+                autovalidateMode: _submittedOnce
+                    ? AutovalidateMode.onUserInteraction
+                    : AutovalidateMode.disabled,
+              ),
+              ConsultationTimingsTab(
+                controller: notifier,
+                autovalidateMode: _submittedOnce
+                    ? AutovalidateMode.onUserInteraction
+                    : AutovalidateMode.disabled,
+              ),
               DocumentsTab(controller: notifier),
             ],
           ),
@@ -120,15 +155,15 @@ class _DoctorProfileEditScreenState
         onPressed: profileState.isLoading
             ? null
             : () async {
+                enableValidation();
                 final isValid = await notifier.validateAllTabs(_tabController);
                 if (!isValid) return;
 
                 if (!notifier.hasUnsavedChanges()) {
                   if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Profile is already up-to-date! 👌'),
-                      ),
+                    AppSnackBar.show(
+                      message: 'Profile is already up-to-date! 👌',
+                      type: AppSnackBarType.info,
                     );
                   }
                   return;
@@ -136,12 +171,9 @@ class _DoctorProfileEditScreenState
                 final success = await notifier.saveProfileChanges();
 
                 if (success && context.mounted) {
-                  final messenger = ScaffoldMessenger.of(context);
-
-                  messenger.showSnackBar(
-                    const SnackBar(
-                      content: Text('Profile updated successfully! 🚀'),
-                    ),
+                  AppSnackBar.show(
+                    message: 'Profile updated successfully! 🚀',
+                    type: AppSnackBarType.success,
                   );
 
                   context.pop();

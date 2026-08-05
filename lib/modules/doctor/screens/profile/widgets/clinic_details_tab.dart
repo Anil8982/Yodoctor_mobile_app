@@ -2,13 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
+import 'package:yodoctor/core/utils/app_field_helper.dart';
 import 'package:yodoctor/modules/doctor/controllers/doctor_profile_controller.dart';
-
-import 'profile_input_field.dart';
+import 'package:yodoctor/modules/widgets/app_search_select_field.dart';
+import 'package:yodoctor/modules/widgets/app_text_field.dart';
 
 class ClinicDetailsTab extends ConsumerWidget {
-  const ClinicDetailsTab({super.key, required this.controller});
+  const ClinicDetailsTab({
+    super.key,
+    required this.controller,
+    required this.autovalidateMode,
+  });
   final DoctorProfileNotifier controller;
+  final AutovalidateMode autovalidateMode;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -16,12 +22,13 @@ class ClinicDetailsTab extends ConsumerWidget {
     final colorScheme = theme.colorScheme;
 
     // Watch provider state reactively for dynamic field integrations
-    // final formState = ref.watch(doctorProfileProvider);
+    final formState = ref.watch(doctorProfileProvider);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.lg),
       child: Form(
         key: controller.clinicFormKey,
+        autovalidateMode: autovalidateMode,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -40,135 +47,115 @@ class ClinicDetailsTab extends ConsumerWidget {
             ),
             const SizedBox(height: AppSpacing.xl),
 
-            ProfileInputField(
-              controller: controller.clinicNameController,
+            AppTextField(
               label: 'Clinic Name',
-              hint: 'Enter clinic or hospital branch name',
-              icon: Icons.local_hospital_outlined,
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return "Enter clinic name";
-                }
-
-                if (value.trim().length < 3) {
-                  return "Clinic name is too short";
-                }
-
-                return null;
-              },
+              isRequired: true,
+              hint: 'Enter clinic or hospital name',
+              icon: Icons.business_outlined,
+              controller: controller.clinicNameController,
+              textCapitalization: TextCapitalization.words,
+              validator: (v) => (v == null || v.trim().isEmpty)
+                  ? 'Clinic name required'
+                  : null,
             ),
             const SizedBox(height: AppSpacing.lg),
 
-            ProfileInputField(
-              controller: controller.addressController,
+            AppTextField(
               label: 'Full Address',
+              isRequired: true,
               hint: 'Shop/Plot no, Building name, Street...',
-              icon: Icons.home_work_outlined,
+              icon: Icons.home_outlined,
+              controller: controller.addressController,
               maxLines: 3,
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return "Enter address";
-                }
-
-                if (value.trim().length < 10) {
-                  return "Address should be at least 10 characters";
-                }
-
-                return null;
-              },
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? 'Address required' : null,
             ),
             const SizedBox(height: AppSpacing.lg),
 
             Row(
               children: [
                 Expanded(
-                  child: ProfileInputField(
-                    controller: controller.cityController,
+                  child: AppTextField(
                     label: 'City',
+                    isRequired: true,
                     hint: 'e.g. Nashik',
                     icon: Icons.location_city_outlined,
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return "Enter city";
-                      }
-
-                      if (!RegExp(r'^[A-Za-z ]+$').hasMatch(value.trim())) {
-                        return "Only alphabets allowed";
-                      }
-
-                      return null;
-                    },
+                    controller: controller.cityController,
+                    textCapitalization: TextCapitalization.words,
+                    validator: (v) => (v == null || v.trim().isEmpty)
+                        ? 'City required'
+                        : null,
                   ),
                 ),
                 const SizedBox(width: AppSpacing.md),
                 Expanded(
-                  child: ProfileInputField(
-                    controller: controller.pincodeController,
+                  child: AppTextField(
                     label: 'Pincode',
+                    isRequired: true,
                     hint: 'e.g. 422001',
                     icon: Icons.pin_drop_outlined,
+                    controller: controller.pincodeController,
                     keyboardType: TextInputType.number,
+                    maxLength: 6,
                     inputFormatters: [
                       FilteringTextInputFormatter.digitsOnly,
                       LengthLimitingTextInputFormatter(6),
                     ],
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Pincode is required";
-                      }
-                      return null;
-                    },
+                    validator: (v) =>
+                        (v == null || v.isEmpty) ? 'Pincode required' : null,
                   ),
                 ),
               ],
             ),
             const SizedBox(height: AppSpacing.lg),
 
-            ProfileInputField(
-              controller: controller.landmarkController,
+            AppTextField(
+              isOptional: true,
               label: 'Landmark',
-              hint: 'e.g. Near City Center Mall',
-              icon: Icons.my_location_rounded,
-              validator: (value) {
-                if (value != null && value.length > 100) {
-                  return "Maximum 100 characters";
-                }
-                return null;
-              },
+              hint: 'Enter nearby landmark',
+              icon: Icons.place_outlined,
+              controller: controller.landmarkController,
             ),
             const SizedBox(height: AppSpacing.lg),
 
-            ProfileInputField(
-              controller: controller.stateController,
+            AppSearchSelectField(
               label: 'State',
-              hint: 'e.g. Madhya Pradesh',
-              icon: Icons.location_on_outlined,
+              icon: Icons.map_outlined,
+              hint: 'eg. Madhya Pradesh',
+              value: formState.selectedState.isEmpty
+                  ? null
+                  : formState.selectedState,
+              items: indianStates,
+              onChanged: (value) {
+                if (value != null) {
+                  controller.updateState(value);
+                }
+              },
               validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return "Enter state";
+                if (value == null || value.isEmpty) {
+                  return 'Select state';
                 }
+                return null;
+              },
+            ),
+            const SizedBox(height: AppSpacing.lg),
 
-                if (!RegExp(r'^[A-Za-z ]+$').hasMatch(value.trim())) {
-                  return "Only alphabets are allowed";
+            AppTextField(
+              isOptional: true,
+              label: 'Google Maps Link',
+              hint: 'Paste Google Maps location link',
+              icon: Icons.location_on_outlined,
+              controller: controller.mapsLinkController,
+              keyboardType: TextInputType.url,
+              validator: (v) {
+                if (v == null || v.trim().isEmpty) return null;
+                if (!v.startsWith('http://') && !v.startsWith('https://')) {
+                  return 'Enter valid URL starting with http:// or https://';
                 }
-
-                if (value.trim().length < 2) {
-                  return "Enter a valid state name";
-                }
-
                 return null;
               },
             ),
 
-            const SizedBox(height: AppSpacing.lg),
-
-            ProfileInputField(
-              controller: controller.mapsLinkController,
-              label: 'Google Maps Link',
-              hint: 'https://maps.google.com/?q=...',
-              icon: Icons.map_outlined,
-              keyboardType: TextInputType.url,
-            ),
             const SizedBox(height: AppSpacing.xxxl),
           ],
         ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:yodoctor/modules/widgets/app_header.dart';
+import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 import '../../../../core/utils/app_spacing.dart';
 import 'widgets/booking_header.dart';
 import 'widgets/manual_booking_form.dart';
@@ -15,6 +16,8 @@ class ManualBookingScreen extends ConsumerStatefulWidget {
 }
 
 class _ManualBookingScreenState extends ConsumerState<ManualBookingScreen> {
+  bool _submittedOnce = false;
+
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(manualBookingProvider);
@@ -40,6 +43,9 @@ class _ManualBookingScreenState extends ConsumerState<ManualBookingScreen> {
                   const SizedBox(height: AppSpacing.xxl),
                   ManualBookingForm(
                     formKey: notifier.formKey,
+                    autovalidateMode: _submittedOnce
+                        ? AutovalidateMode.onUserInteraction
+                        : AutovalidateMode.disabled,
                     patientNameController: notifier.patientNameController,
                     mobileController: notifier.mobileController,
                     ageController: notifier.ageController,
@@ -52,6 +58,9 @@ class _ManualBookingScreenState extends ConsumerState<ManualBookingScreen> {
                       }
                     },
                     onSubmit: () async {
+                      setState(() {
+                        _submittedOnce = true;
+                      });
                       if (!notifier.formKey.currentState!.validate()) {
                         return;
                       }
@@ -61,18 +70,17 @@ class _ManualBookingScreenState extends ConsumerState<ManualBookingScreen> {
                       if (!context.mounted) return;
 
                       if (success) {
-                        _showSnackBar(
-                          context,
-                          "Patient booked successfully! 🚀",
-                          isError: false,
+                        AppSnackBar.show(
+                          message: 'Patient booked successfully! 🚀',
+                          type: AppSnackBarType.success,
                         );
                       } else {
                         final currentState = ref.read(manualBookingProvider);
-                        _showSnackBar(
-                          context,
-                          currentState.errorMessage ??
+                        AppSnackBar.show(
+                          message:
+                              currentState.errorMessage ??
                               "Registration failed. Try again.",
-                          isError: true,
+                          type: AppSnackBarType.error,
                         );
                       }
                     },
@@ -82,24 +90,6 @@ class _ManualBookingScreenState extends ConsumerState<ManualBookingScreen> {
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  void _showSnackBar(
-    BuildContext context,
-    String msg, {
-    required bool isError,
-  }) {
-    final colorScheme = Theme.of(context).colorScheme;
-    ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(msg, style: const TextStyle(fontWeight: FontWeight.w700)),
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: isError ? colorScheme.error : colorScheme.primary,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        elevation: 4,
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/modules/widgets/app_header.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
+import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 import '../../controllers/incoming_appointment_controller.dart';
 import '../../../patient/models/appointment/incoming_appointment_model.dart';
 import '../incoming_appointment/widgets/incoming_appointment_filter.dart';
@@ -148,17 +149,15 @@ class _IncomingAppointmentScreenState
                                     final ok = await notifier.autoAcceptAll();
                                     if (!context.mounted) return;
                                     if (ok) {
-                                      _showSnackBar(
-                                        context,
-                                        "All appointments auto-accepted",
-                                        isError: false,
+                                      AppSnackBar.show(
+                                        message:
+                                            'All appointments auto-accepted',
+                                        type: AppSnackBarType.success,
                                       );
                                     } else {
-                                      _showSnackBar(
-                                        context,
-                                        state.errorMessage ??
-                                            "Auto-accept failed",
-                                        isError: true,
+                                      AppSnackBar.show(
+                                        message: 'Auto-accept failed',
+                                        type: AppSnackBarType.error,
                                       );
                                     }
                                   },
@@ -233,13 +232,14 @@ class _IncomingAppointmentScreenState
 
                                     if (!context.mounted) return;
 
-                                    _showSnackBar(
-                                      context,
-                                      ok
+                                    AppSnackBar.show(
+                                      message: ok
                                           ? "Appointment Accepted"
-                                          : state.errorMessage ??
-                                                "Action Failed",
-                                      isError: !ok,
+                                          : (state.errorMessage ??
+                                                "Action Failed"),
+                                      type: ok
+                                          ? AppSnackBarType.success
+                                          : AppSnackBarType.error,
                                     );
                                   },
 
@@ -250,13 +250,14 @@ class _IncomingAppointmentScreenState
 
                                     if (!context.mounted) return;
 
-                                    _showSnackBar(
-                                      context,
-                                      ok
+                                    AppSnackBar.show(
+                                      message: ok
                                           ? "Appointment Rejected"
-                                          : state.errorMessage ??
-                                                "Action Failed",
-                                      isError: !ok,
+                                          : (state.errorMessage ??
+                                                "Action Failed"),
+                                      type: ok
+                                          ? AppSnackBarType.success
+                                          : AppSnackBarType.error,
                                     );
                                   },
                                 );
@@ -267,24 +268,6 @@ class _IncomingAppointmentScreenState
                 ],
               ),
             ),
-    );
-  }
-
-  void _showSnackBar(
-    BuildContext context,
-    String msg, {
-    required bool isError,
-  }) {
-    final colorScheme = Theme.of(context).colorScheme;
-    ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(msg, style: const TextStyle(fontWeight: FontWeight.w700)),
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: isError ? colorScheme.error : colorScheme.primary,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        elevation: 4,
-      ),
     );
   }
 }

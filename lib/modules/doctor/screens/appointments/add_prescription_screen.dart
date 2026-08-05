@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
 import 'package:yodoctor/modules/widgets/app_header.dart';
+import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 import '../../../doctor/controllers/live_queue_controller.dart';
 
 class AddPrescriptionScreen extends ConsumerStatefulWidget {
@@ -64,10 +65,10 @@ class _AddPrescriptionScreenState extends ConsumerState<AddPrescriptionScreen> {
 
     if (!mounted) return;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Prescription Saved Successfully")),
+    AppSnackBar.show(
+      message: 'Prescription Saved Successfully',
+      type: AppSnackBarType.success,
     );
-
     context.pop();
   }
 
@@ -78,9 +79,7 @@ class _AddPrescriptionScreenState extends ConsumerState<AddPrescriptionScreen> {
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
-      appBar: AppHeader(
-        title: "Add Prescription",
-      ),
+      appBar: AppHeader(title: "Add Prescription"),
       body: SafeArea(
         child: Align(
           alignment: Alignment.topLeft,

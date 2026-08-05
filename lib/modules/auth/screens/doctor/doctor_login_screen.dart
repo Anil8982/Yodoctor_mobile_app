@@ -10,6 +10,7 @@ import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/auth/widgets/auth_widgets.dart';
 import 'package:yodoctor/modules/auth/widgets/top_bottom_curve_widgets.dart';
 import 'package:yodoctor/modules/auth/widgets/yo_login_text_field.dart';
+import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 import '../../controllers/doctor_login_controller.dart';
 
 class DoctorLoginScreen extends ConsumerStatefulWidget {
@@ -71,7 +72,7 @@ class _DoctorLoginScreenState extends ConsumerState<DoctorLoginScreen>
     if (result == null) {
       final loginState = ref.read(doctorLoginControllerProvider);
       final errorMsg = loginState.error?.toString() ?? "Login Failed";
-      _showErrorSnackBar(errorMsg);
+      AppSnackBar.show(message: errorMsg, type: AppSnackBarType.error);
       return;
     }
 
@@ -80,10 +81,7 @@ class _DoctorLoginScreenState extends ConsumerState<DoctorLoginScreen>
 
       switch (result["redirect"]) {
         case "resume":
-          context.go(
-            AppRoutes.doctorRegister,
-            extra: result["nextStep"],
-          );
+          context.go(AppRoutes.doctorRegister, extra: result["nextStep"]);
           break;
 
         case "waiting-approval":
@@ -95,21 +93,12 @@ class _DoctorLoginScreenState extends ConsumerState<DoctorLoginScreen>
           break;
 
         default:
-          _showErrorSnackBar("Unknown login response protocol");
+          AppSnackBar.show(
+            message: 'Unknown login response protocol',
+            type: AppSnackBarType.error,
+          );
       }
     });
-  }
-
-  void _showErrorSnackBar(String message) {
-    ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message, style: const TextStyle(fontWeight: FontWeight.w600)),
-        backgroundColor: Theme.of(context).colorScheme.error,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-    );
   }
 
   @override
@@ -139,7 +128,10 @@ class _DoctorLoginScreenState extends ConsumerState<DoctorLoginScreen>
                     Hero(
                       tag: 'docAppBar',
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 16,
+                        ),
                         child: Row(
                           children: [
                             GestureDetector(
@@ -148,7 +140,9 @@ class _DoctorLoginScreenState extends ConsumerState<DoctorLoginScreen>
                                 width: 40,
                                 height: 40,
                                 decoration: BoxDecoration(
-                                  color: colorScheme.onPrimary.transparency(0.25),
+                                  color: colorScheme.onPrimary.transparency(
+                                    0.25,
+                                  ),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Icon(
@@ -182,7 +176,9 @@ class _DoctorLoginScreenState extends ConsumerState<DoctorLoginScreen>
                             left: 24,
                             right: 24,
                             bottom: 0,
-                            child: _buildMainScrollableLoginCard(loginState.isLoading),
+                            child: _buildMainScrollableLoginCard(
+                              loginState.isLoading,
+                            ),
                           ),
 
                           Positioned(
@@ -368,11 +364,9 @@ class _DoctorLoginScreenState extends ConsumerState<DoctorLoginScreen>
                   const Spacer(),
                   TextButton(
                     onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Forgot password feature coming soon'),
-                          behavior: SnackBarBehavior.floating,
-                        ),
+                      AppSnackBar.show(
+                        message: 'Forgot password feature coming soon',
+                        type: AppSnackBarType.info,
                       );
                     },
                     style: TextButton.styleFrom(

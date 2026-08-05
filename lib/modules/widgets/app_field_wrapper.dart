@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 class AppFieldWrapper extends StatelessWidget {
   final String label;
   final bool isRequired;
+  final bool isOptional;
   final bool enabled;
   final bool hasError;
   final String? activeError;
@@ -13,6 +14,7 @@ class AppFieldWrapper extends StatelessWidget {
     super.key,
     required this.label,
     this.isRequired = false,
+    this.isOptional = false,
     this.enabled = true,
     required this.hasError,
     this.activeError,
@@ -46,6 +48,14 @@ class AppFieldWrapper extends StatelessWidget {
                     color: colorScheme.error,
                   ),
                 ),
+              if (isOptional)
+                TextSpan(
+                  text: ' (Optional)',
+                  style: textTheme.labelSmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant.withValues(alpha: 0.55),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
             ],
           ),
         ),
@@ -68,57 +78,55 @@ class AppFieldWrapper extends StatelessWidget {
                   return ScaleTransition(
                     scale: animation,
                     alignment: Alignment.centerRight,
-                    child: FadeTransition(
-                      opacity: animation,
-                      child: child,
-                    ),
+                    child: FadeTransition(opacity: animation, child: child),
                   );
                 },
-                child: hasError && activeError != null && activeError!.isNotEmpty
+                child:
+                    hasError && activeError != null && activeError!.isNotEmpty
                     ? Container(
-                  key: ValueKey<String>(activeError!),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 2.5,
-                  ),
-                  decoration: BoxDecoration(
-                    color: colorScheme.error,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: colorScheme.error.transparency(0.30),
-                        blurRadius: 6,
-                        spreadRadius: 0,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.error_rounded,
-                        size: 12,
-                        color: colorScheme.onError,
-                      ),
-                      const SizedBox(width: 4),
-                      ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 180),
-                        child: Text(
-                          activeError!,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: textTheme.labelSmall?.copyWith(
-                            color: colorScheme.onError,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 10,
-                            letterSpacing: 0.1,
-                          ),
+                        key: ValueKey<String>(activeError!),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2.5,
                         ),
-                      ),
-                    ],
-                  ),
-                )
+                        decoration: BoxDecoration(
+                          color: colorScheme.error,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: colorScheme.error.transparency(0.30),
+                              blurRadius: 6,
+                              spreadRadius: 0,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.error_rounded,
+                              size: 12,
+                              color: colorScheme.onError,
+                            ),
+                            const SizedBox(width: 4),
+                            ConstrainedBox(
+                              constraints: const BoxConstraints(maxWidth: 180),
+                              child: Text(
+                                activeError!,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: textTheme.labelSmall?.copyWith(
+                                  color: colorScheme.onError,
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 10,
+                                  letterSpacing: 0.1,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
                     : const SizedBox.shrink(key: ValueKey('empty_error')),
               ),
             ),

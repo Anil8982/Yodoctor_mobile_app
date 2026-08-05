@@ -2,6 +2,7 @@ import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/core/utils/app_field_helper.dart';
 
 import 'package:yodoctor/modules/auth/controllers/doctor_register_controller.dart';
 import 'package:yodoctor/modules/auth/models/doctor_register_model.dart';
@@ -40,45 +41,6 @@ class _Step3ClinicState extends ConsumerState<Step3Clinic> {
 
   String? _selectedState;
   bool _hasAttemptedSubmit = false;
-
-  static const List<String> _states = [
-    'Andhra Pradesh',
-    'Arunachal Pradesh',
-    'Assam',
-    'Bihar',
-    'Chhattisgarh',
-    'Goa',
-    'Gujarat',
-    'Haryana',
-    'Himachal Pradesh',
-    'Jharkhand',
-    'Karnataka',
-    'Kerala',
-    'Madhya Pradesh',
-    'Maharashtra',
-    'Manipur',
-    'Meghalaya',
-    'Mizoram',
-    'Nagaland',
-    'Odisha',
-    'Punjab',
-    'Rajasthan',
-    'Sikkim',
-    'Tamil Nadu',
-    'Telangana',
-    'Tripura',
-    'Uttar Pradesh',
-    'Uttarakhand',
-    'West Bengal',
-    'Andaman and Nicobar Islands',
-    'Chandigarh',
-    'Dadra and Nagar Haveli and Daman and Diu',
-    'Delhi',
-    'Jammu and Kashmir',
-    'Ladakh',
-    'Lakshadweep',
-    'Puducherry',
-  ];
 
   @override
   void initState() {
@@ -177,7 +139,7 @@ class _Step3ClinicState extends ConsumerState<Step3Clinic> {
             controller: _nameCtrl,
             textCapitalization: TextCapitalization.words,
             validator: (v) =>
-            (v == null || v.trim().isEmpty) ? 'Clinic name required' : null,
+                (v == null || v.trim().isEmpty) ? 'Clinic name required' : null,
           ),
           const SizedBox(height: 16),
 
@@ -190,7 +152,7 @@ class _Step3ClinicState extends ConsumerState<Step3Clinic> {
             controller: _cityCtrl,
             textCapitalization: TextCapitalization.words,
             validator: (v) =>
-            (v == null || v.trim().isEmpty) ? 'City required' : null,
+                (v == null || v.trim().isEmpty) ? 'City required' : null,
           ),
           const SizedBox(height: 16),
 
@@ -202,7 +164,7 @@ class _Step3ClinicState extends ConsumerState<Step3Clinic> {
             controller: _addrCtrl,
             maxLines: 3,
             validator: (v) =>
-            (v == null || v.trim().isEmpty) ? 'Address required' : null,
+                (v == null || v.trim().isEmpty) ? 'Address required' : null,
           ),
           const SizedBox(height: 16),
 
@@ -213,7 +175,7 @@ class _Step3ClinicState extends ConsumerState<Step3Clinic> {
             hint: 'Select or search state',
             icon: Icons.map_outlined,
             value: _selectedState,
-            items: _states,
+            items: indianStates,
             isInvalid: _selectedState == null && _hasAttemptedSubmit,
             errorText: 'Please select a state',
             onChanged: (v) => setState(() => _selectedState = v),
@@ -230,8 +192,9 @@ class _Step3ClinicState extends ConsumerState<Step3Clinic> {
             keyboardType: TextInputType.number,
             maxLength: 6,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            validator: (v) =>
-            (v == null || v.length != 6) ? 'Enter valid 6-digit pincode' : null,
+            validator: (v) => (v == null || v.length != 6)
+                ? 'Enter valid 6-digit pincode'
+                : null,
           ),
           const SizedBox(height: 16),
 

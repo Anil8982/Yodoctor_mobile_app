@@ -4,10 +4,10 @@ import 'package:flutter/services.dart';
 import 'app_field_wrapper.dart';
 import 'app_input_style.dart';
 
-
 class AppTextField extends StatefulWidget {
   final String label;
   final bool isRequired;
+  final bool isOptional;
   final String hint;
   final IconData icon;
   final TextEditingController? controller;
@@ -30,6 +30,7 @@ class AppTextField extends StatefulWidget {
     super.key,
     required this.label,
     this.isRequired = false,
+    this.isOptional = false,
     required this.hint,
     required this.icon,
     this.controller,
@@ -71,6 +72,7 @@ class _AppTextFieldState extends State<AppTextField> {
     return AppFieldWrapper(
       label: widget.label,
       isRequired: widget.isRequired,
+      isOptional: widget.isOptional,
       enabled: widget.enabled,
       hasError: hasError,
       activeError: activeError,
@@ -110,16 +112,16 @@ class _AppTextFieldState extends State<AppTextField> {
           hasError: hasError,
           suffixIcon: widget.isPassword
               ? IconButton(
-            tooltip: _obscure ? 'Show password' : 'Hide password',
-            icon: Icon(
-              _obscure
-                  ? Icons.visibility_off_rounded
-                  : Icons.visibility_rounded,
-              color: colorScheme.onSurfaceVariant,
-              size: 20,
-            ),
-            onPressed: () => setState(() => _obscure = !_obscure),
-          )
+                  tooltip: _obscure ? 'Show password' : 'Hide password',
+                  icon: Icon(
+                    _obscure
+                        ? Icons.visibility_off_rounded
+                        : Icons.visibility_rounded,
+                    color: colorScheme.onSurfaceVariant,
+                    size: 20,
+                  ),
+                  onPressed: () => setState(() => _obscure = !_obscure),
+                )
               : null,
         ),
       ),

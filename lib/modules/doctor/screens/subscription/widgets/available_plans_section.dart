@@ -2,6 +2,7 @@ import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/modules/doctor/models/subscription/available_plan_model.dart';
+import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 import '../../../controllers/subscription_controller.dart';
 import 'subscription_pricing_card.dart';
 
@@ -18,20 +19,16 @@ class AvailablePlansSection extends ConsumerWidget {
     final plan = state.selectedNewPlan;
 
     if (state.allPlans.isEmpty && !state.isLoading) {
-      Future.microtask(() => ref.read(doctorSubscriptionProvider.notifier).loadPlans());
+      Future.microtask(
+        () => ref.read(doctorSubscriptionProvider.notifier).loadPlans(),
+      );
     }
 
     ref.listen(doctorSubscriptionProvider, (previous, next) {
       if (next.errorMessage != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next.errorMessage!),
-            duration: const Duration(seconds: 5),
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
+        AppSnackBar.show(
+          message: next.errorMessage!,
+          type: AppSnackBarType.error,
         );
       }
     });
