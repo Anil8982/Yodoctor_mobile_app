@@ -12,6 +12,7 @@ class HeroSection extends StatelessWidget {
     required this.onLocationChanged,
     required this.onQueryChanged,
     required this.searchLayerLink,
+    required this.locationLayerLink,
   });
 
   final TextEditingController locationController;
@@ -20,6 +21,7 @@ class HeroSection extends StatelessWidget {
   final ValueChanged<String> onLocationChanged;
   final ValueChanged<String> onQueryChanged;
   final LayerLink searchLayerLink;
+  final LayerLink locationLayerLink;
 
   @override
   Widget build(BuildContext context) {
@@ -37,23 +39,32 @@ class HeroSection extends StatelessWidget {
       ),
       child: Column(
         children: <Widget>[
-          // Text(
-          //   'Your Doctor, Your Health',
-          //   style: theme.textTheme.headlineMedium?.copyWith(
-          //     color: colorScheme.onPrimary,
-          //     fontWeight: FontWeight.w900,
-          //   ),
-          // ),
-          // const SizedBox(height: AppSpacing.xl),
-          _buildSearchWrapper(
-            colorScheme,
-            child: AppSearchField(
-              controller: locationController,
-              hintText: 'Location',
-              onChanged: onLocationChanged,
-              prefixIcon: Icon(
-                Icons.location_on_rounded,
-                color: colorScheme.primary,
+          CompositedTransformTarget(
+            link: locationLayerLink,
+            child: _buildSearchWrapper(
+              colorScheme,
+              child: ValueListenableBuilder<TextEditingValue>(
+                valueListenable: locationController,
+                builder: (context, value, child) {
+                  return AppSearchField(
+                    controller: locationController,
+                    hintText: 'Location',
+                    onChanged: onLocationChanged,
+                    prefixIcon: Icon(
+                      Icons.location_on_rounded,
+                      color: colorScheme.primary,
+                    ),
+                    suffixIcon: value.text.isNotEmpty
+                        ? IconButton(
+                      icon: const Icon(Icons.clear_rounded, size: 20),
+                      onPressed: () {
+                        locationController.clear();
+                        onLocationChanged('');
+                      },
+                    )
+                        : null,
+                  );
+                },
               ),
             ),
           ),
@@ -65,14 +76,28 @@ class HeroSection extends StatelessWidget {
                   link: searchLayerLink,
                   child: _buildSearchWrapper(
                     colorScheme,
-                    child: AppSearchField(
-                      controller: searchController,
-                      hintText: 'Search doctors...',
-                      onChanged: onQueryChanged,
-                      prefixIcon: Icon(
-                        Icons.search_rounded,
-                        color: colorScheme.primary,
-                      ),
+                    child: ValueListenableBuilder<TextEditingValue>(
+                      valueListenable: searchController,
+                      builder: (context, value, child) {
+                        return AppSearchField(
+                          controller: searchController,
+                          hintText: 'Search doctors...',
+                          onChanged: onQueryChanged,
+                          prefixIcon: Icon(
+                            Icons.search_rounded,
+                            color: colorScheme.primary,
+                          ),
+                          suffixIcon: value.text.isNotEmpty
+                              ? IconButton(
+                            icon: const Icon(Icons.clear_rounded, size: 20),
+                            onPressed: () {
+                              searchController.clear();
+                              onQueryChanged('');
+                            },
+                          )
+                              : null,
+                        );
+                      },
                     ),
                   ),
                 ),

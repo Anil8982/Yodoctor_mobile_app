@@ -347,8 +347,9 @@ final routerProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.findDoctors,
         builder: (context, state) {
-          final query = state.uri.queryParameters['q'] ?? '';
-          return FindDoctorsScreen(initialQuery: query);
+          final search = state.uri.queryParameters['q'] ?? '';
+          final city = state.uri.queryParameters['city'] ?? '';
+          return FindDoctorsScreen(search: search, city: city);
         },
       ),
       GoRoute(

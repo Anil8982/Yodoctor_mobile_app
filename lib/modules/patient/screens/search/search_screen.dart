@@ -21,24 +21,23 @@ class SearchScreen extends ConsumerStatefulWidget {
 class _SearchScreenState extends ConsumerState<SearchScreen> {
   late final TextEditingController _locationController;
   late final TextEditingController _searchController;
-
   final LayerLink _searchLink = LayerLink();
+  final LayerLink _locationLink = LayerLink();
 
   @override
   void initState() {
     super.initState();
     final searchState = ref.read(patientSearchControllerProvider);
-    _locationController = TextEditingController(text: searchState.location);
-    _searchController = TextEditingController(text: searchState.query);
+
+    _locationController = TextEditingController(
+      text: searchState.locationQuery,
+    );
+    _searchController = TextEditingController(text: searchState.searchQuery);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (ref
-          .read(patientSearchControllerProvider)
-          .trendingSpecialties
-          .isEmpty) {
-        ref
-            .read(patientSearchControllerProvider.notifier)
-            .loadTrendingSpecialties();
+      final notifier = ref.read(patientSearchControllerProvider.notifier);
+      if (searchState.specialties.isEmpty) {
+        notifier.initialize();
       }
     });
   }
@@ -58,7 +57,27 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
     final searchState = ref.watch(patientSearchControllerProvider);
     final notifier = ref.read(patientSearchControllerProvider.notifier);
-    final hasSuggestions = searchState.doctorSuggestions.isNotEmpty;
+
+    // Sync Text Controllers gracefully
+    if (_searchController.text != searchState.searchQuery) {
+      _searchController.value = _searchController.value.copyWith(
+        text: searchState.searchQuery,
+        selection: TextSelection.collapsed(
+          offset: searchState.searchQuery.length,
+        ),
+      );
+    }
+    if (_locationController.text != searchState.locationQuery) {
+      _locationController.value = _locationController.value.copyWith(
+        text: searchState.locationQuery,
+        selection: TextSelection.collapsed(
+          offset: searchState.locationQuery.length,
+        ),
+      );
+    }
+
+    final hasSearchSuggestions = searchState.searchSuggestions.isNotEmpty;
+    final hasCitySuggestions = searchState.citySuggestions.isNotEmpty;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -86,9 +105,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                       locationController: _locationController,
                       searchController: _searchController,
                       searchLayerLink: _searchLink,
+                      locationLayerLink: _locationLink,
                       onLocationChanged: (val) => notifier.updateLocation(val),
-                      onQueryChanged: (val) => notifier.updateQuery(val),
-                      onSearchTap: () => _onSearchTap(context, searchState),
+                      onQueryChanged: (val) => notifier.updateSearch(val),
+                      onSearchTap: () => _onSearchTap(context),
                     ),
                   ),
                 ),
@@ -99,20 +119,14 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // const SizedBox(height: AppSpacing.xl),
-                  // _buildQuickActions(colorScheme),
                   const SizedBox(height: AppSpacing.xxl),
                   _buildSectionHeader(theme, 'Featured Specialties'),
                   SpecialtyCardList(
-                    specialties: searchState.trendingSpecialties,
-                    onTap: (specialtyName) async {
-                      await notifier.selectTrending(specialtyName);
-                      _searchController.text = specialtyName;
+                    specialties: searchState.specialties,
+                    onTap: (specialtyName) {
+                      notifier.selectSpecialty(specialtyName);
                       if (context.mounted) {
-                        _onSearchTap(
-                          context,
-                          ref.read(patientSearchControllerProvider),
-                        );
+                        _onSearchTap(context);
                       }
                     },
                   ),
@@ -121,7 +135,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               ),
             ),
           ),
-          if (hasSuggestions)
+          if (hasSearchSuggestions)
             Positioned(
               width:
                   MediaQuery.of(context).size.width -
@@ -144,12 +158,47 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                       ),
                     ),
                     child: SearchSuggestionsOverlay(
-                      controller: searchState,
+                      suggestions: searchState.searchSuggestions,
                       searchController: _searchController,
-                      onSearchTap: (ctx, state) => _onSearchTap(
-                        ctx,
-                        ref.read(patientSearchControllerProvider),
+                      searchQuery: searchState.searchQuery,
+                      onSelect: (suggestion) {
+                        notifier.selectSuggestion(suggestion);
+                        _onSearchTap(context);
+                      },
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          if (hasCitySuggestions)
+            Positioned(
+              width:
+                  MediaQuery.of(context).size.width -
+                  (horizontalPadding * 2) -
+                  64,
+              child: CompositedTransformFollower(
+                link: _locationLink,
+                showWhenUnlinked: false,
+                offset: const Offset(0, 56),
+                child: Material(
+                  elevation: 24,
+                  borderRadius: BorderRadius.circular(24),
+                  color: colorScheme.surface,
+                  child: Container(
+                    constraints: const BoxConstraints(maxHeight: 350),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(
+                        color: colorScheme.outlineVariant.transparency(0.4),
                       ),
+                    ),
+                    child: SearchSuggestionsOverlay(
+                      suggestions: searchState.citySuggestions,
+                      searchController: _locationController,
+                      searchQuery: searchState.locationQuery,
+                      onSelect: (suggestion) {
+                        notifier.selectCity(suggestion);
+                      },
                     ),
                   ),
                 ),
@@ -160,49 +209,32 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     );
   }
 
-  void _onSearchTap(BuildContext context, PatientSearchState state) {
-    final query = _searchController.text.trim();
-    if (query.isEmpty) {
-      context.push(AppRoutes.findDoctors);
-    } else {
-      context.push('${AppRoutes.findDoctors}?q=${Uri.encodeComponent(query)}');
+  void _onSearchTap(BuildContext context) {
+    final controller = ref.read(patientSearchControllerProvider.notifier);
+
+    final params = controller.prepareSearch();
+
+    final queryParams = <String, String>{};
+    if (params.search.trim().isNotEmpty) {
+      queryParams['q'] = params.search.trim();
     }
-  }
+    if (params.city.trim().isNotEmpty) {
+      queryParams['city'] = params.city.trim();
+    }
 
-  Widget _buildQuickActions(ColorScheme colorScheme) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        _actionItem(Icons.near_me_rounded, 'Near Me', colorScheme),
-        _actionItem(Icons.star_rounded, 'Top Rated', colorScheme),
-        _actionItem(Icons.bolt_rounded, 'Available', colorScheme),
-        _actionItem(
-          Icons.local_fire_department_rounded,
-          'Trending',
-          colorScheme,
-        ),
-      ],
-    );
-  }
+    if (queryParams.isEmpty) {
+      context.push(AppRoutes.findDoctors);
+      return;
+    }
 
-  Widget _actionItem(IconData icon, String label, ColorScheme colorScheme) {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: colorScheme.primary.transparency(0.05),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(icon, color: colorScheme.primary, size: 24),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
-        ),
-      ],
-    );
+    final queryString = queryParams.entries
+        .map(
+          (e) =>
+              '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
+        )
+        .join('&');
+
+    context.push('${AppRoutes.findDoctors}?$queryString');
   }
 
   Widget _buildSectionHeader(ThemeData theme, String title) {
