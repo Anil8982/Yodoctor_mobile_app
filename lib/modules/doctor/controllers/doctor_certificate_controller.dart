@@ -73,14 +73,7 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
     return const CertificateState();
   }
 
-  /// ✅ Safe list extractor that handles:
-  /// - Direct JSON array: [...]
-  /// - Wrapped object: {"success": true, "data": [...]}
-  /// - Empty array: []
-  /// - null / empty body
-  /// - Unexpected structures (logs warning, returns empty list)
   List<dynamic> _extractList(dynamic data) {
-    // Case 1: null or empty body
     if (data == null || data == '') {
       AppLogger.info(
         'Response data is null or empty, returning empty list',
@@ -90,7 +83,6 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
       return [];
     }
 
-    // Case 2: Direct JSON array
     if (data is List) {
       AppLogger.info(
         'Extracted direct list with ${data.length} items',
@@ -100,9 +92,7 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
       return data;
     }
 
-    // Case 3: Wrapped object with "data" field
     if (data is Map<String, dynamic>) {
-      // Check for success flag if present, but don't require it
       final hasSuccess = data.containsKey('success');
       if (hasSuccess && data['success'] != true) {
         AppLogger.warning(
@@ -130,7 +120,6 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
           );
           return [];
         }
-        // Inner data exists but isn't a List - log and try to handle
         AppLogger.warning(
           'Wrapped data is not a List: ${innerData.runtimeType}',
           tag: LogTags.doctor,
@@ -139,8 +128,6 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
         return [];
       }
 
-      // Wrapped object without "data" field - maybe it's a single item?
-      // Check if it looks like a certificate object
       if (data.containsKey('id') && data.containsKey('full_name')) {
         AppLogger.info(
           'Response is a single object, wrapping in list',
@@ -151,7 +138,6 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
       }
     }
 
-    // Case 4: Unexpected structure
     AppLogger.warning(
       'Unexpected response structure: ${data.runtimeType}',
       tag: LogTags.doctor,
@@ -160,7 +146,6 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
     return [];
   }
 
-  /// ✅ Safe parser that converts raw list to models
   List<DoctorCertificateRequestModel> _parseCertificateList(
       dynamic data,
       String endpoint,
@@ -173,7 +158,6 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
           if (item is Map<String, dynamic>) {
             return DoctorCertificateRequestModel.fromJson(item);
           }
-          // Try to convert if it's a Map-like but not typed
           final map = Map<String, dynamic>.from(item as Map);
           return DoctorCertificateRequestModel.fromJson(map);
         } catch (e) {
@@ -219,9 +203,11 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
       final response = await repository.getRequests();
       final statusCode = response.statusCode ?? 0;
 
-      // ✅ HTTP 2xx = success, regardless of response structure
       if (statusCode >= 200 && statusCode < 300) {
-        final list = _parseCertificateList(response.data, '/certificate/requests');
+        final list = _parseCertificateList(
+          response.data,
+          '/certificate/requests',
+        );
 
         AppLogger.success(
           'Pending requests fetched successfully. Count: ${list.length}',
@@ -239,7 +225,10 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
         state = state.copyWith(loading: false, errorMessage: msg);
       }
     } catch (e, st) {
-      state = state.copyWith(loading: false, errorMessage: "Failed to load requests");
+      state = state.copyWith(
+        loading: false,
+        errorMessage: "Failed to load requests",
+      );
       AppLogger.exception(
         e,
         st,
@@ -263,9 +252,11 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
       final response = await repository.getIssuedCertificates();
       final statusCode = response.statusCode ?? 0;
 
-      // ✅ HTTP 2xx = success, even with empty list
       if (statusCode >= 200 && statusCode < 300) {
-        final list = _parseCertificateList(response.data, '/certificate/issued');
+        final list = _parseCertificateList(
+          response.data,
+          '/certificate/issued',
+        );
 
         AppLogger.success(
           'Issued certificates fetched successfully. Count: ${list.length}',
@@ -283,7 +274,10 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
         state = state.copyWith(loading: false, errorMessage: msg);
       }
     } catch (e, st) {
-      state = state.copyWith(loading: false, errorMessage: "Failed to load issued certs");
+      state = state.copyWith(
+        loading: false,
+        errorMessage: "Failed to load issued certs",
+      );
       AppLogger.exception(
         e,
         st,
@@ -339,8 +333,10 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
         : state.issuedCertificates;
 
     final filtered = source.where((cert) {
+      final status = cert.status.trim().toLowerCase();
+
       final matchesStatus = state.selectedStatusFilter == "All Status" ||
-          cert.status.toLowerCase() == state.selectedStatusFilter.toLowerCase();
+          status == state.selectedStatusFilter.toLowerCase();
 
       final matchesType = state.selectedTypeFilter == "All Types" ||
           cert.certificateType.toLowerCase() ==
@@ -362,22 +358,30 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
     required String fitnessStatus,
     required int validity,
   }) async {
-    final payload = {
-      "id": id,
-      "doctorNotes": notes,
-      "fitnessStatus": fitnessStatus,
-      "validity": validity,
-    };
+    // ✅ Validate fitness status
+    final fitnessStatusLower = fitnessStatus.trim().toLowerCase();
+    if (fitnessStatusLower.isEmpty) {
+      AppLogger.warning(
+        'Fitness status is empty, cannot approve',
+        tag: LogTags.doctor,
+        subTag: _subTag,
+      );
+      return false;
+    }
+
+    if (!['fit', 'unfit'].contains(fitnessStatusLower)) {
+      AppLogger.warning(
+        'Invalid fitness status: $fitnessStatusLower',
+        tag: LogTags.doctor,
+        subTag: _subTag,
+      );
+      return false;
+    }
 
     AppLogger.info(
-      'Approving certificate ID: $id',
+      'Approving certificate ID: $id with fitness: $fitnessStatusLower',
       tag: LogTags.doctor,
       subTag: _subTag,
-    );
-    AppLogger.json(
-      payload,
-      tag: LogTags.doctor,
-      subTag: '$_subTag/ApprovePayload',
     );
 
     try {
@@ -385,14 +389,19 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
       final response = await repository.approve(
         id: id,
         doctorNotes: notes,
-        fitnessStatus: fitnessStatus,
+        fitnessStatus: fitnessStatusLower,
         validity: validity,
       );
 
       final statusCode = response.statusCode ?? 0;
 
-      // ✅ Keep existing approval response parsing (may use success flag)
-      if (statusCode >= 200 && statusCode < 300 && response.data["success"] == true) {
+      final isSuccess = statusCode >= 200 &&
+          statusCode < 300 &&
+          (response.data is! Map ||
+              response.data["success"] == null ||
+              response.data["success"] == true);
+
+      if (isSuccess) {
         AppLogger.success(
           'Certificate ID: $id approved successfully',
           tag: LogTags.doctor,
@@ -431,14 +440,20 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
       final response = await repository.reject(id);
 
       final statusCode = response.statusCode ?? 0;
-      // ✅ Keep existing rejection response parsing
-      if (statusCode >= 200 && statusCode < 300 && response.data["success"] == true) {
+
+      final isSuccess = statusCode >= 200 &&
+          statusCode < 300 &&
+          (response.data is! Map ||
+              response.data["success"] == null ||
+              response.data["success"] == true);
+
+      if (isSuccess) {
         AppLogger.success(
           'Certificate ID: $id rejected successfully',
           tag: LogTags.doctor,
           subTag: _subTag,
         );
-        await loadRequests();
+        await refresh();
         return true;
       }
       AppLogger.warning(
@@ -463,7 +478,6 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
     final previousDataExists = state.pendingCertificates.isNotEmpty ||
         state.issuedCertificates.isNotEmpty;
 
-    // ✅ If data exists, use refreshing flag (keeps UI visible)
     if (previousDataExists) {
       state = state.copyWith(refreshing: true, clearError: true);
       AppLogger.info(
@@ -485,17 +499,18 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
       final reqResponse = await repository.getRequests();
       final issuedResponse = await repository.getIssuedCertificates();
 
-      // ✅ Preserve existing data before refresh
       List<DoctorCertificateRequestModel> pendingList =
           state.pendingCertificates;
       List<DoctorCertificateRequestModel> issuedList =
           state.issuedCertificates;
 
-      // ✅ Safely parse /certificate/requests (direct array)
       if (reqResponse.statusCode != null &&
           reqResponse.statusCode! >= 200 &&
           reqResponse.statusCode! < 300) {
-        pendingList = _parseCertificateList(reqResponse.data, '/certificate/requests');
+        pendingList = _parseCertificateList(
+          reqResponse.data,
+          '/certificate/requests',
+        );
         AppLogger.info(
           'Refresh: Parsed ${pendingList.length} pending certificates',
           tag: LogTags.doctor,
@@ -509,11 +524,13 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
         );
       }
 
-      // ✅ Safely parse /certificate/issued (may be empty array or wrapped)
       if (issuedResponse.statusCode != null &&
           issuedResponse.statusCode! >= 200 &&
           issuedResponse.statusCode! < 300) {
-        issuedList = _parseCertificateList(issuedResponse.data, '/certificate/issued');
+        issuedList = _parseCertificateList(
+          issuedResponse.data,
+          '/certificate/issued',
+        );
         AppLogger.info(
           'Refresh: Parsed ${issuedList.length} issued certificates',
           tag: LogTags.doctor,

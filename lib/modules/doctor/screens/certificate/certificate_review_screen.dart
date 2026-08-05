@@ -24,7 +24,6 @@ class CertificateReviewScreen extends ConsumerStatefulWidget {
 
 class _CertificateReviewScreenState
     extends ConsumerState<CertificateReviewScreen> {
-  // ✅ ADDED: FormKey moved to UI state (fixes null crash)
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -32,7 +31,9 @@ class _CertificateReviewScreenState
     super.initState();
 
     Future.microtask(() {
-      ref.read(doctorCertificateReviewProvider.notifier).load(widget.requestId);
+      ref
+          .read(doctorCertificateReviewProvider.notifier)
+          .load(widget.requestId);
     });
   }
 
@@ -45,7 +46,8 @@ class _CertificateReviewScreenState
     final reviewState = ref.watch(doctorCertificateReviewProvider);
     final notifier = ref.read(doctorCertificateReviewProvider.notifier);
 
-    final isReadOnly = reviewState.detail?.isFinalized ?? false;
+    // ✅ FIXED STATUS CHECK: Use notifier.isFinalized() for consistency
+    final isReadOnly = notifier.isFinalized();
     final isSubmitting = reviewState.submitting;
 
     return Scaffold(
@@ -54,343 +56,427 @@ class _CertificateReviewScreenState
         title: isReadOnly ? 'Certificate Details' : 'Review Request',
       ),
       body: reviewState.loading
-          ? const CertificateReviewShimmer() // ✅ ADDED: Shimmer instead of spinner
+          ? const CertificateReviewShimmer()
           : reviewState.detail == null
           ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline_rounded,
+              size: 64,
+              color: colorScheme.error,
+            ),
+            const SizedBox(height: AppSpacing.md),
+            Text(
+              'Certificate not found',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              'The requested certificate could not be loaded',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
+      )
+          : SafeArea(
+        top: false,
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 1200),
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              padding: EdgeInsets.fromLTRB(
+                hPadding,
+                AppSpacing.xl,
+                hPadding,
+                AppSpacing.xxxl,
+              ),
+              child: isMobile
+                  ? Column(
                 children: [
-                  Icon(
-                    Icons.error_outline_rounded,
-                    size: 64,
-                    color: colorScheme.error,
+                  PatientInfoPanel(
+                    certificate: reviewState.detail!,
+                    documents: reviewState.documents,
+                    isReadOnly: isReadOnly,
                   ),
-                  const SizedBox(height: AppSpacing.md),
-                  Text(
-                    'Certificate not found',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
+                  const SizedBox(height: AppSpacing.lg),
+                  if (!isReadOnly)
+                    Form(
+                      key: _formKey,
+                      child: CertificateActionForm(
+                        certificate: reviewState.detail!,
+                        notesController: notifier.notesController,
+                        selectedFitnessStatus:
+                        reviewState.fitnessStatus,
+                        validityPeriod:
+                        "${reviewState.validity} days",
+                        isSubmitting: isSubmitting,
+                        onFitnessStatusChanged: (value) {
+                          notifier.changeFitnessStatus(value);
+                        },
+                        onValidityChanged: (value) {
+                          if (value == null) return;
+                          final days = int.parse(
+                            value.split(" ").first,
+                          );
+                          notifier.changeValidity(days);
+                        },
+                        onApprove: () async {
+                          if (_formKey.currentState?.validate() !=
+                              true) {
+                            return;
+                          }
+
+                          final ok = await notifier.approve();
+                          if (!context.mounted) return;
+
+                          if (ok) {
+                            await ref
+                                .read(
+                              doctorCertificateProvider
+                                  .notifier,
+                            )
+                                .refresh();
+                            if (!context.mounted) return;
+                            AppSnackBar.show(
+                              message: 'Approved Successfully',
+                              type: AppSnackBarType.success,
+                            );
+                            context.pop();
+                          } else {
+                            AppSnackBar.show(
+                              message:
+                              reviewState.errorMessage ??
+                                  'Approval Failed',
+                              type: AppSnackBarType.error,
+                            );
+                          }
+                        },
+                        onReject: () async {
+                          final ok = await notifier.reject();
+                          if (!context.mounted) return;
+
+                          if (ok) {
+                            await ref
+                                .read(
+                              doctorCertificateProvider
+                                  .notifier,
+                            )
+                                .refresh();
+                            if (!context.mounted) return;
+                            AppSnackBar.show(
+                              message: 'Rejected Successfully',
+                              type: AppSnackBarType.success,
+                            );
+                            context.pop();
+                          } else {
+                            AppSnackBar.show(
+                              message:
+                              reviewState.errorMessage ??
+                                  "Rejection Failed",
+                              type: AppSnackBarType.error,
+                            );
+                          }
+                        },
+                      ),
+                    )
+                  else
+                    _buildReadOnlyStatus(context),
+                ],
+              )
+                  : Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    flex: 4,
+                    child: PatientInfoPanel(
+                      certificate: reviewState.detail!,
+                      documents: reviewState.documents,
+                      isReadOnly: isReadOnly,
                     ),
                   ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Text(
-                    'The requested certificate could not be loaded',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
+                  const SizedBox(width: AppSpacing.lg),
+                  Expanded(
+                    flex: 5,
+                    child: isReadOnly
+                        ? _buildReadOnlyStatus(context)
+                        : Form(
+                      key: _formKey,
+                      child: CertificateActionForm(
+                        certificate: reviewState.detail!,
+                        notesController:
+                        notifier.notesController,
+                        selectedFitnessStatus:
+                        reviewState.fitnessStatus,
+                        validityPeriod:
+                        "${reviewState.validity} days",
+                        isSubmitting: isSubmitting,
+                        onFitnessStatusChanged:
+                        notifier.changeFitnessStatus,
+                        onValidityChanged: (v) {
+                          if (v == null) return;
+                          notifier.changeValidity(
+                            int.parse(v.split(" ").first),
+                          );
+                        },
+                        onApprove: () async {
+                          if (_formKey.currentState
+                              ?.validate() !=
+                              true) {
+                            return;
+                          }
+
+                          final ok = await notifier.approve();
+                          if (!context.mounted) return;
+
+                          if (ok) {
+                            await ref
+                                .read(
+                              doctorCertificateProvider
+                                  .notifier,
+                            )
+                                .refresh();
+                            if (!context.mounted) return;
+                            AppSnackBar.show(
+                              message: 'Certificate Approved',
+                              type: AppSnackBarType.success,
+                            );
+                            context.pop();
+                          } else {
+                            AppSnackBar.show(
+                              message:
+                              reviewState.errorMessage ??
+                                  "Approval Failed",
+                              type: AppSnackBarType.error,
+                            );
+                          }
+                        },
+                        onReject: () async {
+                          final ok = await notifier.reject();
+                          if (!context.mounted) return;
+
+                          if (ok) {
+                            await ref
+                                .read(
+                              doctorCertificateProvider
+                                  .notifier,
+                            )
+                                .refresh();
+                            if (!context.mounted) return;
+                            AppSnackBar.show(
+                              message: 'Certificate Rejected',
+                              type: AppSnackBarType.success,
+                            );
+                            context.pop();
+                          } else {
+                            AppSnackBar.show(
+                              message:
+                              reviewState.errorMessage ??
+                                  "Rejection Failed",
+                              type: AppSnackBarType.error,
+                            );
+                          }
+                        },
+                      ),
                     ),
                   ),
                 ],
               ),
-            )
-          : SafeArea(
-              top: false,
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 1200),
-                  child: SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    padding: EdgeInsets.fromLTRB(
-                      hPadding,
-                      AppSpacing.xl,
-                      hPadding,
-                      AppSpacing.xxxl,
-                    ),
-                    child: isMobile
-                        ? Column(
-                            children: [
-                              PatientInfoPanel(
-                                certificate: reviewState.detail!,
-                                documents: reviewState.documents,
-                                isReadOnly: isReadOnly,
-                              ),
-                              const SizedBox(height: AppSpacing.lg),
-                              if (!isReadOnly)
-                                // ✅ ADDED: Form wrapper with local _formKey
-                                Form(
-                                  key: _formKey,
-                                  child: CertificateActionForm(
-                                    certificate: reviewState.detail!,
-                                    notesController: notifier.notesController,
-                                    selectedFitnessStatus:
-                                        reviewState.fitnessStatus,
-                                    validityPeriod:
-                                        "${reviewState.validity} days",
-                                    isSubmitting: isSubmitting,
-                                    onFitnessStatusChanged: (value) {
-                                      notifier.changeFitnessStatus(value);
-                                    },
-                                    onValidityChanged: (value) {
-                                      if (value == null) return;
-                                      final days = int.parse(
-                                        value.split(" ").first,
-                                      );
-                                      notifier.changeValidity(days);
-                                    },
-                                    onApprove: () async {
-                                      // ✅ FIXED: Null-safe validation
-                                      if (_formKey.currentState?.validate() !=
-                                          true)
-                                        return;
-
-                                      final ok = await notifier.approve();
-                                      if (!context.mounted) return;
-
-                                      if (ok) {
-                                        await ref
-                                            .read(
-                                              doctorCertificateProvider
-                                                  .notifier,
-                                            )
-                                            .refresh();
-                                        if (!context.mounted) return;
-                                        AppSnackBar.show(
-                                          message: 'Approved Successfully',
-                                          type: AppSnackBarType.success,
-                                        );
-                                        context.pop();
-                                      } else {
-                                        AppSnackBar.show(
-                                          message:
-                                              reviewState.errorMessage ??
-                                              'Approval Failed',
-                                          type: AppSnackBarType.error,
-                                        );
-                                      }
-                                    },
-                                    onReject: () async {
-                                      final ok = await notifier.reject();
-                                      if (!context.mounted) return;
-
-                                      if (ok) {
-                                        await ref
-                                            .read(
-                                              doctorCertificateProvider
-                                                  .notifier,
-                                            )
-                                            .refresh();
-                                        if (!context.mounted) return;
-                                        AppSnackBar.show(
-                                          message: 'Rejected Successfully',
-                                          type: AppSnackBarType.success,
-                                        );
-                                        context.pop();
-                                      } else {
-                                        AppSnackBar.show(
-                                          message:
-                                              reviewState.errorMessage ??
-                                              "Rejection Failed",
-                                          type: AppSnackBarType.error,
-                                        );
-                                      }
-                                    },
-                                  ),
-                                )
-                              else
-                                _buildReadOnlyStatus(context),
-                            ],
-                          )
-                        : Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                flex: 4,
-                                child: PatientInfoPanel(
-                                  certificate: reviewState.detail!,
-                                  documents: reviewState.documents,
-                                  isReadOnly: isReadOnly,
-                                ),
-                              ),
-                              const SizedBox(width: AppSpacing.lg),
-                              Expanded(
-                                flex: 5,
-                                child: isReadOnly
-                                    ? _buildReadOnlyStatus(context)
-                                    : // ✅ ADDED: Form wrapper with local _formKey
-                                      Form(
-                                        key: _formKey,
-                                        child: CertificateActionForm(
-                                          certificate: reviewState.detail!,
-                                          notesController:
-                                              notifier.notesController,
-                                          selectedFitnessStatus:
-                                              reviewState.fitnessStatus,
-                                          validityPeriod:
-                                              "${reviewState.validity} days",
-                                          isSubmitting: isSubmitting,
-                                          onFitnessStatusChanged:
-                                              notifier.changeFitnessStatus,
-                                          onValidityChanged: (v) {
-                                            if (v == null) return;
-                                            notifier.changeValidity(
-                                              int.parse(v.split(" ").first),
-                                            );
-                                          },
-                                          onApprove: () async {
-                                            // ✅ FIXED: Null-safe validation
-                                            if (_formKey.currentState
-                                                    ?.validate() !=
-                                                true)
-                                              return;
-
-                                            final ok = await notifier.approve();
-                                            if (!context.mounted) return;
-
-                                            if (ok) {
-                                              await ref
-                                                  .read(
-                                                    doctorCertificateProvider
-                                                        .notifier,
-                                                  )
-                                                  .refresh();
-                                              if (!context.mounted) return;
-                                              AppSnackBar.show(
-                                                message: 'Certificate Approved',
-                                                type: AppSnackBarType.success,
-                                              );
-                                              context.pop();
-                                            } else {
-                                              AppSnackBar.show(
-                                                message:
-                                                    reviewState.errorMessage ??
-                                                    "Approval Failed",
-                                                type: AppSnackBarType.error,
-                                              );
-                                            }
-                                          },
-                                          onReject: () async {
-                                            final ok = await notifier.reject();
-                                            if (!context.mounted) return;
-
-                                            if (ok) {
-                                              await ref
-                                                  .read(
-                                                    doctorCertificateProvider
-                                                        .notifier,
-                                                  )
-                                                  .refresh();
-                                              if (!context.mounted) return;
-                                              AppSnackBar.show(
-                                                message: 'Certificate Rejected',
-                                                type: AppSnackBarType.success,
-                                              );
-                                              context.pop();
-                                            } else {
-                                              AppSnackBar.show(
-                                                message:
-                                                    reviewState.errorMessage ??
-                                                    "Rejection Failed",
-                                                type: AppSnackBarType.error,
-                                              );
-                                            }
-                                          },
-                                        ),
-                                      ),
-                              ),
-                            ],
-                          ),
-                  ),
-                ),
-              ),
             ),
+          ),
+        ),
+      ),
     );
   }
 
+  // ✅ CUSTOM SOFT MEDICAL STYLED READONLY PANEL
   Widget _buildReadOnlyStatus(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     final state = ref.watch(doctorCertificateReviewProvider);
 
+    final statusStr = state.detail?.status?.trim().toUpperCase() ?? '';
+    final isApproved = state.detail?.isApproved == true ||
+        statusStr == 'APPROVED' ||
+        statusStr == 'ISSUED';
+    final isRejected = statusStr == 'REJECTED' || statusStr == 'CANCELLED';
+
+    // Status Theme Dynamic Colors
+    final Color statusBg = isApproved
+        ? (isDark ? const Color(0xFF132E23) : const Color(0xFFE8F5E9))
+        : isRejected
+        ? (isDark ? const Color(0xFF331619) : const Color(0xFFFFEBEE))
+        : (isDark ? const Color(0xFF332712) : const Color(0xFFFFF8E1));
+
+    final Color statusFg = isApproved
+        ? (isDark ? const Color(0xFF81C784) : const Color(0xFF2E7D32))
+        : isRejected
+        ? (isDark ? const Color(0xFFE57373) : const Color(0xFFC62828))
+        : (isDark ? const Color(0xFFFFD54F) : const Color(0xFFE65100));
+
+    final IconData statusIcon = isApproved
+        ? Icons.check_circle_rounded
+        : isRejected
+        ? Icons.cancel_rounded
+        : Icons.hourglass_full_rounded;
+
+    // Fitness Status Dynamic Colors
     final isFit = state.fitnessStatus.toUpperCase() == 'FIT';
-    final statusColor = isFit ? colorScheme.primary : colorScheme.error;
+    final fitnessBg = isFit
+        ? (isDark ? const Color(0xFF132E23) : const Color(0xFFE8F5E9))
+        : (isDark ? const Color(0xFF331619) : const Color(0xFFFFEBEE));
+    final fitnessFg = isFit
+        ? (isDark ? const Color(0xFF81C784) : const Color(0xFF2E7D32))
+        : (isDark ? const Color(0xFFE57373) : const Color(0xFFC62828));
 
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.xl),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainer,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: colorScheme.outlineVariant.withValues(alpha: 0.35),
+          color: colorScheme.outlineVariant.withValues(alpha: 0.4),
           width: 1.2,
         ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            state.detail?.isApproved == true
-                ? Icons.check_circle_rounded
-                : Icons.cancel_rounded,
-            size: 48,
-            color: state.detail?.isApproved == true
-                ? colorScheme.primary
-                : colorScheme.error,
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: statusBg,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  statusIcon,
+                  size: 32,
+                  color: statusFg,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Certificate ${statusStr.toLowerCase()}',
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w900,
+                        color: statusFg,
+                      ),
+                    ),
+                    if (state.detail?.certificateId != null)
+                      Text(
+                        'ID: ${state.detail!.certificateId}',
+                        style: theme.textTheme.labelMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: AppSpacing.md),
-          Text(
-            state.detail?.isApproved == true
-                ? 'Certificate Approved'
-                : 'Certificate ${state.detail?.status.toUpperCase() ?? ''}',
-            style: theme.textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.w900,
-              color: state.detail?.isApproved == true
-                  ? colorScheme.primary
-                  : colorScheme.error,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          if (state.detail?.certificateId != null) ...[
-            Text(
-              'Certificate ID: ${state.detail!.certificateId}',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w700,
-                color: colorScheme.onSurface,
-              ),
-            ),
-            const SizedBox(height: 4),
-          ],
-          if (state.detail?.issuedAt != null) ...[
-            Text(
-              'Issued: ${_formatDate(state.detail!.issuedAt!)}',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ],
-          if (state.detail?.expiryDate != null) ...[
-            Text(
-              'Expires: ${_formatDate(state.detail!.expiryDate!)}',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: colorScheme.error,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ],
           const SizedBox(height: AppSpacing.lg),
-          Divider(
-            color: colorScheme.outlineVariant.withValues(alpha: 0.25),
-            height: 1,
-          ),
-          const SizedBox(height: AppSpacing.md),
+          if (state.detail?.issuedAt != null ||
+              state.detail?.expiryDate != null) ...[
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: isDark
+                    ? const Color(0xFF1E2124)
+                    : const Color(0xFFF8F9FA),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                children: [
+                  if (state.detail?.issuedAt != null)
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'ISSUED DATE',
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w800,
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            _formatDate(state.detail!.issuedAt!),
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  if (state.detail?.expiryDate != null)
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'EXPIRATION DATE',
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w800,
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            _formatDate(state.detail!.expiryDate!),
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.w700,
+                              color: statusFg,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            const SizedBox(height: AppSpacing.lg),
+          ],
           Text(
-            "Doctor's Notes",
+            "DOCTOR'S REMARKS",
             style: theme.textTheme.labelSmall?.copyWith(
               color: colorScheme.onSurfaceVariant,
               fontWeight: FontWeight.w800,
+              fontSize: 10,
               letterSpacing: 0.8,
             ),
           ),
-          const SizedBox(height: AppSpacing.xs),
+          const SizedBox(height: 6),
           Container(
+            width: double.infinity,
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: colorScheme.surfaceContainerHigh,
+              color: isDark
+                  ? const Color(0xFF1E2124)
+                  : const Color(0xFFF8F9FA),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
               state.detail?.doctorNotes?.isNotEmpty == true
                   ? state.detail!.doctorNotes!
-                  : 'No notes provided',
+                  : 'No remarks recorded',
               style: theme.textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.w600,
                 color: colorScheme.onSurface,
@@ -399,21 +485,20 @@ class _CertificateReviewScreenState
           ),
           const SizedBox(height: AppSpacing.md),
           Text(
-            "Fitness Status",
+            "FITNESS ASSESSMENT",
             style: theme.textTheme.labelSmall?.copyWith(
               color: colorScheme.onSurfaceVariant,
               fontWeight: FontWeight.w800,
+              fontSize: 10,
               letterSpacing: 0.8,
             ),
           ),
-          const SizedBox(height: AppSpacing.xs),
+          const SizedBox(height: 6),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              color: isFit
-                  ? colorScheme.primaryContainer.withValues(alpha: 0.3)
-                  : colorScheme.errorContainer.withValues(alpha: 0.3),
-              borderRadius: BorderRadius.circular(12),
+              color: fitnessBg,
+              borderRadius: BorderRadius.circular(10),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -423,14 +508,14 @@ class _CertificateReviewScreenState
                       ? Icons.check_circle_outline_rounded
                       : Icons.warning_amber_rounded,
                   size: 16,
-                  color: statusColor,
+                  color: fitnessFg,
                 ),
                 const SizedBox(width: 8),
                 Text(
                   state.fitnessStatus.isNotEmpty ? state.fitnessStatus : 'N/A',
                   style: theme.textTheme.labelMedium?.copyWith(
                     fontWeight: FontWeight.w800,
-                    color: statusColor,
+                    color: fitnessFg,
                   ),
                 ),
               ],

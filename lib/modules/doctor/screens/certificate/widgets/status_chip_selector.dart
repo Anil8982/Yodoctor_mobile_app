@@ -13,7 +13,7 @@ class StatusChipSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
 
     final List<Map<String, dynamic>> statusOptions = [
       {
@@ -21,24 +21,27 @@ class StatusChipSelector extends StatelessWidget {
         'value': 'FIT',
         'icon': Icons.check_circle_outline_rounded,
         'selectedIcon': Icons.check_circle_rounded,
-        'color': colorScheme.primary,
-        'containerColor': colorScheme.primaryContainer,
+        'activeBg': isDark ? const Color(0xFF132E23) : const Color(0xFFE8F5E9),
+        'activeBorder': isDark ? const Color(0xFF2E7D32) : const Color(0xFF4CAF50),
+        'activeFg': isDark ? const Color(0xFF81C784) : const Color(0xFF2E7D32),
       },
       {
         'label': 'UNFIT',
         'value': 'UNFIT',
         'icon': Icons.cancel_outlined,
         'selectedIcon': Icons.cancel_rounded,
-        'color': colorScheme.error,
-        'containerColor': colorScheme.errorContainer,
+        'activeBg': isDark ? const Color(0xFF331619) : const Color(0xFFFFEBEE),
+        'activeBorder': isDark ? const Color(0xFFC62828) : const Color(0xFFEF5350),
+        'activeFg': isDark ? const Color(0xFFE57373) : const Color(0xFFC62828),
       },
       {
         'label': 'TEMP UNFIT',
         'value': 'TEMPORARILY UNFIT',
         'icon': Icons.hourglass_empty_rounded,
         'selectedIcon': Icons.hourglass_full_rounded,
-        'color': colorScheme.tertiary,
-        'containerColor': colorScheme.tertiaryContainer,
+        'activeBg': isDark ? const Color(0xFF332712) : const Color(0xFFFFF8E1),
+        'activeBorder': isDark ? const Color(0xFFF57F17) : const Color(0xFFFFB74D),
+        'activeFg': isDark ? const Color(0xFFFFD54F) : const Color(0xFFE65100),
       },
     ];
 
@@ -49,8 +52,8 @@ class StatusChipSelector extends StatelessWidget {
           text: TextSpan(
             text: 'FITNESS ASSESSMENT STATUS',
             style: theme.textTheme.labelSmall?.copyWith(
-              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
-              fontWeight: FontWeight.w900,
+              color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+              fontWeight: FontWeight.w800,
               fontSize: 10,
               letterSpacing: 0.8,
             ),
@@ -58,7 +61,7 @@ class StatusChipSelector extends StatelessWidget {
               TextSpan(
                 text: ' *',
                 style: TextStyle(
-                  color: colorScheme.error,
+                  color: theme.colorScheme.error,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -69,59 +72,69 @@ class StatusChipSelector extends StatelessWidget {
         Row(
           children: statusOptions.map((option) {
             final isSelected = selectedStatus.toUpperCase() == option['value'];
+
+            final activeBg = option['activeBg'] as Color;
+            final activeBorder = option['activeBorder'] as Color;
+            final activeFg = option['activeFg'] as Color;
+
+            // Inactive styles
+            final inactiveBg = isDark
+                ? const Color(0xFF1E2124)
+                : const Color(0xFFF4F5F7);
+            final inactiveBorder = isDark
+                ? Colors.white10
+                : const Color(0xFFE0E0E0);
+            final inactiveFg = isDark
+                ? const Color(0xFF9E9E9E)
+                : const Color(0xFF616161);
+
             return Expanded(
               child: Container(
                 margin: EdgeInsets.only(
                   right: option['label'] != 'TEMP UNFIT' ? 8 : 0,
                 ),
-                height: 46,
-                child: InkWell(
-                  onTap: () => onChanged(option['value']),
-                  borderRadius: BorderRadius.circular(14),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 180),
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? option['containerColor'].withValues(alpha: 0.35)
-                          : colorScheme.surfaceContainerHigh,
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(
-                        color: isSelected
-                            ? option['color']
-                            : colorScheme.outlineVariant.withValues(alpha: 0.3),
-                        width: isSelected ? 1.5 : 1.0,
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          isSelected ? option['selectedIcon'] : option['icon'],
-                          size: 16,
-                          color: isSelected
-                              ? option['color']
-                              : colorScheme.onSurfaceVariant.withValues(
-                            alpha: 0.8,
-                          ),
+                height: 44,
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () => onChanged(option['value']),
+                    borderRadius: BorderRadius.circular(12),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 180),
+                      padding: const EdgeInsets.symmetric(horizontal: 6),
+                      decoration: BoxDecoration(
+                        color: isSelected ? activeBg : inactiveBg,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isSelected ? activeBorder : inactiveBorder,
+                          width: isSelected ? 1.5 : 1.0,
                         ),
-                        const SizedBox(width: 6),
-                        Flexible(
-                          child: Text(
-                            option['label'],
-                            style: theme.textTheme.labelMedium?.copyWith(
-                              fontWeight: isSelected
-                                  ? FontWeight.w900
-                                  : FontWeight.w800,
-                              color: isSelected
-                                  ? colorScheme.onSurface
-                                  : colorScheme.onSurfaceVariant,
-                              fontSize: 11,
-                              letterSpacing: 0.2,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            isSelected ? option['selectedIcon'] : option['icon'],
+                            size: 16,
+                            color: isSelected ? activeFg : inactiveFg,
+                          ),
+                          const SizedBox(width: 6),
+                          Flexible(
+                            child: Text(
+                              option['label'],
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: theme.textTheme.labelMedium?.copyWith(
+                                fontWeight: isSelected
+                                    ? FontWeight.w900
+                                    : FontWeight.w700,
+                                color: isSelected ? activeFg : inactiveFg,
+                                fontSize: 11,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
