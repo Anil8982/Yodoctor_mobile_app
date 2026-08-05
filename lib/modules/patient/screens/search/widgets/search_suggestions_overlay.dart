@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart'; // 🎯 Added Riverpod Import
-import 'package:yodoctor/modules/patient/controllers/patient_search_controller.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/modules/patient/models/search/suggestion_model.dart';
 
 class SearchSuggestionsOverlay extends ConsumerWidget {
-  final PatientSearchState controller;
+  final List<SuggestionModel> suggestions;
   final TextEditingController searchController;
-  final Function(BuildContext, PatientSearchState) onSearchTap;
+  final Function(SuggestionModel) onSelect;
+  final String? searchQuery;
 
   const SearchSuggestionsOverlay({
     super.key,
-    required this.controller,
+    required this.suggestions,
     required this.searchController,
-    required this.onSearchTap,
+    required this.onSelect,
+    this.searchQuery,
   });
 
   @override
@@ -19,66 +21,138 @@ class SearchSuggestionsOverlay extends ConsumerWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
+    if (suggestions.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
     return ListView.separated(
       padding: const EdgeInsets.symmetric(vertical: 8),
       shrinkWrap: true,
-      itemCount: controller.doctorSuggestions.length,
+      itemCount: suggestions.length,
       separatorBuilder: (context, index) =>
       const Divider(height: 1, indent: 20, endIndent: 20),
       itemBuilder: (context, index) {
-        final doc = controller.doctorSuggestions[index];
-        final query = controller.query.toLowerCase();
-
-        String displayTitle = '';
-        String displaySubtitle = '';
-        IconData icon = Icons.person_search_rounded;
-
-        if (doc.name.toLowerCase().contains(query)) {
-          displayTitle = doc.name;
-          displaySubtitle = "${doc.specialty} • ${doc.hospital}";
-          icon = Icons.person_rounded;
-        } else if (doc.specialty.toLowerCase().contains(query)) {
-          displayTitle = doc.specialty;
-          displaySubtitle = "Doctor: ${doc.name} • ${doc.hospital}";
-          icon = Icons.medical_services_rounded;
-        } else if (doc.hospital.toLowerCase().contains(query)) {
-          displayTitle = doc.hospital;
-          displaySubtitle = "${doc.specialty} • ${doc.name}";
-          icon = Icons.local_hospital_rounded;
-        } else {
-          displayTitle = doc.name;
-          displaySubtitle = doc.specialty;
-        }
+        final suggestion = suggestions[index];
+        final icon = _getSuggestionIcon(suggestion);
 
         return ListTile(
           visualDensity: VisualDensity.compact,
           leading: CircleAvatar(
             backgroundColor: colorScheme.primary.withValues(alpha: 0.08),
-            child: Icon(icon, color: colorScheme.primary, size: 20),
+            child: Icon(
+              icon,
+              color: colorScheme.primary,
+              size: 20,
+            ),
           ),
-          title: Text(
-            displayTitle,
-            style: const TextStyle(fontWeight: FontWeight.bold),
+          title: _buildHighlightedText(
+            suggestion.title,
+            searchQuery ?? '',
+            theme,
           ),
-          subtitle: Text(
-            displaySubtitle,
+          subtitle: suggestion.subtitle != null
+              ? Text(
+            suggestion.subtitle!,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-          ),
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          )
+              : null,
           trailing: Icon(
             Icons.north_west_rounded,
             size: 14,
             color: colorScheme.onSurfaceVariant,
           ),
           onTap: () {
-            searchController.text = displayTitle;
-
-            ref.read(patientSearchControllerProvider.notifier).clearSuggestions();
-
-            onSearchTap(context, ref.read(patientSearchControllerProvider));
+            searchController.text = suggestion.title;
+            onSelect(suggestion);
           },
         );
       },
+    );
+  }
+
+  IconData _getSuggestionIcon(SuggestionModel suggestion) {
+    final subtitle = suggestion.subtitle ?? '';
+
+    if (subtitle.contains('Clinic')) {
+      return Icons.local_hospital_rounded;
+    }
+    if (subtitle.contains('Doctor')) {
+      return Icons.person_rounded;
+    }
+    if (subtitle.contains('Specialty') || subtitle.contains('Specialist')) {
+      return Icons.medical_services_rounded;
+    }
+    if (subtitle.contains('Location') || subtitle.contains('City')) {
+      return Icons.location_on_rounded;
+    }
+    if (suggestion.title.toLowerCase().contains('clinic')) {
+      return Icons.local_hospital_rounded;
+    }
+    if (suggestion.title.toLowerCase().contains('hospital')) {
+      return Icons.local_hospital_rounded;
+    }
+    if (suggestion.title.toLowerCase().contains('dr') ||
+        suggestion.title.toLowerCase().contains('doctor')) {
+      return Icons.person_rounded;
+    }
+
+    return Icons.search_rounded;
+  }
+
+  Widget _buildHighlightedText(
+      String text,
+      String query,
+      ThemeData theme,
+      ) {
+    if (query.isEmpty) {
+      return Text(
+        text,
+        style: theme.textTheme.bodyMedium?.copyWith(
+          fontWeight: FontWeight.w500,
+        ),
+      );
+    }
+
+    final lowerText = text.toLowerCase();
+    final lowerQuery = query.toLowerCase();
+    final startIndex = lowerText.indexOf(lowerQuery);
+
+    if (startIndex == -1) {
+      return Text(
+        text,
+        style: theme.textTheme.bodyMedium?.copyWith(
+          fontWeight: FontWeight.w500,
+        ),
+      );
+    }
+
+    final endIndex = startIndex + query.length;
+    final before = text.substring(0, startIndex);
+    final highlighted = text.substring(startIndex, endIndex);
+    final after = text.substring(endIndex);
+
+    return RichText(
+      text: TextSpan(
+        style: theme.textTheme.bodyMedium?.copyWith(
+          fontWeight: FontWeight.w500,
+          color: theme.colorScheme.onSurface,
+        ),
+        children: [
+          TextSpan(text: before),
+          TextSpan(
+            text: highlighted,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: theme.colorScheme.secondary,
+            ),
+          ),
+          TextSpan(text: after),
+        ],
+      ),
     );
   }
 }
