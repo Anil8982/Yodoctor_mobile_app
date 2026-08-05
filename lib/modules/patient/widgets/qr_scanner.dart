@@ -56,10 +56,7 @@ class _QrScannerSheetState extends ConsumerState<QrScannerSheet> {
               final barcodes = capture.barcodes;
               for (final barcode in barcodes) {
                 if (barcode.rawValue != null && barcode.rawValue!.isNotEmpty) {
-                  controller.handleScannedQr(
-                    barcode.rawValue!,
-                    context,
-                  );
+                  controller.handleScannedQr(barcode.rawValue!, context);
                   break;
                 }
               }
@@ -172,7 +169,7 @@ class _QrScannerSheetState extends ConsumerState<QrScannerSheet> {
 
           // 6. Instructions
           Positioned(
-            bottom: 40,
+            bottom: MediaQuery.of(context).padding.bottom + 20,
             left: 0,
             right: 0,
             child: Column(

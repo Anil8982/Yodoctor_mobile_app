@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/modules/widgets/app_header.dart';
+import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 
 import '../../../../core/routes/app_routes.dart';
 import '../../controllers/family_controller.dart';
@@ -31,35 +32,35 @@ class _FamilyMembersScreenState extends ConsumerState<FamilyMembersScreen> {
       appBar: const AppHeader(title: 'Family Members'),
       body: familyState.members.isEmpty
           ? Column(
-        children: [
-          const SizedBox(height: 16),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: FamilyHeader(membersCount: 0),
-          ),
-          Expanded(child: _buildEmptyState(context)),
-        ],
-      )
+              children: [
+                const SizedBox(height: 16),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: FamilyHeader(membersCount: 0),
+                ),
+                Expanded(child: _buildEmptyState(context)),
+              ],
+            )
           : ListView(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
-        physics: const BouncingScrollPhysics(),
-        children: [
-          FamilyHeader(membersCount: familyState.members.length),
-          const SizedBox(height: 16),
-          ...familyState.members.map((member) {
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: FamilyMemberCard(
-                member: member,
-                onDelete: () async {
-                  await notifier.deleteMember(member.id);
-                },
-                onEdit: () => _openEditMemberScreen(context, member),
-              ),
-            );
-          }),
-        ],
-      ),
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+              physics: const BouncingScrollPhysics(),
+              children: [
+                FamilyHeader(membersCount: familyState.members.length),
+                const SizedBox(height: 16),
+                ...familyState.members.map((member) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: FamilyMemberCard(
+                      member: member,
+                      onDelete: () async {
+                        await notifier.deleteMember(member.id);
+                      },
+                      onEdit: () => _openEditMemberScreen(context, member),
+                    ),
+                  );
+                }),
+              ],
+            ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'family_members_screen_fab_tag',
@@ -73,29 +74,20 @@ class _FamilyMembersScreenState extends ConsumerState<FamilyMembersScreen> {
   }
 
   Future<void> _openAddMemberScreen(BuildContext context) async {
-    final messenger = ScaffoldMessenger.of(context);
-    final colorScheme = Theme.of(context).colorScheme;
-
     final bool? wasAdded = await context.push<bool>(AppRoutes.addFamilyMember);
 
     if (!mounted || wasAdded != true) return;
 
-    messenger.showSnackBar(
-      SnackBar(
-        content: const Text('Member added successfully.'),
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: colorScheme.secondary,
-      ),
+    AppSnackBar.show(
+      message: 'Member added successfully.',
+      type: AppSnackBarType.success,
     );
   }
 
   Future<void> _openEditMemberScreen(
-      BuildContext context,
-      FamilyMemberModel member,
-      ) async {
-    final messenger = ScaffoldMessenger.of(context);
-    final colorScheme = Theme.of(context).colorScheme;
-
+    BuildContext context,
+    FamilyMemberModel member,
+  ) async {
     final bool? wasUpdated = await context.push<bool>(
       AppRoutes.addFamilyMember,
       extra: member,
@@ -103,12 +95,9 @@ class _FamilyMembersScreenState extends ConsumerState<FamilyMembersScreen> {
 
     if (!mounted || wasUpdated != true) return;
 
-    messenger.showSnackBar(
-      SnackBar(
-        content: const Text('Member updated successfully.'),
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: colorScheme.secondary,
-      ),
+    AppSnackBar.show(
+      message: 'Member updated successfully.',
+      type: AppSnackBarType.success,
     );
   }
 

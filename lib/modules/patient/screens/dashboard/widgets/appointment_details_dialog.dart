@@ -1,6 +1,7 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 import '../../../models/dashboard/appointment_model.dart';
 import '../../../controllers/patient_dashboard_controller.dart';
 
@@ -295,19 +296,16 @@ class AppointmentDetailsDialog extends ConsumerWidget {
 
                       if (success) {
                         Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text("Appointment cancelled successfully"),
-                          ),
+                        AppSnackBar.show(
+                          message: 'Appointment cancelled successfully',
+                          type: AppSnackBarType.success,
                         );
                       } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
+                        AppSnackBar.show(
+                          message:
                               controller.errorMessage ??
-                                  "Unable to cancel appointment",
-                            ),
-                          ),
+                              "Unable to cancel appointment",
+                          type: AppSnackBarType.error,
                         );
                       }
                     },

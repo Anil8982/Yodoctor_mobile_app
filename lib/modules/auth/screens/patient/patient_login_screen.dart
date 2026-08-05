@@ -13,6 +13,7 @@ import 'package:yodoctor/modules/auth/widgets/auth_widgets.dart';
 import 'package:yodoctor/modules/auth/widgets/top_bottom_curve_widgets.dart';
 import 'package:yodoctor/modules/auth/controllers/patient_auth_controller.dart';
 import 'package:yodoctor/modules/auth/widgets/yo_login_text_field.dart';
+import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 
 class PatientLoginScreen extends ConsumerStatefulWidget {
   const PatientLoginScreen({super.key});
@@ -74,25 +75,28 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
       subTag: _subTag,
     );
 
-    ref.read(patientAuthControllerProvider.notifier).signInWithEmail(
-      email: email,
-      password: password,
-      onSuccess: () {
-        if (email == "admin@gmail.com" ||
-            email.toLowerCase().contains("admin")) {
-          ref.read(appRoleProvider.notifier).setRole(AppRole.admin);
-          context.go(AppRoutes.adminDashboard);
-        } else {
-          ref.read(appRoleProvider.notifier).setRole(AppRole.patient);
-          context.go(AppRoutes.dashboard);
-        }
-      },
-      onFailure: (errorMessage) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(errorMessage)),
+    ref
+        .read(patientAuthControllerProvider.notifier)
+        .signInWithEmail(
+          email: email,
+          password: password,
+          onSuccess: () {
+            if (email == "admin@gmail.com" ||
+                email.toLowerCase().contains("admin")) {
+              ref.read(appRoleProvider.notifier).setRole(AppRole.admin);
+              context.go(AppRoutes.adminDashboard);
+            } else {
+              ref.read(appRoleProvider.notifier).setRole(AppRole.patient);
+              context.go(AppRoutes.dashboard);
+            }
+          },
+          onFailure: (errorMessage) {
+            AppSnackBar.show(
+              message: errorMessage,
+              type: AppSnackBarType.error,
+            );
+          },
         );
-      },
-    );
   }
 
   @override
@@ -218,14 +222,16 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
                   ),
                 ),
                 TextButton(
-                  onPressed: isProcessing ? null : () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const PatientRegisterScreen(),
-                      ),
-                    );
-                  },
+                  onPressed: isProcessing
+                      ? null
+                      : () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const PatientRegisterScreen(),
+                            ),
+                          );
+                        },
                   style: TextButton.styleFrom(
                     padding: const EdgeInsets.symmetric(horizontal: 6),
                     minimumSize: Size.zero,
@@ -234,7 +240,9 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
                   child: Text(
                     "Register Here",
                     style: TextStyle(
-                      color: isProcessing ? colorScheme.outline : AppTheme.secondary,
+                      color: isProcessing
+                          ? colorScheme.outline
+                          : AppTheme.secondary,
                       fontWeight: FontWeight.bold,
                       fontSize: 15,
                     ),
@@ -337,11 +345,13 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(4),
                       ),
-                      onChanged: isProcessing ? null : (value) {
-                        setState(() {
-                          _rememberMe = value!;
-                        });
-                      },
+                      onChanged: isProcessing
+                          ? null
+                          : (value) {
+                              setState(() {
+                                _rememberMe = value!;
+                              });
+                            },
                     ),
                   ),
                   Text(
@@ -352,13 +362,14 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
                   ),
                   const Spacer(),
                   TextButton(
-                    onPressed: isProcessing ? null : () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Forgot password feature coming soon'),
-                        ),
-                      );
-                    },
+                    onPressed: isProcessing
+                        ? null
+                        : () {
+                            AppSnackBar.show(
+                              message: 'Forgot password feature coming soon',
+                              type: AppSnackBarType.info,
+                            );
+                          },
                     style: TextButton.styleFrom(
                       padding: EdgeInsets.zero,
                       minimumSize: Size.zero,
@@ -367,7 +378,9 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
                     child: Text(
                       'Forgot Password?',
                       style: textTheme.bodySmall?.copyWith(
-                        color: isProcessing ? colorScheme.outline : AppTheme.secondary,
+                        color: isProcessing
+                            ? colorScheme.outline
+                            : AppTheme.secondary,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -392,35 +405,33 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
                 onTap: isProcessing
                     ? null
                     : () {
-                  FocusManager.instance.primaryFocus?.unfocus(); // Close keyboard
-                  AppLogger.info(
-                    'Google button click event received',
-                    tag: LogTags.ui,
-                    subTag: _subTag,
-                  );
-                  ref
-                      .read(patientAuthControllerProvider.notifier)
-                      .signInWithGoogle(
-                    onSuccess: (user) {
-                      AppLogger.highlight(
-                        'OAuth authorization resolved for user: ${user.name}',
-                      );
-                      ref
-                          .read(appRoleProvider.notifier)
-                          .setRole(AppRole.patient);
-                      context.go(AppRoutes.dashboard);
-                    },
-                    onCanceled: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                            'Google Sign-In was canceled.',
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                },
+                        FocusManager.instance.primaryFocus
+                            ?.unfocus(); // Close keyboard
+                        AppLogger.info(
+                          'Google button click event received',
+                          tag: LogTags.ui,
+                          subTag: _subTag,
+                        );
+                        ref
+                            .read(patientAuthControllerProvider.notifier)
+                            .signInWithGoogle(
+                              onSuccess: (user) {
+                                AppLogger.highlight(
+                                  'OAuth authorization resolved for user: ${user.name}',
+                                );
+                                ref
+                                    .read(appRoleProvider.notifier)
+                                    .setRole(AppRole.patient);
+                                context.go(AppRoutes.dashboard);
+                              },
+                              onCanceled: () {
+                                AppSnackBar.show(
+                                  message: 'Google Sign-In was canceled.',
+                                  type: AppSnackBarType.error,
+                                );
+                              },
+                            );
+                      },
               ),
             ],
           ),
@@ -455,13 +466,13 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
           children: [
             isLoading
                 ? SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: colorScheme.primary,
-              ),
-            )
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: colorScheme.primary,
+                    ),
+                  )
                 : icon,
             const SizedBox(width: 12),
             Text(
@@ -476,5 +487,4 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
       ),
     );
   }
-
 }

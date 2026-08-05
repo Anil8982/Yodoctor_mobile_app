@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 import '../../../../core/utils/responsive.dart';
 import '../../controllers/appointment_history_controller.dart';
 import '../../widgets/custom_sliver_app_bar.dart';
@@ -17,7 +18,8 @@ class AppointmentsHistoryScreen extends ConsumerStatefulWidget {
       _AppointmentsHistoryScreenState();
 }
 
-class _AppointmentsHistoryScreenState extends ConsumerState<AppointmentsHistoryScreen> {
+class _AppointmentsHistoryScreenState
+    extends ConsumerState<AppointmentsHistoryScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
@@ -25,12 +27,11 @@ class _AppointmentsHistoryScreenState extends ConsumerState<AppointmentsHistoryS
     final historyState = ref.watch(appointmentHistoryControllerProvider);
     final notifier = ref.read(appointmentHistoryControllerProvider.notifier);
 
-    final bool isLoadingInitial = historyState.isLoading && historyState.appointments.isEmpty;
+    final bool isLoadingInitial =
+        historyState.isLoading && historyState.appointments.isEmpty;
 
     if (isLoadingInitial) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     final double horizontal = Responsive.horizontalPadding(context);
@@ -65,100 +66,112 @@ class _AppointmentsHistoryScreenState extends ConsumerState<AppointmentsHistoryS
                   child: historyState.appointments.isEmpty
                       ? _buildEmptyState(context)
                       : ListView.separated(
-                    physics: const BouncingScrollPhysics(),
-                    itemCount: historyState.appointments.length,
-                    separatorBuilder: (_, _) => const SizedBox(height: 12),
-                    itemBuilder: (BuildContext context, int index) {
-                      final appointment = historyState.appointments[index];
+                          physics: const BouncingScrollPhysics(),
+                          itemCount: historyState.appointments.length,
+                          separatorBuilder: (_, _) =>
+                              const SizedBox(height: 12),
+                          itemBuilder: (BuildContext context, int index) {
+                            final appointment =
+                                historyState.appointments[index];
 
-                      return HistoryAppointmentCard(
-                        appointment: appointment,
-                        onViewDetails: () {
-                          showAppointmentDetailsDialog(
-                            context: context,
-                            appointment: appointment,
-                            initialRating: notifier.ratingFor(appointment.id),
-                            initialFeedback: notifier.feedbackFor(appointment.id),
-                            onSubmitRating: (int rating, String feedback) async {
-                              await notifier.submitRating(
-                                appointmentId: appointment.id,
-                                rating: rating,
-                                feedback: feedback,
-                              );
-
-                              if (!context.mounted) {
-                                return;
-                              }
-
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    'Thanks! You rated ${appointment.doctorName} $rating stars.',
-                                  ),
-                                  behavior: SnackBarBehavior.floating,
-                                ),
-                              );
-                            },
-                            onDownloadPrescription: () async {
-                              try {
-                                final prescription = await notifier.getPrescription(appointment.id);
-
-                                if (!context.mounted) return;
-
-                                showDialog(
+                            return HistoryAppointmentCard(
+                              appointment: appointment,
+                              onViewDetails: () {
+                                showAppointmentDetailsDialog(
                                   context: context,
-                                  builder: (_) => AlertDialog(
-                                    title: const Text("Prescription"),
-                                    content: SingleChildScrollView(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          const Text(
-                                            "Medicines",
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 8),
-                                          Text(prescription["medicines"] ?? ""),
-                                          const SizedBox(height: 20),
-                                          const Text(
-                                            "Instructions",
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 8),
-                                          Text(prescription["instructions"] ?? ""),
-                                        ],
-                                      ),
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () => Navigator.pop(context),
-                                        child: const Text("Close"),
-                                      ),
-                                    ],
+                                  appointment: appointment,
+                                  initialRating: notifier.ratingFor(
+                                    appointment.id,
                                   ),
-                                );
-                              } catch (e) {
-                                if (!context.mounted) return;
+                                  initialFeedback: notifier.feedbackFor(
+                                    appointment.id,
+                                  ),
+                                  onSubmitRating:
+                                      (int rating, String feedback) async {
+                                        await notifier.submitRating(
+                                          appointmentId: appointment.id,
+                                          rating: rating,
+                                          feedback: feedback,
+                                        );
 
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      e.toString().replaceFirst("Exception: ", ""),
-                                    ),
-                                  ),
+                                        if (!context.mounted) {
+                                          return;
+                                        }
+
+                                        AppSnackBar.show(
+                                          message:
+                                              'Thanks! You rated ${appointment.doctorName} $rating stars.',
+                                          type: AppSnackBarType.success,
+                                        );
+                                      },
+                                  onDownloadPrescription: () async {
+                                    try {
+                                      final prescription = await notifier
+                                          .getPrescription(appointment.id);
+
+                                      if (!context.mounted) return;
+
+                                      showDialog(
+                                        context: context,
+                                        builder: (_) => AlertDialog(
+                                          title: const Text("Prescription"),
+                                          content: SingleChildScrollView(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                const Text(
+                                                  "Medicines",
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 8),
+                                                Text(
+                                                  prescription["medicines"] ??
+                                                      "",
+                                                ),
+                                                const SizedBox(height: 20),
+                                                const Text(
+                                                  "Instructions",
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 8),
+                                                Text(
+                                                  prescription["instructions"] ??
+                                                      "",
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () =>
+                                                  Navigator.pop(context),
+                                              child: const Text("Close"),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    } catch (e) {
+                                      if (!context.mounted) return;
+                                      AppSnackBar.show(
+                                        message: e.toString().replaceFirst(
+                                          "Exception: ",
+                                          "",
+                                        ),
+                                        type: AppSnackBarType.error,
+                                      );
+                                    }
+                                  },
                                 );
-                              }
-                            },
-                          );
-                        },
-                      );
-                    },
-                  ),
+                              },
+                            );
+                          },
+                        ),
                 ),
               ),
             ],

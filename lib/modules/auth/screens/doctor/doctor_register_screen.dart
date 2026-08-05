@@ -12,6 +12,7 @@ import 'package:yodoctor/modules/auth/screens/doctor/register_steps/step6_docume
 import 'package:yodoctor/modules/auth/screens/doctor/register_steps/step7_declaration.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
+import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 import '../../controllers/doctor_register_controller.dart';
 
 class DoctorRegisterScreen extends ConsumerStatefulWidget {
@@ -51,13 +52,10 @@ class _DoctorRegisterScreenState extends ConsumerState<DoctorRegisterScreen>
     if (widget.initialStep > 1) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              "Welcome back! Continue your registration from Step ${widget.initialStep}.",
-            ),
-            behavior: SnackBarBehavior.floating,
-          ),
+        AppSnackBar.show(
+          message:
+              'Welcome back! Continue your registration from Step ${widget.initialStep}.',
+          type: AppSnackBarType.info,
         );
       });
     }
@@ -110,7 +108,7 @@ class _DoctorRegisterScreenState extends ConsumerState<DoctorRegisterScreen>
       final errorMessage =
           ref.read(doctorRegisterControllerProvider).errorMessage ??
           "Registration Failed";
-      _showErrorSnackBar(errorMessage);
+      AppSnackBar.show(message: errorMessage, type: AppSnackBarType.error);
       return;
     }
 
@@ -121,21 +119,6 @@ class _DoctorRegisterScreenState extends ConsumerState<DoctorRegisterScreen>
     _formData.reset();
 
     context.go(AppRoutes.waitingApproval);
-  }
-
-  void _showErrorSnackBar(String message) {
-    ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          message,
-          style: const TextStyle(fontWeight: FontWeight.w600),
-        ),
-        backgroundColor: Theme.of(context).colorScheme.error,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-    );
   }
 
   @override
@@ -169,7 +152,10 @@ class _DoctorRegisterScreenState extends ConsumerState<DoctorRegisterScreen>
                       child: Column(
                         children: [
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 16,
+                            ),
                             child: Row(
                               children: [
                                 GestureDetector(
@@ -184,7 +170,9 @@ class _DoctorRegisterScreenState extends ConsumerState<DoctorRegisterScreen>
                                     width: 40,
                                     height: 40,
                                     decoration: BoxDecoration(
-                                      color: colorScheme.onPrimary.transparency(0.25),
+                                      color: colorScheme.onPrimary.transparency(
+                                        0.25,
+                                      ),
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: Icon(
@@ -208,7 +196,8 @@ class _DoctorRegisterScreenState extends ConsumerState<DoctorRegisterScreen>
                                         text: 'Doctor',
                                         style: textTheme.titleLarge?.copyWith(
                                           fontWeight: FontWeight.w800,
-                                          color: colorScheme.onPrimary.withValues(alpha: 0.6),
+                                          color: colorScheme.onPrimary
+                                              .withValues(alpha: 0.6),
                                         ),
                                       ),
                                     ],
@@ -266,11 +255,14 @@ class _DoctorRegisterScreenState extends ConsumerState<DoctorRegisterScreen>
                             if (success) {
                               _nextStep();
                             } else {
-                              _showErrorSnackBar(
-                                ref
-                                        .read(doctorRegisterControllerProvider)
-                                        .errorMessage ??
-                                    "Step 1 Failed",
+                              final errorMessage =
+                                  ref
+                                      .read(doctorRegisterControllerProvider)
+                                      .errorMessage ??
+                                  "Step 1 Failed";
+                              AppSnackBar.show(
+                                message: errorMessage,
+                                type: AppSnackBarType.error,
                               );
                             }
                           },
@@ -288,11 +280,14 @@ class _DoctorRegisterScreenState extends ConsumerState<DoctorRegisterScreen>
                             if (success) {
                               _nextStep();
                             } else {
-                              _showErrorSnackBar(
-                                ref
-                                        .read(doctorRegisterControllerProvider)
-                                        .errorMessage ??
-                                    "Step 2 Failed",
+                              final errorMessage =
+                                  ref
+                                      .read(doctorRegisterControllerProvider)
+                                      .errorMessage ??
+                                  "Step 2 Failed";
+                              AppSnackBar.show(
+                                message: errorMessage,
+                                type: AppSnackBarType.error,
                               );
                             }
                           },
@@ -310,11 +305,14 @@ class _DoctorRegisterScreenState extends ConsumerState<DoctorRegisterScreen>
                             if (success) {
                               _nextStep();
                             } else {
-                              _showErrorSnackBar(
-                                ref
-                                        .read(doctorRegisterControllerProvider)
-                                        .errorMessage ??
-                                    "Step 3 Failed",
+                              final errorMessage =
+                                  ref
+                                      .read(doctorRegisterControllerProvider)
+                                      .errorMessage ??
+                                  "Step 3 Failed";
+                              AppSnackBar.show(
+                                message: errorMessage,
+                                type: AppSnackBarType.error,
                               );
                             }
                           },
@@ -332,11 +330,14 @@ class _DoctorRegisterScreenState extends ConsumerState<DoctorRegisterScreen>
                             if (success) {
                               _nextStep();
                             } else {
-                              _showErrorSnackBar(
-                                ref
-                                        .read(doctorRegisterControllerProvider)
-                                        .errorMessage ??
-                                    "Step 4 Failed",
+                              final errorMessage =
+                                  ref
+                                      .read(doctorRegisterControllerProvider)
+                                      .errorMessage ??
+                                  "Step 4 Failed";
+                              AppSnackBar.show(
+                                message: errorMessage,
+                                type: AppSnackBarType.error,
                               );
                             }
                           },
@@ -354,11 +355,14 @@ class _DoctorRegisterScreenState extends ConsumerState<DoctorRegisterScreen>
                             if (success) {
                               _nextStep();
                             } else {
-                              _showErrorSnackBar(
-                                ref
-                                        .read(doctorRegisterControllerProvider)
-                                        .errorMessage ??
-                                    "Step 5 Failed",
+                              final errorMessage =
+                                  ref
+                                      .read(doctorRegisterControllerProvider)
+                                      .errorMessage ??
+                                  "Step 5 Failed";
+                              AppSnackBar.show(
+                                message: errorMessage,
+                                type: AppSnackBarType.error,
                               );
                             }
                           },
@@ -376,11 +380,14 @@ class _DoctorRegisterScreenState extends ConsumerState<DoctorRegisterScreen>
                             if (success) {
                               _nextStep();
                             } else {
-                              _showErrorSnackBar(
-                                ref
-                                        .read(doctorRegisterControllerProvider)
-                                        .errorMessage ??
-                                    "Step 6 Failed",
+                              final errorMessage =
+                                  ref
+                                      .read(doctorRegisterControllerProvider)
+                                      .errorMessage ??
+                                  "Step 6 Failed";
+                              AppSnackBar.show(
+                                message: errorMessage,
+                                type: AppSnackBarType.error,
                               );
                             }
                           },

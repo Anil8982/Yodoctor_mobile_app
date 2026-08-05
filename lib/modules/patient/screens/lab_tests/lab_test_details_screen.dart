@@ -89,9 +89,7 @@ class _LabTestDetailsScreenState extends ConsumerState<LabTestDetailsScreen> {
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () {
-                  ref
-                      .read(labProvider.notifier)
-                      .loadTestDetails(widget.testId);
+                  ref.read(labProvider.notifier).loadTestDetails(widget.testId);
                 },
                 child: const Text('Retry'),
               ),
@@ -124,328 +122,335 @@ class _LabTestDetailsScreenState extends ConsumerState<LabTestDetailsScreen> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppHeader(title: test.name),
-      body: Column(
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(
-                parent: ClampingScrollPhysics(),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Container(
-                    height: 180,
-                    margin: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: colorScheme.primary.withValues(alpha: 0.05),
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                    child: Stack(
-                      children: [
-                        Center(
-                          child: Icon(
-                            Icons.science_rounded,
-                            size: 64,
-                            color: colorScheme.primary,
-                          ),
-                        ),
-                        Positioned(
-                          bottom: 12,
-                          left: 12,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: colorScheme.primaryContainer,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              test.type == 'fullbody' ? 'Package' : 'Essential',
-                              style: const TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Card(
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(
+                  parent: ClampingScrollPhysics(),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Container(
+                      height: 180,
+                      margin: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: colorScheme.primary.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(24),
-                        side: BorderSide(
-                          color: colorScheme.outlineVariant.withValues(
-                            alpha: 0.6,
+                      ),
+                      child: Stack(
+                        children: [
+                          Center(
+                            child: Icon(
+                              Icons.science_rounded,
+                              size: 64,
+                              color: colorScheme.primary,
+                            ),
+                          ),
+                          Positioned(
+                            bottom: 12,
+                            left: 12,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: colorScheme.primaryContainer,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                test.type == 'fullbody'
+                                    ? 'Package'
+                                    : 'Essential',
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Card(
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(24),
+                          side: BorderSide(
+                            color: colorScheme.outlineVariant.withValues(
+                              alpha: 0.6,
+                            ),
                           ),
                         ),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    test.name,
-                                    style: theme.textTheme.titleLarge?.copyWith(
-                                      fontWeight: FontWeight.bold,
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      test.name,
+                                      style: theme.textTheme.titleLarge
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                     ),
                                   ),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 4,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.green,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Text(
+                                      "${(((test.price - test.offerPrice) / test.price) * 100).round()}% OFF",
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                test.tagline,
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: colorScheme.onSurfaceVariant,
                                 ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 4,
+                              ),
+                              const SizedBox(height: 16),
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: [
+                                  _buildSmallTag(
+                                    context,
+                                    Icons.analytics_outlined,
+                                    '${test.includes.length} Parameters',
                                   ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.green,
-                                    borderRadius: BorderRadius.circular(8),
+                                  _buildSmallTag(
+                                    context,
+                                    Icons.schedule_rounded,
+                                    test.reportTime,
                                   ),
-                                  child: Text(
-                                    "${(((test.price - test.offerPrice) / test.price) * 100).round()}% OFF",
+                                ],
+                              ),
+                              const SizedBox(height: 20),
+                              Divider(
+                                color: colorScheme.outlineVariant.withValues(
+                                  alpha: 0.4,
+                                ),
+                                height: 1,
+                              ),
+                              const SizedBox(height: 16),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.baseline,
+                                textBaseline: TextBaseline.alphabetic,
+                                children: [
+                                  Text(
+                                    '₹${test.offerPrice.toInt()}',
+                                    style: theme.textTheme.headlineMedium
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.w900,
+                                          color: colorScheme.primary,
+                                        ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    '₹${test.price.toInt()}',
+                                    style: theme.textTheme.titleMedium
+                                        ?.copyWith(
+                                          color: colorScheme.outline,
+                                          decoration:
+                                              TextDecoration.lineThrough,
+                                        ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    'Save ₹${(test.price - test.offerPrice).toInt()}',
                                     style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 11,
+                                      color: Colors.green,
                                       fontWeight: FontWeight.bold,
+                                      fontSize: 13,
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              test.tagline,
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                color: colorScheme.onSurfaceVariant,
+                                ],
                               ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                      child: Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          _buildVerificationPill(
+                            context,
+                            Icons.gavel_rounded,
+                            'NABL Certified Labs',
+                          ),
+                          _buildVerificationPill(
+                            context,
+                            Icons.home_work_rounded,
+                            'Free Home Sample Pickup',
+                          ),
+                          _buildVerificationPill(
+                            context,
+                            Icons.timer_outlined,
+                            '24 Hours Report',
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'About This Test',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
                             ),
-                            const SizedBox(height: 16),
-                            Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
-                              children: [
-                                _buildSmallTag(
-                                  context,
-                                  Icons.analytics_outlined,
-                                  '${test.includes.length} Parameters',
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(height: 20),
+                              Text(
+                                "Includes",
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
                                 ),
-                                _buildSmallTag(
-                                  context,
-                                  Icons.schedule_rounded,
-                                  test.reportTime,
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 20),
-                            Divider(
-                              color: colorScheme.outlineVariant.withValues(
-                                alpha: 0.4,
                               ),
-                              height: 1,
-                            ),
-                            const SizedBox(height: 16),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.baseline,
-                              textBaseline: TextBaseline.alphabetic,
-                              children: [
-                                Text(
-                                  '₹${test.offerPrice.toInt()}',
-                                  style: theme.textTheme.headlineMedium
-                                      ?.copyWith(
-                                    fontWeight: FontWeight.w900,
-                                    color: colorScheme.primary,
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  '₹${test.price.toInt()}',
-                                  style: theme.textTheme.titleMedium?.copyWith(
-                                    color: colorScheme.outline,
-                                    decoration: TextDecoration.lineThrough,
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Text(
-                                  'Save ₹${(test.price - test.offerPrice).toInt()}',
-                                  style: const TextStyle(
+                              const SizedBox(height: 10),
+                              ...test.includes.map(
+                                (e) => ListTile(
+                                  dense: true,
+                                  leading: const Icon(
+                                    Icons.check_circle,
                                     color: Colors.green,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 13,
                                   ),
+                                  title: Text(e),
                                 ),
-                              ],
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            'This test helps evaluate overall health status and detects a wide range of conditions, including anemia, infection, and various other clinical parameters.',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                              height: 1.4,
                             ),
-                          ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+              decoration: BoxDecoration(
+                color: theme.cardColor,
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(28),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: colorScheme.shadow.withValues(alpha: 0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, -4),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: SizedBox(
+                      height: 48,
+                      child: OutlinedButton.icon(
+                        onPressed: () =>
+                            _handleCartToggle(labPackage, isInCart),
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(
+                            color: isInCart
+                                ? colorScheme.error
+                                : colorScheme.primary,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                        icon: Icon(
+                          isInCart
+                              ? Icons.remove_shopping_cart_rounded
+                              : Icons.add_shopping_cart_rounded,
+                          color: isInCart
+                              ? colorScheme.error
+                              : colorScheme.primary,
+                        ),
+                        label: Text(
+                          isInCart ? 'Remove' : 'Add to Cart',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: isInCart
+                                ? colorScheme.error
+                                : colorScheme.primary,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-                    child: Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        _buildVerificationPill(
-                          context,
-                          Icons.gavel_rounded,
-                          'NABL Certified Labs',
-                        ),
-                        _buildVerificationPill(
-                          context,
-                          Icons.home_work_rounded,
-                          'Free Home Sample Pickup',
-                        ),
-                        _buildVerificationPill(
-                          context,
-                          Icons.timer_outlined,
-                          '24 Hours Report',
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'About This Test',
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: SizedBox(
+                      height: 48,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          if (!isInCart) {
+                            _handleCartToggle(labPackage, isInCart);
+                          }
+                          context.push(AppRoutes.labSlotBooking);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: colorScheme.primary,
+                          foregroundColor: colorScheme.onPrimary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
                           ),
                         ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const SizedBox(height: 20),
-                            Text(
-                              "Includes",
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            ...test.includes.map(
-                                  (e) => ListTile(
-                                dense: true,
-                                leading: const Icon(
-                                  Icons.check_circle,
-                                  color: Colors.green,
-                                ),
-                                title: Text(e),
-                              ),
-                            ),
-                          ],
+                        child: Text(
+                          isInCart ? 'Book Now' : 'Add & Book',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
-                        const SizedBox(height: 6),
-                        Text(
-                          'This test helps evaluate overall health status and detects a wide range of conditions, including anemia, infection, and various other clinical parameters.',
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                            height: 1.4,
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
-          ),
-          Container(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-            decoration: BoxDecoration(
-              color: theme.cardColor,
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(28),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: colorScheme.shadow.withValues(alpha: 0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, -4),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: SizedBox(
-                    height: 48,
-                    child: OutlinedButton.icon(
-                      onPressed: () => _handleCartToggle(labPackage, isInCart),
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(
-                          color: isInCart
-                              ? colorScheme.error
-                              : colorScheme.primary,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
-                      icon: Icon(
-                        isInCart
-                            ? Icons.remove_shopping_cart_rounded
-                            : Icons.add_shopping_cart_rounded,
-                        color: isInCart
-                            ? colorScheme.error
-                            : colorScheme.primary,
-                      ),
-                      label: Text(
-                        isInCart ? 'Remove' : 'Add to Cart',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: isInCart
-                              ? colorScheme.error
-                              : colorScheme.primary,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: SizedBox(
-                    height: 48,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        if (!isInCart) {
-                          _handleCartToggle(labPackage, isInCart);
-                        }
-                        context.push(AppRoutes.labSlotBooking);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: colorScheme.primary,
-                        foregroundColor: colorScheme.onPrimary,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
-                      child: Text(
-                        isInCart ? 'Book Now' : 'Add & Book',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -476,10 +481,10 @@ class _LabTestDetailsScreenState extends ConsumerState<LabTestDetailsScreen> {
   }
 
   Widget _buildVerificationPill(
-      BuildContext context,
-      IconData icon,
-      String text,
-      ) {
+    BuildContext context,
+    IconData icon,
+    String text,
+  ) {
     final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),

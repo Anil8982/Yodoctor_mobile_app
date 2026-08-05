@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/modules/patient/controllers/profile_controller.dart';
+import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 
 class ProfileActionBar extends ConsumerWidget {
   final GlobalKey<FormState> formKey;
@@ -75,20 +76,14 @@ class ProfileActionBar extends ConsumerWidget {
                         final currentState = ref.read(
                           profileControllerProvider,
                         );
-
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              success
-                                  ? "Profile Updated Successfully!"
-                                  : (currentState.errorMessage ??
-                                        "Failed to update profile"),
-                            ),
-                            backgroundColor: success
-                                ? Colors.green
-                                : Colors.red,
-                            behavior: SnackBarBehavior.floating,
-                          ),
+                        AppSnackBar.show(
+                          message: success
+                              ? "Profile Updated Successfully!"
+                              : (currentState.errorMessage ??
+                                    "Failed to update profile"),
+                          type: success
+                              ? AppSnackBarType.success
+                              : AppSnackBarType.error,
                         );
                       }
                     },

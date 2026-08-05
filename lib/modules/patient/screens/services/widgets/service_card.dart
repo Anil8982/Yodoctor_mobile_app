@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/modules/patient/screens/services/models/services_model.dart';
+import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 
 class ServiceCard extends StatelessWidget {
   final MedicalService service;
@@ -18,11 +19,9 @@ class ServiceCard extends StatelessWidget {
         if (service.isQrScanner && onQrTap != null) {
           onQrTap!();
         } else if (service.title == 'Medicine Delivery') {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Medicine delivery coming soon'),
-              duration: Duration(seconds: 2),
-            ),
+          AppSnackBar.show(
+            message: 'Medicine delivery coming soon',
+            type: AppSnackBarType.info,
           );
           return;
         } else if (service.route != '#') {

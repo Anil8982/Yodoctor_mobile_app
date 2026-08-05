@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/modules/widgets/app_header.dart';
+import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 
 import '../../../../core/utils/responsive.dart';
 import '../../controllers/certificate_request.dart';
@@ -53,9 +54,7 @@ class _ApplyCertificateScreenState
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
 
-      appBar: AppHeader(
-        title: 'Apply for Certificate',
-      ),
+      appBar: AppHeader(title: 'Apply for Certificate'),
       body: Column(
         children: [
           Container(
@@ -217,11 +216,9 @@ class _ApplyCertificateScreenState
   ) async {
     if (_currentStep == 1) {
       if (formState.selectedType == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Please select a certificate type'),
-            behavior: SnackBarBehavior.floating,
-          ),
+        AppSnackBar.show(
+          message: 'Please select a certificate type',
+          type: AppSnackBarType.info,
         );
         return;
       }
@@ -236,39 +233,27 @@ class _ApplyCertificateScreenState
       if (notifier.validateDocuments()) {
         setState(() => _currentStep = 4);
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Please upload required verification files.'),
-            behavior: SnackBarBehavior.floating,
-          ),
+        AppSnackBar.show(
+          message: 'Please upload required verification files.',
+          type: AppSnackBarType.error,
         );
       }
     } else if (_currentStep == 4) {
       if (!_confirmDisclaimer) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Please confirm accuracy verification to proceed.'),
-            behavior: SnackBarBehavior.floating,
-          ),
+        AppSnackBar.show(
+          message: 'Please confirm accuracy verification to proceed.',
+          type: AppSnackBarType.info,
         );
         return;
       }
 
       final success = await notifier.submitRequest();
       if (success && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Row(
-              children: [
-                Icon(Icons.check_circle_rounded, color: Colors.white),
-                SizedBox(width: 10),
-                Text('Certificate Request Dispatched!'),
-              ],
-            ),
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            behavior: SnackBarBehavior.floating,
-          ),
+        AppSnackBar.show(
+          message: 'Certificate Request Dispatched!',
+          type: AppSnackBarType.success,
         );
+
         context.pop();
       }
     }
