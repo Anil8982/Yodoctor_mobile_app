@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
 import 'package:yodoctor/modules/doctor/controllers/doctor_profile_controller.dart';
-import 'profile_input_field.dart';
+import 'package:yodoctor/modules/widgets/app_text_field.dart';
 
 class ConsultationTimingsTab extends ConsumerWidget {
-  const ConsultationTimingsTab({super.key, required this.controller});
+  const ConsultationTimingsTab({
+    super.key,
+    required this.controller,
+    required this.autovalidateMode,
+  });
   final DoctorProfileNotifier controller;
+  final AutovalidateMode autovalidateMode;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -30,6 +36,7 @@ class ConsultationTimingsTab extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSpacing.lg),
       child: Form(
         key: controller.consultationFormKey,
+        autovalidateMode: autovalidateMode,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -51,17 +58,22 @@ class ConsultationTimingsTab extends ConsumerWidget {
             Row(
               children: [
                 Expanded(
-                  child: ProfileInputField(
-                    controller: controller.feeController,
+                  child: AppTextField(
                     label: 'Consultation Fee (₹)',
+                    isRequired: true,
                     hint: 'e.g. 500',
                     icon: Icons.currency_rupee_rounded,
+                    controller: controller.feeController,
                     keyboardType: TextInputType.number,
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    validator: (v) {
+                      if (v == null || v.trim().isEmpty) {
                         return 'Enter fee';
                       }
-
+                      final fee = int.tryParse(v);
+                      if (fee == null || fee < 0) {
+                        return 'Enter valid fee amount';
+                      }
                       return null;
                     },
                   ),

@@ -12,6 +12,7 @@ class ProfileFormState {
   final bool isLoading;
   final DoctorProfileModel? profile;
   final String selectedGender;
+  final String selectedState;
   final String selectedPracticeType;
   final int avgDuration;
   final List<String> activeDays;
@@ -25,6 +26,7 @@ class ProfileFormState {
     this.isLoading = false,
     this.profile,
     this.selectedGender = '',
+    this.selectedState = '',
     this.selectedPracticeType = 'Solo Practice',
     this.avgDuration = 20,
     this.activeDays = const [],
@@ -40,6 +42,7 @@ class ProfileFormState {
     DoctorProfileModel? profile,
     bool clearProfile = false,
     String? selectedGender,
+    String? selectedState,
     String? selectedPracticeType,
     int? avgDuration,
     List<String>? activeDays,
@@ -54,6 +57,7 @@ class ProfileFormState {
       isLoading: isLoading ?? this.isLoading,
       profile: clearProfile ? null : (profile ?? this.profile),
       selectedGender: selectedGender ?? this.selectedGender,
+      selectedState: selectedState ?? this.selectedState,
       selectedPracticeType: selectedPracticeType ?? this.selectedPracticeType,
       avgDuration: avgDuration ?? this.avgDuration,
       activeDays: activeDays ?? this.activeDays,
@@ -219,6 +223,7 @@ class DoctorProfileNotifier extends Notifier<ProfileFormState> {
       clearError: true,
       profile: currentProfile,
       selectedGender: currentProfile.gender,
+      selectedState: currentProfile.state,
       selectedPracticeType: currentProfile.practiceType,
       avgDuration: currentProfile.consultationDuration,
       activeDays: List.from(currentProfile.availableDays),
@@ -232,6 +237,12 @@ class DoctorProfileNotifier extends Notifier<ProfileFormState> {
       subTag: _subTag,
     );
     state = state.copyWith(selectedGender: gender);
+  }
+
+  void updateState(String value) {
+    stateController.text = value;
+
+    state = state.copyWith(selectedState: value);
   }
 
   void updatePracticeType(String type) {

@@ -114,6 +114,9 @@ AppTextField(
   hint: 'Enter your full name',
   icon: Icons.person,
   controller: nameController,
+   inputFormatters: [
+    SingleSpaceFormatter(),
+  ],
   validator: (value) {
     if (value == null || value.trim().isEmpty) {
       return 'Name is required';

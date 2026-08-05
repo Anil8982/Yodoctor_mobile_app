@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
 import 'package:yodoctor/modules/doctor/controllers/doctor_profile_controller.dart';
+import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 
 class DocumentsTab extends ConsumerWidget {
   const DocumentsTab({super.key, required this.controller});
@@ -115,8 +116,9 @@ class DocumentsTab extends ConsumerWidget {
 
           InkWell(
             onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('File picker opening...')),
+              AppSnackBar.show(
+                message: 'File picker opening...',
+                type: AppSnackBarType.info,
               );
             },
             borderRadius: BorderRadius.circular(16),
