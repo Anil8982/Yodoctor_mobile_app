@@ -6,6 +6,7 @@ import 'package:yodoctor/core/debug/app_logger.dart';
 import 'package:yodoctor/modules/patient/controllers/book_appointment_controller.dart';
 import 'package:yodoctor/modules/patient/controllers/family_controller.dart';
 import 'package:yodoctor/modules/widgets/app_header.dart';
+import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 import '../../../../core/routes/app_routes.dart';
 import '../../models/search/doctor_detail_model.dart';
 import 'models/appointment_queue_info.dart';
@@ -60,9 +61,7 @@ class BookAppointmentScreen extends ConsumerWidget {
           controllerState.error?.toString() ??
           "Booking Failed. Please try again.";
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(errorMsg)));
+      AppSnackBar.show(message: errorMsg, type: AppSnackBarType.error);
       return;
     }
 

@@ -2,12 +2,14 @@ import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/auth/controllers/patient_register_controller.dart';
 import 'package:yodoctor/modules/auth/widgets/auth_widgets.dart';
+import 'package:yodoctor/modules/widgets/app_date_picker_field.dart';
+import 'package:yodoctor/modules/widgets/app_dropdown_field.dart';
+import 'package:yodoctor/modules/widgets/app_text_field.dart';
 
 class PatientRegisterScreen extends ConsumerStatefulWidget {
   const PatientRegisterScreen({super.key});
@@ -30,6 +32,8 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
 
   late AnimationController _animController;
   late Animation<double> _fadeAnim;
+
+  bool _submittedOnce = false;
 
   @override
   void initState() {
@@ -64,6 +68,9 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
   }
 
   void _submitForm() {
+    setState(() {
+      _submittedOnce = true;
+    });
     if (!_formKey.currentState!.validate()) {
       AppLogger.warning(
         'Form validation failed for patient registration',
@@ -108,7 +115,6 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
         child: Column(
           children: [
             Container(
-              height: 120,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
@@ -190,6 +196,9 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                   ),
                   child: Form(
                     key: _formKey,
+                    autovalidateMode: _submittedOnce
+                        ? AutovalidateMode.onUserInteraction
+                        : AutovalidateMode.disabled,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -232,51 +241,55 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                         const SizedBox(height: 28),
                         _sectionLabel(context, 'Personal Information'),
                         const SizedBox(height: 14),
-                        YoTextField(
-                          controller: _nameController,
+                        AppTextField(
                           label: 'Full Name',
+                          isRequired: true,
                           hint: 'Enter your full name',
-                          prefixIcon: Icons.person_rounded,
+                          icon: Icons.person_rounded,
+                          controller: _nameController,
+                          textCapitalization: TextCapitalization.words,
                           validator: (v) {
                             if (v == null || v.trim().isEmpty) {
                               return 'Enter name';
                             }
-
-                            if (v.trim().length < 2) {
-                              return 'Name should have at least 2 characters';
+                            if (v.trim().length < 3) {
+                              return 'Enter a valid name';
                             }
-
-                            if (!RegExp(
-                              r'^[A-Za-z]+(?: [A-Za-z]+)*$',
-                            ).hasMatch(v)) {
-                              return 'Only alphabets are allowed';
-                            }
-
                             return null;
                           },
                         ),
+
                         const SizedBox(height: 16),
-                        YoTextField(
-                          controller: _emailController,
+                        AppTextField(
                           label: 'Email Address',
+                          isRequired: true,
                           hint: 'patient@example.com',
-                          prefixIcon: Icons.email_rounded,
+                          icon: Icons.email_rounded,
+                          controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
                           validator: (v) {
-                            if (v == null || v.isEmpty) return 'Enter email';
-                            if (!RegExp(r'\S+@\S+\.\S+').hasMatch(v)) {
-                              return 'Enter valid email';
+                            if (v == null || v.trim().isEmpty) {
+                              return 'Email required';
+                            }
+                            final emailRegExp = RegExp(
+                              r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
+                            );
+                            if (!emailRegExp.hasMatch(v.trim())) {
+                              return 'Enter a valid email address';
                             }
                             return null;
                           },
                         ),
+
                         const SizedBox(height: 16),
-                        YoTextField(
-                          controller: _phoneController,
+                        AppTextField(
                           label: 'Phone Number',
+                          isRequired: true,
                           hint: '9876543210',
-                          prefixIcon: Icons.phone_rounded,
+                          icon: Icons.phone_rounded,
+                          controller: _phoneController,
                           keyboardType: TextInputType.phone,
+                          maxLength: 10,
                           inputFormatters: [
                             FilteringTextInputFormatter.digitsOnly,
                             LengthLimitingTextInputFormatter(10),
@@ -285,160 +298,82 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                             if (v == null || v.trim().isEmpty) {
                               return 'Enter phone number';
                             }
-
-                            if (!RegExp(r'^[6-9]\d{9}$').hasMatch(v)) {
+                            final indianPhoneRegExp = RegExp(r'^[6-9]\d{9}$');
+                            if (!indianPhoneRegExp.hasMatch(v.trim())) {
                               return 'Enter a valid 10-digit mobile number';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        AppDatePickerField(
+                          label: 'Date of Birth',
+                          isRequired: true,
+                          hint: 'Select date of birth',
+                          icon: Icons.cake_rounded,
+                          value: registerState.selectedDOB,
+                          firstDate: DateTime(1920),
+                          lastDate: DateTime.now(),
+                          onChanged: (date) {
+                            controllerNotifier.selectDateOfBirth(date);
+                          },
+                          validator: (date) {
+                            if (date == null) {
+                              return 'Select date of birth';
                             }
 
                             return null;
                           },
                         ),
                         const SizedBox(height: 16),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Date of Birth',
-                              style: textTheme.labelLarge?.copyWith(
-                                color: colorScheme.onSurface,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            GestureDetector(
-                              onTap: () {
-                                AppLogger.info(
-                                  'Triggering Date of Birth picker bottom sheet/dialog',
-                                  tag: LogTags.ui,
-                                  subTag: _subTag,
-                                );
-                                controllerNotifier.pickDateOfBirth(context);
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 16,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: colorScheme.surfaceContainerLow,
-                                  borderRadius: BorderRadius.circular(14),
-                                  border: Border.all(
-                                    color: colorScheme.outlineVariant,
-                                    width: 1.2,
-                                  ),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      Icons.calendar_today_rounded,
-                                      color: AppTheme.secondary,
-                                      size: 20,
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Text(
-                                      registerState.selectedDOB != null
-                                          ? DateFormat(
-                                              'dd/MM/yyyy',
-                                            ).format(registerState.selectedDOB!)
-                                          : 'Select date of birth',
-                                      style: textTheme.bodyMedium?.copyWith(
-                                        color: registerState.selectedDOB != null
-                                            ? colorScheme.onSurface
-                                            : colorScheme.onSurfaceVariant
-                                                  .transparency(0.65),
-                                      ),
-                                    ),
-                                    const Spacer(),
-                                    Icon(
-                                      Icons.keyboard_arrow_down_rounded,
-                                      color: colorScheme.onSurfaceVariant,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            if (registerState.dobError != null)
-                              Padding(
-                                padding: const EdgeInsets.only(top: 6),
-                                child: Text(
-                                  registerState.dobError!,
-                                  style: textTheme.bodySmall?.copyWith(
-                                    color: colorScheme.error,
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Gender',
-                              style: textTheme.labelLarge?.copyWith(
-                                color: colorScheme.onSurface,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            Row(
-                              children: [
-                                _genderButton(
-                                  context,
-                                  'Male',
-                                  registerState.selectedGender,
-                                ),
-                                _genderButton(
-                                  context,
-                                  'Female',
-                                  registerState.selectedGender,
-                                ),
-                                _genderButton(
-                                  context,
-                                  'Other',
-                                  registerState.selectedGender,
-                                ),
-                              ],
-                            ),
-                            if (registerState.genderError != null)
-                              Padding(
-                                padding: const EdgeInsets.only(top: 6),
-                                child: Text(
-                                  registerState.genderError!,
-                                  style: textTheme.bodySmall?.copyWith(
-                                    color: colorScheme.error,
-                                  ),
-                                ),
-                              ),
-                          ],
+                        AppDropdownField(
+                          label: 'Gender',
+                          isRequired: true,
+                          hint: 'Select gender',
+                          icon: Icons.wc_rounded,
+                          value: registerState.selectedGender,
+                          items: const ['Male', 'Female', 'Other'],
+                          onChanged: (value) {
+                            controllerNotifier.selectGender(value!);
+                          },
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Select gender';
+                            }
+                            return null;
+                          },
                         ),
                         const SizedBox(height: 24),
                         _sectionLabel(context, 'Account Security'),
                         const SizedBox(height: 14),
-                        YoTextField(
-                          controller: _passwordController,
+                        AppTextField(
                           label: 'Password',
-                          hint: 'Min. 8 characters',
-                          prefixIcon: Icons.lock_rounded,
+                          isRequired: true,
+                          hint: 'Create password',
+                          icon: Icons.lock_rounded,
+                          controller: _passwordController,
                           isPassword: true,
                           validator: (v) {
-                            if (v == null || v.isEmpty) return 'Enter password';
+                            if (v == null || v.isEmpty) {
+                              return 'Password required';
+                            }
                             if (v.length < 8) {
-                              return 'Password must be 8 characters';
+                              return 'Minimum 8 characters required';
                             }
                             return null;
                           },
                         ),
                         const SizedBox(height: 16),
-                        YoTextField(
-                          controller: _confirmPasswordController,
+                        AppTextField(
                           label: 'Confirm Password',
+                          isRequired: true,
                           hint: 'Re-enter password',
-                          prefixIcon: Icons.lock_outline_rounded,
+                          icon: Icons.lock_rounded,
+                          controller: _confirmPasswordController,
                           isPassword: true,
                           validator: (v) {
                             if (v == null || v.isEmpty) {
-                              return 'Confirm password';
+                              return 'Confirm password required';
                             }
                             if (v != _passwordController.text) {
                               return 'Passwords do not match';

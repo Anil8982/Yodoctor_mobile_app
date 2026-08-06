@@ -5,6 +5,7 @@ import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/modules/patient/controllers/booking_controller.dart';
 import 'package:yodoctor/modules/patient/controllers/lab_test_controller.dart';
 import 'package:yodoctor/modules/widgets/app_header.dart';
+import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 import 'widgets/lab_booking_step_container.dart';
 import 'widgets/lab_booking_patient_fields.dart';
 import 'widgets/lab_booking_address_fields.dart';
@@ -51,11 +52,9 @@ class _LabSlotBookingScreenState extends ConsumerState<LabSlotBookingScreen> {
             },
           );
         } else if (next.paymentError != null) {
-          ScaffoldMessenger.maybeOf(context)?.showSnackBar(
-            SnackBar(
-              content: Text(next.paymentError!),
-              backgroundColor: Colors.red,
-            ),
+          AppSnackBar.show(
+            message: next.paymentError!,
+            type: AppSnackBarType.error,
           );
         }
       }
@@ -87,90 +86,95 @@ class _LabSlotBookingScreenState extends ConsumerState<LabSlotBookingScreen> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppHeader(title: 'Book a Slot'),
-      body: Form(
-        key: _formKey,
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              color: colorScheme.primary.withValues(alpha: 0.04),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.shopping_bag_rounded,
-                    size: 16,
-                    color: colorScheme.primary,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    '${cartItems.length} tests selected • ',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  Text(
-                    '₹${totalPayable.toInt()}',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.primary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+      body: SafeArea(
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
+                color: colorScheme.primary.withValues(alpha: 0.04),
+                child: Row(
                   children: [
-                    LabBookingStepContainer(
-                      step: 1,
-                      title: 'Patient Details',
-                      child: LabBookingPatientFields(
-                        nameController: _nameController,
-                        ageController: _ageController,
-                        phoneController: _phoneController,
-                        state: bookingState,
+                    Icon(
+                      Icons.shopping_bag_rounded,
+                      size: 16,
+                      color: colorScheme.primary,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      '${cartItems.length} tests selected • ',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-                    const SizedBox(height: 20),
-                    LabBookingStepContainer(
-                      step: 2,
-                      title: 'Sample Pickup Address',
-                      child: LabBookingAddressFields(
-                        addressController: _addressController,
+                    Text(
+                      '₹${totalPayable.toInt()}',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.primary,
+                        fontWeight: FontWeight.bold,
                       ),
-                    ),
-                    const SizedBox(height: 20),
-                    LabBookingStepContainer(
-                      step: 3,
-                      title: 'Select Date & Time',
-                      child: LabBookingDateTime(state: bookingState),
                     ),
                   ],
                 ),
               ),
-            ),
-            if (validationMessage != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: Text(
-                  validationMessage!,
-                  style: const TextStyle(color: Colors.red, fontSize: 12),
+              Expanded(
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      LabBookingStepContainer(
+                        step: 1,
+                        title: 'Patient Details',
+                        child: LabBookingPatientFields(
+                          nameController: _nameController,
+                          ageController: _ageController,
+                          phoneController: _phoneController,
+                          state: bookingState,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      LabBookingStepContainer(
+                        step: 2,
+                        title: 'Sample Pickup Address',
+                        child: LabBookingAddressFields(
+                          addressController: _addressController,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      LabBookingStepContainer(
+                        step: 3,
+                        title: 'Select Date & Time',
+                        child: LabBookingDateTime(state: bookingState),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            LabBookingBottomBar(
-              state: bookingState,
-              totalPayable: totalPayable,
-              labState: labState,
-              formKey: _formKey,
-              validationMessage: validationMessage,
-              onValidationChanged: (msg) =>
-                  setState(() => validationMessage = msg),
-            ),
-          ],
+              if (validationMessage != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Text(
+                    validationMessage!,
+                    style: const TextStyle(color: Colors.red, fontSize: 12),
+                  ),
+                ),
+              LabBookingBottomBar(
+                state: bookingState,
+                totalPayable: totalPayable,
+                labState: labState,
+                formKey: _formKey,
+                validationMessage: validationMessage,
+                onValidationChanged: (msg) =>
+                    setState(() => validationMessage = msg),
+              ),
+            ],
+          ),
         ),
       ),
     );

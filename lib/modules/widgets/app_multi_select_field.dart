@@ -71,7 +71,10 @@ class _AppMultiSelectFieldState extends State<AppMultiSelectField> {
                 top: 16,
                 left: 20,
                 right: 20,
-                bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+                bottom:
+                    MediaQuery.of(context).viewInsets.bottom +
+                    MediaQuery.of(context).padding.bottom +
+                    8,
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,

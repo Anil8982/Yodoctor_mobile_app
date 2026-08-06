@@ -241,7 +241,7 @@ class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
                                         icon: Icons.person_rounded,
                                         controller: _nameController,
                                         textCapitalization:
-                                        TextCapitalization.words,
+                                            TextCapitalization.words,
                                         validator: (String? value) {
                                           final String name =
                                               value?.trim() ?? '';
@@ -250,11 +250,6 @@ class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
                                           }
                                           if (name.length < 2) {
                                             return 'Name should have at least 2 characters';
-                                          }
-                                          if (!RegExp(
-                                            r'^[A-Za-z]+(?: [A-Za-z]+)*$',
-                                          ).hasMatch(name)) {
-                                            return 'Only alphabets are allowed';
                                           }
                                           return null;
                                         },
@@ -270,7 +265,7 @@ class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
                                         value: _selectedGender,
                                         items: _genderOptions,
                                         onChanged: (String? value) => setState(
-                                              () => _selectedGender = value,
+                                          () => _selectedGender = value,
                                         ),
                                         validator: (String? value) {
                                           if (value == null || value.isEmpty) {
@@ -308,7 +303,7 @@ class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
                                         value: _selectedBloodGroup,
                                         items: _bloodGroupOptions,
                                         onChanged: (String? value) => setState(
-                                              () => _selectedBloodGroup = value,
+                                          () => _selectedBloodGroup = value,
                                         ),
                                         validator: (String? value) {
                                           if (value == null || value.isEmpty) {
@@ -328,7 +323,7 @@ class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
                                         value: _selectedRelation,
                                         items: _relationOptions,
                                         onChanged: (String? value) => setState(
-                                              () => _selectedRelation = value,
+                                          () => _selectedRelation = value,
                                         ),
                                         validator: (String? value) {
                                           if (value == null || value.isEmpty) {
@@ -348,9 +343,9 @@ class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
                                         icon: Icons.height_rounded,
                                         controller: _heightController,
                                         keyboardType:
-                                        const TextInputType.numberWithOptions(
-                                          decimal: true,
-                                        ),
+                                            const TextInputType.numberWithOptions(
+                                              decimal: true,
+                                            ),
                                         inputFormatters: <TextInputFormatter>[
                                           FilteringTextInputFormatter.allow(
                                             RegExp(r'^\d*\.?\d?$'),
@@ -363,7 +358,7 @@ class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
                                             return 'Please enter height';
                                           }
                                           final double? parsed =
-                                          double.tryParse(text);
+                                              double.tryParse(text);
                                           if (parsed == null) {
                                             return 'Enter a valid height';
                                           }
@@ -384,9 +379,9 @@ class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
                                         icon: Icons.monitor_weight_outlined,
                                         controller: _weightController,
                                         keyboardType:
-                                        const TextInputType.numberWithOptions(
-                                          decimal: true,
-                                        ),
+                                            const TextInputType.numberWithOptions(
+                                              decimal: true,
+                                            ),
                                         inputFormatters: <TextInputFormatter>[
                                           FilteringTextInputFormatter.allow(
                                             RegExp(r'^\d*\.?\d?$'),
@@ -399,7 +394,7 @@ class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
                                             return 'Please enter weight';
                                           }
                                           final double? parsed =
-                                          double.tryParse(text);
+                                              double.tryParse(text);
                                           if (parsed == null) {
                                             return 'Enter a valid weight';
                                           }

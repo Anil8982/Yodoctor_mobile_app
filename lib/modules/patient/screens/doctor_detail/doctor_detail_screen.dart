@@ -84,18 +84,20 @@ class _DoctorDetailScreenState extends ConsumerState<DoctorDetailScreen> {
         );
       }(),
       bottomNavigationBar: isMobile && doctorState.doctor != null
-          ? Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: colorScheme.surface,
-                border: Border(
-                  top: BorderSide(
-                    color: colorScheme.outlineVariant.transparency(0.3),
-                    width: 1,
+          ? SafeArea(
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: colorScheme.surface,
+                  border: Border(
+                    top: BorderSide(
+                      color: colorScheme.outlineVariant.transparency(0.3),
+                      width: 1,
+                    ),
                   ),
                 ),
+                child: _buildBookingButton(context, doctorState.doctor!),
               ),
-              child: _buildBookingButton(context, doctorState.doctor!),
             )
           : null,
     );

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/modules/patient/controllers/home_service_controller.dart';
 import 'package:yodoctor/modules/patient/screens/home_care/widgets/booking_header.dart';
 import 'package:yodoctor/modules/widgets/app_header.dart';
+import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 import '../../models/home_care/home_service_booking_model.dart';
 import '../../../../core/utils/input_decoration_helper.dart';
 import 'widgets/booking_personal_details.dart';
@@ -53,271 +54,262 @@ class _HomeServiceBookingScreenState
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppHeader(title: 'Book a Care Service'),
-      body: Form(
-        key: _formKey,
-        child: Column(
-          children: [
-            if (bookingState.isLoading) const LinearProgressIndicator(),
-            Expanded(
-              child: ListView(
-                physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.all(16),
-                children: [
-                  const BookingHeader(),
-                  const SizedBox(height: 20),
+      body: SafeArea(
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              if (bookingState.isLoading) const LinearProgressIndicator(),
+              Expanded(
+                child: ListView(
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.all(16),
+                  children: [
+                    const BookingHeader(),
+                    const SizedBox(height: 20),
 
-                  _buildCardSection(
-                    context,
-                    title: 'Personal Details',
-                    icon: Icons.person_outline_rounded,
-                    child: BookingPersonalDetails(
-                      bookingState: currentModel,
-                      nameController: _nameController,
-                      phoneController: _phoneController,
-                      ageController: _ageController,
-                      addressController: _addressController,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildCardSection(
-                    context,
-                    title: 'Caregiver & Urgency',
-                    icon: Icons.assignment_ind_outlined,
-                    child: BookingUrgencySection(bookingState: currentModel),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildCardSection(
-                    context,
-                    title: 'Type of Service',
-                    icon: Icons.medical_services_outlined,
-                    child: GridView.count(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 10,
-                      childAspectRatio: 2.1,
-                      children: [
-                        _buildServiceTile(
-                          context,
-                          'General Nursing',
-                          Icons.local_hospital_rounded,
-                          currentModel,
-                        ),
-                        _buildServiceTile(
-                          context,
-                          'Elderly Care',
-                          Icons.elderly_rounded,
-                          currentModel,
-                        ),
-                        _buildServiceTile(
-                          context,
-                          'Post Surgery',
-                          Icons.wheelchair_pickup_rounded,
-                          currentModel,
-                        ),
-                        _buildServiceTile(
-                          context,
-                          'ICU Nurse',
-                          Icons.masks_rounded,
-                          currentModel,
-                        ),
-                        _buildServiceTile(
-                          context,
-                          'Attendant',
-                          Icons.hail_rounded,
-                          currentModel,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildCardSection(
-                    context,
-                    title: 'Medical Condition',
-                    icon: Icons.health_and_safety_outlined,
-                    child: TextFormField(
-                      controller: _conditionController,
-                      maxLines: 3,
-                      decoration: AppInputDecoration.build(
-                        context,
-                        label: 'Describe medical condition, symptoms...',
-                        prefixIcon: Icons.description_rounded,
+                    _buildCardSection(
+                      context,
+                      title: 'Personal Details',
+                      icon: Icons.person_outline_rounded,
+                      child: BookingPersonalDetails(
+                        bookingState: currentModel,
+                        nameController: _nameController,
+                        phoneController: _phoneController,
+                        ageController: _ageController,
+                        addressController: _addressController,
                       ),
-                      onChanged: (val) => ref
-                          .read(homeServiceBookingProvider.notifier)
-                          .updateField(medicalCondition: val),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildCardSection(
-                    context,
-                    title: 'Service Duration',
-                    icon: Icons.av_timer_rounded,
-                    child: BookingServiceDuration(
-                      bookingState: currentModel,
-                      daysController: _daysController,
-                      showDurationDateError: _showDurationDateError,
+                    const SizedBox(height: 16),
+                    _buildCardSection(
+                      context,
+                      title: 'Caregiver & Urgency',
+                      icon: Icons.assignment_ind_outlined,
+                      child: BookingUrgencySection(bookingState: currentModel),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildCardSection(
-                    context,
-                    title: 'Time Preference',
-                    icon: Icons.access_time_rounded,
-                    child: Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        _buildTimeChip(
-                          context,
-                          'Morning (6am - 12pm)',
-                          Icons.wb_sunny_rounded,
-                          currentModel,
-                        ),
-                        _buildTimeChip(
-                          context,
-                          'Afternoon (12pm - 5pm)',
-                          Icons.sunny,
-                          currentModel,
-                        ),
-                        _buildTimeChip(
-                          context,
-                          'Evening (5pm - 9pm)',
-                          Icons.wb_twilight_rounded,
-                          currentModel,
-                        ),
-                        _buildTimeChip(
-                          context,
-                          'Night (9pm - 6am)',
-                          Icons.dark_mode_rounded,
-                          currentModel,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildCardSection(
-                    context,
-                    title: 'Additional Notes',
-                    icon: Icons.note_alt_outlined,
-                    child: TextFormField(
-                      controller: _notesController,
-                      maxLines: 2,
-                      decoration: AppInputDecoration.build(
-                        context,
-                        label: 'Any special instructions? (Optional)',
-                        prefixIcon: Icons.edit_note_rounded,
+                    const SizedBox(height: 16),
+                    _buildCardSection(
+                      context,
+                      title: 'Type of Service',
+                      icon: Icons.medical_services_outlined,
+                      child: GridView.count(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 10,
+                        mainAxisSpacing: 10,
+                        childAspectRatio: 2.1,
+                        children: [
+                          _buildServiceTile(
+                            context,
+                            'General Nursing',
+                            Icons.local_hospital_rounded,
+                            currentModel,
+                          ),
+                          _buildServiceTile(
+                            context,
+                            'Elderly Care',
+                            Icons.elderly_rounded,
+                            currentModel,
+                          ),
+                          _buildServiceTile(
+                            context,
+                            'Post Surgery',
+                            Icons.wheelchair_pickup_rounded,
+                            currentModel,
+                          ),
+                          _buildServiceTile(
+                            context,
+                            'ICU Nurse',
+                            Icons.masks_rounded,
+                            currentModel,
+                          ),
+                          _buildServiceTile(
+                            context,
+                            'Attendant',
+                            Icons.hail_rounded,
+                            currentModel,
+                          ),
+                        ],
                       ),
-                      onChanged: (val) => ref
-                          .read(homeServiceBookingProvider.notifier)
-                          .updateField(additionalNotes: val),
                     ),
-                  ),
-                  const SizedBox(height: 24),
-                ],
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
-              decoration: BoxDecoration(
-                color: theme.cardColor,
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(24),
+                    const SizedBox(height: 16),
+                    _buildCardSection(
+                      context,
+                      title: 'Medical Condition',
+                      icon: Icons.health_and_safety_outlined,
+                      child: TextFormField(
+                        controller: _conditionController,
+                        maxLines: 3,
+                        decoration: AppInputDecoration.build(
+                          context,
+                          label: 'Describe medical condition, symptoms...',
+                          prefixIcon: Icons.description_rounded,
+                        ),
+                        onChanged: (val) => ref
+                            .read(homeServiceBookingProvider.notifier)
+                            .updateField(medicalCondition: val),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    _buildCardSection(
+                      context,
+                      title: 'Service Duration',
+                      icon: Icons.av_timer_rounded,
+                      child: BookingServiceDuration(
+                        bookingState: currentModel,
+                        daysController: _daysController,
+                        showDurationDateError: _showDurationDateError,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    _buildCardSection(
+                      context,
+                      title: 'Time Preference',
+                      icon: Icons.access_time_rounded,
+                      child: Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          _buildTimeChip(
+                            context,
+                            'Morning (6am - 12pm)',
+                            Icons.wb_sunny_rounded,
+                            currentModel,
+                          ),
+                          _buildTimeChip(
+                            context,
+                            'Afternoon (12pm - 5pm)',
+                            Icons.sunny,
+                            currentModel,
+                          ),
+                          _buildTimeChip(
+                            context,
+                            'Evening (5pm - 9pm)',
+                            Icons.wb_twilight_rounded,
+                            currentModel,
+                          ),
+                          _buildTimeChip(
+                            context,
+                            'Night (9pm - 6am)',
+                            Icons.dark_mode_rounded,
+                            currentModel,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    _buildCardSection(
+                      context,
+                      title: 'Additional Notes',
+                      icon: Icons.note_alt_outlined,
+                      child: TextFormField(
+                        controller: _notesController,
+                        maxLines: 2,
+                        decoration: AppInputDecoration.build(
+                          context,
+                          label: 'Any special instructions? (Optional)',
+                          prefixIcon: Icons.edit_note_rounded,
+                        ),
+                        onChanged: (val) => ref
+                            .read(homeServiceBookingProvider.notifier)
+                            .updateField(additionalNotes: val),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                  ],
                 ),
-                boxShadow: [
-                  BoxShadow(
-                    color: colorScheme.shadow.withValues(alpha: 0.04),
-                    blurRadius: 10,
-                    offset: const Offset(0, -4),
-                  ),
-                ],
               ),
-              child: SizedBox(
-                height: 50,
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: bookingState.isLoading
-                      ? null
-                      : () async {
-                          if (!(_formKey.currentState?.validate() ?? false)) {
-                            return;
-                          }
-                          setState(() {
-                            _showDurationDateError =
-                                currentModel.durationType.isEmpty ||
-                                currentModel.startDate == null;
-                          });
+              Container(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
+                decoration: BoxDecoration(
+                  color: theme.cardColor,
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(24),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: colorScheme.shadow.withValues(alpha: 0.04),
+                      blurRadius: 10,
+                      offset: const Offset(0, -4),
+                    ),
+                  ],
+                ),
+                child: SizedBox(
+                  height: 50,
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: bookingState.isLoading
+                        ? null
+                        : () async {
+                            if (!(_formKey.currentState?.validate() ?? false)) {
+                              return;
+                            }
+                            setState(() {
+                              _showDurationDateError =
+                                  currentModel.durationType.isEmpty ||
+                                  currentModel.startDate == null;
+                            });
 
-                          if (_showDurationDateError) {
-                            return;
-                          }
+                            if (_showDurationDateError) {
+                              return;
+                            }
 
-                          final success = await ref
-                              .read(homeServiceBookingProvider.notifier)
-                              .createBooking();
-
-                          if (!context.mounted) return;
-
-                          final currentContextState = ref.read(
-                            homeServiceBookingProvider,
-                          );
-
-                          if (success) {
-                            final messenger = ScaffoldMessenger.of(context);
-
-                            messenger.clearSnackBars();
-
-                            await messenger
-                                .showSnackBar(
-                                  const SnackBar(
-                                    content: Text(
-                                      "Booking submitted successfully",
-                                    ),
-                                    duration: Duration(seconds: 2),
-                                  ),
-                                )
-                                .closed;
+                            final success = await ref
+                                .read(homeServiceBookingProvider.notifier)
+                                .createBooking();
 
                             if (!context.mounted) return;
 
-                            ref
-                                .read(homeServiceBookingProvider.notifier)
-                                .resetBooking();
+                            final currentContextState = ref.read(
+                              homeServiceBookingProvider,
+                            );
 
-                            Navigator.pop(context);
-                          } else {
-                            ScaffoldMessenger.of(context)
-                              ..clearSnackBars()
-                              ..showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    currentContextState.errorMessage ??
-                                        "Booking request failed",
-                                  ),
-                                  backgroundColor: Colors.red,
-                                  behavior: SnackBarBehavior.floating,
-                                ),
+                            if (success) {
+                              AppSnackBar.show(
+                                message: 'Booking submitted successfully',
+                                type: AppSnackBarType.success,
+                                bottomMargin: 0,
                               );
-                          }
-                        },
-                  icon: const Icon(Icons.send_rounded, size: 16),
-                  label: const Text(
-                    'Submit Booking Request',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: colorScheme.primary,
-                    foregroundColor: colorScheme.onPrimary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+
+                              if (!context.mounted) return;
+
+                              ref
+                                  .read(homeServiceBookingProvider.notifier)
+                                  .resetBooking();
+
+                              Navigator.pop(context);
+                            } else {
+                              AppSnackBar.show(
+                                message:
+                                    currentContextState.errorMessage ??
+                                    "Booking request failed",
+                                type: AppSnackBarType.error,
+                                bottomMargin: 0,
+                              );
+                            }
+                          },
+                    icon: const Icon(Icons.send_rounded, size: 16),
+                    label: const Text(
+                      'Submit Booking Request',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
                     ),
-                    elevation: 0,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: colorScheme.primary,
+                      foregroundColor: colorScheme.onPrimary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      elevation: 0,
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -7,8 +7,8 @@ import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
 import 'package:yodoctor/core/providers/app_role_provider.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
-import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/auth/repositories/patient_auth_repository.dart';
+import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 
 class PatientRegisterState {
   final bool isLoading;
@@ -49,51 +49,51 @@ class PatientRegisterState {
 }
 
 final patientRegisterControllerProvider =
-NotifierProvider<PatientRegisterController, PatientRegisterState>(
-  PatientRegisterController.new,
-);
+    NotifierProvider<PatientRegisterController, PatientRegisterState>(
+      PatientRegisterController.new,
+    );
 
 class PatientRegisterController extends Notifier<PatientRegisterState> {
   static const String _subTag = 'PatientRegisterController';
 
   @override
   PatientRegisterState build() {
-    AppLogger.info('PatientRegisterController Initialized', tag: LogTags.auth, subTag: _subTag);
+    AppLogger.info(
+      'PatientRegisterController Initialized',
+      tag: LogTags.auth,
+      subTag: _subTag,
+    );
     return PatientRegisterState();
   }
 
   void selectGender(String gender) {
-    AppLogger.info('Gender selection updated locally to: $gender', tag: LogTags.auth, subTag: _subTag);
-    state = state.copyWith(selectedGender: gender, clearGenderError: true);
+    AppLogger.info(
+      'Gender selection updated locally to: $gender',
+      tag: LogTags.auth,
+      subTag: _subTag,
+    );
+    state = state.copyWith(selectedGender: gender, genderError: null);
   }
 
   void toggleTerms(bool value) {
-    AppLogger.info('Terms & conditions agreement toggle value: $value', tag: LogTags.auth, subTag: _subTag);
+    AppLogger.info(
+      'Terms & conditions agreement toggle value: $value',
+      tag: LogTags.auth,
+      subTag: _subTag,
+    );
     state = state.copyWith(agreedToTerms: value);
   }
 
-  Future<void> pickDateOfBirth(BuildContext context) async {
-    AppLogger.info('Launching Date of Birth selection calendar UI dialog', tag: LogTags.auth, subTag: _subTag);
+  void selectDateOfBirth(DateTime? date) {
+    if (date == null) return;
 
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime(1995),
-      firstDate: DateTime(1920),
-      lastDate: DateTime.now(),
-      builder: (context, child) => Theme(
-        data: Theme.of(context).copyWith(
-          colorScheme: Theme.of(context).colorScheme.copyWith(primary: AppTheme.secondary),
-        ),
-        child: child!,
-      ),
+    AppLogger.info(
+      'Date of Birth selected: ${DateFormat('dd MMM yyyy').format(date)}',
+      tag: LogTags.auth,
+      subTag: _subTag,
     );
 
-    if (picked != null) {
-      AppLogger.success('Date of Birth successfully selected: ${picked.toIso8601String()}', tag: LogTags.auth, subTag: _subTag);
-      state = state.copyWith(selectedDOB: picked, clearDobError: true);
-    } else {
-      AppLogger.info('Date of Birth window dismissed without making selection', tag: LogTags.auth, subTag: _subTag);
-    }
+    state = state.copyWith(selectedDOB: date, clearDobError: true);
   }
 
   Future<void> registerPatient({
@@ -105,27 +105,42 @@ class PatientRegisterController extends Notifier<PatientRegisterState> {
     required String confirmPassword,
   }) async {
     if (state.selectedDOB == null) {
-      AppLogger.warning('Patient registration aborted: Missing selected Date of Birth', tag: LogTags.auth, subTag: _subTag);
+      AppLogger.warning(
+        'Patient registration aborted: Missing selected Date of Birth',
+        tag: LogTags.auth,
+        subTag: _subTag,
+      );
       state = state.copyWith(dobError: 'Please select date of birth');
       return;
     }
 
     if (state.selectedGender == null) {
-      AppLogger.warning('Patient registration aborted: Missing selected Gender reference', tag: LogTags.auth, subTag: _subTag);
+      AppLogger.warning(
+        'Patient registration aborted: Missing selected Gender reference',
+        tag: LogTags.auth,
+        subTag: _subTag,
+      );
       state = state.copyWith(genderError: 'Please select gender');
       return;
     }
 
     if (!state.agreedToTerms) {
-      AppLogger.warning('Patient registration aborted: Terms & conditions declaration checkbox unticked', tag: LogTags.auth, subTag: _subTag);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please agree to Terms & Conditions')),
+      AppLogger.warning(
+        'Patient registration aborted: Terms & conditions declaration checkbox unticked',
+        tag: LogTags.auth,
+        subTag: _subTag,
+      );
+      AppSnackBar.show(
+        message: 'Please agree to Terms & Conditions',
+        type: AppSnackBarType.warning,
       );
       return;
     }
 
     state = state.copyWith(isLoading: true);
-    final String formattedDOB = DateFormat('yyyy-MM-dd').format(state.selectedDOB!);
+    final String formattedDOB = DateFormat(
+      'yyyy-MM-dd',
+    ).format(state.selectedDOB!);
 
     final payloadSummary = {
       "fullName": fullName,
@@ -135,8 +150,16 @@ class PatientRegisterController extends Notifier<PatientRegisterState> {
       "dob": formattedDOB,
     };
 
-    AppLogger.info('Initiating patient registration pipeline workflow...', tag: LogTags.auth, subTag: _subTag);
-    AppLogger.json(payloadSummary, tag: LogTags.auth, subTag: '$_subTag/RegistrationPayloadSummary');
+    AppLogger.info(
+      'Initiating patient registration pipeline workflow...',
+      tag: LogTags.auth,
+      subTag: _subTag,
+    );
+    AppLogger.json(
+      payloadSummary,
+      tag: LogTags.auth,
+      subTag: '$_subTag/RegistrationPayloadSummary',
+    );
 
     try {
       final repository = ref.read(patientAuthRepositoryProvider);
@@ -153,22 +176,34 @@ class PatientRegisterController extends Notifier<PatientRegisterState> {
       if (!context.mounted) return;
 
       if (result.success) {
-        AppLogger.success('Patient account registration dispatched and approved successfully on backend', tag: LogTags.auth, subTag: _subTag);
+        AppLogger.success(
+          'Patient account registration dispatched and approved successfully on backend',
+          tag: LogTags.auth,
+          subTag: _subTag,
+        );
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(result.message), backgroundColor: Colors.green),
+        AppSnackBar.show(
+          message: result.message,
+          type: AppSnackBarType.success,
         );
         ref.read(appRoleProvider.notifier).setRole(AppRole.patient);
         context.go(AppRoutes.patientLogin);
       } else {
-        AppLogger.warning('Patient registration sequence explicitly rejected by remote backend: ${result.message}', tag: LogTags.auth, subTag: _subTag);
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(result.message), backgroundColor: Theme.of(context).colorScheme.error),
+        AppLogger.warning(
+          'Patient registration sequence explicitly rejected by remote backend: ${result.message}',
+          tag: LogTags.auth,
+          subTag: _subTag,
         );
+        AppSnackBar.show(message: result.message, type: AppSnackBarType.error);
       }
     } catch (e, st) {
-      AppLogger.error('Registration pipeline collapse exception encountered during transmission', tag: LogTags.auth, subTag: _subTag, error: e, stackTrace: st);
+      AppLogger.error(
+        'Registration pipeline collapse exception encountered during transmission',
+        tag: LogTags.auth,
+        subTag: _subTag,
+        error: e,
+        stackTrace: st,
+      );
     } finally {
       state = state.copyWith(isLoading: false);
     }

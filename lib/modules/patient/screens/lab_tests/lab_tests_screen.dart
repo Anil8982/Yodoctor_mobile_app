@@ -87,133 +87,139 @@ class _LabTestsScreenState extends ConsumerState<LabTestsScreen> {
           const SizedBox(width: 8),
         ],
       ),
-      body: RefreshIndicator(
-        onRefresh: _refreshData,
-        color: colorScheme.primary,
-        backgroundColor: colorScheme.surface,
-        child: isLoading
-            ? SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(
-            parent: ClampingScrollPhysics(),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const LabHeroShimmer(),
-              const SizedBox(height: 5),
-              const LabCategoriesShimmer(),
-              const SizedBox(height: 6),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Popular Packages',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
+      body: SafeArea(
+        child: RefreshIndicator(
+          onRefresh: _refreshData,
+          color: colorScheme.primary,
+          backgroundColor: colorScheme.surface,
+          child: isLoading
+              ? SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(
+                    parent: ClampingScrollPhysics(),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const LabHeroShimmer(),
+                      const SizedBox(height: 5),
+                      const LabCategoriesShimmer(),
+                      const SizedBox(height: 6),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Popular Packages',
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: null,
+                              child: const Text('View All'),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    TextButton(
-                      onPressed: null,
-                      child: const Text('View All'),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 8),
-              const LabPackageCardShimmer(),
-              const SizedBox(height: 24),
-              const LabTrustShimmer(),
-              const SizedBox(height: 12),
-              const LabSupportShimmer(),
-              const SizedBox(height: 24),
-            ],
-          ),
-        )
-            : SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(
-            parent: ClampingScrollPhysics(),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              LabHeroSection(
-                controller: _searchController,
-                onSearch: (value) {},
-              ),
-              const SizedBox(height: 5),
-              LabCategoriesList(
-                categories: labState.categories,
-                selectedCategoryId: selectedCategory,
-                onCategorySelected: (catId) {
-                  notifier.selectCategory(catId);
-                },
-              ),
-              const SizedBox(height: 6),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Popular Packages',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        context.push(AppRoutes.allLabTests);
-                      },
-                      child: const Text('View All'),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 8),
-              SizedBox(
-                height: 283,
-                child: popularTests.isEmpty
-                    ? const Center(
-                  child: Text('No tests available in this category'),
+                      const SizedBox(height: 8),
+                      const LabPackageCardShimmer(),
+                      const SizedBox(height: 24),
+                      const LabTrustShimmer(),
+                      const SizedBox(height: 12),
+                      const LabSupportShimmer(),
+                      const SizedBox(height: 24),
+                    ],
+                  ),
                 )
-                    : ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  scrollDirection: Axis.horizontal,
-                  physics: const ClampingScrollPhysics(),
-                  itemCount: popularTests.length,
-                  itemBuilder: (context, index) {
-                    final package = popularTests[index];
-                    final isInCart = cartItems.any(
-                          (item) => item.id == package.id,
-                    );
-
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 14),
-                      child: LabPackageCard(
-                        package: package,
-                        isInCart: isInCart,
-                        onAddToCart: () {
-                          notifier.toggleCartItem(package);
-                        },
-                        onViewDetails: () {
-                          context.push(
-                            '${AppRoutes.labTestDetails}/${package.id}',
-                          );
+              : SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(
+                    parent: ClampingScrollPhysics(),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      LabHeroSection(
+                        controller: _searchController,
+                        onSearch: (value) {},
+                      ),
+                      const SizedBox(height: 5),
+                      LabCategoriesList(
+                        categories: labState.categories,
+                        selectedCategoryId: selectedCategory,
+                        onCategorySelected: (catId) {
+                          notifier.selectCategory(catId);
                         },
                       ),
-                    );
-                  },
+                      const SizedBox(height: 6),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Popular Packages',
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                context.push(AppRoutes.allLabTests);
+                              },
+                              child: const Text('View All'),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      SizedBox(
+                        height: 283,
+                        child: popularTests.isEmpty
+                            ? const Center(
+                                child: Text(
+                                  'No tests available in this category',
+                                ),
+                              )
+                            : ListView.builder(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                ),
+                                scrollDirection: Axis.horizontal,
+                                physics: const ClampingScrollPhysics(),
+                                itemCount: popularTests.length,
+                                itemBuilder: (context, index) {
+                                  final package = popularTests[index];
+                                  final isInCart = cartItems.any(
+                                    (item) => item.id == package.id,
+                                  );
+
+                                  return Padding(
+                                    padding: const EdgeInsets.only(right: 14),
+                                    child: LabPackageCard(
+                                      package: package,
+                                      isInCart: isInCart,
+                                      onAddToCart: () {
+                                        notifier.toggleCartItem(package);
+                                      },
+                                      onViewDetails: () {
+                                        context.push(
+                                          '${AppRoutes.labTestDetails}/${package.id}',
+                                        );
+                                      },
+                                    ),
+                                  );
+                                },
+                              ),
+                      ),
+                      const SizedBox(height: 24),
+                      const LabTrustSection(),
+                      const SizedBox(height: 12),
+                      const LabSupportBanner(),
+                      const SizedBox(height: 24),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 24),
-              const LabTrustSection(),
-              const SizedBox(height: 12),
-              const LabSupportBanner(),
-              const SizedBox(height: 24),
-            ],
-          ),
         ),
       ),
     );
