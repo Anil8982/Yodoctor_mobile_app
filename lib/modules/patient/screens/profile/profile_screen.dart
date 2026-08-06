@@ -76,61 +76,63 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ),
         ],
       ),
-      body: profileState.user == null && profileState.isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(AppSpacing.md),
-                    physics: const BouncingScrollPhysics(),
-                    child: Column(
-                      children: [
-                        if (profileState.user != null) ...[
-                          ProfileHeader(
-                            user: profileState.user!,
-                            isEditing: isEditing,
-                          ),
-                          const SizedBox(height: 32),
-                          Form(
-                            key: _formKey,
-                            child: ProfileInfoCard(
-                              controller: ref.read(
-                                profileControllerProvider.notifier,
-                              ),
+      body: SafeArea(
+        child: profileState.user == null && profileState.isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : Column(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(AppSpacing.md),
+                      physics: const BouncingScrollPhysics(),
+                      child: Column(
+                        children: [
+                          if (profileState.user != null) ...[
+                            ProfileHeader(
+                              user: profileState.user!,
                               isEditing: isEditing,
                             ),
-                          ),
-                        ] else if (profileState.errorMessage != null) ...[
-                          Center(
-                            child: Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Text(
-                                profileState.errorMessage!,
-                                style: TextStyle(color: colorScheme.error),
+                            const SizedBox(height: 32),
+                            Form(
+                              key: _formKey,
+                              child: ProfileInfoCard(
+                                controller: ref.read(
+                                  profileControllerProvider.notifier,
+                                ),
+                                isEditing: isEditing,
                               ),
                             ),
-                          ),
+                          ] else if (profileState.errorMessage != null) ...[
+                            Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Text(
+                                  profileState.errorMessage!,
+                                  style: TextStyle(color: colorScheme.error),
+                                ),
+                              ),
+                            ),
+                          ],
+                          const SizedBox(height: 24),
                         ],
-                        const SizedBox(height: 24),
-                      ],
+                      ),
                     ),
                   ),
-                ),
-                if (isEditing)
-                  ProfileActionBar(
-                    formKey: _formKey,
-                    onComplete: () {
-                      setState(() => isEditing = false);
-                      AppLogger.info(
-                        'Profile editing mode completed',
-                        tag: LogTags.ui,
-                        subTag: _subTag,
-                      );
-                    },
-                  ),
-              ],
-            ),
+                  if (isEditing)
+                    ProfileActionBar(
+                      formKey: _formKey,
+                      onComplete: () {
+                        setState(() => isEditing = false);
+                        AppLogger.info(
+                          'Profile editing mode completed',
+                          tag: LogTags.ui,
+                          subTag: _subTag,
+                        );
+                      },
+                    ),
+                ],
+              ),
+      ),
     );
   }
 }

@@ -132,7 +132,7 @@ class PatientRegisterController extends Notifier<PatientRegisterState> {
       );
       AppSnackBar.show(
         message: 'Please agree to Terms & Conditions',
-        type: AppSnackBarType.info,
+        type: AppSnackBarType.warning,
       );
       return;
     }

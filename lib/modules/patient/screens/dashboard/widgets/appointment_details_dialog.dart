@@ -299,12 +299,14 @@ class AppointmentDetailsDialog extends ConsumerWidget {
                         AppSnackBar.show(
                           message: 'Appointment cancelled successfully',
                           type: AppSnackBarType.success,
+                          bottomMargin: 0,
                         );
                       } else {
                         AppSnackBar.show(
                           message:
                               controller.errorMessage ??
                               "Unable to cancel appointment",
+                          bottomMargin: 0,
                           type: AppSnackBarType.error,
                         );
                       }

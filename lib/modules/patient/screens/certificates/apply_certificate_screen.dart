@@ -218,7 +218,7 @@ class _ApplyCertificateScreenState
       if (formState.selectedType == null) {
         AppSnackBar.show(
           message: 'Please select a certificate type',
-          type: AppSnackBarType.info,
+          type: AppSnackBarType.warning,
         );
         return;
       }
@@ -235,14 +235,14 @@ class _ApplyCertificateScreenState
       } else {
         AppSnackBar.show(
           message: 'Please upload required verification files.',
-          type: AppSnackBarType.error,
+          type: AppSnackBarType.warning,
         );
       }
     } else if (_currentStep == 4) {
       if (!_confirmDisclaimer) {
         AppSnackBar.show(
           message: 'Please confirm accuracy verification to proceed.',
-          type: AppSnackBarType.info,
+          type: AppSnackBarType.warning,
         );
         return;
       }
@@ -252,6 +252,7 @@ class _ApplyCertificateScreenState
         AppSnackBar.show(
           message: 'Certificate Request Dispatched!',
           type: AppSnackBarType.success,
+          bottomMargin: 1,
         );
 
         context.pop();

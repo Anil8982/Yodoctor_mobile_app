@@ -22,6 +22,7 @@ class ServiceCard extends StatelessWidget {
           AppSnackBar.show(
             message: 'Medicine delivery coming soon',
             type: AppSnackBarType.info,
+            bottomMargin: 0,
           );
           return;
         } else if (service.route != '#') {

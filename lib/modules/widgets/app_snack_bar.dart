@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 final GlobalKey<ScaffoldMessengerState> appScaffoldMessengerKey =
-GlobalKey<ScaffoldMessengerState>();
+    GlobalKey<ScaffoldMessengerState>();
 
-final GlobalKey<NavigatorState> appNavigatorKey =
-GlobalKey<NavigatorState>();
+final GlobalKey<NavigatorState> appNavigatorKey = GlobalKey<NavigatorState>();
 
 enum AppSnackBarType { success, error, info, warning, loading }
 
@@ -29,6 +28,7 @@ class AppSnackBar {
     Color? customAccentColor,
     IconData? customIcon,
     double maxAdaptiveWidth = 420.0,
+    double bottomMargin = 24,
   }) {
     // 1. Throttle Duplicates
     final key = "$type:$message";
@@ -41,13 +41,14 @@ class AppSnackBar {
     _lastKey = key;
     _lastShownTime = now;
 
-    final context = appNavigatorKey.currentContext ??
+    final context =
+        appNavigatorKey.currentContext ??
         appScaffoldMessengerKey.currentContext;
 
     final isDarkMode = context != null
         ? Theme.of(context).brightness == Brightness.dark
         : WidgetsBinding.instance.platformDispatcher.platformBrightness ==
-        Brightness.dark;
+              Brightness.dark;
 
     // 2. Haptic
     if (haptic) {
@@ -80,7 +81,9 @@ class AppSnackBar {
       case AppSnackBarType.success:
         accentColor = customAccentColor ?? const Color(0xFF10B981);
         iconData = customIcon ?? Icons.check_circle_rounded;
-        textColor = isDarkMode ? const Color(0xFFA7F3D0) : const Color(0xFF065F46);
+        textColor = isDarkMode
+            ? const Color(0xFFA7F3D0)
+            : const Color(0xFF065F46);
         cardBgColor = isDarkMode ? const Color(0xFF064E3B) : Colors.white;
         break;
 
@@ -88,14 +91,18 @@ class AppSnackBar {
         accentColor = customAccentColor ?? const Color(0xFFEF4444);
         iconData = customIcon ?? Icons.error_rounded;
         snackDuration = duration ?? const Duration(seconds: 4);
-        textColor = isDarkMode ? const Color(0xFFFECACA) : const Color(0xFF991B1B);
+        textColor = isDarkMode
+            ? const Color(0xFFFECACA)
+            : const Color(0xFF991B1B);
         cardBgColor = isDarkMode ? const Color(0xFF7F1D1D) : Colors.white;
         break;
 
       case AppSnackBarType.warning:
         accentColor = customAccentColor ?? const Color(0xFFF59E0B);
         iconData = customIcon ?? Icons.warning_rounded;
-        textColor = isDarkMode ? const Color(0xFFFDE68A) : const Color(0xFF92400E);
+        textColor = isDarkMode
+            ? const Color(0xFFFDE68A)
+            : const Color(0xFF92400E);
         cardBgColor = isDarkMode ? const Color(0xFF78350F) : Colors.white;
         break;
 
@@ -110,7 +117,9 @@ class AppSnackBar {
       case AppSnackBarType.info:
         accentColor = customAccentColor ?? const Color(0xFF3B82F6);
         iconData = customIcon ?? Icons.info_rounded;
-        textColor = isDarkMode ? const Color(0xFFBFDBFE) : const Color(0xFF1E40AF);
+        textColor = isDarkMode
+            ? const Color(0xFFBFDBFE)
+            : const Color(0xFF1E40AF);
         cardBgColor = isDarkMode ? const Color(0xFF1E3A8A) : Colors.white;
         break;
     }
@@ -135,7 +144,7 @@ class AppSnackBar {
             width: 1.5,
           ),
         ),
-        margin: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+        margin: EdgeInsets.fromLTRB(16, 0, 16, bottomMargin),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         content: Row(
           children: [
@@ -167,11 +176,7 @@ class AppSnackBar {
                   color: accentColor.withValues(alpha: 0.15),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
-                  iconData,
-                  color: accentColor,
-                  size: 20,
-                ),
+                child: Icon(iconData, color: accentColor, size: 20),
               ),
 
             const SizedBox(width: 12),
@@ -225,8 +230,10 @@ class AppSnackBar {
                 },
                 borderRadius: BorderRadius.circular(8),
                 child: Container(
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: accentColor.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(8),
@@ -266,8 +273,9 @@ class AppSnackBar {
   }
 
   static void hide() {
-    appScaffoldMessengerKey.currentState
-        ?.hideCurrentSnackBar(reason: SnackBarClosedReason.hide);
+    appScaffoldMessengerKey.currentState?.hideCurrentSnackBar(
+      reason: SnackBarClosedReason.hide,
+    );
   }
 }
 
