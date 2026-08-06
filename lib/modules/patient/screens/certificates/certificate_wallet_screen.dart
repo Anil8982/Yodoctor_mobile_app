@@ -20,7 +20,8 @@ class CertificateWalletScreen extends ConsumerStatefulWidget {
       _CertificateWalletScreenState();
 }
 
-class _CertificateWalletScreenState extends ConsumerState<CertificateWalletScreen> {
+class _CertificateWalletScreenState
+    extends ConsumerState<CertificateWalletScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final TextEditingController _searchController = TextEditingController();
 
@@ -104,15 +105,15 @@ class _CertificateWalletScreenState extends ConsumerState<CertificateWalletScree
                           ),
                           suffixIcon: value.text.isNotEmpty
                               ? IconButton(
-                            icon: const Icon(
-                              Icons.clear_rounded,
-                              size: 20,
-                            ),
-                            onPressed: () {
-                              _searchController.clear();
-                              notifier.setSearchQuery('');
-                            },
-                          )
+                                  icon: const Icon(
+                                    Icons.clear_rounded,
+                                    size: 20,
+                                  ),
+                                  onPressed: () {
+                                    _searchController.clear();
+                                    notifier.setSearchQuery('');
+                                  },
+                                )
                               : null,
                           filled: true,
                           fillColor: theme.colorScheme.surfaceContainerLow,
@@ -144,7 +145,9 @@ class _CertificateWalletScreenState extends ConsumerState<CertificateWalletScree
                     scrollDirection: Axis.horizontal,
                     physics: const BouncingScrollPhysics(),
                     child: Row(
-                      children: ['All', 'Pending', 'Approved', 'Rejected'].map((filter) {
+                      children: ['All', 'Pending', 'Approved', 'Rejected'].map((
+                        filter,
+                      ) {
                         final isSelected = formState.selectedFilter == filter;
                         return Padding(
                           padding: const EdgeInsets.only(right: 8.0),
@@ -177,26 +180,26 @@ class _CertificateWalletScreenState extends ConsumerState<CertificateWalletScree
           ),
           filteredCertificates.isEmpty
               ? SliverFillRemaining(
-            hasScrollBody: false,
-            child: _buildEmptyState(context, formState.selectedFilter),
-          )
+                  hasScrollBody: false,
+                  child: _buildEmptyState(context, formState.selectedFilter),
+                )
               : SliverPadding(
-            padding: EdgeInsets.fromLTRB(
-              horizontalPadding,
-              12,
-              horizontalPadding,
-              95,
-            ),
-            sliver: SliverList(
-              delegate: SliverChildBuilderDelegate((context, index) {
-                final cert = filteredCertificates[index];
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 12.0),
-                  child: _buildCertificateCard(context, cert),
-                );
-              }, childCount: filteredCertificates.length),
-            ),
-          ),
+                  padding: EdgeInsets.fromLTRB(
+                    horizontalPadding,
+                    12,
+                    horizontalPadding,
+                    95,
+                  ),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      final cert = filteredCertificates[index];
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 12.0),
+                        child: _buildCertificateCard(context, cert),
+                      );
+                    }, childCount: filteredCertificates.length),
+                  ),
+                ),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
@@ -213,9 +216,9 @@ class _CertificateWalletScreenState extends ConsumerState<CertificateWalletScree
   }
 
   Widget _buildCertificateCard(
-      BuildContext context,
-      PatientCertificateRequestModel cert,
-      ) {
+    BuildContext context,
+    PatientCertificateRequestModel cert,
+  ) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final dateStr = DateFormat('dd MMM yyyy').format(cert.createdAt);
@@ -264,9 +267,7 @@ class _CertificateWalletScreenState extends ConsumerState<CertificateWalletScree
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: BorderSide(
-            color: colorScheme.outlineVariant.transparency(0.4),
-          ),
+          side: BorderSide(color: colorScheme.outlineVariant.transparency(0.4)),
         ),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -342,14 +343,17 @@ class _CertificateWalletScreenState extends ConsumerState<CertificateWalletScree
                       color: colorScheme.onSurfaceVariant,
                     ),
                   ),
-                  Text(
-                    cert.doctorName,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: colorScheme.onSurface,
+                  Expanded(
+                    child: Text(
+                      cert.doctorName,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurface,
+                      ),
                     ),
                   ),
-                  const Spacer(),
                   Text(
                     dateStr,
                     style: theme.textTheme.bodySmall?.copyWith(

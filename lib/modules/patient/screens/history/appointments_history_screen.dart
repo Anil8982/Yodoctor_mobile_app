@@ -113,7 +113,7 @@ class _AppointmentsHistoryScreenState
 
                                       showDialog(
                                         context: context,
-                                        builder: (_) => AlertDialog(
+                                        builder: (dialogContext) => AlertDialog(
                                           title: const Text("Prescription"),
                                           content: SingleChildScrollView(
                                             child: Column(
@@ -150,7 +150,7 @@ class _AppointmentsHistoryScreenState
                                           actions: [
                                             TextButton(
                                               onPressed: () =>
-                                                  Navigator.pop(context),
+                                                  Navigator.pop(dialogContext),
                                               child: const Text("Close"),
                                             ),
                                           ],
@@ -164,6 +164,7 @@ class _AppointmentsHistoryScreenState
                                           "",
                                         ),
                                         type: AppSnackBarType.error,
+                                        bottomMargin: 0,
                                       );
                                     }
                                   },
