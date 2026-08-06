@@ -1,3 +1,4 @@
+import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -251,84 +252,90 @@ class _EmptyAppointments extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    return InkWell(
-      onTap: () => context.push(AppRoutes.search),
-      borderRadius: BorderRadius.circular(24),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(
-          vertical: AppSpacing.xxl,
-          horizontal: AppSpacing.xl,
-        ),
-        decoration: BoxDecoration(
-          color: colorScheme.surfaceContainerLow,
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(
-            color: colorScheme.outlineVariant.withValues(alpha: 0.5),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: colorScheme.shadow.withValues(alpha: 0.03),
-              blurRadius: 20,
-              offset: const Offset(0, 10),
-            ),
-          ],
-        ),
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
+          children: [
+            // Illustration
             Container(
-              padding: const EdgeInsets.all(20),
+              width: 120,
+              height: 120,
               decoration: BoxDecoration(
-                color: colorScheme.secondaryContainer.withValues(alpha: 0.4),
                 shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    colorScheme.primaryContainer.transparency(0.6),
+                    colorScheme.primaryContainer.transparency(0.1),
+                  ],
+                ),
               ),
               child: Icon(
-                Icons.event_busy_rounded,
-                size: 40,
-                color: colorScheme.secondary,
+                Icons.calendar_month_rounded,
+                size: 48,
+                color: colorScheme.primary.transparency(0.7),
               ),
             ),
-            const SizedBox(height: AppSpacing.lg),
+
+            const SizedBox(height: 24),
+
             Text(
-              'No Appointments Found',
-              style: textTheme.titleMedium?.copyWith(
+              'No Appointments',
+              style: textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w800,
-                color: colorScheme.onSurface,
+                letterSpacing: -0.5,
               ),
             ),
-            const SizedBox(height: AppSpacing.xs),
+
+            const SizedBox(height: 8),
+
             Text(
-              'You don\'t have any appointments for the selected filter.',
+              'Book an appointment with a doctor',
               textAlign: TextAlign.center,
               style: textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
             ),
-            const SizedBox(height: AppSpacing.xl),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                color: colorScheme.primary,
-                borderRadius: BorderRadius.circular(99),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.add_rounded,
-                    size: 20,
-                    color: colorScheme.onPrimary,
-                  ),
-                  const SizedBox(width: 5),
-                  Text(
-                    'Book New',
-                    style: textTheme.labelLarge?.copyWith(
-                      color: colorScheme.onPrimary,
-                      fontWeight: FontWeight.w400,
+
+            const SizedBox(height: 24),
+
+            InkWell(
+              onTap: () => context.push(AppRoutes.search),
+              borderRadius: BorderRadius.circular(14),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                decoration: BoxDecoration(
+                  color: colorScheme.primary,
+                  borderRadius: BorderRadius.circular(14),
+                  boxShadow: [
+                    BoxShadow(
+                      color: colorScheme.primary.transparency(0.25),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
                     ),
-                  ),
-                ],
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.add_rounded,
+                      size: 20,
+                      color: colorScheme.onPrimary,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Book Appointment',
+                      style: textTheme.labelLarge?.copyWith(
+                        color: colorScheme.onPrimary,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],

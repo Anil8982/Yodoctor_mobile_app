@@ -131,7 +131,7 @@ class PatientAuthRepository implements AuthRepository {
       );
 
       final response = await _dio.post(
-        'http://100.54.44.160/patient/register',
+        ApiConstants.patientRegister,
         data: {
           'fullName': fullName.trim(),
           'phone': phone.trim(),

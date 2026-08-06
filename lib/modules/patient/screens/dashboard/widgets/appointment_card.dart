@@ -13,84 +13,106 @@ class AppointmentCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
 
     final String? imageUrl = appointment.profileImage;
 
     final bool isAccepted = appointment.status == 'ACCEPTED';
     final Color statusColor = isAccepted
-        ? colorScheme.primary
-        : colorScheme.secondary;
+        ? colorScheme.tertiary
+        : Colors.amber.shade700;
     final Color statusBg = isAccepted
-        ? colorScheme.onPrimaryContainer
-        : colorScheme.onSecondaryContainer;
+        ? colorScheme.tertiaryContainer
+        : colorScheme.errorContainer;
 
     final String doctorInitial = appointment.doctorName.isNotEmpty
-        ? appointment.doctorName.replaceAll('Dr. ', '')[0].toUpperCase()
+        ? appointment.doctorName.replaceAll('Dr. ', '').trim()[0].toUpperCase()
         : 'D';
 
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.sm),
       decoration: BoxDecoration(
-        color: colorScheme.secondaryContainer.transparency(1),
-        borderRadius: BorderRadius.circular(20),
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: colorScheme.outlineVariant.transparency(0.5),
+          color: colorScheme.outlineVariant.transparency(0.4),
+          width: 1.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: colorScheme.shadow.transparency(0.04),
-            blurRadius: 15,
-            offset: const Offset(0, 8),
+            color: isDark
+                ? Colors.black26
+                : colorScheme.shadow.transparency(0.04),
+            blurRadius: 18,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
       child: Material(
-        color: colorScheme.surface.transparency(0),
+        color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(20),
-          // onTap: () {
-          //   showDialog(
-          //     context: context,
-          //     builder: (context) =>
-          //         AppointmentDetailsDialog(appointment: appointment),
-          //   );
-          // },
+          borderRadius: BorderRadius.circular(24),
           onTap: () {
             showAppointmentDetailsBottomSheet(context, appointment);
           },
           child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.md),
+            padding: const EdgeInsets.all(18),
             child: Column(
               children: <Widget>[
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
+                    // Doctor Avatar Box
                     Container(
-                      width: 52,
-                      height: 52,
+                      width: 56,
+                      height: 56,
                       decoration: BoxDecoration(
-                        color: colorScheme.primaryContainer,
-                        borderRadius: BorderRadius.circular(16),
-                        image: imageUrl != null && imageUrl.isNotEmpty
-                            ? DecorationImage(
-                          image: NetworkImage(imageUrl),
-                          fit: BoxFit.cover,
-                        )
-                            : null,
-                      ),
-                      child: imageUrl == null || imageUrl.isEmpty
-                          ? Center(
-                        child: Text(
-                          doctorInitial,
-                          style: theme.textTheme.titleLarge?.copyWith(
-                            color: colorScheme.onPrimaryContainer,
-                            fontWeight: FontWeight.w800,
-                          ),
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [colorScheme.primary, colorScheme.tertiary],
                         ),
-                      )
-                          : null,
+                        borderRadius: BorderRadius.circular(18),
+                        boxShadow: [
+                          BoxShadow(
+                            color: colorScheme.primary.transparency(0.2),
+                            blurRadius: 8,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: imageUrl != null && imageUrl.isNotEmpty
+                          ? ClipRRect(
+                              borderRadius: BorderRadius.circular(18),
+                              child: Image.network(
+                                imageUrl,
+                                fit: BoxFit.cover,
+                                width: 56,
+                                height: 56,
+                                errorBuilder: (_, _, _) => Center(
+                                  child: Text(
+                                    doctorInitial,
+                                    style: theme.textTheme.titleLarge?.copyWith(
+                                      color: colorScheme.onPrimary,
+                                      fontWeight: FontWeight.w900,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )
+                          : Center(
+                              child: Text(
+                                doctorInitial,
+                                style: theme.textTheme.titleLarge?.copyWith(
+                                  color: colorScheme.onPrimary,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
+                            ),
                     ),
-                    const SizedBox(width: AppSpacing.md),
+                    const SizedBox(width: 16),
+
+                    // Details Area
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -106,10 +128,11 @@ class AppointmentCard extends StatelessWidget {
                                       appointment.doctorName,
                                       style: theme.textTheme.titleMedium
                                           ?.copyWith(
-                                            fontWeight: FontWeight.w800,
+                                            fontWeight: FontWeight.w900,
                                             letterSpacing: -0.3,
                                           ),
                                     ),
+                                    const SizedBox(height: 2),
                                     Text(
                                       appointment.specialization,
                                       style: theme.textTheme.labelMedium
@@ -121,22 +144,26 @@ class AppointmentCard extends StatelessWidget {
                                   ],
                                 ),
                               ),
+                              const SizedBox(width: 8),
+
+                              // Status Chip
                               Container(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 10,
-                                  vertical: 4,
+                                  vertical: 5,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: statusBg.transparency(0.2),
-                                  borderRadius: BorderRadius.circular(180),
+                                  color: statusBg.transparency(0.6),
+                                  borderRadius: BorderRadius.circular(20),
                                 ),
                                 child: Row(
+                                  mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Icon(
                                       isAccepted
                                           ? Icons.check_circle_rounded
                                           : Icons.pending_rounded,
-                                      size: 14,
+                                      size: 13,
                                       color: statusColor,
                                     ),
                                     const SizedBox(width: 4),
@@ -145,7 +172,8 @@ class AppointmentCard extends StatelessWidget {
                                       style: theme.textTheme.labelSmall
                                           ?.copyWith(
                                             color: statusColor,
-                                            fontWeight: FontWeight.w800,
+                                            fontWeight: FontWeight.w900,
+                                            fontSize: 10,
                                           ),
                                     ),
                                   ],
@@ -153,15 +181,24 @@ class AppointmentCard extends StatelessWidget {
                               ),
                             ],
                           ),
-                          const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 8.0),
-                            child: Divider(height: 1, thickness: 1),
+
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 12.0),
+                            child: Divider(
+                              height: 1,
+                              thickness: 0.6,
+                              color: colorScheme.outlineVariant.withValues(
+                                alpha: 0.3,
+                              ),
+                            ),
                           ),
+
+                          // Patient Info Row
                           Row(
                             children: <Widget>[
                               Icon(
                                 Icons.person_outline_rounded,
-                                size: 16,
+                                size: 15,
                                 color: colorScheme.onSurfaceVariant,
                               ),
                               const SizedBox(width: 6),
@@ -169,14 +206,15 @@ class AppointmentCard extends StatelessWidget {
                                 'Patient: ${appointment.familyName ?? "Self"}',
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   color: colorScheme.onSurfaceVariant,
-                                  fontWeight: FontWeight.w600,
+                                  fontWeight: FontWeight.w700,
                                 ),
                               ),
                               const Spacer(),
                               Icon(
-                                Icons.more_horiz_rounded,
+                                Icons.arrow_forward_ios_rounded,
+                                size: 12,
                                 color: colorScheme.onSurfaceVariant.withValues(
-                                  alpha: 0.5,
+                                  alpha: 0.4,
                                 ),
                               ),
                             ],
