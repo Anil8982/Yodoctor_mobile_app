@@ -38,139 +38,100 @@ class PatientDashboardState {
 }
 
 final patientDashboardControllerProvider =
-NotifierProvider.autoDispose<PatientDashboardController, PatientDashboardState>(
-  PatientDashboardController.new,
-);
+    NotifierProvider.autoDispose<
+      PatientDashboardController,
+      PatientDashboardState
+    >(PatientDashboardController.new);
 
 class PatientDashboardController extends Notifier<PatientDashboardState> {
   static const List<String> availableFilters = ["All", "Today", "Next 7 Days"];
   static const String _subTag = 'PatientDashboardController';
 
+  PatientDashboardRepository get _repo =>
+      ref.read(patientDashboardRepositoryProvider);
+
   @override
   PatientDashboardState build() {
-    Future.microtask(() => loadDashboard());
+    Future.microtask(_loadDashboard);
     return const PatientDashboardState();
   }
 
-  Future<void> loadDashboard({String? filter}) async {
-    state = state.copyWith(
-      isLoading: true,
-      clearError: true,
-      selectedFilter: filter ?? state.selectedFilter,
-    );
+  Future<void> loadDashboard({String? filter}) =>
+      _loadDashboard(filter: filter);
 
-    AppLogger.info(
-      'Loading dashboard',
-      tag: LogTags.patient,
-      subTag: _subTag,
-    );
+  Future<bool> cancelAppointment(int appointmentId) =>
+      _cancelAppointment(appointmentId);
+
+  Future<void> refreshTokenStatus() => _refreshTokenStatus();
+
+  Future<void> setFilter(String filter) async {
+    if (state.selectedFilter == filter) return;
+    await _loadDashboard(filter: filter);
+  }
+
+  Future<void> _loadDashboard({String? filter}) async {
+    _setLoading(error: true);
+
+    AppLogger.info('Loading dashboard', tag: LogTags.patient, subTag: _subTag);
 
     try {
-      final repository = ref.read(patientDashboardRepositoryProvider);
-      final response = await repository.getDashboard();
+      final response = await _repo.getDashboard();
 
-      final statusCode = response.statusCode;
-
-      if (statusCode != null && statusCode >= 200 && statusCode < 300) {
+      if (_isSuccess(response.statusCode)) {
         if (response.data is Map<String, dynamic>) {
-          AppLogger.json(
-            response.data as Map<String, dynamic>,
-            tag: LogTags.api,
-            subTag: _subTag,
-          );
+          AppLogger.json(response.data, tag: LogTags.api, subTag: _subTag);
         }
-        final dashboardData = DashboardModel.fromJson(response.data);
         state = state.copyWith(
           isLoading: false,
-          dashboardData: dashboardData,
+          dashboardData: DashboardModel.fromJson(response.data),
+          selectedFilter: filter ?? state.selectedFilter,
         );
       } else {
-        final errorMsg = response.data["message"] ?? "Unable to load dashboard";
-        AppLogger.warning(
-          'Failed to load dashboard: $errorMsg',
-          tag: LogTags.patient,
-          subTag: _subTag,
-        );
-        state = state.copyWith(
-          isLoading: false,
-          errorMessage: errorMsg,
-        );
+        final msg = response.data["message"] ?? "Unable to load dashboard";
+        _handleError(msg, 'Failed to load dashboard');
       }
-    } catch (e, stackTrace) {
-      AppLogger.exception(
-        e,
-        stackTrace,
-        message: 'Failed to load dashboard',
-        tag: LogTags.patient,
-        subTag: _subTag,
-      );
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: "Unable to load dashboard",
-      );
+    } catch (e, st) {
+      _handleException(e, st, 'Failed to load dashboard');
     }
   }
 
-  Future<bool> cancelAppointment(int appointmentId) async {
+  Future<bool> _cancelAppointment(int appointmentId) async {
     AppLogger.info(
-      'Cancelling appointment ID: $appointmentId',
+      'Cancelling $appointmentId',
       tag: LogTags.patient,
       subTag: _subTag,
     );
+
     try {
-      final repository = ref.read(patientDashboardRepositoryProvider);
-      final response = await repository.cancelAppointment(appointmentId);
+      final response = await _repo.cancelAppointment(appointmentId);
 
-      final statusCode = response.statusCode;
-
-      if (statusCode != null && statusCode >= 200 && statusCode < 300 && response.data["success"] == true) {
-        AppLogger.success(
-          'Appointment cancelled successfully',
-          tag: LogTags.patient,
-          subTag: _subTag,
-        );
-        await loadDashboard(filter: state.selectedFilter);
+      if (_isSuccess(response.statusCode) && response.data["success"] == true) {
+        AppLogger.success('Cancelled', tag: LogTags.patient, subTag: _subTag);
+        await _loadDashboard(filter: state.selectedFilter);
         return true;
       }
 
-      final errorMsg = response.data["message"] ?? "Unable to cancel appointment";
-      state = state.copyWith(errorMessage: errorMsg);
+      final msg = response.data["message"] ?? "Unable to cancel appointment";
+      state = state.copyWith(errorMessage: msg);
       return false;
-    } catch (e, stackTrace) {
-      AppLogger.exception(
-        e,
-        stackTrace,
-        message: 'Failed to cancel appointment',
-        tag: LogTags.patient,
-        subTag: _subTag,
-      );
-      state = state.copyWith(errorMessage: "Unable to cancel appointment");
+    } catch (e, st) {
+      _handleException(e, st, 'Failed to cancel appointment');
       return false;
     }
   }
 
-  Future<void> refreshTokenStatus() async {
-    if (state.dashboardData?.todayToken == null) return;
-    if (state.isRefreshingToken) return;
+  Future<void> _refreshTokenStatus() async {
+    final token = state.dashboardData?.todayToken;
+    if (token == null || state.isRefreshingToken) return;
 
     state = state.copyWith(isRefreshingToken: true);
 
-    AppLogger.info(
-      'Refreshing token status',
-      tag: LogTags.patient,
-      subTag: _subTag,
-    );
+    AppLogger.info('Refreshing token', tag: LogTags.patient, subTag: _subTag);
 
     try {
-      final repository = ref.read(patientDashboardRepositoryProvider);
-      final response = await repository.getTokenStatus(
-        state.dashboardData!.todayToken!.appointmentId,
-      );
+      final response = await _repo.getTokenStatus(token.appointmentId);
 
-      final statusCode = response.statusCode;
-
-      if (statusCode != null && statusCode >= 200 && statusCode < 300) {
-        final token = state.dashboardData!.todayToken!;
+      if (_isSuccess(response.statusCode)) {
         final updatedDashboard = DashboardModel(
           patient: state.dashboardData!.patient,
           patientName: state.dashboardData!.patientName,
@@ -179,26 +140,46 @@ class PatientDashboardController extends Notifier<PatientDashboardState> {
           todayToken: token.copyWith(
             nowServing: response.data["nowServing"],
             patientsAhead: response.data["patientsAhead"],
-            estimatedTime: response.data["estimatedTime"] ?? "${response.data["estimatedWaitMinutes"]} mins",
+            estimatedTime:
+                response.data["estimatedTime"] ??
+                "${response.data["estimatedWaitMinutes"]} mins",
           ),
         );
         state = state.copyWith(dashboardData: updatedDashboard);
       }
     } catch (e, st) {
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Failed to refresh token status',
-        tag: LogTags.patient,
-        subTag: _subTag,
-      );
+      _handleException(e, st, 'Failed to refresh token status');
     } finally {
       state = state.copyWith(isRefreshingToken: false);
     }
   }
 
-  Future<void> setFilter(String filter) async {
-    if (state.selectedFilter == filter) return;
-    await loadDashboard(filter: filter);
+  void _setLoading({bool error = false}) {
+    state = state.copyWith(isLoading: true, clearError: error);
   }
+
+  void _handleError(String message, String logMessage) {
+    AppLogger.warning(
+      '$logMessage: $message',
+      tag: LogTags.patient,
+      subTag: _subTag,
+    );
+    state = state.copyWith(isLoading: false, errorMessage: message);
+  }
+
+  void _handleException(Object e, StackTrace st, String logMessage) {
+    AppLogger.exception(
+      e,
+      st,
+      message: logMessage,
+      tag: LogTags.patient,
+      subTag: _subTag,
+    );
+    state = state.copyWith(
+      isLoading: false,
+      errorMessage: "Unable to load dashboard",
+    );
+  }
+
+  bool _isSuccess(int? code) => code != null && code >= 200 && code < 300;
 }

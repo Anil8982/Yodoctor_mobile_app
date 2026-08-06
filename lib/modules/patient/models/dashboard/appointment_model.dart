@@ -60,12 +60,44 @@ class AppointmentModel {
       address: json["address"] ?? "",
       profileImage: json["profile_image"] ?? json["profileImage"],
       appointmentType: json["appointment_type"] ?? "",
-      appointmentDate: json["appointment_date"] ?? "",
+      appointmentDate: _formatDate(json["appointment_date"]),
       appointmentSlot: json["appointment_slot"] ?? "",
       tokenNumber: json["token_number"] ?? 0,
       status: json["status"] ?? "",
       familyName: json["familyName"],
       relation: json["relation"],
     );
+  }
+
+  // Helper method to convert "2026-08-06T00:00:00.000Z" to "06 Aug 2026"
+  static String _formatDate(dynamic dateStr) {
+    if (dateStr == null || dateStr.toString().isEmpty) return "";
+    try {
+      final dateTime = DateTime.parse(dateStr.toString());
+      final day = dateTime.day.toString().padLeft(2, '0');
+      final month = _getMonthName(dateTime.month);
+      final year = dateTime.year;
+      return "$day $month $year"; // Output: "06 Aug 2026"
+    } catch (e) {
+      return dateStr.toString(); // Fallback if parsing fails
+    }
+  }
+
+  static String _getMonthName(int month) {
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    return months[month - 1];
   }
 }

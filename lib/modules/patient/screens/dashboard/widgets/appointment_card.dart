@@ -2,7 +2,7 @@ import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import '../../../../../core/utils/app_spacing.dart';
 import '../../../models/dashboard/appointment_model.dart';
-import 'appointment_details_dialog.dart';
+import 'appointment_details/appointment_details_bottom_sheet.dart';
 
 class AppointmentCard extends StatelessWidget {
   const AppointmentCard({super.key, required this.appointment});
@@ -48,12 +48,15 @@ class AppointmentCard extends StatelessWidget {
         color: colorScheme.surface.transparency(0),
         child: InkWell(
           borderRadius: BorderRadius.circular(20),
+          // onTap: () {
+          //   showDialog(
+          //     context: context,
+          //     builder: (context) =>
+          //         AppointmentDetailsDialog(appointment: appointment),
+          //   );
+          // },
           onTap: () {
-            showDialog(
-              context: context,
-              builder: (context) =>
-                  AppointmentDetailsDialog(appointment: appointment),
-            );
+            showAppointmentDetailsBottomSheet(context, appointment);
           },
           child: Padding(
             padding: const EdgeInsets.all(AppSpacing.md),
