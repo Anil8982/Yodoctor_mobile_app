@@ -10,7 +10,6 @@ import '../../widgets/custom_sliver_app_bar.dart';
 import '../../widgets/patient_drawer.dart';
 import 'widgets/certificate_header.dart';
 import '../../../patient/models/certificate/patient_certificate_request_model.dart';
-import '../../controllers/patient_dashboard_controller.dart';
 
 class CertificateWalletScreen extends ConsumerStatefulWidget {
   const CertificateWalletScreen({super.key});
@@ -46,10 +45,6 @@ class _CertificateWalletScreenState
     final colorScheme = theme.colorScheme;
     final horizontalPadding = Responsive.horizontalPadding(context);
 
-    // 🎯 Replaced provider's context.watch with reactive Riverpod ref.watch sync
-    final dashboardState = ref.watch(patientDashboardControllerProvider);
-    final dashboardData = dashboardState.dashboardData;
-
     // Watch dynamic state layout values from profile notifier provider
     final formState = ref.watch(certificateProvider);
     final notifier = ref.read(certificateProvider.notifier);
@@ -59,7 +54,7 @@ class _CertificateWalletScreenState
 
     return Scaffold(
       key: _scaffoldKey,
-      drawer: PatientDrawer(dashboard: dashboardData),
+      drawer: PatientDrawer(),
       backgroundColor: theme.scaffoldBackgroundColor,
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),

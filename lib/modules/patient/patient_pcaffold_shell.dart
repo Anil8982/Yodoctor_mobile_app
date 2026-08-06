@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
-import 'package:yodoctor/modules/patient/screens/dashboard/dashboard_screen.dart';
-import 'package:yodoctor/modules/patient/screens/certificates/certificate_wallet_screen.dart';
-import 'package:yodoctor/modules/patient/screens/history/appointments_history_screen.dart';
-import 'package:yodoctor/modules/patient/screens/services/services_screen.dart';
-import 'package:yodoctor/modules/patient/widgets/patient_bottom_nav.dart';
-import 'package:yodoctor/modules/patient/widgets/qr_scanner.dart';
 
-class PatientScaffoldShell extends StatefulWidget {
+import 'widgets/patient_bottom_nav.dart';
+import 'widgets/patient_drawer.dart';
+import 'widgets/qr_scanner.dart';
+
+class PatientScaffoldShell extends ConsumerWidget {
   const PatientScaffoldShell({
     super.key,
     required this.navigationShell,
@@ -16,89 +14,37 @@ class PatientScaffoldShell extends StatefulWidget {
 
   final StatefulNavigationShell navigationShell;
 
-  @override
-  State<PatientScaffoldShell> createState() => _PatientScaffoldShellState();
-}
-
-class _PatientScaffoldShellState extends State<PatientScaffoldShell> {
-  late PersistentTabController _controller;
-  int _lastActiveIndex = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    final int initialNavIndex = widget.navigationShell.currentIndex >= 2
-        ? widget.navigationShell.currentIndex + 1
-        : widget.navigationShell.currentIndex;
-
-    _controller = PersistentTabController(initialIndex: initialNavIndex);
-    _lastActiveIndex = initialNavIndex;
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  List<Widget> _buildScreens() {
-    return [
-      DashboardScreen(),
-      const CertificateWalletScreen(),
-      const Scaffold(body: SizedBox.shrink()),
-      // const FamilyMembersScreen(),
-      const ServicesScreen(),
-      const AppointmentsHistoryScreen(),
-    ];
-  }
-
-  void _openQRScanner() {
+  void _openQRScanner(BuildContext context) {
     QrScannerSheet.show(context);
   }
 
   @override
-  Widget build(BuildContext context) {
-    final int expectedNavIndex = widget.navigationShell.currentIndex >= 2
-        ? widget.navigationShell.currentIndex + 1
-        : widget.navigationShell.currentIndex;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final bool isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
 
-    if (_controller.index != expectedNavIndex) {
-      _controller.index = expectedNavIndex;
-    }
-
-    return PersistentTabView(
-      context,
-      controller: _controller,
-      screens: _buildScreens(),
-      items: PatientBottomNav.navBarItems(context),
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      handleAndroidBackButtonPress: true,
-      resizeToAvoidBottomInset: true,
-      stateManagement: true,
-      hideNavigationBarWhenKeyboardAppears: true,
-      padding: const EdgeInsets.only(top: 8),
-      navBarHeight: kBottomNavigationBarHeight + 10,
-      decoration: NavBarDecoration(
-        borderRadius: BorderRadius.zero,
-        colorBehindNavBar: Theme.of(context).scaffoldBackgroundColor,
-        border: Border(
-          top: BorderSide(
-            color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.4),
-          ),
-        ),
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      drawer: PatientDrawer(),
+      body: navigationShell,
+      bottomNavigationBar: PatientBottomNav(
+        currentIndex: navigationShell.currentIndex,
+        onTap: (index) {
+          navigationShell.goBranch(
+            index,
+            initialLocation: index == navigationShell.currentIndex,
+          );
+        },
       ),
-      navBarStyle: NavBarStyle.style15,
-      onItemSelected: (index) {
-        if (index == 2) {
-          _controller.index = _lastActiveIndex;
-          _openQRScanner();
-        } else {
-          _lastActiveIndex = index;
-
-          final int routerBranchIndex = index >= 2 ? index - 1 : index;
-          widget.navigationShell.goBranch(routerBranchIndex);
-        }
-      },
+      floatingActionButton: isKeyboardVisible
+          ? null
+          : FloatingActionButton(
+        heroTag: 'patient_qr_scanner',
+        tooltip: 'Scan QR Code',
+        onPressed: () => _openQRScanner(context),
+        elevation: 4,
+        child: const Icon(Icons.qr_code_scanner_rounded),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }

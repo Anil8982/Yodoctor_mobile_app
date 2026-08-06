@@ -12,7 +12,6 @@ import '../../../../core/utils/responsive.dart';
 
 import '../../controllers/patient_dashboard_controller.dart';
 import 'widgets/appointment_card.dart';
-import 'widgets/appointment_filter_chips.dart';
 import 'widgets/token_card.dart';
 import 'widgets/search_doctor_card.dart';
 
@@ -41,9 +40,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    final controller = ref.watch(patientDashboardControllerProvider);
-    final loading = controller.isLoading;
-    final data = controller.dashboardData;
+    // 🎯 Watching the new state provider
+    final state = ref.watch(patientDashboardControllerProvider);
+    final loading = state.isLoading;
+    final data = state.dashboardData;
 
     if (loading && data == null) {
       return Scaffold(
@@ -57,7 +57,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         key: _scaffoldKey,
         extendBodyBehindAppBar: true,
         backgroundColor: theme.scaffoldBackgroundColor,
-        drawer: const PatientDrawer(dashboard: null),
+        drawer: const PatientDrawer(),
         body: NestedScrollView(
           headerSliverBuilder: (context, innerBoxIsScrolled) {
             return [
@@ -96,7 +96,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   ),
                   const SizedBox(height: AppSpacing.xs),
                   Text(
-                    controller.errorMessage ??
+                    state.errorMessage ??
                         "Unable to connect to the server. Please check your internet connection.",
                     textAlign: TextAlign.center,
                     style: theme.textTheme.bodyMedium?.copyWith(
@@ -135,7 +135,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       key: _scaffoldKey,
       extendBodyBehindAppBar: true,
       backgroundColor: theme.scaffoldBackgroundColor,
-      drawer: PatientDrawer(dashboard: data),
+      drawer: PatientDrawer(),
       body: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
@@ -147,7 +147,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           ];
         },
         body: RefreshIndicator(
-          onRefresh: controller.loadDashboard,
+          onRefresh: () => ref
+              .read(patientDashboardControllerProvider.notifier)
+              .loadDashboard(),
           color: colorScheme.primary,
           backgroundColor: colorScheme.surface,
           child: SingleChildScrollView(
@@ -161,7 +163,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SearchDoctorCard(),
+                const SearchDoctorCard(),
                 const SizedBox(height: AppSpacing.xl),
                 TokenCard(token: data.todayToken),
                 const SizedBox(height: AppSpacing.xl),
@@ -170,17 +172,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   colorScheme,
                   'Upcoming Appointments',
                 ),
-                // const SizedBox(height: AppSpacing.sm),
-                // AppointmentFilterChips(
-                //   filters: PatientDashboardController.availableFilters,
-                //   selectedFilter: controller.selectedFilter,
-                //   onFilterSelected: (filter) {
-                //     HapticFeedback.selectionClick();
-                //     ref
-                //         .read(patientDashboardControllerProvider.notifier)
-                //         .setFilter(filter);
-                //   },
-                // ),
                 const SizedBox(height: AppSpacing.md),
                 if (loading)
                   LinearProgressIndicator(
@@ -197,10 +188,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   }
 
   Widget _buildSectionHeader(
-    BuildContext context,
-    ColorScheme colorScheme,
-    String title,
-  ) {
+      BuildContext context,
+      ColorScheme colorScheme,
+      String title,
+      ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -214,36 +205,21 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             ),
           ),
         ),
-        // TextButton.icon(
-        //   onPressed: () {},
-        //   icon: Text(
-        //     'View All',
-        //     style: TextStyle(
-        //       color: colorScheme.primary,
-        //       fontWeight: FontWeight.w700,
-        //     ),
-        //   ),
-        //   label: Icon(
-        //     Icons.arrow_forward_rounded,
-        //     size: 16,
-        //     color: colorScheme.primary,
-        //   ),
-        // ),
       ],
     );
   }
 
   Widget _buildAppointmentsContent(dynamic data, bool mobile) {
-    if (data.appointments.isEmpty) return _EmptyAppointments();
+    if (data.appointments.isEmpty) return const _EmptyAppointments();
     if (mobile) {
       return Column(
         children: data.appointments
             .map<Widget>(
               (appointment) => Padding(
-                padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                child: AppointmentCard(appointment: appointment),
-              ),
-            )
+            padding: const EdgeInsets.only(bottom: AppSpacing.md),
+            child: AppointmentCard(appointment: appointment),
+          ),
+        )
             .toList(),
       );
     }
@@ -256,10 +232,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           children: data.appointments
               .map<Widget>(
                 (appointment) => SizedBox(
-                  width: itemWidth,
-                  child: AppointmentCard(appointment: appointment),
-                ),
-              )
+              width: itemWidth,
+              child: AppointmentCard(appointment: appointment),
+            ),
+          )
               .toList(),
         );
       },

@@ -80,32 +80,32 @@ class AppointmentDetailsDialog extends ConsumerWidget {
                             ),
                             borderRadius: BorderRadius.circular(16),
                             image:
-                                appointment.profileImage != null &&
-                                    appointment.profileImage!.isNotEmpty
+                            appointment.profileImage != null &&
+                                appointment.profileImage!.isNotEmpty
                                 ? DecorationImage(
-                                    image: NetworkImage(
-                                      appointment.profileImage!,
-                                    ),
-                                    fit: BoxFit.cover,
-                                  )
+                              image: NetworkImage(
+                                appointment.profileImage!,
+                              ),
+                              fit: BoxFit.cover,
+                            )
                                 : null,
                           ),
                           child:
-                              appointment.profileImage == null ||
-                                  appointment.profileImage!.isEmpty
+                          appointment.profileImage == null ||
+                              appointment.profileImage!.isEmpty
                               ? Center(
-                                  child: Text(
-                                    appointment.doctorName.isNotEmpty
-                                        ? appointment.doctorName
-                                              .replaceAll('Dr. ', '')[0]
-                                              .toUpperCase()
-                                        : 'D',
-                                    style: textTheme.titleLarge?.copyWith(
-                                      color: colorScheme.primary,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                )
+                            child: Text(
+                              appointment.doctorName.isNotEmpty
+                                  ? appointment.doctorName
+                                  .replaceAll('Dr. ', '')[0]
+                                  .toUpperCase()
+                                  : 'D',
+                              style: textTheme.titleLarge?.copyWith(
+                                color: colorScheme.primary,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          )
                               : null,
                         ),
                         const SizedBox(width: 16),
@@ -195,7 +195,7 @@ class AppointmentDetailsDialog extends ConsumerWidget {
                           context,
                           Icons.tag_rounded,
                           'Token Number',
-                          '#${appointment.tokenNumber.toString()}', // 🎯 फिक्स: .toString() लावून कास्टिंग एरर घालवला
+                          '#${appointment.tokenNumber.toString()}',
                         ),
                       ],
                     ),
@@ -285,10 +285,10 @@ class AppointmentDetailsDialog extends ConsumerWidget {
 
                       if (confirm != true) return;
 
-                      final controller = ref.read(
+                      final controllerNotifier = ref.read(
                         patientDashboardControllerProvider.notifier,
                       );
-                      final success = await controller.cancelAppointment(
+                      final success = await controllerNotifier.cancelAppointment(
                         appointment.id,
                       );
 
@@ -302,9 +302,12 @@ class AppointmentDetailsDialog extends ConsumerWidget {
                           bottomMargin: 0,
                         );
                       } else {
+                        final currentState = ref.read(
+                          patientDashboardControllerProvider,
+                        );
                         AppSnackBar.show(
                           message:
-                              controller.errorMessage ??
+                          currentState.errorMessage ??
                               "Unable to cancel appointment",
                           bottomMargin: 0,
                           type: AppSnackBarType.error,
@@ -340,10 +343,10 @@ class AppointmentDetailsDialog extends ConsumerWidget {
   }
 
   Widget _buildSectionTitle(
-    TextTheme textTheme,
-    ColorScheme colorScheme,
-    String title,
-  ) {
+      TextTheme textTheme,
+      ColorScheme colorScheme,
+      String title,
+      ) {
     return Text(
       title,
       style: textTheme.labelSmall?.copyWith(
@@ -355,12 +358,12 @@ class AppointmentDetailsDialog extends ConsumerWidget {
   }
 
   Widget _buildGridInfoItem(
-    BuildContext context,
-    IconData icon,
-    String label,
-    String value, {
-    bool isFullWidth = false,
-  }) {
+      BuildContext context,
+      IconData icon,
+      String label,
+      String value, {
+        bool isFullWidth = false,
+      }) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 

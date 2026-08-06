@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:yodoctor/modules/patient/controllers/patient_dashboard_controller.dart';
 import 'package:yodoctor/modules/patient/widgets/custom_sliver_app_bar.dart';
 import 'package:yodoctor/modules/patient/widgets/patient_drawer.dart';
 import 'package:yodoctor/modules/patient/widgets/qr_scanner.dart';
@@ -27,11 +26,10 @@ class _ServicesScreenState extends ConsumerState<ServicesScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    final dashboardState = ref.watch(patientDashboardControllerProvider);
 
     return Scaffold(
       key: _scaffoldKey,
-      drawer: PatientDrawer(dashboard: dashboardState.dashboardData),
+      drawer: PatientDrawer(),
       backgroundColor: theme.scaffoldBackgroundColor,
       body: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) {

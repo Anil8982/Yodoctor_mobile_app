@@ -16,6 +16,7 @@ class DoctorScaffoldShell extends ConsumerWidget {
     final dashboard = ref.watch(doctorDashboardProvider);
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       drawer: dashboard.when(
         data: (data) => DoctorDrawer(doctor: data.doctor),
         loading: () => const Drawer(),

@@ -23,24 +23,32 @@ class _AppointmentsHistoryScreenState
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      final historyState = ref.read(appointmentHistoryControllerProvider);
+      if (historyState.appointments.isEmpty && !historyState.isLoading) {
+        ref.read(appointmentHistoryControllerProvider.notifier).refresh();
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final historyState = ref.watch(appointmentHistoryControllerProvider);
     final notifier = ref.read(appointmentHistoryControllerProvider.notifier);
 
-    final bool isLoadingInitial =
-        historyState.isLoading && historyState.appointments.isEmpty;
-
-    if (isLoadingInitial) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
-
     final double horizontal = Responsive.horizontalPadding(context);
+    final bool isWideScreen = MediaQuery.sizeOf(context).width >= 980;
 
     return Scaffold(
       key: _scaffoldKey,
       drawer: const PatientDrawer(),
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: NestedScrollView(
-        headerSliverBuilder: (context, innerBoxIsScrolled) {
+        physics: const ClampingScrollPhysics(),
+        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return <Widget>[
             CustomSliverAppBar(
               expandedHeight: 220,
@@ -49,135 +57,194 @@ class _AppointmentsHistoryScreenState
                 appointmentCount: historyState.appointments.length,
               ),
             ),
+            if (historyState.isLoading)
+              SliverToBoxAdapter(
+                child: Container(
+                  color: theme.scaffoldBackgroundColor,
+                  child: const LinearProgressIndicator(minHeight: 3),
+                ),
+              ),
           ];
         },
-        body: Padding(
-          padding: EdgeInsets.fromLTRB(horizontal, 0, horizontal, 20),
-          child: Column(
-            children: <Widget>[
-              if (historyState.isLoading) const LinearProgressIndicator(),
-              if (MediaQuery.sizeOf(context).width >= 980) ...<Widget>[
-                const HistoryTableHeader(),
-                const SizedBox(height: 12),
-              ],
-              Expanded(
-                child: RefreshIndicator(
-                  onRefresh: notifier.refresh,
-                  child: historyState.appointments.isEmpty
-                      ? _buildEmptyState(context)
-                      : ListView.separated(
-                          physics: const BouncingScrollPhysics(),
-                          itemCount: historyState.appointments.length,
-                          separatorBuilder: (_, _) =>
-                              const SizedBox(height: 12),
-                          itemBuilder: (BuildContext context, int index) {
+        body: historyState.appointments.isEmpty && !historyState.isLoading
+            ? _buildEmptyState(context)
+            : RefreshIndicator(
+                onRefresh: notifier.refresh,
+                child: CustomScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(
+                    parent: BouncingScrollPhysics(),
+                  ),
+                  slivers: <Widget>[
+                    if (isWideScreen)
+                      SliverPadding(
+                        padding: EdgeInsets.fromLTRB(
+                          horizontal,
+                          12,
+                          horizontal,
+                          0,
+                        ),
+                        sliver: const SliverToBoxAdapter(
+                          child: HistoryTableHeader(),
+                        ),
+                      ),
+                    if (historyState.appointments.isEmpty &&
+                        historyState.isLoading)
+                      SliverFillRemaining(
+                        hasScrollBody: false,
+                        child: _buildLoadingState(),
+                      )
+                    else
+                      SliverPadding(
+                        padding: EdgeInsets.fromLTRB(
+                          horizontal,
+                          12,
+                          horizontal,
+                          95,
+                        ),
+                        sliver: SliverList(
+                          delegate: SliverChildBuilderDelegate((
+                            BuildContext context,
+                            int index,
+                          ) {
                             final appointment =
                                 historyState.appointments[index];
 
-                            return HistoryAppointmentCard(
-                              appointment: appointment,
-                              onViewDetails: () {
-                                showAppointmentDetailsDialog(
-                                  context: context,
-                                  appointment: appointment,
-                                  initialRating: notifier.ratingFor(
-                                    appointment.id,
-                                  ),
-                                  initialFeedback: notifier.feedbackFor(
-                                    appointment.id,
-                                  ),
-                                  onSubmitRating:
-                                      (int rating, String feedback) async {
-                                        await notifier.submitRating(
-                                          appointmentId: appointment.id,
-                                          rating: rating,
-                                          feedback: feedback,
-                                        );
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 12.0),
+                              child: HistoryAppointmentCard(
+                                appointment: appointment,
+                                onViewDetails: () {
+                                  showAppointmentDetailsDialog(
+                                    context: context,
+                                    appointment: appointment,
+                                    initialRating: notifier.ratingFor(
+                                      appointment.id,
+                                    ),
+                                    initialFeedback: notifier.feedbackFor(
+                                      appointment.id,
+                                    ),
+                                    onSubmitRating:
+                                        (int rating, String feedback) async {
+                                          await notifier.submitRating(
+                                            appointmentId: appointment.id,
+                                            rating: rating,
+                                            feedback: feedback,
+                                          );
 
-                                        if (!context.mounted) {
-                                          return;
-                                        }
+                                          if (!context.mounted) {
+                                            return;
+                                          }
 
-                                        AppSnackBar.show(
-                                          message:
-                                              'Thanks! You rated ${appointment.doctorName} $rating stars.',
-                                          type: AppSnackBarType.success,
-                                        );
-                                      },
-                                  onDownloadPrescription: () async {
-                                    try {
-                                      final prescription = await notifier
-                                          .getPrescription(appointment.id);
+                                          AppSnackBar.show(
+                                            message:
+                                                'Thanks! You rated ${appointment.doctorName} $rating stars.',
+                                            type: AppSnackBarType.success,
+                                          );
+                                        },
+                                    onDownloadPrescription: () async {
+                                      try {
+                                        final prescription = await notifier
+                                            .getPrescription(appointment.id);
 
-                                      if (!context.mounted) return;
+                                        if (!context.mounted) return;
 
-                                      showDialog(
-                                        context: context,
-                                        builder: (dialogContext) => AlertDialog(
-                                          title: const Text("Prescription"),
-                                          content: SingleChildScrollView(
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                const Text(
-                                                  "Medicines",
-                                                  style: TextStyle(
-                                                    fontWeight: FontWeight.bold,
+                                        showDialog(
+                                          context: context,
+                                          builder: (dialogContext) => AlertDialog(
+                                            title: const Text("Prescription"),
+                                            content: SingleChildScrollView(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  const Text(
+                                                    "Medicines",
+                                                    style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
                                                   ),
-                                                ),
-                                                const SizedBox(height: 8),
-                                                Text(
-                                                  prescription["medicines"] ??
-                                                      "",
-                                                ),
-                                                const SizedBox(height: 20),
-                                                const Text(
-                                                  "Instructions",
-                                                  style: TextStyle(
-                                                    fontWeight: FontWeight.bold,
+                                                  const SizedBox(height: 8),
+                                                  Text(
+                                                    prescription["medicines"] ??
+                                                        "",
                                                   ),
-                                                ),
-                                                const SizedBox(height: 8),
-                                                Text(
-                                                  prescription["instructions"] ??
-                                                      "",
-                                                ),
-                                              ],
+                                                  const SizedBox(height: 20),
+                                                  const Text(
+                                                    "Instructions",
+                                                    style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 8),
+                                                  Text(
+                                                    prescription["instructions"] ??
+                                                        "",
+                                                  ),
+                                                ],
+                                              ),
                                             ),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () => Navigator.pop(
+                                                  dialogContext,
+                                                ),
+                                                child: const Text("Close"),
+                                              ),
+                                            ],
                                           ),
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () =>
-                                                  Navigator.pop(dialogContext),
-                                              child: const Text("Close"),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    } catch (e) {
-                                      if (!context.mounted) return;
-                                      AppSnackBar.show(
-                                        message: e.toString().replaceFirst(
-                                          "Exception: ",
-                                          "",
-                                        ),
-                                        type: AppSnackBarType.error,
-                                        bottomMargin: 0,
-                                      );
-                                    }
-                                  },
-                                );
-                              },
+                                        );
+                                      } catch (e) {
+                                        if (!context.mounted) return;
+                                        AppSnackBar.show(
+                                          message: e.toString().replaceFirst(
+                                            "Exception: ",
+                                            "",
+                                          ),
+                                          type: AppSnackBarType.error,
+                                          bottomMargin: 0,
+                                        );
+                                      }
+                                    },
+                                  );
+                                },
+                              ),
                             );
-                          },
+                          }, childCount: historyState.appointments.length),
                         ),
+                      ),
+                  ],
                 ),
               ),
-            ],
+      ),
+    );
+  }
+
+  Widget _buildLoadingState() {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          SizedBox(
+            width: 40,
+            height: 40,
+            child: CircularProgressIndicator(
+              strokeWidth: 3,
+              valueColor: AlwaysStoppedAnimation<Color>(colorScheme.primary),
+            ),
           ),
-        ),
+          const SizedBox(height: 16),
+          Text(
+            'Loading appointments...',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -191,20 +258,23 @@ class _AppointmentsHistoryScreenState
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           CircleAvatar(
-            radius: 28,
-            backgroundColor: colorScheme.primaryContainer,
+            radius: 36,
+            backgroundColor: colorScheme.surfaceContainerHighest,
             child: Icon(
               Icons.event_busy_rounded,
-              size: 28,
-              color: colorScheme.primary,
+              size: 36,
+              color: colorScheme.onSurfaceVariant,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           Text(
             'No appointment history available',
-            style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+            style: textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: colorScheme.onSurface,
+            ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 4),
           Text(
             'Booked appointments will appear here.',
             style: textTheme.bodyMedium?.copyWith(

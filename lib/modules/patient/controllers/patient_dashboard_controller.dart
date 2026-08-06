@@ -1,45 +1,63 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
 import '../models/dashboard/dashboard_model.dart';
 import '../repositories/patient_dashboard_repository.dart';
 
+class PatientDashboardState {
+  const PatientDashboardState({
+    this.isLoading = false,
+    this.isRefreshingToken = false,
+    this.errorMessage,
+    this.dashboardData,
+    this.selectedFilter = "All",
+  });
+
+  final bool isLoading;
+  final bool isRefreshingToken;
+  final String? errorMessage;
+  final DashboardModel? dashboardData;
+  final String selectedFilter;
+
+  PatientDashboardState copyWith({
+    bool? isLoading,
+    bool? isRefreshingToken,
+    String? errorMessage,
+    DashboardModel? dashboardData,
+    String? selectedFilter,
+    bool clearError = false,
+  }) {
+    return PatientDashboardState(
+      isLoading: isLoading ?? this.isLoading,
+      isRefreshingToken: isRefreshingToken ?? this.isRefreshingToken,
+      errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
+      dashboardData: dashboardData ?? this.dashboardData,
+      selectedFilter: selectedFilter ?? this.selectedFilter,
+    );
+  }
+}
+
 final patientDashboardControllerProvider =
-ChangeNotifierProvider.autoDispose<PatientDashboardController>(
-      (ref) => PatientDashboardController(ref),
+NotifierProvider.autoDispose<PatientDashboardController, PatientDashboardState>(
+  PatientDashboardController.new,
 );
 
-class PatientDashboardController extends ChangeNotifier {
-  PatientDashboardController(this._ref) {
-    loadDashboard();
-  }
-
-  final Ref _ref;
+class PatientDashboardController extends Notifier<PatientDashboardState> {
   static const List<String> availableFilters = ["All", "Today", "Next 7 Days"];
   static const String _subTag = 'PatientDashboardController';
 
-  bool _isLoading = false;
-  bool _isRefreshingToken = false;
-  String? _errorMessage;
-  DashboardModel? _dashboardData;
-  String _selectedFilter = "All";
-
-  bool get isLoading => _isLoading;
-  bool get isRefreshingToken => _isRefreshingToken;
-  String? get errorMessage => _errorMessage;
-  DashboardModel? get dashboardData => _dashboardData;
-  String get selectedFilter => _selectedFilter;
+  @override
+  PatientDashboardState build() {
+    Future.microtask(() => loadDashboard());
+    return const PatientDashboardState();
+  }
 
   Future<void> loadDashboard({String? filter}) async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
-
-    if (filter != null) {
-      _selectedFilter = filter;
-    }
+    state = state.copyWith(
+      isLoading: true,
+      clearError: true,
+      selectedFilter: filter ?? state.selectedFilter,
+    );
 
     AppLogger.info(
       'Loading dashboard',
@@ -48,10 +66,12 @@ class PatientDashboardController extends ChangeNotifier {
     );
 
     try {
-      final repository = _ref.read(patientDashboardRepositoryProvider);
+      final repository = ref.read(patientDashboardRepositoryProvider);
       final response = await repository.getDashboard();
 
-      if (response.statusCode == 200) {
+      final statusCode = response.statusCode;
+
+      if (statusCode != null && statusCode >= 200 && statusCode < 300) {
         if (response.data is Map<String, dynamic>) {
           AppLogger.json(
             response.data as Map<String, dynamic>,
@@ -59,17 +79,24 @@ class PatientDashboardController extends ChangeNotifier {
             subTag: _subTag,
           );
         }
-        _dashboardData = DashboardModel.fromJson(response.data);
+        final dashboardData = DashboardModel.fromJson(response.data);
+        state = state.copyWith(
+          isLoading: false,
+          dashboardData: dashboardData,
+        );
       } else {
-        _errorMessage = response.data["message"] ?? "Unable to load dashboard";
+        final errorMsg = response.data["message"] ?? "Unable to load dashboard";
         AppLogger.warning(
-          'Failed to load dashboard: $_errorMessage',
+          'Failed to load dashboard: $errorMsg',
           tag: LogTags.patient,
           subTag: _subTag,
         );
+        state = state.copyWith(
+          isLoading: false,
+          errorMessage: errorMsg,
+        );
       }
     } catch (e, stackTrace) {
-      _errorMessage = "Unable to load dashboard";
       AppLogger.exception(
         e,
         stackTrace,
@@ -77,10 +104,11 @@ class PatientDashboardController extends ChangeNotifier {
         tag: LogTags.patient,
         subTag: _subTag,
       );
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: "Unable to load dashboard",
+      );
     }
-
-    _isLoading = false;
-    notifyListeners();
   }
 
   Future<bool> cancelAppointment(int appointmentId) async {
@@ -90,24 +118,25 @@ class PatientDashboardController extends ChangeNotifier {
       subTag: _subTag,
     );
     try {
-      final repository = _ref.read(patientDashboardRepositoryProvider);
+      final repository = ref.read(patientDashboardRepositoryProvider);
       final response = await repository.cancelAppointment(appointmentId);
 
-      if (response.statusCode == 200 && response.data["success"] == true) {
+      final statusCode = response.statusCode;
+
+      if (statusCode != null && statusCode >= 200 && statusCode < 300 && response.data["success"] == true) {
         AppLogger.success(
           'Appointment cancelled successfully',
           tag: LogTags.patient,
           subTag: _subTag,
         );
-        await loadDashboard(filter: _selectedFilter);
+        await loadDashboard(filter: state.selectedFilter);
         return true;
       }
 
-      _errorMessage = response.data["message"] ?? "Unable to cancel appointment";
-      notifyListeners();
+      final errorMsg = response.data["message"] ?? "Unable to cancel appointment";
+      state = state.copyWith(errorMessage: errorMsg);
       return false;
     } catch (e, stackTrace) {
-      _errorMessage = "Unable to cancel appointment";
       AppLogger.exception(
         e,
         stackTrace,
@@ -115,16 +144,16 @@ class PatientDashboardController extends ChangeNotifier {
         tag: LogTags.patient,
         subTag: _subTag,
       );
-      notifyListeners();
+      state = state.copyWith(errorMessage: "Unable to cancel appointment");
       return false;
     }
   }
 
   Future<void> refreshTokenStatus() async {
-    if (_dashboardData?.todayToken == null) return;
-    if (_isRefreshingToken) return;
+    if (state.dashboardData?.todayToken == null) return;
+    if (state.isRefreshingToken) return;
 
-    _isRefreshingToken = true;
+    state = state.copyWith(isRefreshingToken: true);
 
     AppLogger.info(
       'Refreshing token status',
@@ -133,25 +162,27 @@ class PatientDashboardController extends ChangeNotifier {
     );
 
     try {
-      final repository = _ref.read(patientDashboardRepositoryProvider);
+      final repository = ref.read(patientDashboardRepositoryProvider);
       final response = await repository.getTokenStatus(
-        _dashboardData!.todayToken!.appointmentId,
+        state.dashboardData!.todayToken!.appointmentId,
       );
 
-      if (response.statusCode == 200) {
-        final token = _dashboardData!.todayToken!;
-        _dashboardData = DashboardModel(
-          patient: _dashboardData!.patient,
-          patientName: _dashboardData!.patientName,
-          upcomingCount: _dashboardData!.upcomingCount,
-          appointments: _dashboardData!.appointments,
+      final statusCode = response.statusCode;
+
+      if (statusCode != null && statusCode >= 200 && statusCode < 300) {
+        final token = state.dashboardData!.todayToken!;
+        final updatedDashboard = DashboardModel(
+          patient: state.dashboardData!.patient,
+          patientName: state.dashboardData!.patientName,
+          upcomingCount: state.dashboardData!.upcomingCount,
+          appointments: state.dashboardData!.appointments,
           todayToken: token.copyWith(
             nowServing: response.data["nowServing"],
             patientsAhead: response.data["patientsAhead"],
             estimatedTime: response.data["estimatedTime"] ?? "${response.data["estimatedWaitMinutes"]} mins",
           ),
         );
-        notifyListeners();
+        state = state.copyWith(dashboardData: updatedDashboard);
       }
     } catch (e, st) {
       AppLogger.exception(
@@ -162,12 +193,12 @@ class PatientDashboardController extends ChangeNotifier {
         subTag: _subTag,
       );
     } finally {
-      _isRefreshingToken = false;
+      state = state.copyWith(isRefreshingToken: false);
     }
   }
 
   Future<void> setFilter(String filter) async {
-    if (_selectedFilter == filter) return;
+    if (state.selectedFilter == filter) return;
     await loadDashboard(filter: filter);
   }
 }

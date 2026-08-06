@@ -3,12 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/profile_image/profile_image_controller.dart';
 import 'package:yodoctor/core/providers/app_role_provider.dart';
+import 'package:yodoctor/modules/doctor/models/dashboard/doctor_profile_model.dart';
+import 'package:yodoctor/modules/widgets/app_drawer.dart';
 import 'package:yodoctor/modules/widgets/logout_dialog.dart';
 
 import '../../../core/routes/app_routes.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../../core/utils/app_spacing.dart';
-import '../models/dashboard/doctor_profile_model.dart';
 
 class DoctorDrawer extends ConsumerWidget {
   const DoctorDrawer({super.key, required this.doctor});
@@ -17,307 +16,134 @@ class DoctorDrawer extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final colorScheme = Theme.of(context).colorScheme;
     final String currentRoute = GoRouterState.of(context).uri.toString();
-
     final imageState = ref.watch(profileImageController);
 
-    return Drawer(
-      backgroundColor: colorScheme.surface,
-      surfaceTintColor: colorScheme.surfaceTint,
-      child: SafeArea(
-        bottom: false,
-        child: Column(
-          children: [
-            Container(
-              margin: const EdgeInsets.all(AppSpacing.md),
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              decoration: BoxDecoration(
-                gradient: AppTheme.doctorGradient,
-                borderRadius: BorderRadius.circular(28),
-                boxShadow: [
-                  BoxShadow(
-                    color: colorScheme.primary.withValues(alpha: 0.18),
-                    blurRadius: 24,
-                    offset: const Offset(0, 12),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 58,
-                    height: 58,
-                    decoration: BoxDecoration(
-                      color: colorScheme.onPrimary.withValues(alpha: 0.18),
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(
-                        color: colorScheme.onPrimary.withValues(alpha: 0.25),
-                      ),
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(15),
-                      child: imageState.when(
-                        data: (imageUrl) {
-                          if (imageUrl != null && imageUrl.isNotEmpty) {
-                            return Image.network(
-                              imageUrl,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  _buildDefaultAvatar(colorScheme),
-                            );
-                          }
-                          return _buildDefaultAvatar(colorScheme);
-                        },
-                        loading: () => Center(
-                          child: SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: colorScheme.onPrimary,
-                            ),
-                          ),
-                        ),
-                        error: (_, _) => _buildDefaultAvatar(colorScheme),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.md),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          doctor?.doctorName ?? "Doctor",
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            color: colorScheme.onPrimary,
-                            fontWeight: FontWeight.w900,
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.xxs),
-                        Text(
-                          doctor?.specialization ?? "",
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: colorScheme.onPrimary.withValues(
-                              alpha: 0.82,
-                            ),
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.xs),
-                        const _DrawerBadge(label: 'Verified Specialist'),
-                      ],
-                    ),
-                  ),
-                ],
+    return AppDrawer(
+      footerText: 'YoDoctor Doctor',
+      headerData: DrawerHeaderData(
+        title: doctor?.doctorName ?? "Doctor",
+        subtitle: doctor?.specialization ?? "",
+        badge: const GlassBadge(label: 'Verified Specialist'),
+        avatarChild: imageState.when(
+          data: (imageUrl) {
+            if (imageUrl != null && imageUrl.isNotEmpty) {
+              return Image.network(
+                imageUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) =>
+                    _buildDefaultAvatar(colorScheme),
+              );
+            }
+            return _buildDefaultAvatar(colorScheme);
+          },
+          loading: () => Center(
+            child: SizedBox(
+              width: 18,
+              height: 18,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: colorScheme.onPrimary,
               ),
             ),
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
-                children: [
-                  _DoctorDrawerItem(
-                    icon: Icons.home_rounded,
-                    label: 'Home',
-                    selected: currentRoute == AppRoutes.doctorDashboard,
-                    onTap: () {
-                      Navigator.pop(context);
-                      context.go(AppRoutes.doctorDashboard);
-                    },
-                  ),
-                  _DoctorDrawerItem(
-                    icon: Icons.person_outline_rounded,
-                    label: 'Doctor Profile',
-                    selected:
-                    currentRoute.contains('profile') ||
-                        currentRoute.contains('doctorprofilesection'),
-                    onTap: () {
-                      Navigator.pop(context);
-                      context.push(AppRoutes.doctorProfile);
-                    },
-                  ),
-                  _DoctorDrawerItem(
-                    icon: Icons.calendar_month_rounded,
-                    label: 'Appointment History',
-                    selected: currentRoute == AppRoutes.doctorAppointments,
-                    onTap: () {
-                      Navigator.pop(context);
-                      context.go(AppRoutes.doctorAppointments);
-                    },
-                  ),
-                  _DoctorDrawerItem(
-                    icon: Icons.book_online_rounded,
-                    label: 'Manual Booking',
-                    selected: currentRoute == AppRoutes.doctorManualBooking,
-                    onTap: () {
-                      Navigator.pop(context);
-                      context.push(AppRoutes.doctorManualBooking);
-                    },
-                  ),
-                  _DoctorDrawerItem(
-                    icon: Icons.star_outline_rounded,
-                    label: 'Patient Reviews',
-                    selected: currentRoute == AppRoutes.doctorReviews,
-                    onTap: () {
-                      Navigator.pop(context);
-                      context.go(AppRoutes.doctorReviews);
-                    },
-                  ),
-                  _DoctorDrawerItem(
-                    icon: Icons.card_membership_rounded,
-                    label: 'Medical Certificates',
-                    selected: currentRoute.contains('certificate'),
-                    onTap: () {
-                      Navigator.pop(context);
-                      context.go(AppRoutes.doctorCertificates);
-                    },
-                  ),
-                  _DoctorDrawerItem(
-                    icon: Icons.workspace_premium_rounded,
-                    label: 'My Subscription',
-                    selected: currentRoute == AppRoutes.doctorSubscription,
-                    onTap: () {
-                      Navigator.pop(context);
-                      context.push(AppRoutes.doctorSubscription);
-                    },
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.md,
-                      vertical: AppSpacing.xs,
-                    ),
-                    child: Divider(
-                      color: colorScheme.outlineVariant.withValues(alpha: 0.45),
-                    ),
-                  ),
-                  _DoctorDrawerItem(
-                    icon: Icons.logout_rounded,
-                    label: 'Logout',
-                    foregroundColor: colorScheme.error,
-                    onTap: () {
-                      Navigator.pop(context);
-
-                      LogoutDialog.show(context, role: AppRole.doctor);
-                    },
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: Text(
-                'yoDoctor Doctor • v1.0.0',
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
+          ),
+          error: (_, _) => _buildDefaultAvatar(colorScheme),
         ),
       ),
+      items: [
+        GlassDrawerItem(
+          icon: Icons.home_rounded,
+          label: 'Home',
+          selected: currentRoute == AppRoutes.doctorDashboard,
+          onTap: () {
+            Navigator.pop(context);
+            context.go(AppRoutes.doctorDashboard);
+          },
+        ),
+        GlassDrawerItem(
+          icon: Icons.person_outline_rounded,
+          label: 'Doctor Profile',
+          selected: currentRoute.contains('profile') ||
+              currentRoute.contains('doctorprofilesection'),
+          onTap: () {
+            Navigator.pop(context);
+            context.push(AppRoutes.doctorProfile);
+          },
+        ),
+        GlassDrawerItem(
+          icon: Icons.calendar_month_rounded,
+          label: 'Appointment History',
+          selected: currentRoute == AppRoutes.doctorAppointments,
+          onTap: () {
+            Navigator.pop(context);
+            context.go(AppRoutes.doctorAppointments);
+          },
+        ),
+        GlassDrawerItem(
+          icon: Icons.book_online_rounded,
+          label: 'Manual Booking',
+          selected: currentRoute == AppRoutes.doctorManualBooking,
+          onTap: () {
+            Navigator.pop(context);
+            context.push(AppRoutes.doctorManualBooking);
+          },
+        ),
+        GlassDrawerItem(
+          icon: Icons.star_outline_rounded,
+          label: 'Patient Reviews',
+          selected: currentRoute == AppRoutes.doctorReviews,
+          onTap: () {
+            Navigator.pop(context);
+            context.go(AppRoutes.doctorReviews);
+          },
+        ),
+        GlassDrawerItem(
+          icon: Icons.card_membership_rounded,
+          label: 'Medical Certificates',
+          selected: currentRoute.contains('certificate'),
+          onTap: () {
+            Navigator.pop(context);
+            context.go(AppRoutes.doctorCertificates);
+          },
+        ),
+        GlassDrawerItem(
+          icon: Icons.workspace_premium_rounded,
+          label: 'My Subscription',
+          selected: currentRoute == AppRoutes.doctorSubscription,
+          onTap: () {
+            Navigator.pop(context);
+            context.push(AppRoutes.doctorSubscription);
+          },
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          child: Divider(
+            color: colorScheme.outlineVariant.withValues(alpha: 0.3),
+            height: 1,
+          ),
+        ),
+        GlassDrawerItem(
+          icon: Icons.logout_rounded,
+          label: 'Logout',
+          foregroundColor: colorScheme.error,
+          onTap: () {
+            Navigator.pop(context);
+            LogoutDialog.show(context, role: AppRole.doctor);
+          },
+        ),
+      ],
     );
   }
 
-  // 👤 Default Fallback Icon Component
   Widget _buildDefaultAvatar(ColorScheme colorScheme) {
     return Container(
-      color: colorScheme.onPrimary.withValues(alpha: 0.12),
+      color: Colors.white.withValues(alpha: 0.15),
       alignment: Alignment.center,
       child: Icon(
         Icons.medical_services_rounded,
         color: colorScheme.onPrimary,
-        size: 30,
-      ),
-    );
-  }
-}
-
-class _DoctorDrawerItem extends StatelessWidget {
-  const _DoctorDrawerItem({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-    this.selected = false,
-    this.foregroundColor,
-  });
-
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-  final bool selected;
-  final Color? foregroundColor;
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final itemColor =
-        foregroundColor ??
-            (selected ? colorScheme.primary : colorScheme.onSurfaceVariant);
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.xs,
-        vertical: AppSpacing.xxs,
-      ),
-      child: ListTile(
-        onTap: onTap,
-        selected: selected,
-        selectedTileColor: colorScheme.primaryContainer.withValues(alpha: 0.35),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        leading: Icon(icon, color: itemColor, size: 22),
-        title: Text(
-          label,
-          style: TextStyle(
-            color:
-            foregroundColor ??
-                (selected ? colorScheme.primary : colorScheme.onSurface),
-            fontWeight: selected ? FontWeight.w900 : FontWeight.w700,
-            fontSize: 14,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _DrawerBadge extends StatelessWidget {
-  const _DrawerBadge({required this.label});
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm,
-        vertical: AppSpacing.xxs,
-      ),
-      decoration: BoxDecoration(
-        color: colorScheme.onPrimary.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(99),
-        border: Border.all(
-          color: colorScheme.onPrimary.withValues(alpha: 0.12),
-        ),
-      ),
-      child: Text(
-        label.toUpperCase(),
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-          color: colorScheme.onPrimary,
-          fontSize: 9,
-          fontWeight: FontWeight.w900,
-          letterSpacing: 0.6,
-        ),
+        size: 26,
       ),
     );
   }
