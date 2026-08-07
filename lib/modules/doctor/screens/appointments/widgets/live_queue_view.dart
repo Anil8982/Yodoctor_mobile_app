@@ -35,7 +35,7 @@ class _LiveQueueViewState extends ConsumerState<LiveQueueView> {
     final todayAppointments = queueState.queue;
     final filteredTodayAppointments = todayAppointments;
     final hasWaitingPatient = filteredTodayAppointments.any(
-          (e) => e.status.toUpperCase() == "ACCEPTED",
+      (e) => e.status.toUpperCase() == "ACCEPTED",
     );
     final totalCount = filteredTodayAppointments.length;
 
@@ -122,10 +122,10 @@ class _LiveQueueViewState extends ConsumerState<LiveQueueView> {
   }
 
   Widget _buildShiftButton(
-      String text,
-      QueueShift shift,
-      ColorScheme colorScheme,
-      ) {
+    String text,
+    QueueShift shift,
+    ColorScheme colorScheme,
+  ) {
     final selectedSlot = ref.watch(
       liveQueueProvider.select((state) => state.selectedSlot),
     );
@@ -164,12 +164,12 @@ class _LiveQueueViewState extends ConsumerState<LiveQueueView> {
   }
 
   Widget _buildCounterCards(
-      int total,
-      int waiting,
-      int done,
-      ColorScheme colorScheme,
-      ThemeData theme,
-      ) {
+    int total,
+    int waiting,
+    int done,
+    ColorScheme colorScheme,
+    ThemeData theme,
+  ) {
     return Row(
       children: [
         Expanded(
@@ -206,12 +206,12 @@ class _LiveQueueViewState extends ConsumerState<LiveQueueView> {
   }
 
   Widget _buildCounterCard(
-      String label,
-      String count,
-      Color bgColor,
-      Color textColor,
-      ThemeData theme,
-      ) {
+    String label,
+    String count,
+    Color bgColor,
+    Color textColor,
+    ThemeData theme,
+  ) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
@@ -246,10 +246,10 @@ class _LiveQueueViewState extends ConsumerState<LiveQueueView> {
   }
 
   Widget _buildActionCards(
-      LiveQueueNotifier notifier,
-      LiveQueueItem? current,
-      String slot,
-      ) {
+    LiveQueueNotifier notifier,
+    LiveQueueItem? current,
+    String slot,
+  ) {
     return Row(
       children: [
         Expanded(
@@ -278,8 +278,8 @@ class _LiveQueueViewState extends ConsumerState<LiveQueueView> {
             onTap: current == null
                 ? null
                 : () {
-              notifier.skip(current.id, slot);
-            },
+                    notifier.skip(current.id, slot);
+                  },
           ),
         ),
         const SizedBox(width: AppSpacing.sm),
@@ -292,8 +292,8 @@ class _LiveQueueViewState extends ConsumerState<LiveQueueView> {
             onTap: current == null
                 ? null
                 : () async {
-              await notifier.noShow(slot);
-            },
+                    await notifier.noShow(slot);
+                  },
           ),
         ),
       ],
@@ -347,14 +347,14 @@ class _LiveQueueViewState extends ConsumerState<LiveQueueView> {
   }
 
   Widget _buildTrackerSection(
-      LiveQueueItem? current,
-      LiveQueueItem? next,
-      LiveQueueNotifier notifier,
-      String slot,
-      ColorScheme colorScheme,
-      ThemeData theme,
-      bool hasWaitingPatient,
-      ) {
+    LiveQueueItem? current,
+    LiveQueueItem? next,
+    LiveQueueNotifier notifier,
+    String slot,
+    ColorScheme colorScheme,
+    ThemeData theme,
+    bool hasWaitingPatient,
+  ) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
@@ -371,20 +371,18 @@ class _LiveQueueViewState extends ConsumerState<LiveQueueView> {
           Expanded(
             child: _buildPatientTrackCard(
               'CURRENT PATIENT',
-              current != null
-                  ? _cleanPatientName(current.patientName)
-                  : 'None',
+              current != null ? _cleanPatientName(current.patientName) : 'None',
               current?.tokenNumber ?? '-',
               colorScheme.primary,
               theme,
               action: (current != null && !hasWaitingPatient)
                   ? FilledButton.tonalIcon(
-                onPressed: () async {
-                  await notifier.nextToken(slot);
-                },
-                icon: const Icon(Icons.stop_circle_rounded, size: 18),
-                label: const Text("Stop"),
-              )
+                      onPressed: () async {
+                        await notifier.nextToken(slot);
+                      },
+                      icon: const Icon(Icons.stop_circle_rounded, size: 18),
+                      label: const Text("Finish"),
+                    )
                   : null,
             ),
           ),
@@ -451,13 +449,13 @@ class _LiveQueueViewState extends ConsumerState<LiveQueueView> {
   }
 
   Widget _buildPatientTrackCard(
-      String title,
-      String name,
-      String token,
-      Color accentColor,
-      ThemeData theme, {
-        Widget? action,
-      }) {
+    String title,
+    String name,
+    String token,
+    Color accentColor,
+    ThemeData theme, {
+    Widget? action,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -486,20 +484,17 @@ class _LiveQueueViewState extends ConsumerState<LiveQueueView> {
             fontWeight: FontWeight.w700,
           ),
         ),
-        if (action != null) ...[
-          const SizedBox(height: 10),
-          action,
-        ],
+        if (action != null) ...[const SizedBox(height: 10), action],
       ],
     );
   }
 
   Widget _buildPatientListSection(
-      List<LiveQueueItem> patients,
-      LiveQueueNotifier notifier,
-      ColorScheme colorScheme,
-      ThemeData theme,
-      ) {
+    List<LiveQueueItem> patients,
+    LiveQueueNotifier notifier,
+    ColorScheme colorScheme,
+    ThemeData theme,
+  ) {
     if (patients.isEmpty) {
       return Container(
         width: double.infinity,
@@ -518,8 +513,10 @@ class _LiveQueueViewState extends ConsumerState<LiveQueueView> {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: patients.length,
-      separatorBuilder: (context, index) =>
-          Divider(height: 1, color: colorScheme.outlineVariant.withValues(alpha: 0.3)),
+      separatorBuilder: (context, index) => Divider(
+        height: 1,
+        color: colorScheme.outlineVariant.withValues(alpha: 0.3),
+      ),
       itemBuilder: (context, index) {
         final appointment = patients[index];
         final statusUpper = appointment.status.toUpperCase();

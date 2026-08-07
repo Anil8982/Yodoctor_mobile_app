@@ -49,179 +49,183 @@ class _DoctorProfileScreenState extends ConsumerState<DoctorProfileScreen> {
             ),
           ];
         },
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.sm,
-            vertical: AppSpacing.md,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // 🎯 Action Card to Edit Profile
-              _buildActionCard(
-                context,
-                title: 'Edit Professional Profile',
-                subtitle: 'Update setup, timings, and documents',
-                icon: Icons.edit_note_rounded,
-                onTap: () => context.push(AppRoutes.doctorProfileEdit),
-              ),
-              const SizedBox(height: AppSpacing.xl),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.sm,
+              vertical: AppSpacing.md,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 🎯 Action Card to Edit Profile
+                _buildActionCard(
+                  context,
+                  title: 'Edit Professional Profile',
+                  subtitle: 'Update setup, timings, and documents',
+                  icon: Icons.edit_note_rounded,
+                  onTap: () => context.push(AppRoutes.doctorProfileEdit),
+                ),
+                const SizedBox(height: AppSpacing.xl),
 
-              // 🎯 About / Bio Section (If available)
-              if (doctor.bio.isNotEmpty) ...[
+                // 🎯 About / Bio Section (If available)
+                if (doctor.bio.isNotEmpty) ...[
+                  Text(
+                    'About Doctor',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    doctor.bio,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                      height: 1.4,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.xl),
+                ],
+
                 Text(
-                  'About Doctor',
+                  'Profile Overview',
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w800,
                   ),
                 ),
+                const SizedBox(height: AppSpacing.md),
+
+                // 🎯 Quick Stats Row
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildStatCard(
+                        context,
+                        label: 'Experience',
+                        value: '${doctor.experienceYears} Years',
+                        icon: Icons.hourglass_empty_rounded,
+                        cardColor: colorScheme.surface,
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.xxs),
+                    Expanded(
+                      child: _buildStatCard(
+                        context,
+                        label: 'Consultation Fee',
+                        value: '₹${doctor.consultationFee}',
+                        icon: Icons.payments_outlined,
+                        cardColor: colorScheme.surface,
+                      ),
+                    ),
+                  ],
+                ),
                 const SizedBox(height: AppSpacing.sm),
-                Text(
-                  doctor.bio,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                    height: 1.4,
-                    fontWeight: FontWeight.w600,
-                  ),
+
+                // 🎯 1. Professional & Council Compliance Card
+                _buildSectionCard(
+                  context,
+                  title: 'Professional Registration',
+                  icon: Icons.gavel_rounded,
+                  children: [
+                    _buildInfoRow(context, 'Reg. No', doctor.licenseNumber),
+                    _buildInfoRow(context, 'Council', doctor.stateCouncil),
+                    _buildInfoRow(context, 'Valid Till', doctor.validTill),
+                  ],
                 ),
-                const SizedBox(height: AppSpacing.xl),
-              ],
+                const SizedBox(height: AppSpacing.sm),
 
-              Text(
-                'Profile Overview',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w800,
+                // 🎯 2. Clinic Information Card
+                _buildSectionCard(
+                  context,
+                  title: 'Clinic Information',
+                  icon: Icons.gite_outlined,
+                  children: [
+                    _buildInfoRow(context, 'Name', doctor.clinicName),
+                    _buildInfoRow(context, 'Type', doctor.practiceType),
+                    _buildInfoRow(context, 'City', doctor.city),
+                    _buildInfoRow(
+                      context,
+                      'Address',
+                      doctor.address,
+                      maxLines: 3,
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(height: AppSpacing.md),
+                const SizedBox(height: AppSpacing.sm),
 
-              // 🎯 Quick Stats Row
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildStatCard(
+                // 🎯 3. Availability & Consultation Card
+                _buildSectionCard(
+                  context,
+                  title: 'Consultation & Timings',
+                  icon: Icons.access_time_rounded,
+                  children: [
+                    _buildInfoRow(
                       context,
-                      label: 'Experience',
-                      value: '${doctor.experienceYears} Years',
-                      icon: Icons.hourglass_empty_rounded,
-                      cardColor: colorScheme.surface,
+                      'Slot Time',
+                      '${doctor.consultationDuration} Mins',
                     ),
-                  ),
-                  const SizedBox(width: AppSpacing.xxs),
-                  Expanded(
-                    child: _buildStatCard(
+                    _buildInfoRow(
                       context,
-                      label: 'Consultation Fee',
-                      value: '₹${doctor.consultationFee}',
-                      icon: Icons.payments_outlined,
-                      cardColor: colorScheme.surface,
+                      'Days',
+                      doctor.availableDays.isNotEmpty
+                          ? doctor.availableDays.join(', ')
+                          : 'Not Configured',
+                      maxLines: 2,
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.sm),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.sm),
 
-              // 🎯 1. Professional & Council Compliance Card
-              _buildSectionCard(
-                context,
-                title: 'Professional Registration',
-                icon: Icons.gavel_rounded,
-                children: [
-                  _buildInfoRow(context, 'Reg. No', doctor.licenseNumber),
-                  _buildInfoRow(context, 'Council', doctor.stateCouncil),
-                  _buildInfoRow(context, 'Valid Till', doctor.validTill),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.sm),
+                // 🎯 4. Documents Verification Status Summary
+                _buildSectionCard(
+                  context,
+                  title: 'KYC / Documents Status',
+                  icon: Icons.folder_shared_outlined,
+                  children: doctor.documents.isEmpty
+                      ? [
+                          Text(
+                            'No documents uploaded.',
+                            style: theme.textTheme.bodySmall,
+                          ),
+                        ]
+                      : doctor.documents.entries.map<Widget>((entry) {
+                          final key = entry.key;
+                          // final value = entry.value;
 
-              // 🎯 2. Clinic Information Card
-              _buildSectionCard(
-                context,
-                title: 'Clinic Information',
-                icon: Icons.gite_outlined,
-                children: [
-                  _buildInfoRow(context, 'Name', doctor.clinicName),
-                  _buildInfoRow(context, 'Type', doctor.practiceType),
-                  _buildInfoRow(context, 'City', doctor.city),
-                  _buildInfoRow(
-                    context,
-                    'Address',
-                    doctor.address,
-                    maxLines: 3,
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.sm),
-
-              // 🎯 3. Availability & Consultation Card
-              _buildSectionCard(
-                context,
-                title: 'Consultation & Timings',
-                icon: Icons.access_time_rounded,
-                children: [
-                  _buildInfoRow(
-                    context,
-                    'Slot Time',
-                    '${doctor.consultationDuration} Mins',
-                  ),
-                  _buildInfoRow(
-                    context,
-                    'Days',
-                    doctor.availableDays.isNotEmpty
-                        ? doctor.availableDays.join(', ')
-                        : 'Not Configured',
-                    maxLines: 2,
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.sm),
-
-              // 🎯 4. Documents Verification Status Summary
-              _buildSectionCard(
-                context,
-                title: 'KXC / Documents Status',
-                icon: Icons.folder_shared_outlined,
-                children: doctor.documents.isEmpty
-                    ? [
-                        Text(
-                          'No documents uploaded.',
-                          style: theme.textTheme.bodySmall,
-                        ),
-                      ]
-                    : doctor.documents.entries.map<Widget>((entry) {
-                        final key = entry.key;
-                        // final value = entry.value;
-
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.description_outlined,
-                                size: 16,
-                                color: colorScheme.onSurfaceVariant,
-                              ),
-                              const SizedBox(width: AppSpacing.xs),
-                              Expanded(
-                                child: Text(
-                                  key,
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    fontWeight: FontWeight.w700,
+                          return Padding(
+                            padding: const EdgeInsets.only(
+                              bottom: AppSpacing.sm,
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.description_outlined,
+                                  size: 16,
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                                const SizedBox(width: AppSpacing.xs),
+                                Expanded(
+                                  child: Text(
+                                    key,
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      fontWeight: FontWeight.w700,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              Icon(
-                                Icons.check_circle,
-                                color: Colors.green,
-                                size: 18,
-                              ),
-                            ],
-                          ),
-                        );
-                      }).toList(),
-              ),
-              // const SizedBox(height: AppSpacing.sm),
-            ],
+                                Icon(
+                                  Icons.check_circle,
+                                  color: Colors.green,
+                                  size: 18,
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                ),
+                // const SizedBox(height: AppSpacing.sm),
+              ],
+            ),
           ),
         ),
       ),

@@ -29,10 +29,10 @@ class ActionButtons extends ConsumerWidget {
   }
 
   Widget _buildCancelButton(
-      BuildContext context,
-      WidgetRef ref,
-      ColorScheme colorScheme,
-      ) {
+    BuildContext context,
+    WidgetRef ref,
+    ColorScheme colorScheme,
+  ) {
     return SizedBox(
       width: double.infinity,
       height: 56,
@@ -41,7 +41,11 @@ class ActionButtons extends ConsumerWidget {
         icon: const Icon(Icons.cancel_outlined, size: 20),
         label: const Text(
           'Cancel Appointment',
-          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15, letterSpacing: -0.3),
+          style: TextStyle(
+            fontWeight: FontWeight.w800,
+            fontSize: 15,
+            letterSpacing: -0.3,
+          ),
         ),
         style: ElevatedButton.styleFrom(
           foregroundColor: colorScheme.error,
@@ -49,7 +53,10 @@ class ActionButtons extends ConsumerWidget {
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(18),
-            side: BorderSide(color: colorScheme.error.withValues(alpha: 0.2), width: 1.5),
+            side: BorderSide(
+              color: colorScheme.error.withValues(alpha: 0.2),
+              width: 1.5,
+            ),
           ),
         ),
       ),
@@ -65,14 +72,20 @@ class ActionButtons extends ConsumerWidget {
         icon: const Icon(Icons.check_circle_outline_rounded, size: 20),
         label: const Text(
           'Close',
-          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15, letterSpacing: -0.3),
+          style: TextStyle(
+            fontWeight: FontWeight.w800,
+            fontSize: 15,
+            letterSpacing: -0.3,
+          ),
         ),
         style: FilledButton.styleFrom(
           backgroundColor: colorScheme.primary,
           foregroundColor: colorScheme.onPrimary,
           elevation: 2,
           shadowColor: colorScheme.primary.withValues(alpha: 0.3),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
         ),
       ),
     );
@@ -109,7 +122,7 @@ class ActionButtons extends ConsumerWidget {
 
     return showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         backgroundColor: colorScheme.surface,
         title: Row(
@@ -120,10 +133,19 @@ class ActionButtons extends ConsumerWidget {
                 color: colorScheme.error.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(Icons.warning_rounded, color: colorScheme.error, size: 24),
+              child: Icon(
+                Icons.warning_rounded,
+                color: colorScheme.error,
+                size: 24,
+              ),
             ),
             const SizedBox(width: 12),
-            const Text('Cancel Appointment', style: TextStyle(fontWeight: FontWeight.w800)),
+            Expanded(
+              child: const Text(
+                'Cancel Appointment',
+                style: TextStyle(fontWeight: FontWeight.w800),
+              ),
+            ),
           ],
         ),
         content: Text(
@@ -132,18 +154,29 @@ class ActionButtons extends ConsumerWidget {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text("Keep", style: TextStyle(color: colorScheme.primary, fontWeight: FontWeight.w700)),
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(
+              "Keep",
+              style: TextStyle(
+                color: colorScheme.primary,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
           ),
           const SizedBox(width: 8),
           FilledButton(
-            onPressed: () => Navigator.pop(context, true),
+            onPressed: () => Navigator.pop(dialogContext, true),
             style: FilledButton.styleFrom(
               backgroundColor: colorScheme.error,
               foregroundColor: colorScheme.onError,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
-            child: const Text("Cancel Appointment", style: TextStyle(fontWeight: FontWeight.w700)),
+            child: const Text(
+              "Cancel Appointment",
+              style: TextStyle(fontWeight: FontWeight.w700),
+            ),
           ),
         ],
       ),
