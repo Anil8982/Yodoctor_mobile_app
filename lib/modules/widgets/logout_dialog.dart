@@ -1,14 +1,11 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
 import 'package:yodoctor/core/providers/app_role_provider.dart';
-import 'package:yodoctor/core/routes/app_routes.dart';
+import 'package:yodoctor/core/session/app_session_controller.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
-import 'package:yodoctor/modules/auth/controllers/doctor_login_controller.dart';
-import 'package:yodoctor/modules/auth/repositories/patient_auth_repository.dart';
 
 class LogoutDialog extends ConsumerWidget {
   const LogoutDialog({super.key, required this.role});
@@ -86,7 +83,9 @@ class LogoutDialog extends ConsumerWidget {
                     'Are you sure you want to log out? You will need to re-authenticate to access your medical dashboard.',
                     textAlign: TextAlign.center,
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.onSurfaceVariant.withValues(alpha: 0.9),
+                      color: colorScheme.onSurfaceVariant.withValues(
+                        alpha: 0.9,
+                      ),
                       height: 1.3,
                     ),
                   ),
@@ -99,8 +98,12 @@ class LogoutDialog extends ConsumerWidget {
                           onPressed: () => Navigator.pop(context),
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 14),
-                            side: BorderSide(color: colorScheme.outline.withValues(alpha: 0.5)),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                            side: BorderSide(
+                              color: colorScheme.outline.withValues(alpha: 0.5),
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
                           ),
                           child: Text(
                             'Cancel',
@@ -126,23 +129,23 @@ class LogoutDialog extends ConsumerWidget {
                             );
 
                             try {
-                              if (isDoctor) {
-                                await ref.read(doctorLoginControllerProvider.notifier).logout();
-                              } else {
-                                await ref.read(patientAuthRepositoryProvider).signOut();
-                                await ref.read(appRoleProvider.notifier).clearRole();
-                              }
+                              await ref.read(appSessionProvider).logout(role);
 
-                              AppLogger.success('Flushed session context. Dropping core router anchor.');
+                              AppLogger.success(
+                                'Flushed session context. Dropping core router anchor.',
+                                tag: LogTags.auth,
+                                subTag: 'LogoutDialog',
+                              );
 
-                              if (context.mounted) {
-                                context.go(AppRoutes.landing);
-                              }
+                              // if (context.mounted) {
+                              //   context.go(AppRoutes.landing);
+                              // }
                             } catch (e, st) {
                               AppLogger.exception(
                                 e,
                                 st,
-                                message: 'Failed to intercept and cleanly terminate session',
+                                message:
+                                    'Failed to intercept and cleanly terminate session',
                                 tag: LogTags.auth,
                                 subTag: 'LogoutDialog',
                               );
@@ -152,7 +155,9 @@ class LogoutDialog extends ConsumerWidget {
                             backgroundColor: colorScheme.error,
                             foregroundColor: colorScheme.onError,
                             padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
                             elevation: 0,
                           ),
                           child: const Text(

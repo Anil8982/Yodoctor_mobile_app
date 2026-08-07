@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
@@ -255,10 +254,3 @@ class RazorpayController {
     );
   }
 }
-
-/// Riverpod provider for RazorpayController
-final razorpayControllerProvider = Provider<RazorpayController>((ref) {
-  final controller = RazorpayController();
-  ref.onDispose(() => controller.dispose());
-  return controller;
-});
