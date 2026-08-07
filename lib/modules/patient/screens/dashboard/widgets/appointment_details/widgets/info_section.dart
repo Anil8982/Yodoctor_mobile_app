@@ -49,7 +49,7 @@ class _AppointmentInfoGrid extends StatelessWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       crossAxisCount: 2,
-      childAspectRatio: 2.5,
+      childAspectRatio: 2.3,
       crossAxisSpacing: 12,
       mainAxisSpacing: 12,
       children: [
@@ -89,7 +89,7 @@ class _ClinicInfoGrid extends StatelessWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       crossAxisCount: 2,
-      childAspectRatio: 2.5,
+      childAspectRatio: 2.3,
       crossAxisSpacing: 12,
       mainAxisSpacing: 12,
       children: [
