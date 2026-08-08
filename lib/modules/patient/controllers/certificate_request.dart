@@ -7,7 +7,8 @@ import '../../../modules/patient/models/certificate/patient_certificate_detail_m
 import '../../../modules/patient/models/certificate/patient_certificate_timeline_model.dart';
 import '../../patient/models/certificate/patient_doctor_model.dart';
 import '../../../core/constants/log_tags.dart';
-import '../repositories/patient_certificate_repository.dart' show patientCertificateRepositoryProvider;
+import '../repositories/patient_certificate_repository.dart'
+    show patientCertificateRepositoryProvider;
 import 'dart:io';
 import 'package:open_filex/open_filex.dart';
 
@@ -20,6 +21,7 @@ class CertificateFormState {
   final String? selectedType;
   final PatientDoctorModel? assignedDoctor;
   final String? purpose;
+  final DateTime? dateOfBirth;
   final String? gender;
   final String bloodGroup;
   final bool showValidationError;
@@ -37,6 +39,7 @@ class CertificateFormState {
     this.selectedType,
     this.assignedDoctor,
     this.purpose,
+    this.dateOfBirth,
     this.gender,
     this.bloodGroup = 'A+',
     this.showValidationError = false,
@@ -65,6 +68,7 @@ class CertificateFormState {
     String? selectedType,
     PatientDoctorModel? assignedDoctor,
     String? purpose,
+    DateTime? dateOfBirth,
     String? gender,
     String? bloodGroup,
     bool? showValidationError,
@@ -83,6 +87,7 @@ class CertificateFormState {
       assignedDoctor: assignedDoctor ?? this.assignedDoctor,
       purpose: purpose ?? this.purpose,
       doctors: doctors ?? this.doctors,
+      dateOfBirth: dateOfBirth ?? this.dateOfBirth,
       gender: gender ?? this.gender,
       bloodGroup: bloodGroup ?? this.bloodGroup,
       showValidationError: showValidationError ?? this.showValidationError,
@@ -97,7 +102,6 @@ class CertificateFormState {
 class CertificateNotifier extends Notifier<CertificateFormState> {
   final additionalNotesController = TextEditingController();
   final fullNameController = TextEditingController();
-  final dobController = TextEditingController();
   final heightController = TextEditingController();
   final weightController = TextEditingController();
   final medicalConditionsController = TextEditingController();
@@ -110,7 +114,6 @@ class CertificateNotifier extends Notifier<CertificateFormState> {
     ref.onDispose(() {
       additionalNotesController.dispose();
       fullNameController.dispose();
-      dobController.dispose();
       heightController.dispose();
       weightController.dispose();
       medicalConditionsController.dispose();
@@ -125,15 +128,27 @@ class CertificateNotifier extends Notifier<CertificateFormState> {
       final repo = ref.read(patientCertificateRepositoryProvider);
       final response = await repo.getRequestDetail(id);
 
-      final detail = PatientCertificateDetailModel.fromJson(response.data["request"]);
+      final detail = PatientCertificateDetailModel.fromJson(
+        response.data["request"],
+      );
       final timelineList = (response.data["timeline"] as List)
           .map((e) => PatientCertificateTimelineModel.fromJson(e))
           .toList();
 
-      state = state.copyWith(selectedCertificate: detail, timeline: timelineList, isLoading: false);
+      state = state.copyWith(
+        selectedCertificate: detail,
+        timeline: timelineList,
+        isLoading: false,
+      );
     } catch (e, st) {
       state = state.copyWith(isLoading: false);
-      AppLogger.exception(e, st, message: 'Failed to load certificate detailed track matrix', tag: LogTags.patient, subTag: _subTag);
+      AppLogger.exception(
+        e,
+        st,
+        message: 'Failed to load certificate detailed track matrix',
+        tag: LogTags.patient,
+        subTag: _subTag,
+      );
     }
   }
 
@@ -149,8 +164,18 @@ class CertificateNotifier extends Notifier<CertificateFormState> {
         state = state.copyWith(doctors: list);
       }
     } catch (e, st) {
-      AppLogger.exception(e, st, message: 'Failed fetching secure repositories doctor list', tag: LogTags.patient, subTag: _subTag);
+      AppLogger.exception(
+        e,
+        st,
+        message: 'Failed fetching secure repositories doctor list',
+        tag: LogTags.patient,
+        subTag: _subTag,
+      );
     }
+  }
+
+  void selectDateOfBirth(DateTime? date) {
+    state = state.copyWith(dateOfBirth: date);
   }
 
   Future<void> downloadCertificate(int id) async {
@@ -164,7 +189,13 @@ class CertificateNotifier extends Notifier<CertificateFormState> {
       await file.writeAsBytes(List<int>.from(response.data));
       await OpenFilex.open(file.path);
     } catch (e, st) {
-      AppLogger.exception(e, st, message: 'PDF binary write system failure', tag: LogTags.patient, subTag: _subTag);
+      AppLogger.exception(
+        e,
+        st,
+        message: 'PDF binary write system failure',
+        tag: LogTags.patient,
+        subTag: _subTag,
+      );
     }
   }
 
@@ -181,13 +212,25 @@ class CertificateNotifier extends Notifier<CertificateFormState> {
       state = state.copyWith(allCertificates: list, isLoading: false);
     } catch (e, st) {
       state = state.copyWith(isLoading: false);
-      AppLogger.exception(e, st, message: 'Wallet requests sync engine faulted', tag: LogTags.patient, subTag: _subTag);
+      AppLogger.exception(
+        e,
+        st,
+        message: 'Wallet requests sync engine faulted',
+        tag: LogTags.patient,
+        subTag: _subTag,
+      );
     }
   }
 
   Future<bool> submitRequest() async {
-    if (!validateDocuments() || state.selectedType == null || state.assignedDoctor == null) {
-      AppLogger.warning("Validation failed for certificate request submission", tag: LogTags.patient, subTag: _subTag);
+    if (!validateDocuments() ||
+        state.selectedType == null ||
+        state.assignedDoctor == null) {
+      AppLogger.warning(
+        "Validation failed for certificate request submission",
+        tag: LogTags.patient,
+        subTag: _subTag,
+      );
       return false;
     }
 
@@ -199,7 +242,11 @@ class CertificateNotifier extends Notifier<CertificateFormState> {
       "purpose": state.purpose,
       "notes": additionalNotesController.text,
       "full_name": fullNameController.text,
-      "dob": dobController.text,
+      "dob": state.dateOfBirth == null
+          ? null
+          : '${state.dateOfBirth!.year}-'
+                '${state.dateOfBirth!.month.toString().padLeft(2, '0')}-'
+                '${state.dateOfBirth!.day.toString().padLeft(2, '0')}',
       "gender": state.gender,
       "blood_group": state.bloodGroup,
       "height": double.tryParse(heightController.text),
@@ -208,7 +255,11 @@ class CertificateNotifier extends Notifier<CertificateFormState> {
       "medications": medicationsController.text,
     };
 
-    AppLogger.info("Submitting certificate request", tag: LogTags.patient, subTag: _subTag);
+    AppLogger.info(
+      "Submitting certificate request",
+      tag: LogTags.patient,
+      subTag: _subTag,
+    );
     AppLogger.json(payload, tag: LogTags.patient, subTag: "$_subTag/Payload");
 
     try {
@@ -217,7 +268,8 @@ class CertificateNotifier extends Notifier<CertificateFormState> {
 
       dynamic resId;
       if (create.data is Map) {
-        if (create.data["data"] != null && create.data["data"]["requestId"] != null) {
+        if (create.data["data"] != null &&
+            create.data["data"]["requestId"] != null) {
           resId = create.data["data"]["requestId"];
         } else {
           resId = create.data["requestId"];
@@ -225,11 +277,17 @@ class CertificateNotifier extends Notifier<CertificateFormState> {
       }
 
       if (resId == null) {
-        throw Exception("Backend failed to return valid response hash map identifier for requestId.");
+        throw Exception(
+          "Backend failed to return valid response hash map identifier for requestId.",
+        );
       }
 
       final int requestId = int.parse(resId.toString());
-      AppLogger.success("Request created. Starting document streams upload...", tag: LogTags.patient, subTag: _subTag);
+      AppLogger.success(
+        "Request created. Starting document streams upload...",
+        tag: LogTags.patient,
+        subTag: _subTag,
+      );
 
       await repo.uploadDocuments(
         requestId: requestId,
@@ -239,14 +297,24 @@ class CertificateNotifier extends Notifier<CertificateFormState> {
         prescription: state.uploadedDocs["Prescription"],
       );
 
-      AppLogger.success("Certificate workflows synchronization complete", tag: LogTags.patient, subTag: _subTag);
+      AppLogger.success(
+        "Certificate workflows synchronization complete",
+        tag: LogTags.patient,
+        subTag: _subTag,
+      );
 
       await loadMyRequests();
       resetForm();
       return true;
     } catch (e, st) {
       state = state.copyWith(isLoading: false);
-      AppLogger.exception(e, st, message: 'Certificate creation workflow halted', tag: LogTags.patient, subTag: _subTag);
+      AppLogger.exception(
+        e,
+        st,
+        message: 'Certificate creation workflow halted',
+        tag: LogTags.patient,
+        subTag: _subTag,
+      );
       return false;
     }
   }
@@ -254,10 +322,12 @@ class CertificateNotifier extends Notifier<CertificateFormState> {
   // 🎯 Restored synchronization data computations
   List<PatientCertificateRequestModel> getFilteredCertificates() {
     return state.allCertificates.where((cert) {
-      final matchesStatus = state.selectedFilter == "All" ||
+      final matchesStatus =
+          state.selectedFilter == "All" ||
           cert.status.toLowerCase() == state.selectedFilter.toLowerCase();
 
-      final matchesSearch = state.searchQuery.isEmpty ||
+      final matchesSearch =
+          state.searchQuery.isEmpty ||
           cert.certificateType.toLowerCase().contains(state.searchQuery) ||
           cert.doctorName.toLowerCase().contains(state.searchQuery);
 
@@ -266,18 +336,26 @@ class CertificateNotifier extends Notifier<CertificateFormState> {
   }
 
   // 🎯 Restored Form Actions
-  void setFilter(String filter) => state = state.copyWith(selectedFilter: filter);
-  void setSearchQuery(String query) => state = state.copyWith(searchQuery: query.toLowerCase());
-  void setSelectedType(String type) => state = state.copyWith(selectedType: type);
-  void setAssignedDoctor(PatientDoctorModel doctor) => state = state.copyWith(assignedDoctor: doctor);
+  void setFilter(String filter) =>
+      state = state.copyWith(selectedFilter: filter);
+  void setSearchQuery(String query) =>
+      state = state.copyWith(searchQuery: query.toLowerCase());
+  void setSelectedType(String type) =>
+      state = state.copyWith(selectedType: type);
+  void setAssignedDoctor(PatientDoctorModel doctor) =>
+      state = state.copyWith(assignedDoctor: doctor);
   void setPurpose(String purpose) => state = state.copyWith(purpose: purpose);
+  void setDateOfBirth(DateTime? date) =>
+      state = state.copyWith(dateOfBirth: date);
   void setGender(String gender) => state = state.copyWith(gender: gender);
   void setBloodGroup(String bg) => state = state.copyWith(bloodGroup: bg);
-  void clearValidationError() => state = state.copyWith(showValidationError: false);
+  void clearValidationError() =>
+      state = state.copyWith(showValidationError: false);
 
   // 🎯 Restored Mandatory Identity Document Validations
   bool validateDocuments() {
-    if (state.uploadedDocs["Profile Photo"] == null || state.uploadedDocs["Government ID Proof"] == null) {
+    if (state.uploadedDocs["Profile Photo"] == null ||
+        state.uploadedDocs["Government ID Proof"] == null) {
       state = state.copyWith(showValidationError: true);
       return false;
     }
@@ -291,15 +369,19 @@ class CertificateNotifier extends Notifier<CertificateFormState> {
   }
 
   void removeDocument(String documentKey) {
-    final updatedDocs = Map<String, String?>.from(state.uploadedDocs)..[documentKey] = null;
-    final updatedProgress = Map<String, double?>.from(state.uploadProgress)..[documentKey] = null;
-    state = state.copyWith(uploadedDocs: updatedDocs, uploadProgress: updatedProgress);
+    final updatedDocs = Map<String, String?>.from(state.uploadedDocs)
+      ..[documentKey] = null;
+    final updatedProgress = Map<String, double?>.from(state.uploadProgress)
+      ..[documentKey] = null;
+    state = state.copyWith(
+      uploadedDocs: updatedDocs,
+      uploadProgress: updatedProgress,
+    );
   }
 
   void resetForm() {
     additionalNotesController.clear();
     fullNameController.clear();
-    dobController.clear();
     heightController.clear();
     weightController.clear();
     medicalConditionsController.clear();
@@ -310,6 +392,7 @@ class CertificateNotifier extends Notifier<CertificateFormState> {
       assignedDoctor: null,
       purpose: null,
       showValidationError: false,
+      dateOfBirth: null,
       gender: null,
       bloodGroup: 'A+',
       uploadedDocs: {
@@ -328,4 +411,7 @@ class CertificateNotifier extends Notifier<CertificateFormState> {
   }
 }
 
-final certificateProvider = NotifierProvider<CertificateNotifier, CertificateFormState>(CertificateNotifier.new);
+final certificateProvider =
+    NotifierProvider<CertificateNotifier, CertificateFormState>(
+      CertificateNotifier.new,
+    );

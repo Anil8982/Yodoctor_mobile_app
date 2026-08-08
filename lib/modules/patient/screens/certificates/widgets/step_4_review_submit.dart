@@ -66,7 +66,14 @@ class Step4ReviewSubmit extends ConsumerWidget {
               'label': 'Full Legal Name',
               'value': controller.fullNameController.text,
             },
-            {'label': 'Date of Birth', 'value': controller.dobController.text},
+            {
+              'label': 'Date of Birth',
+              'value': formState.dateOfBirth != null
+                  ? '${formState.dateOfBirth!.day.toString().padLeft(2, '0')}-'
+                        '${formState.dateOfBirth!.month.toString().padLeft(2, '0')}-'
+                        '${formState.dateOfBirth!.year}'
+                  : 'N/A',
+            },
             {'label': 'Biological Gender', 'value': formState.gender ?? 'N/A'},
             {'label': 'Blood Group Staging', 'value': formState.bloodGroup},
             {

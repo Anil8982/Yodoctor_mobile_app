@@ -1,28 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/core/constants/app_constants.dart';
 import 'package:yodoctor/modules/patient/controllers/certificate_request.dart';
+import 'package:yodoctor/modules/widgets/app_date_picker_field.dart';
+import 'package:yodoctor/modules/widgets/app_dropdown_field.dart';
+import 'package:yodoctor/modules/widgets/app_text_field.dart';
 import 'step_header_helper.dart';
-import 'custom_text_field.dart';
 
 class Step2MedicalInfo extends ConsumerWidget {
   final GlobalKey<FormState> formKey;
   final CertificateNotifier controller;
+  final AutovalidateMode autovalidateMode;
 
   const Step2MedicalInfo({
     super.key,
     required this.formKey,
     required this.controller,
+    this.autovalidateMode = AutovalidateMode.disabled,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     // Watch current form state reactively from provider
     final formState = ref.watch(certificateProvider);
 
     return Form(
       key: formKey,
+      autovalidateMode: autovalidateMode,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -32,23 +37,41 @@ class Step2MedicalInfo extends ConsumerWidget {
                 'Provide baseline biometrics to appear on your medical clearance.',
           ),
           const SizedBox(height: 20),
-          CustomCertificateTextField(
+
+          AppTextField(
+            label: 'Full Name',
+            isRequired: true,
+            hint: 'Enter your full name',
+            icon: Icons.badge_rounded,
             controller: controller.fullNameController,
-            labelText: 'Full Name *',
-            prefixIcon: Icons.badge_rounded,
-            validator: (value) {
-              if (value == null || value.trim().isEmpty) {
-                return 'Please enter name';
+            textCapitalization: TextCapitalization.words,
+            validator: (v) {
+              if (v == null || v.trim().isEmpty) {
+                return 'Enter name';
               }
-
-              if (value.trim().length < 2) {
-                return 'Name should have at least 2 characters';
+              if (v.trim().length < 3) {
+                return 'Enter a valid name';
               }
+              return null;
+            },
+          ),
 
-              if (!RegExp(r'^[A-Za-z]+(?: [A-Za-z]+)*$').hasMatch(value)) {
-                return 'Only alphabets are allowed';
+          const SizedBox(height: 20),
+          AppDatePickerField(
+            label: 'Date of Birth',
+            isRequired: true,
+            hint: 'Select DOB',
+            icon: Icons.cake_rounded,
+            value: formState.dateOfBirth,
+            firstDate: DateTime(1900),
+            lastDate: DateTime.now(),
+            onChanged: (date) {
+              controller.selectDateOfBirth(date);
+            },
+            validator: (date) {
+              if (date == null) {
+                return 'Select date of birth';
               }
-
               return null;
             },
           ),
@@ -57,117 +80,116 @@ class Step2MedicalInfo extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                child: CustomCertificateTextField(
-                  controller: controller.dobController,
-                  labelText: 'Date of Birth *',
-                  prefixIcon: Icons.calendar_today_rounded,
-                  onTap: () async {
-                    FocusScope.of(context).requestFocus(FocusNode());
-                    final DateTime? picked = await showDatePicker(
-                      context: context,
-                      initialDate: DateTime(2002, 6, 14),
-                      firstDate: DateTime(1900),
-                      lastDate: DateTime.now(),
-                    );
-                    if (picked != null) {
-                      controller.dobController.text =
-                          '${picked.day.toString().padLeft(2, '0')}-${picked.month.toString().padLeft(2, '0')}-${picked.year}';
+                child: AppDropdownField<String>(
+                  label: 'Gender',
+                  isRequired: true,
+                  hint: 'Select gender',
+                  icon: Icons.wc_rounded,
+                  value: formState.gender,
+                  items: AppConstants.genderOptions,
+                  onChanged: (value) =>
+                      value != null ? controller.setGender(value) : null,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Select gender';
                     }
+                    return null;
                   },
-                  validator: (value) =>
-                      value == null || value.trim().isEmpty ? 'Required' : null,
                 ),
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: DropdownButtonFormField<String>(
-                  initialValue: formState.gender,
-                  decoration: InputDecoration(
-                    labelText: 'Gender *',
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide(
-                        color: colorScheme.outlineVariant.withValues(
-                          alpha: 0.35,
-                        ),
-                      ),
-                    ),
-                  ),
-                  validator: (value) => value == null ? 'Required' : null,
-                  items: const ['Male', 'Female', 'Other']
-                      .map(
-                        (g) =>
-                            DropdownMenuItem<String>(value: g, child: Text(g)),
-                      )
-                      .toList(),
+                child: AppDropdownField<String>(
+                  label: 'Blood Group',
+                  hint: 'Select blood group',
+                  icon: Icons.bloodtype_rounded,
+                  value: formState.bloodGroup,
+                  items: AppConstants.bloodGroupOptions,
                   onChanged: (value) =>
-                      value != null ? controller.setGender(value) : null,
+                      value != null ? controller.setBloodGroup(value) : null,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 20),
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                child: DropdownButtonFormField<String>(
-                  initialValue: formState.bloodGroup,
-                  decoration: InputDecoration(
-                    labelText: 'Blood Group *',
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide(
-                        color: colorScheme.outlineVariant.withValues(
-                          alpha: 0.35,
-                        ),
-                      ),
-                    ),
+                child: AppTextField(
+                  label: 'Height (CM)',
+                  hint: 'e.g. 170',
+                  maxLength: 3,
+                  icon: Icons.height_rounded,
+                  controller: controller.heightController,
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
                   ),
-                  items:
-                      const ['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-']
-                          .map(
-                            (bg) => DropdownMenuItem<String>(
-                              value: bg,
-                              child: Text(bg),
-                            ),
-                          )
-                          .toList(),
-                  onChanged: (value) =>
-                      value != null ? controller.setBloodGroup(value) : null,
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d?$')),
+                  ],
+                  validator: (String? value) {
+                    final String text = value?.trim() ?? '';
+                    if (text.isEmpty) {
+                      return null;
+                    }
+                    final double? parsed = double.tryParse(text);
+                    if (parsed == null) {
+                      return 'Enter valid height';
+                    }
+                    if (parsed < 30 || parsed > 250) {
+                      return 'B/w 30 and 250 cm';
+                    }
+                    return null;
+                  },
                 ),
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: CustomCertificateTextField(
-                  controller: controller.heightController,
-                  labelText: 'Height',
-                  suffixText: 'CM',
-                  keyboardType: TextInputType.number,
+                child: AppTextField(
+                  label: 'Weight (KG)',
+                  hint: 'e.g. 65',
+                  maxLength: 3,
+                  icon: Icons.monitor_weight_outlined,
+                  controller: controller.weightController,
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d?$')),
+                  ],
+                  validator: (String? value) {
+                    final String text = value?.trim() ?? '';
+                    if (text.isEmpty) {
+                      return null;
+                    }
+                    final double? parsed = double.tryParse(text);
+                    if (parsed == null) {
+                      return 'Enter valid weight';
+                    }
+                    if (parsed < 2 || parsed > 350) {
+                      return 'B/w 2 and 350 kg';
+                    }
+                    return null;
+                  },
                 ),
               ),
             ],
           ),
           const SizedBox(height: 20),
-          CustomCertificateTextField(
-            controller: controller.weightController,
-            labelText: 'Weight',
-            suffixText: 'KG',
-            prefixIcon: Icons.scale_rounded,
-            keyboardType: TextInputType.number,
-          ),
-          const SizedBox(height: 20),
-          CustomCertificateTextField(
+          AppTextField(
+            label: 'Known Medical Conditions',
+            hint: 'e.g., Diabetes, Hypertension, Asthma',
+            icon: Icons.note_alt_sharp,
             controller: controller.medicalConditionsController,
-            labelText: 'Known Medical Conditions',
-            hintText: 'e.g., Diabetes, Hypertension, Asthma',
             maxLines: 2,
           ),
+
           const SizedBox(height: 20),
-          CustomCertificateTextField(
+          AppTextField(
+            label: 'Current Medications',
+            hint: 'e.g., Metformin 500mg, Daily Multivitamins',
+            icon: Icons.notes,
             controller: controller.medicationsController,
-            labelText: 'Current Medications',
-            hintText: 'e.g., Metformin 500mg, Daily Multivitamins',
             maxLines: 2,
           ),
         ],

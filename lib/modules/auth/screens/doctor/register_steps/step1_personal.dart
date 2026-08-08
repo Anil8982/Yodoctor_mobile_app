@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/core/constants/app_constants.dart';
 
 import 'package:yodoctor/modules/auth/controllers/doctor_register_controller.dart';
 import 'package:yodoctor/modules/auth/models/doctor_register_model.dart';
@@ -17,11 +18,7 @@ class Step1Personal extends ConsumerStatefulWidget {
   final DoctorFormData data;
   final VoidCallback onNext;
 
-  const Step1Personal({
-    super.key,
-    required this.data,
-    required this.onNext,
-  });
+  const Step1Personal({super.key, required this.data, required this.onNext});
 
   @override
   ConsumerState<Step1Personal> createState() => _Step1PersonalState();
@@ -227,13 +224,13 @@ class _Step1PersonalState extends ConsumerState<Step1Personal> {
           const SizedBox(height: 16),
 
           // Gender Selection
-          AppDropdownField(
+          AppDropdownField<String>(
             label: 'Gender',
             isRequired: true,
             hint: 'Select gender',
             icon: Icons.wc_rounded,
             value: _gender,
-            items: const ['Male', 'Female', 'Other'],
+            items: AppConstants.genderOptions,
             onChanged: (v) => setState(() => _gender = v),
             validator: (v) => v == null ? 'Select gender' : null,
           ),
@@ -295,7 +292,8 @@ class _Step1PersonalState extends ConsumerState<Step1Personal> {
           AppTextField(
             label: 'Professional Bio',
             isRequired: true,
-            hint: 'Write a brief summary about your expertise and background...',
+            hint:
+                'Write a brief summary about your expertise and background...',
             icon: Icons.notes_rounded,
             controller: _bioCtrl,
             maxLines: 4,

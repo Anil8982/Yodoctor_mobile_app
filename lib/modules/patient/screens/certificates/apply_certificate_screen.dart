@@ -26,6 +26,7 @@ class _ApplyCertificateScreenState
   final _step1Key = GlobalKey<FormState>();
   final _step2Key = GlobalKey<FormState>();
   bool _confirmDisclaimer = false;
+  bool _submittedOnce = false;
 
   final List<String> _steps = ['Type', 'Medical Info', 'Documents', 'Review'];
 
@@ -182,9 +183,21 @@ class _ApplyCertificateScreenState
   Widget _buildCurrentStepView(CertificateNotifier notifier) {
     switch (_currentStep) {
       case 1:
-        return Step1TypeSelection(formKey: _step1Key, controller: notifier);
+        return Step1TypeSelection(
+          formKey: _step1Key,
+          controller: notifier,
+          autovalidateMode: _submittedOnce
+              ? AutovalidateMode.onUserInteraction
+              : AutovalidateMode.disabled,
+        );
       case 2:
-        return Step2MedicalInfo(formKey: _step2Key, controller: notifier);
+        return Step2MedicalInfo(
+          formKey: _step2Key,
+          controller: notifier,
+          autovalidateMode: _submittedOnce
+              ? AutovalidateMode.onUserInteraction
+              : AutovalidateMode.disabled,
+        );
       case 3:
         return Step3DocumentUpload(controller: notifier);
       case 4:
@@ -214,6 +227,10 @@ class _ApplyCertificateScreenState
     CertificateFormState formState,
     CertificateNotifier notifier,
   ) async {
+    setState(() {
+      _submittedOnce = true;
+    });
+
     if (_currentStep == 1) {
       if (formState.selectedType == null) {
         AppSnackBar.show(

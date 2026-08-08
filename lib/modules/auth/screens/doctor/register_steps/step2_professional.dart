@@ -117,13 +117,14 @@ class _Step2ProfessionalState extends ConsumerState<Step2Professional> {
           StepTitle(
             icon: Icons.school_rounded,
             title: 'Professional Details',
-            subtitle: 'Enter your medical qualifications and council credentials',
+            subtitle:
+                'Enter your medical qualifications and council credentials',
             color: colorScheme.primary,
           ),
           const SizedBox(height: 24),
 
           // Primary Qualification Dropdown
-          AppDropdownField(
+          AppDropdownField<String>(
             label: 'Primary Qualification',
             isRequired: true,
             hint: 'Select primary qualification',
@@ -151,8 +152,9 @@ class _Step2ProfessionalState extends ConsumerState<Step2Professional> {
             hint: 'Enter your primary specialization',
             icon: Icons.local_hospital_outlined,
             controller: _specCtrl,
-            validator: (v) =>
-            (v == null || v.trim().isEmpty) ? 'Specialization required' : null,
+            validator: (v) => (v == null || v.trim().isEmpty)
+                ? 'Specialization required'
+                : null,
           ),
           const SizedBox(height: 16),
 
@@ -185,7 +187,7 @@ class _Step2ProfessionalState extends ConsumerState<Step2Professional> {
             textCapitalization: TextCapitalization.characters,
             inputFormatters: [
               TextInputFormatter.withFunction(
-                    (oldValue, newValue) => TextEditingValue(
+                (oldValue, newValue) => TextEditingValue(
                   text: newValue.text.toUpperCase(),
                   selection: newValue.selection,
                 ),
@@ -215,8 +217,9 @@ class _Step2ProfessionalState extends ConsumerState<Step2Professional> {
             hint: 'Enter state medical council name',
             icon: Icons.account_balance_outlined,
             controller: _councilCtrl,
-            validator: (v) =>
-            (v == null || v.trim().isEmpty) ? 'State council required' : null,
+            validator: (v) => (v == null || v.trim().isEmpty)
+                ? 'State council required'
+                : null,
           ),
           const SizedBox(height: 16),
 
@@ -243,7 +246,7 @@ class _Step2ProfessionalState extends ConsumerState<Step2Professional> {
           // Compliance Note
           const InfoBox(
             text:
-            'Your registration details will be verified with the official state medical council for authenticity.',
+                'Your registration details will be verified with the official state medical council for authenticity.',
           ),
           const SizedBox(height: 28),
 
