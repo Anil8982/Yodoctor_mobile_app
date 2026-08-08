@@ -63,8 +63,6 @@ class _AppDropdownFieldState<T> extends State<AppDropdownField<T>> {
       activeError: activeError,
       child: DropdownButtonFormField<T>(
         initialValue: widget.value,
-        isExpanded: true,
-        menuMaxHeight: 300,
         validator: (value) {
           final error = widget.validator?.call(value);
           if (_internalErrorMessage != error) {

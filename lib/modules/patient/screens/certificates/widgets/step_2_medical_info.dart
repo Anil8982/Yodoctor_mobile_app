@@ -71,97 +71,109 @@ class Step2MedicalInfo extends ConsumerWidget {
             isRequired: true,
             hint: 'Select Date',
             icon: Icons.calendar_today_rounded,
-            value: formState.dateOfBirth ??
-                (controller.dobController.text.isNotEmpty
-                    ? _parseDate(controller.dobController.text)
-                    : null),
+            value: formState.dateOfBirth,
             firstDate: DateTime(1900),
             lastDate: DateTime.now(),
             onChanged: (date) {
               if (date != null) {
                 controller.selectDateOfBirth(date);
-                controller.dobController.text =
-                '${date.day.toString().padLeft(2, '0')}-${date.month.toString().padLeft(2, '0')}-${date.year}';
               }
             },
             validator: (value) {
-              if (formState.dateOfBirth == null &&
-                  controller.dobController.text.trim().isEmpty) {
+              if (formState.dateOfBirth == null) {
                 return 'Required';
               }
               return null;
             },
           ),
           const SizedBox(height: 20),
-          AppDropdownField<String>(
-            label: 'Gender',
-            isRequired: true,
-            hint: 'Select Gender',
-            icon: Icons.people_outline_rounded,
-            value: formState.gender,
-            items: const ['Male', 'Female', 'Other'],
-            onChanged: (value) =>
-            value != null ? controller.setGender(value) : null,
-            validator: (value) =>
-            value == null || value.trim().isEmpty ? 'Required' : null,
-          ),
-          const SizedBox(height: 20),
-          AppDropdownField<String>(
-            label: 'Blood Group',
-            hint: 'Select Blood Group',
-            icon: Icons.bloodtype_outlined,
-            value: formState.bloodGroup,
-            items: const ['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'],
-            onChanged: (value) =>
-            value != null ? controller.setBloodGroup(value) : null,
-          ),
-          const SizedBox(height: 20),
-          AppTextField(
-            controller: controller.heightController,
-            label: 'Height',
-            hint: 'e.g. 175',
-            maxLength: 3,
-            icon: Icons.height_rounded,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            inputFormatters: <TextInputFormatter>[
-              FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d?$')),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: AppDropdownField<String>(
+                  label: 'Gender',
+                  isRequired: true,
+                  hint: 'Select Gender',
+                  icon: Icons.people_outline_rounded,
+                  value: formState.gender,
+                  items: const ['Male', 'Female', 'Other'],
+                  onChanged: (value) =>
+                  value != null ? controller.setGender(value) : null,
+                  validator: (value) =>
+                  value == null || value.trim().isEmpty ? 'Required' : null,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: AppDropdownField<String>(
+                  label: 'Blood Group',
+                  hint: 'Select Blood Group',
+                  icon: Icons.bloodtype_outlined,
+                  value: formState.bloodGroup,
+                  items: const ['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'],
+                  onChanged: (value) =>
+                  value != null ? controller.setBloodGroup(value) : null,
+                ),
+              ),
             ],
-            validator: (value) {
-              if (value != null && value.trim().isNotEmpty) {
-                final height = double.tryParse(value.trim());
-                if (height == null) {
-                  return 'Enter a valid number';
-                }
-                if (height <= 0 || height > 300) {
-                  return 'Enter a valid height (1 - 300 cm)';
-                }
-              }
-              return null;
-            },
           ),
           const SizedBox(height: 20),
-          AppTextField(
-            controller: controller.weightController,
-            label: 'Weight',
-            hint: 'e.g. 70',
-            maxLength: 3,
-            icon: Icons.scale_rounded,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            inputFormatters: <TextInputFormatter>[
-              FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d?$')),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: AppTextField(
+                  controller: controller.heightController,
+                  label: 'Height',
+                  hint: 'e.g. 175',
+                  maxLength: 3,
+                  icon: Icons.height_rounded,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d?$')),
+                  ],
+                  validator: (value) {
+                    if (value != null && value.trim().isNotEmpty) {
+                      final height = double.tryParse(value.trim());
+                      if (height == null) {
+                        return 'Enter a valid number';
+                      }
+                      if (height <= 0 || height > 300) {
+                        return 'Enter a valid height (1 - 300 cm)';
+                      }
+                    }
+                    return null;
+                  },
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: AppTextField(
+                  controller: controller.weightController,
+                  label: 'Weight',
+                  hint: 'e.g. 70',
+                  maxLength: 3,
+                  icon: Icons.scale_rounded,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d?$')),
+                  ],
+                  validator: (value) {
+                    if (value != null && value.trim().isNotEmpty) {
+                      final weight = double.tryParse(value.trim());
+                      if (weight == null) {
+                        return 'Enter a valid number';
+                      }
+                      if (weight <= 0 || weight > 500) {
+                        return 'Enter a valid weight (1 - 500 kg)';
+                      }
+                    }
+                    return null;
+                  },
+                ),
+              ),
             ],
-            validator: (value) {
-              if (value != null && value.trim().isNotEmpty) {
-                final weight = double.tryParse(value.trim());
-                if (weight == null) {
-                  return 'Enter a valid number';
-                }
-                if (weight <= 0 || weight > 500) {
-                  return 'Enter a valid weight (1 - 500 kg)';
-                }
-              }
-              return null;
-            },
           ),
           const SizedBox(height: 20),
           AppTextField(
@@ -186,19 +198,5 @@ class Step2MedicalInfo extends ConsumerWidget {
         ],
       ),
     );
-  }
-
-  DateTime? _parseDate(String dateStr) {
-    try {
-      final parts = dateStr.split('-');
-      if (parts.length == 3) {
-        return DateTime(
-          int.parse(parts[2]),
-          int.parse(parts[1]),
-          int.parse(parts[0]),
-        );
-      }
-    } catch (_) {}
-    return null;
   }
 }
