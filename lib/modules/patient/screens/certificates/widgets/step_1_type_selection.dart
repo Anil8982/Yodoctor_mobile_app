@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/modules/widgets/app_dropdown_field.dart';
+import 'package:yodoctor/modules/widgets/app_search_select_field.dart';
+import 'package:yodoctor/modules/widgets/app_text_field.dart';
 
 import 'package:yodoctor/modules/patient/controllers/certificate_request.dart';
 import 'certificate_type_card.dart';
 import 'step_header_helper.dart';
-import 'custom_text_field.dart';
-import '../../../../patient/models/certificate/patient_doctor_model.dart';
 
 class Step1TypeSelection extends ConsumerWidget {
   final GlobalKey<FormState> formKey;
@@ -47,17 +48,23 @@ class Step1TypeSelection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     // Watch current form state reactively from provider
     final formState = ref.watch(certificateProvider);
     final selectedDoctor =
-        formState.doctors.any(
+    formState.doctors.any(
           (doctor) => doctor.id == formState.assignedDoctor?.id,
-        )
+    )
         ? formState.doctors.firstWhere(
-            (doctor) => doctor.id == formState.assignedDoctor?.id,
-          )
+          (doctor) => doctor.id == formState.assignedDoctor?.id,
+    )
+        : null;
+
+    final doctorItems = formState.doctors
+        .map((doc) => "${doc.name} (${doc.specialty})")
+        .toList();
+
+    final selectedDoctorString = selectedDoctor != null
+        ? "${selectedDoctor.name} (${selectedDoctor.specialty})"
         : null;
 
     return Form(
@@ -94,73 +101,62 @@ class Step1TypeSelection extends ConsumerWidget {
           ),
           const SizedBox(height: 28),
 
-          DropdownButtonFormField<PatientDoctorModel>(
-            initialValue: selectedDoctor,
-            isExpanded: true,
-            decoration: const InputDecoration(
-              labelText: "Assigned Doctor *",
-              hintText: "Select Doctor",
-              border: OutlineInputBorder(),
-              prefixIcon: Icon(Icons.person),
-            ),
+          AppSearchSelectField(
+            label: 'Assigned Doctor',
+            isRequired: true,
+            hint: 'Select Doctor',
+            icon: Icons.person,
+            value: selectedDoctorString,
+            items: doctorItems,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            onChanged: (value) {
+              if (value != null) {
+                final matchedDoc = formState.doctors.firstWhere(
+                      (doc) => "${doc.name} (${doc.specialty})" == value,
+                );
+                controller.setAssignedDoctor(matchedDoc);
+              }
+            },
             validator: (value) {
-              if (value == null) {
+              if (value == null || value.trim().isEmpty) {
                 return 'Please select an assigned doctor';
               }
               return null;
             },
-            items: formState.doctors.map((doc) {
-              return DropdownMenuItem(
-                value: doc,
-                child: Text("${doc.name} (${doc.specialty})"),
-              );
-            }).toList(),
-            onChanged: (value) {
-              if (value != null) {
-                controller.setAssignedDoctor(value);
-              }
-            },
           ),
           const SizedBox(height: 20),
-          DropdownButtonFormField<String>(
-            initialValue: formState.purpose,
-            decoration: InputDecoration(
-              labelText: 'Purpose of Certificate *',
-              prefixIcon: const Icon(
-                Icons.assignment_turned_in_rounded,
-                size: 22,
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide: BorderSide(
-                  color: colorScheme.outlineVariant.withValues(alpha: 0.35),
-                ),
-              ),
-            ),
-            validator: (value) =>
-                value == null ? 'Please select a purpose' : null,
-            items:
-                const [
-                  'Travel',
-                  'Employment',
-                  'Sports',
-                  'School/University',
-                  'Insurance',
-                  'Other',
-                ].map((p) {
-                  return DropdownMenuItem<String>(value: p, child: Text(p));
-                }).toList(),
+
+          AppDropdownField(
+            label: 'Purpose of Certificate',
+            isRequired: true,
+            hint: 'Select Purpose',
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            icon: Icons.assignment_turned_in_rounded,
+            value: formState.purpose,
+            items: const [
+              'Travel',
+              'Employment',
+              'Sports',
+              'School/University',
+              'Insurance',
+              'Other',
+            ],
             onChanged: (value) =>
-                value != null ? controller.setPurpose(value) : null,
+            value != null ? controller.setPurpose(value) : null,
+            validator: (value) =>
+            value == null || value.trim().isEmpty ? 'Please select a purpose' : null,
           ),
           const SizedBox(height: 20),
-          CustomCertificateTextField(
+
+          AppTextField(
             controller: controller.additionalNotesController,
-            labelText: 'Additional Notes For Doctor',
-            hintText:
-                'Describe specific conditions or background details contextually...',
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            label: 'Additional Notes For Doctor',
+            hint: 'Describe specific conditions or background details contextually...',
+            icon: Icons.note_alt_outlined,
             maxLines: 3,
-            alignLabelWithHint: true,
+            minLines: 1,
+            maxLength: 2000,
           ),
         ],
       ),

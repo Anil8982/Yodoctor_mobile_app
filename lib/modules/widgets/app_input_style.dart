@@ -9,6 +9,7 @@ class AppInputStyle {
     required bool hasError,
     bool enabled = true,
     Widget? suffixIcon,
+    bool isDropdown = false,
   }) {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
@@ -29,9 +30,9 @@ class AppInputStyle {
             : (hasError ? colorScheme.error : colorScheme.primary),
         size: 20,
       ),
-      prefixIconConstraints: const BoxConstraints(
+      prefixIconConstraints: BoxConstraints(
         minWidth: 48,
-        minHeight: 48,
+        minHeight: isDropdown ? 40 : 48,
       ),
       suffixIcon: suffixIcon,
       filled: true,
@@ -44,9 +45,9 @@ class AppInputStyle {
 
       errorStyle: const TextStyle(height: 0, fontSize: 0),
       isDense: true,
-      contentPadding: const EdgeInsets.symmetric(
+      contentPadding: EdgeInsets.symmetric(
         horizontal: 16,
-        vertical: 16,
+        vertical: isDropdown ? 14 : 16,
       ),
 
       border: OutlineInputBorder(

@@ -4,8 +4,8 @@ import 'package:yodoctor/modules/patient/controllers/home_service_controller.dar
 import 'package:yodoctor/modules/patient/screens/home_care/widgets/booking_header.dart';
 import 'package:yodoctor/modules/widgets/app_header.dart';
 import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
+import 'package:yodoctor/modules/widgets/app_text_field.dart';
 import '../../models/home_care/home_service_booking_model.dart';
-import '../../../../core/utils/input_decoration_helper.dart';
 import 'widgets/booking_personal_details.dart';
 import 'widgets/booking_urgency_section.dart';
 import 'widgets/booking_service_duration.dart';
@@ -138,14 +138,14 @@ class _HomeServiceBookingScreenState
                       context,
                       title: 'Medical Condition',
                       icon: Icons.health_and_safety_outlined,
-                      child: TextFormField(
+                      child: AppTextField(
                         controller: _conditionController,
+                        label: 'Medical Condition',
+                        hint: 'Describe medical condition, symptoms...',
+                        icon: Icons.description_rounded,
                         maxLines: 3,
-                        decoration: AppInputDecoration.build(
-                          context,
-                          label: 'Describe medical condition, symptoms...',
-                          prefixIcon: Icons.description_rounded,
-                        ),
+                        minLines: 1,
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
                         onChanged: (val) => ref
                             .read(homeServiceBookingProvider.notifier)
                             .updateField(medicalCondition: val),
@@ -203,14 +203,15 @@ class _HomeServiceBookingScreenState
                       context,
                       title: 'Additional Notes',
                       icon: Icons.note_alt_outlined,
-                      child: TextFormField(
+                      child: AppTextField(
                         controller: _notesController,
+                        label: 'Additional Notes',
+                        isOptional: true,
+                        hint: 'Any special instructions? (Optional)',
+                        icon: Icons.edit_note_rounded,
                         maxLines: 2,
-                        decoration: AppInputDecoration.build(
-                          context,
-                          label: 'Any special instructions? (Optional)',
-                          prefixIcon: Icons.edit_note_rounded,
-                        ),
+                        minLines: 1,
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
                         onChanged: (val) => ref
                             .read(homeServiceBookingProvider.notifier)
                             .updateField(additionalNotes: val),
@@ -242,53 +243,53 @@ class _HomeServiceBookingScreenState
                     onPressed: bookingState.isLoading
                         ? null
                         : () async {
-                            if (!(_formKey.currentState?.validate() ?? false)) {
-                              return;
-                            }
-                            setState(() {
-                              _showDurationDateError =
-                                  currentModel.durationType.isEmpty ||
-                                  currentModel.startDate == null;
-                            });
+                      if (!(_formKey.currentState?.validate() ?? false)) {
+                        return;
+                      }
+                      setState(() {
+                        _showDurationDateError =
+                            currentModel.durationType.isEmpty ||
+                                currentModel.startDate == null;
+                      });
 
-                            if (_showDurationDateError) {
-                              return;
-                            }
+                      if (_showDurationDateError) {
+                        return;
+                      }
 
-                            final success = await ref
-                                .read(homeServiceBookingProvider.notifier)
-                                .createBooking();
+                      final success = await ref
+                          .read(homeServiceBookingProvider.notifier)
+                          .createBooking();
 
-                            if (!context.mounted) return;
+                      if (!context.mounted) return;
 
-                            final currentContextState = ref.read(
-                              homeServiceBookingProvider,
-                            );
+                      final currentContextState = ref.read(
+                        homeServiceBookingProvider,
+                      );
 
-                            if (success) {
-                              AppSnackBar.show(
-                                message: 'Booking submitted successfully',
-                                type: AppSnackBarType.success,
-                                bottomMargin: 0,
-                              );
+                      if (success) {
+                        AppSnackBar.show(
+                          message: 'Booking submitted successfully',
+                          type: AppSnackBarType.success,
+                          bottomMargin: 0,
+                        );
 
-                              if (!context.mounted) return;
+                        if (!context.mounted) return;
 
-                              ref
-                                  .read(homeServiceBookingProvider.notifier)
-                                  .resetBooking();
+                        ref
+                            .read(homeServiceBookingProvider.notifier)
+                            .resetBooking();
 
-                              Navigator.pop(context);
-                            } else {
-                              AppSnackBar.show(
-                                message:
-                                    currentContextState.errorMessage ??
-                                    "Booking request failed",
-                                type: AppSnackBarType.error,
-                                bottomMargin: 0,
-                              );
-                            }
-                          },
+                        Navigator.pop(context);
+                      } else {
+                        AppSnackBar.show(
+                          message:
+                          currentContextState.errorMessage ??
+                              "Booking request failed",
+                          type: AppSnackBarType.error,
+                          bottomMargin: 0,
+                        );
+                      }
+                    },
                     icon: const Icon(Icons.send_rounded, size: 16),
                     label: const Text(
                       'Submit Booking Request',
@@ -315,13 +316,12 @@ class _HomeServiceBookingScreenState
     );
   }
 
-  // (... _buildCardSection, _buildServiceTile and _buildTimeChip retain completely preserved logic)
   Widget _buildCardSection(
-    BuildContext context, {
-    required String title,
-    required IconData icon,
-    required Widget child,
-  }) {
+      BuildContext context, {
+        required String title,
+        required IconData icon,
+        required Widget child,
+      }) {
     final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.all(16),
@@ -359,11 +359,11 @@ class _HomeServiceBookingScreenState
   }
 
   Widget _buildServiceTile(
-    BuildContext context,
-    String title,
-    IconData icon,
-    HomeServiceBookingModel state,
-  ) {
+      BuildContext context,
+      String title,
+      IconData icon,
+      HomeServiceBookingModel state,
+      ) {
     final colorScheme = Theme.of(context).colorScheme;
     final isSel = state.selectedServiceType == title;
     return InkWell(
@@ -409,11 +409,11 @@ class _HomeServiceBookingScreenState
   }
 
   Widget _buildTimeChip(
-    BuildContext context,
-    String label,
-    IconData icon,
-    HomeServiceBookingModel state,
-  ) {
+      BuildContext context,
+      String label,
+      IconData icon,
+      HomeServiceBookingModel state,
+      ) {
     final colorScheme = Theme.of(context).colorScheme;
     final isSel = state.timePreference == label;
     return InkWell(

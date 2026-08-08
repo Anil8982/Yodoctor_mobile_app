@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/modules/patient/models/home_care/home_service_booking_model.dart';
-import 'package:yodoctor/core/utils/input_decoration_helper.dart';
 import 'package:yodoctor/modules/patient/controllers/home_service_controller.dart';
+import 'package:yodoctor/modules/widgets/app_dropdown_field.dart';
 
 class BookingUrgencySection extends ConsumerWidget {
   final HomeServiceBookingModel bookingState;
@@ -16,23 +16,24 @@ class BookingUrgencySection extends ConsumerWidget {
 
     return Column(
       children: [
-        DropdownButtonFormField<String>(
-          initialValue: bookingState.preferredCaregiverGender,
-          decoration: AppInputDecoration.build(
-            context,
-            label: 'Preferred Caregiver Gender *',
-            prefixIcon: Icons.face_rounded,
-          ),
-          items: [
+        AppDropdownField(
+          label: 'Preferred Caregiver Gender',
+          isRequired: true,
+          hint: 'Select Preference',
+          icon: Icons.face_rounded,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          value: bookingState.preferredCaregiverGender.isEmpty
+              ? null
+              : bookingState.preferredCaregiverGender,
+          items: const [
             'No Preference',
             'Male',
             'Female',
-          ].map((g) => DropdownMenuItem(value: g, child: Text(g))).toList(),
-          onChanged: (val) =>
-              notifier.updateField(preferredCaregiverGender: val),
+          ],
+          onChanged: (val) => notifier.updateField(preferredCaregiverGender: val),
           validator: (value) {
-            if (value == null) {
-              return 'Please select gender';
+            if (value == null || value.trim().isEmpty) {
+              return 'Please select gender preference';
             }
             return null;
           },
@@ -50,7 +51,7 @@ class BookingUrgencySection extends ConsumerWidget {
           ),
           value: bookingState.needEmergencyService,
           activeColor: colorScheme.primary,
-          onChanged: (val) => notifier.updateField(needEmergencyService: val),
+          onChanged: (val) => notifier.updateField(needEmergencyService: val ?? false),
         ),
       ],
     );

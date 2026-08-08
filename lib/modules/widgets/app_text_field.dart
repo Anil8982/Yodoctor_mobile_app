@@ -14,6 +14,7 @@ class AppTextField extends StatefulWidget {
   final bool isPassword;
   final TextInputType keyboardType;
   final String? Function(String?)? validator;
+  final ValueChanged<String>? onChanged;
   final int? maxLength;
   final int? maxLines;
   final int? minLines;
@@ -37,6 +38,7 @@ class AppTextField extends StatefulWidget {
     this.isPassword = false,
     this.keyboardType = TextInputType.text,
     this.validator,
+    this.onChanged,
     this.maxLength,
     this.maxLines = 1,
     this.minLines,
@@ -88,6 +90,7 @@ class _AppTextFieldState extends State<AppTextField> {
         readOnly: widget.readOnly,
         enabled: widget.enabled,
         onTap: widget.onTap,
+        onChanged: widget.onChanged,
         autovalidateMode: widget.autovalidateMode,
         style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface),
 
@@ -112,16 +115,16 @@ class _AppTextFieldState extends State<AppTextField> {
           hasError: hasError,
           suffixIcon: widget.isPassword
               ? IconButton(
-                  tooltip: _obscure ? 'Show password' : 'Hide password',
-                  icon: Icon(
-                    _obscure
-                        ? Icons.visibility_off_rounded
-                        : Icons.visibility_rounded,
-                    color: colorScheme.onSurfaceVariant,
-                    size: 20,
-                  ),
-                  onPressed: () => setState(() => _obscure = !_obscure),
-                )
+            tooltip: _obscure ? 'Show password' : 'Hide password',
+            icon: Icon(
+              _obscure
+                  ? Icons.visibility_off_rounded
+                  : Icons.visibility_rounded,
+              color: colorScheme.onSurfaceVariant,
+              size: 20,
+            ),
+            onPressed: () => setState(() => _obscure = !_obscure),
+          )
               : null,
         ),
       ),

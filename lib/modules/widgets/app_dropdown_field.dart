@@ -3,61 +3,73 @@ import 'package:flutter/material.dart';
 import 'app_field_wrapper.dart';
 import 'app_input_style.dart';
 
-class AppDropdownField extends StatefulWidget {
+class AppDropdownField<T> extends StatefulWidget {
   final String label;
   final bool isRequired;
+  final bool isOptional;
   final IconData icon;
-  final String? value;
+  final T? value;
   final String hint;
-  final List<String> items;
-  final void Function(String?) onChanged;
-  final String? Function(String?)? validator;
+  final List<T> items;
+  final String Function(T)? itemLabelBuilder;
+  final void Function(T?) onChanged;
+  final String? Function(T?)? validator;
   final bool enabled;
+  final bool isInvalid;
+  final String? errorText;
   final AutovalidateMode? autovalidateMode;
 
   const AppDropdownField({
     super.key,
     required this.label,
     this.isRequired = false,
+    this.isOptional = false,
     required this.icon,
     required this.value,
     required this.items,
+    this.itemLabelBuilder,
     required this.onChanged,
     this.hint = 'Select...',
     this.validator,
     this.enabled = true,
+    this.isInvalid = false,
+    this.errorText,
     this.autovalidateMode,
   });
 
   @override
-  State<AppDropdownField> createState() => _AppDropdownFieldState();
+  State<AppDropdownField<T>> createState() => _AppDropdownFieldState<T>();
 }
 
-class _AppDropdownFieldState extends State<AppDropdownField> {
-  String? _errorMessage;
+class _AppDropdownFieldState<T> extends State<AppDropdownField<T>> {
+  String? _internalErrorMessage;
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
 
-    final hasError = _errorMessage != null && _errorMessage!.isNotEmpty;
+    final activeError = widget.isInvalid
+        ? (widget.errorText ?? 'Invalid selection')
+        : _internalErrorMessage;
+    final hasError = activeError != null && activeError.isNotEmpty;
 
     return AppFieldWrapper(
       label: widget.label,
       isRequired: widget.isRequired,
+      isOptional: widget.isOptional,
       enabled: widget.enabled,
       hasError: hasError,
-      activeError: _errorMessage,
-      child: DropdownButtonFormField<String>(
+      activeError: activeError,
+      child: DropdownButtonFormField<T>(
         initialValue: widget.value,
         validator: (value) {
           final error = widget.validator?.call(value);
-          if (_errorMessage != error) {
+          if (_internalErrorMessage != error) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (mounted) {
                 setState(() {
-                  _errorMessage = error;
+                  _internalErrorMessage = error;
                 });
               }
             });
@@ -68,25 +80,32 @@ class _AppDropdownFieldState extends State<AppDropdownField> {
         style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface),
         dropdownColor: colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
+        isDense: true,
+        isExpanded: true,
         icon: Icon(
           Icons.keyboard_arrow_down_rounded,
           color: colorScheme.onSurfaceVariant,
+          size: 20,
         ),
         decoration: AppInputStyle.decoration(
           context: context,
           hint: widget.hint,
           icon: widget.icon,
           hasError: hasError,
+          isDropdown: true
         ),
         items: widget.items
             .map(
-              (s) => DropdownMenuItem(
-            value: s,
+              (item) => DropdownMenuItem<T>(
+            value: item,
             child: Text(
-              s,
+              widget.itemLabelBuilder != null
+                  ? widget.itemLabelBuilder!(item)
+                  : item.toString(),
               style: textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurface,
               ),
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         )
