@@ -47,7 +47,6 @@ class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
     "DAUGHTER",
     "BROTHER",
     "SISTER",
-    "GRANDPARENT",
     "OTHER",
   ];
 
