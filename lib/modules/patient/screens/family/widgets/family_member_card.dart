@@ -338,9 +338,4 @@ class FamilyMemberCard extends StatelessWidget {
       ),
     );
   }
-
-  String _formatNumber(double value, String unit) {
-    final bool isWhole = value == value.roundToDouble();
-    return '${isWhole ? value.toStringAsFixed(0) : value.toStringAsFixed(1)} $unit';
-  }
 }

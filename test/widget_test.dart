@@ -1,19 +1,23 @@
-// import 'package:flutter_test/flutter_test.dart';
-//
-// import 'package:yodoctor/core/constants/app_strings.dart';
-// import 'package:yodoctor/features/patient/data/datasource/patient_local_datasource.dart';
-// import 'package:yodoctor/features/patient/data/repositories/patient_repository_impl.dart';
-// import 'package:yodoctor/main.dart';
-//
-// void main() {
-//   testWidgets('Search landing renders', (WidgetTester tester) async {
-//     await tester.pumpWidget(
-//       YoDoctorApp(
-//         repositories: PatientRepositoryImpl(const PatientLocalDataSource()),
-//       ),
-//     );
-//     await tester.pumpAndSettle();
-//
-//     expect(find.text(AppStrings.searchTitle), findsOneWidget);
-//   });
-// }
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+import 'package:yodoctor/modules/payment/screens/payment_success_screen.dart';
+
+void main() {
+  testWidgets('Payment Success Screen Preview', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const ProviderScope(
+        child: MaterialApp(
+          home: PaymentSuccessScreen(
+            paymentId: 'pay_RzP8QwX123456',
+            planName: 'Premium Monthly',
+            nextRoute: '/doctor/dashboard',
+          ),
+        ),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+  });
+}

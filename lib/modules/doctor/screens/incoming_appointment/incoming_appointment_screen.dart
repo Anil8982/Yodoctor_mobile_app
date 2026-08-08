@@ -217,7 +217,7 @@ class _IncomingAppointmentScreenState
                                 vertical: 10,
                               ),
                               itemCount: appointments.length,
-                              separatorBuilder: (_, __) =>
+                              separatorBuilder: (_, _) =>
                                   const SizedBox(height: 18),
                               itemBuilder: (context, index) {
                                 final appointment = appointments[index];

@@ -1,4 +1,3 @@
-// lib/modules/payment/screens/payment_success_screen.dart
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

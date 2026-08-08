@@ -505,55 +505,6 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
     );
   }
 
-  Widget _genderButton(
-    BuildContext context,
-    String gender,
-    String? currentSelected,
-  ) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    final selected = currentSelected == gender;
-
-    return Expanded(
-      child: GestureDetector(
-        onTap: () {
-          AppLogger.info(
-            'Gender selected row state update ->: $gender',
-            tag: LogTags.ui,
-            subTag: _subTag,
-          );
-          ref
-              .read(patientRegisterControllerProvider.notifier)
-              .selectGender(gender);
-        },
-        child: Container(
-          margin: EdgeInsets.only(right: gender != 'Other' ? 10 : 0),
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          decoration: BoxDecoration(
-            color: selected
-                ? AppTheme.secondary
-                : colorScheme.surfaceContainerLow,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: selected ? AppTheme.secondary : colorScheme.outlineVariant,
-              width: 1.5,
-            ),
-          ),
-          child: Text(
-            gender,
-            textAlign: TextAlign.center,
-            style: textTheme.labelLarge?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: selected
-                  ? colorScheme.onPrimary
-                  : colorScheme.onSurfaceVariant,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _sectionLabel(BuildContext context, String label) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;

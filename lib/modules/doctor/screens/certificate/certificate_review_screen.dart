@@ -302,7 +302,7 @@ class _CertificateReviewScreenState
     final isDark = theme.brightness == Brightness.dark;
     final state = ref.watch(doctorCertificateReviewProvider);
 
-    final statusStr = state.detail?.status?.trim().toUpperCase() ?? '';
+    final statusStr = state.detail?.status.trim().toUpperCase() ?? '';
     final isApproved = state.detail?.isApproved == true ||
         statusStr == 'APPROVED' ||
         statusStr == 'ISSUED';
