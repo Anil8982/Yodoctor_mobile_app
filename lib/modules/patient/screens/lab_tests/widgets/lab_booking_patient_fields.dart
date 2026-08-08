@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:yodoctor/core/utils/input_decoration_helper.dart';
+import 'package:yodoctor/core/utils/app_field_helper.dart';
 import 'package:yodoctor/modules/patient/controllers/booking_controller.dart';
 import 'package:yodoctor/modules/patient/models/lab/booking_state_model.dart';
+import 'package:yodoctor/modules/widgets/app_dropdown_field.dart';
+import 'package:yodoctor/modules/widgets/app_text_field.dart';
+
 
 class LabBookingPatientFields extends ConsumerWidget {
   final TextEditingController nameController;
   final TextEditingController ageController;
   final TextEditingController phoneController;
   final BookingStateModel state;
+  final bool hasSubmitted;
 
   const LabBookingPatientFields({
     super.key,
@@ -17,75 +21,75 @@ class LabBookingPatientFields extends ConsumerWidget {
     required this.ageController,
     required this.phoneController,
     required this.state,
+    this.hasSubmitted = false,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final autovalidateMode = hasSubmitted
+        ? AutovalidateMode.onUserInteraction
+        : AutovalidateMode.disabled;
+
     return Column(
       children: [
-        Row(
-          children: [
-            Expanded(
-              child: TextFormField(
-                controller: nameController,
-                decoration: AppInputDecoration.build(
-                  context,
-                  label: 'Full Name *',
-                  prefixIcon: Icons.person_outline_rounded,
-                ),
-                onChanged: (val) => ref
-                    .read(labBookingProvider.notifier)
-                    .updatePatientDetails(name: val),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Enter your full name';
-                  }
-                  if (!RegExp(r'^[a-zA-Z ]+$').hasMatch(value.trim())) {
-                    return 'Only alphabets are allowed';
-                  }
-                  if (value.trim().length < 3) {
-                    return 'Name must be at least 3 characters';
-                  }
-                  return null;
-                },
-              ),
-            ),
-            const SizedBox(width: 10),
-            SizedBox(
-              width: 90,
-              child: TextFormField(
-                controller: ageController,
-                keyboardType: TextInputType.number,
-                decoration: AppInputDecoration.build(context, label: 'Age *'),
-                onChanged: (val) => ref
-                    .read(labBookingProvider.notifier)
-                    .updatePatientDetails(age: val),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) return 'Enter age';
-                  final age = int.tryParse(value);
-                  if (age == null) return 'Invalid age';
-                  if (age < 1 || age > 120) {
-                    return 'Age must be between 1 and 120';
-                  }
-                  return null;
-                },
-              ),
-            ),
+        AppTextField(
+          label: 'Full Name',
+          isRequired: true,
+          hint: 'Enter your full name',
+          maxLength: 50,
+          icon: Icons.person_outline_rounded,
+          controller: nameController,
+          autovalidateMode: autovalidateMode,
+          textCapitalization: TextCapitalization.words,
+          inputFormatters: [
+            SingleSpaceFormatter(),
           ],
+          validator: (value) {
+            if (value == null || value.trim().isEmpty) {
+              return 'Enter your full name';
+            }
+            if (!RegExp(r'^[a-zA-Z ]+$').hasMatch(value.trim())) {
+              return 'Only alphabets are allowed';
+            }
+            if (value.trim().length < 3) {
+              return 'Name must be at least 3 characters';
+            }
+            return null;
+          },
         ),
         const SizedBox(height: 12),
-        TextFormField(
+        AppTextField(
+          label: 'Age',
+          isRequired: true,
+          hint: 'Age',
+          icon: Icons.calendar_today_outlined,
+          controller: ageController,
+          autovalidateMode: autovalidateMode,
+          keyboardType: TextInputType.number,
+          maxLength: 3,
+          inputFormatters: [
+            FilteringTextInputFormatter.digitsOnly,
+          ],
+          validator: (value) {
+            if (value == null || value.trim().isEmpty) return 'Enter age';
+            final age = int.tryParse(value);
+            if (age == null) return 'Invalid age';
+            if (age < 1 || age > 120) {
+              return 'Age must be between 1 and 120';
+            }
+            return null;
+          },
+        ),
+        const SizedBox(height: 12),
+        AppTextField(
+          label: 'Phone Number',
+          isRequired: true,
+          hint: 'Enter 10-digit number',
+          icon: Icons.phone_android_rounded,
           controller: phoneController,
+          autovalidateMode: autovalidateMode,
           keyboardType: TextInputType.phone,
-          decoration: AppInputDecoration.build(
-            context,
-            label: 'Phone Number *',
-            prefixIcon: Icons.phone_android_rounded,
-          ),
-          onChanged: (val) => ref
-              .read(labBookingProvider.notifier)
-              .updatePatientDetails(phone: val),
+          maxLength: 10,
           inputFormatters: [
             FilteringTextInputFormatter.digitsOnly,
             LengthLimitingTextInputFormatter(10),
@@ -101,51 +105,17 @@ class LabBookingPatientFields extends ConsumerWidget {
           },
         ),
         const SizedBox(height: 14),
-        Row(
-          children: ['Male', 'Female', 'Other'].map((gender) {
-            final isSelected = state.gender == gender;
-            return Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                child: InkWell(
-                  onTap: () => ref
-                      .read(labBookingProvider.notifier)
-                      .updatePatientDetails(gender: gender),
-                  borderRadius: BorderRadius.circular(12),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? colorScheme.primary
-                          : colorScheme.surfaceContainerHighest.withValues(
-                              alpha: 0.4,
-                            ),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: isSelected
-                            ? Colors.transparent
-                            : colorScheme.outlineVariant.withValues(alpha: 0.3),
-                      ),
-                    ),
-                    child: Center(
-                      child: Text(
-                        gender,
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: isSelected
-                              ? FontWeight.bold
-                              : FontWeight.w500,
-                          color: isSelected
-                              ? colorScheme.onPrimary
-                              : colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            );
-          }).toList(),
+        AppDropdownField(
+          label: 'Gender',
+          isRequired: true,
+          hint: 'Select Gender',
+          icon: Icons.people_alt_outlined,
+          value: state.gender.isNotEmpty ? state.gender : null,
+          items: const ['Male', 'Female', 'Other'],
+          autovalidateMode: autovalidateMode,
+          onChanged: (value) => ref
+              .read(labBookingProvider.notifier)
+              .updatePatientDetails(gender: value),
         ),
       ],
     );

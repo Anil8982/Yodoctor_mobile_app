@@ -28,6 +28,7 @@ class _LabSlotBookingScreenState extends ConsumerState<LabSlotBookingScreen> {
   final _addressController = TextEditingController();
   String? validationMessage;
   late final ProviderSubscription<LabState> _labSubscription;
+  bool _hasSubmitted = false;
 
   @override
   void initState() {
@@ -80,7 +81,7 @@ class _LabSlotBookingScreenState extends ConsumerState<LabSlotBookingScreen> {
     final cartItems = labState.cart;
     final double totalPayable = cartItems.fold(
       0,
-      (sum, item) => sum + item.currentPrice,
+          (sum, item) => sum + item.currentPrice,
     );
 
     return Scaffold(
@@ -136,6 +137,7 @@ class _LabSlotBookingScreenState extends ConsumerState<LabSlotBookingScreen> {
                           ageController: _ageController,
                           phoneController: _phoneController,
                           state: bookingState,
+                          hasSubmitted: _hasSubmitted,
                         ),
                       ),
                       const SizedBox(height: 20),
@@ -144,6 +146,7 @@ class _LabSlotBookingScreenState extends ConsumerState<LabSlotBookingScreen> {
                         title: 'Sample Pickup Address',
                         child: LabBookingAddressFields(
                           addressController: _addressController,
+                          hasSubmitted: _hasSubmitted,
                         ),
                       ),
                       const SizedBox(height: 20),
@@ -172,6 +175,11 @@ class _LabSlotBookingScreenState extends ConsumerState<LabSlotBookingScreen> {
                 validationMessage: validationMessage,
                 onValidationChanged: (msg) =>
                     setState(() => validationMessage = msg),
+                nameController: _nameController,
+                ageController: _ageController,
+                phoneController: _phoneController,
+                addressController: _addressController,
+                onSubmitted: () => setState(() => _hasSubmitted = true),
               ),
             ],
           ),

@@ -20,28 +20,35 @@ class LabBookingNotifier extends Notifier<BookingStateModel> {
     return BookingStateModel(selectedDate: DateTime.now());
   }
 
+
   void updatePatientDetails({
     String? name,
     String? age,
     String? phone,
     String? gender,
   }) {
-    final payload = {
-      "fullName": ?name,
-      "age": ?age,
-      "phoneNumber": ?phone,
-      "gender": ?gender,
-    };
+    if (gender == null) return;
 
     AppLogger.info(
-      'Updating patient details for lab booking',
+      'Updating gender for lab booking',
       tag: LogTags.patient,
       subTag: _subTag,
     );
-    AppLogger.json(
-      payload,
+
+    state = state.copyWith(gender: gender);
+  }
+
+
+  void setPatientDetailsForBooking({
+    required String name,
+    required String age,
+    required String phone,
+    String? gender,
+  }) {
+    AppLogger.info(
+      'Setting patient details for booking submission',
       tag: LogTags.patient,
-      subTag: '$_subTag/PatientDetails',
+      subTag: _subTag,
     );
 
     state = state.copyWith(
@@ -75,6 +82,11 @@ class LabBookingNotifier extends Notifier<BookingStateModel> {
       latitude: latitude,
       longitude: longitude,
     );
+  }
+
+  void setAddressForBooking(String address) {
+    if (address.trim().isEmpty) return;
+    state = state.copyWith(address: address.trim());
   }
 
   Future<void> fetchCurrentLocation(

@@ -1,16 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:yodoctor/core/utils/input_decoration_helper.dart';
 import 'package:yodoctor/modules/patient/controllers/booking_controller.dart';
+import 'package:yodoctor/modules/widgets/app_text_field.dart';
 
 class LabBookingAddressFields extends ConsumerWidget {
   final TextEditingController addressController;
+  final bool hasSubmitted;
 
-  const LabBookingAddressFields({super.key, required this.addressController});
+  const LabBookingAddressFields({
+    super.key,
+    required this.addressController,
+    this.hasSubmitted = false,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
+    final autovalidateMode = hasSubmitted
+        ? AutovalidateMode.onUserInteraction
+        : AutovalidateMode.disabled;
     return Column(
       children: [
         InkWell(
@@ -49,16 +57,16 @@ class LabBookingAddressFields extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: 12),
-        TextFormField(
+        AppTextField(
+          label: 'Full Address',
+          isRequired: true,
+          hint: 'House/Flat No., Street, Area, City',
+          icon: Icons.home_rounded,
           controller: addressController,
-          maxLines: 2,
-          decoration: AppInputDecoration.build(
-            context,
-            label: 'Full Address *',
-            prefixIcon: Icons.home_rounded,
-          ),
-          onChanged: (val) =>
-              ref.read(labBookingProvider.notifier).updateAddress(val),
+          maxLines: 3,
+          minLines: 2,
+          maxLength: 500,
+          autovalidateMode: autovalidateMode,
           validator: (value) {
             if (value == null || value.trim().isEmpty) return 'Enter address';
             if (value.trim().length < 10) return 'Address is too short';

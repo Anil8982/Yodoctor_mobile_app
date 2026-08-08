@@ -12,6 +12,11 @@ class LabBookingBottomBar extends ConsumerWidget {
   final GlobalKey<FormState> formKey;
   final String? validationMessage;
   final ValueChanged<String?> onValidationChanged;
+  final TextEditingController nameController;
+  final TextEditingController ageController;
+  final TextEditingController phoneController;
+  final TextEditingController addressController;
+  final VoidCallback onSubmitted;
 
   const LabBookingBottomBar({
     super.key,
@@ -21,16 +26,18 @@ class LabBookingBottomBar extends ConsumerWidget {
     required this.formKey,
     this.validationMessage,
     required this.onValidationChanged,
+    required this.nameController,
+    required this.ageController,
+    required this.phoneController,
+    required this.addressController,
+    required this.onSubmitted,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final isReady =
-        state.fullName.isNotEmpty &&
-        state.phoneNumber.isNotEmpty &&
-        state.selectedTimeSlot.isNotEmpty;
+    final isReady = state.selectedTimeSlot.isNotEmpty;
     final isProcessing = labState.isPaymentLoading;
 
     return Container(
@@ -75,37 +82,51 @@ class LabBookingBottomBar extends ConsumerWidget {
               child: ElevatedButton(
                 onPressed: (isReady && !isProcessing)
                     ? () async {
-                        final booking = ref.read(labBookingProvider);
-                        if (booking.gender.isEmpty) {
-                          onValidationChanged("Select gender");
-                          return;
-                        }
-                        if (booking.selectedTimeSlot.isEmpty) {
-                          onValidationChanged("Select a time slot");
-                          return;
-                        }
-                        onValidationChanged(null);
-                        if (!(formKey.currentState?.validate() ?? false))
-                          return;
+                  if (!(formKey.currentState?.validate() ?? false)) {
+                    onSubmitted();
+                    return;
+                  }
 
-                        final notifier = ref.read(labProvider.notifier);
-                        final bookingId = await notifier.createBooking(
-                          booking: booking,
-                        );
+                  onSubmitted();
 
-                        if (!context.mounted) return;
+                  ref.read(labBookingProvider.notifier).setPatientDetailsForBooking(
+                    name: nameController.text.trim(),
+                    age: ageController.text.trim(),
+                    phone: phoneController.text.trim(),
+                  );
 
-                        if (bookingId == null) {
-                          AppSnackBar.show(
-                            message: 'Booking failed',
-                            type: AppSnackBarType.error,
-                          );
+                  ref.read(labBookingProvider.notifier).setAddressForBooking(
+                    addressController.text.trim(),
+                  );
 
-                          return;
-                        }
+                  final booking = ref.read(labBookingProvider);
+                  if (booking.gender.isEmpty) {
+                    onValidationChanged("Select gender");
+                    return;
+                  }
+                  if (booking.selectedTimeSlot.isEmpty) {
+                    onValidationChanged("Select a time slot");
+                    return;
+                  }
+                  onValidationChanged(null);
 
-                        await notifier.initiatePayment(bookingId);
-                      }
+                  final notifier = ref.read(labProvider.notifier);
+                  final bookingId = await notifier.createBooking(
+                    booking: booking,
+                  );
+
+                  if (!context.mounted) return;
+
+                  if (bookingId == null) {
+                    AppSnackBar.show(
+                      message: 'Booking failed',
+                      type: AppSnackBarType.error,
+                    );
+                    return;
+                  }
+
+                  await notifier.initiatePayment(bookingId);
+                }
                     : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: colorScheme.primary,
@@ -116,21 +137,21 @@ class LabBookingBottomBar extends ConsumerWidget {
                   ),
                 ),
                 child: isProcessing
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
-                      )
+                    ? SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: colorScheme.onPrimary,
+                  ),
+                )
                     : const Text(
-                        'Confirm & Pay',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                        ),
-                      ),
+                  'Confirm & Pay',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
+                ),
               ),
             ),
           ),
