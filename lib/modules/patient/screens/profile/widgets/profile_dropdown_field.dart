@@ -91,16 +91,8 @@ class ProfileDropdownField extends StatelessWidget {
           isDense: true,
           contentPadding: const EdgeInsets.symmetric(vertical: 12),
 
-          // 🟢 Clean Underline Transitions
           border: InputBorder.none,
-          enabledBorder: isEditing
-              ? UnderlineInputBorder(
-                  borderSide: BorderSide(
-                    color: colorScheme.outlineVariant.transparency(0.6),
-                    width: 1,
-                  ),
-                )
-              : InputBorder.none,
+          enabledBorder: InputBorder.none,
           focusedBorder: isEditing
               ? UnderlineInputBorder(
                   borderSide: BorderSide(color: colorScheme.primary, width: 2),

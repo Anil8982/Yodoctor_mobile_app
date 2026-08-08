@@ -98,15 +98,20 @@ class ProfileController extends Notifier<ProfileState> {
 
   Future<void> pickDateOfBirth(BuildContext context) async {
     final DateTime now = DateTime.now();
+    final DateTime maxDate = now.subtract(const Duration(days: 1));
 
-    final DateTime initialDate =
+    DateTime initialDate =
         DateTime.tryParse(dobController.text) ?? DateTime(now.year - 25, 1, 1);
+
+    if (initialDate.isAfter(maxDate) || initialDate.isAtSameMomentAs(now)) {
+      initialDate = maxDate;
+    }
 
     final pickedDate = await showDatePicker(
       context: context,
       initialDate: initialDate,
       firstDate: DateTime(1900),
-      lastDate: now,
+      lastDate: maxDate,
     );
 
     if (pickedDate == null) return;
@@ -116,7 +121,6 @@ class ProfileController extends Notifier<ProfileState> {
     // Store API format
     dobController.text = formattedDate;
   }
-
   String formatDob(String? value) {
     if (value == null || value.trim().isEmpty) {
       return 'Not provided';

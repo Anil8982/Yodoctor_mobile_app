@@ -9,6 +9,7 @@ import 'widgets/appointment_details_dialog.dart';
 import 'widgets/history_appointment_card.dart';
 import 'widgets/history_header.dart';
 import 'widgets/history_table_header.dart';
+import 'widgets/prescription_bottom_sheet.dart';
 
 class AppointmentsHistoryScreen extends ConsumerStatefulWidget {
   const AppointmentsHistoryScreen({super.key});
@@ -148,53 +149,9 @@ class _AppointmentsHistoryScreenState
 
                                         if (!context.mounted) return;
 
-                                        showDialog(
-                                          context: context,
-                                          builder: (dialogContext) => AlertDialog(
-                                            title: const Text("Prescription"),
-                                            content: SingleChildScrollView(
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  const Text(
-                                                    "Medicines",
-                                                    style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                  const SizedBox(height: 8),
-                                                  Text(
-                                                    prescription["medicines"] ??
-                                                        "",
-                                                  ),
-                                                  const SizedBox(height: 20),
-                                                  const Text(
-                                                    "Instructions",
-                                                    style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                  const SizedBox(height: 8),
-                                                  Text(
-                                                    prescription["instructions"] ??
-                                                        "",
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            actions: [
-                                              TextButton(
-                                                onPressed: () => Navigator.pop(
-                                                  dialogContext,
-                                                ),
-                                                child: const Text("Close"),
-                                              ),
-                                            ],
-                                          ),
+                                        PrescriptionBottomSheet.show(
+                                          context,
+                                          prescription,
                                         );
                                       } catch (e) {
                                         if (!context.mounted) return;

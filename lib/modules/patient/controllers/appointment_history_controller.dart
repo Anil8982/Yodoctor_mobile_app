@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
@@ -171,9 +172,20 @@ class AppointmentHistoryController extends Notifier<AppointmentHistoryState> {
         AppLogger.warning('Review submission rejected by backend: $errorMsg', tag: LogTags.patient, subTag: _subTag);
         throw Exception(errorMsg);
       }
-    } catch (e, st) {
-      AppLogger.exception(e, st, message: 'Review submission execution faulted', tag: LogTags.patient, subTag: _subTag);
-      throw Exception("Failed to submit review");
+    } catch (e) {
+      String message = "Failed to submit review";
+      if (e is DioException && e.response?.data != null) {
+        final data = e.response?.data;
+        if (data is Map && data.containsKey("message")) {
+          message = data["message"].toString();
+        }
+      } else {
+        message = e.toString().replaceFirst("Exception: ", "");
+      }
+
+      AppLogger.warning('Review submission handled safely: $message', tag: LogTags.patient, subTag: _subTag);
+
+      throw Exception(message);
     }
   }
 
