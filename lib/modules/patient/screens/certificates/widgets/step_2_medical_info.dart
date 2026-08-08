@@ -1,20 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/utils/app_field_helper.dart';
+import 'package:yodoctor/modules/patient/controllers/certificate_request.dart';
 import 'package:yodoctor/modules/widgets/app_date_picker_field.dart';
 import 'package:yodoctor/modules/widgets/app_dropdown_field.dart';
 import 'package:yodoctor/modules/widgets/app_text_field.dart';
-import 'package:yodoctor/modules/patient/controllers/certificate_request.dart';
 import 'step_header_helper.dart';
 
 class Step2MedicalInfo extends ConsumerWidget {
   final GlobalKey<FormState> formKey;
   final CertificateNotifier controller;
+  final AutovalidateMode? autovalidateMode;
 
   const Step2MedicalInfo({
     super.key,
     required this.formKey,
     required this.controller,
+    this.autovalidateMode,
   });
 
   @override
@@ -24,7 +27,7 @@ class Step2MedicalInfo extends ConsumerWidget {
 
     return Form(
       key: formKey,
-      autovalidateMode: AutovalidateMode.onUserInteraction,
+      autovalidateMode: autovalidateMode ?? AutovalidateMode.onUserInteraction,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -40,6 +43,7 @@ class Step2MedicalInfo extends ConsumerWidget {
             isRequired: true,
             hint: 'Enter full name',
             icon: Icons.badge_rounded,
+            textCapitalization: TextCapitalization.words,
             inputFormatters: [
               SingleSpaceFormatter(),
             ],
@@ -67,23 +71,29 @@ class Step2MedicalInfo extends ConsumerWidget {
             isRequired: true,
             hint: 'Select Date',
             icon: Icons.calendar_today_rounded,
-            value: controller.dobController.text.isNotEmpty
-                ? _parseDate(controller.dobController.text)
-                : null,
+            value: formState.dateOfBirth ??
+                (controller.dobController.text.isNotEmpty
+                    ? _parseDate(controller.dobController.text)
+                    : null),
             firstDate: DateTime(1900),
             lastDate: DateTime.now(),
             onChanged: (date) {
               if (date != null) {
+                controller.selectDateOfBirth(date);
                 controller.dobController.text =
                 '${date.day.toString().padLeft(2, '0')}-${date.month.toString().padLeft(2, '0')}-${date.year}';
               }
             },
-            validator: (value) => controller.dobController.text.trim().isEmpty
-                ? 'Required'
-                : null,
+            validator: (value) {
+              if (formState.dateOfBirth == null &&
+                  controller.dobController.text.trim().isEmpty) {
+                return 'Required';
+              }
+              return null;
+            },
           ),
           const SizedBox(height: 20),
-          AppDropdownField(
+          AppDropdownField<String>(
             label: 'Gender',
             isRequired: true,
             hint: 'Select Gender',
@@ -96,7 +106,7 @@ class Step2MedicalInfo extends ConsumerWidget {
             value == null || value.trim().isEmpty ? 'Required' : null,
           ),
           const SizedBox(height: 20),
-          AppDropdownField(
+          AppDropdownField<String>(
             label: 'Blood Group',
             hint: 'Select Blood Group',
             icon: Icons.bloodtype_outlined,
@@ -110,8 +120,12 @@ class Step2MedicalInfo extends ConsumerWidget {
             controller: controller.heightController,
             label: 'Height',
             hint: 'e.g. 175',
+            maxLength: 3,
             icon: Icons.height_rounded,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            inputFormatters: <TextInputFormatter>[
+              FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d?$')),
+            ],
             validator: (value) {
               if (value != null && value.trim().isNotEmpty) {
                 final height = double.tryParse(value.trim());
@@ -130,8 +144,12 @@ class Step2MedicalInfo extends ConsumerWidget {
             controller: controller.weightController,
             label: 'Weight',
             hint: 'e.g. 70',
+            maxLength: 3,
             icon: Icons.scale_rounded,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            inputFormatters: <TextInputFormatter>[
+              FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d?$')),
+            ],
             validator: (value) {
               if (value != null && value.trim().isNotEmpty) {
                 final weight = double.tryParse(value.trim());

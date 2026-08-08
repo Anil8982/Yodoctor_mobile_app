@@ -44,7 +44,7 @@ class ProfessionalInfoTab extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.xl),
 
-            AppDropdownField(
+            AppDropdownField<String>(
               label: 'Primary Qualification',
               isRequired: true,
               hint: 'e.g. MBBS, MD, MS',

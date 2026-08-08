@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/core/constants/app_constants.dart';
 import 'package:yodoctor/core/utils/app_field_helper.dart';
 import 'package:yodoctor/modules/patient/controllers/booking_controller.dart';
 import 'package:yodoctor/modules/patient/models/lab/booking_state_model.dart';
 import 'package:yodoctor/modules/widgets/app_dropdown_field.dart';
 import 'package:yodoctor/modules/widgets/app_text_field.dart';
-
 
 class LabBookingPatientFields extends ConsumerWidget {
   final TextEditingController nameController;
@@ -41,9 +41,7 @@ class LabBookingPatientFields extends ConsumerWidget {
           controller: nameController,
           autovalidateMode: autovalidateMode,
           textCapitalization: TextCapitalization.words,
-          inputFormatters: [
-            SingleSpaceFormatter(),
-          ],
+          inputFormatters: [SingleSpaceFormatter()],
           validator: (value) {
             if (value == null || value.trim().isEmpty) {
               return 'Enter your full name';
@@ -67,9 +65,7 @@ class LabBookingPatientFields extends ConsumerWidget {
           autovalidateMode: autovalidateMode,
           keyboardType: TextInputType.number,
           maxLength: 3,
-          inputFormatters: [
-            FilteringTextInputFormatter.digitsOnly,
-          ],
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           validator: (value) {
             if (value == null || value.trim().isEmpty) return 'Enter age';
             final age = int.tryParse(value);
@@ -105,13 +101,13 @@ class LabBookingPatientFields extends ConsumerWidget {
           },
         ),
         const SizedBox(height: 14),
-        AppDropdownField(
+        AppDropdownField<String>(
           label: 'Gender',
           isRequired: true,
           hint: 'Select Gender',
           icon: Icons.people_alt_outlined,
           value: state.gender.isNotEmpty ? state.gender : null,
-          items: const ['Male', 'Female', 'Other'],
+          items: AppConstants.genderOptions,
           autovalidateMode: autovalidateMode,
           onChanged: (value) => ref
               .read(labBookingProvider.notifier)

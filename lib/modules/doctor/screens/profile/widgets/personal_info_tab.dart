@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/core/constants/app_constants.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
 import 'package:yodoctor/modules/doctor/controllers/doctor_profile_controller.dart';
 import 'package:yodoctor/modules/widgets/app_dropdown_field.dart';
@@ -91,7 +92,7 @@ class PersonalInfoTab extends ConsumerWidget {
             ),
             const SizedBox(height: AppSpacing.lg),
 
-            AppDropdownField(
+            AppDropdownField<String>(
               label: 'Gender',
               isRequired: true,
               hint: 'Select gender',
@@ -104,7 +105,7 @@ class PersonalInfoTab extends ConsumerWidget {
                       'OTHER' => 'Other',
                       _ => null,
                     },
-              items: const ['Male', 'Female', 'Other'],
+              items: AppConstants.genderOptions,
               onChanged: (value) {
                 if (value != null) {
                   controller.updateGender(value);

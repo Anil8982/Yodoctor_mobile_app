@@ -1,24 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:yodoctor/modules/widgets/app_dropdown_field.dart';
-import 'package:yodoctor/modules/widgets/app_search_select_field.dart';
-import 'package:yodoctor/modules/widgets/app_text_field.dart';
 
 import 'package:yodoctor/modules/patient/controllers/certificate_request.dart';
+import 'package:yodoctor/modules/patient/models/certificate/patient_doctor_model.dart';
+import 'package:yodoctor/modules/widgets/app_dropdown_field.dart';
+import 'package:yodoctor/modules/widgets/app_text_field.dart';
 import 'certificate_type_card.dart';
 import 'step_header_helper.dart';
 
 class Step1TypeSelection extends ConsumerWidget {
-  final GlobalKey<FormState> formKey;
+  final GlobalKey formKey;
   final CertificateNotifier controller;
+  final AutovalidateMode? autovalidateMode;
 
-  Step1TypeSelection({
+  const Step1TypeSelection({
     super.key,
     required this.formKey,
     required this.controller,
+    this.autovalidateMode,
   });
 
-  final List<Map<String, dynamic>> _certificateTypes = [
+  static const List<Map<String, dynamic>> _certificateTypes = [
     {
       'title': 'Medical Fitness',
       'desc': 'For employment or sports',
@@ -50,8 +52,8 @@ class Step1TypeSelection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // Watch current form state reactively from provider
     final formState = ref.watch(certificateProvider);
-    final selectedDoctor =
-    formState.doctors.any(
+
+    final selectedDoctor = formState.doctors.any(
           (doctor) => doctor.id == formState.assignedDoctor?.id,
     )
         ? formState.doctors.firstWhere(
@@ -59,16 +61,9 @@ class Step1TypeSelection extends ConsumerWidget {
     )
         : null;
 
-    final doctorItems = formState.doctors
-        .map((doc) => "${doc.name} (${doc.specialty})")
-        .toList();
-
-    final selectedDoctorString = selectedDoctor != null
-        ? "${selectedDoctor.name} (${selectedDoctor.specialty})"
-        : null;
-
     return Form(
       key: formKey,
+      autovalidateMode: autovalidateMode,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -93,7 +88,6 @@ class Step1TypeSelection extends ConsumerWidget {
                 title: type['title'],
                 description: type['desc'],
                 icon: type['icon'],
-                // Read reactive properties from formState payload safely
                 isSelected: formState.selectedType == type['title'],
                 onTap: () => controller.setSelectedType(type['title']),
               );
@@ -101,24 +95,23 @@ class Step1TypeSelection extends ConsumerWidget {
           ),
           const SizedBox(height: 28),
 
-          AppSearchSelectField(
+          // Assigned Doctor Dropdown
+          AppDropdownField<PatientDoctorModel>(
             label: 'Assigned Doctor',
             isRequired: true,
             hint: 'Select Doctor',
-            icon: Icons.person,
-            value: selectedDoctorString,
-            items: doctorItems,
-            autovalidateMode: AutovalidateMode.onUserInteraction,
+            icon: Icons.person_rounded,
+            value: selectedDoctor,
+            items: formState.doctors,
+            itemLabelBuilder: (doctor) => '${doctor.name} (${doctor.specialty})',
+            autovalidateMode: autovalidateMode,
             onChanged: (value) {
               if (value != null) {
-                final matchedDoc = formState.doctors.firstWhere(
-                      (doc) => "${doc.name} (${doc.specialty})" == value,
-                );
-                controller.setAssignedDoctor(matchedDoc);
+                controller.setAssignedDoctor(value);
               }
             },
             validator: (value) {
-              if (value == null || value.trim().isEmpty) {
+              if (value == null) {
                 return 'Please select an assigned doctor';
               }
               return null;
@@ -126,11 +119,11 @@ class Step1TypeSelection extends ConsumerWidget {
           ),
           const SizedBox(height: 20),
 
-          AppDropdownField(
+          // Purpose of Certificate Dropdown
+          AppDropdownField<String>(
             label: 'Purpose of Certificate',
             isRequired: true,
             hint: 'Select Purpose',
-            autovalidateMode: AutovalidateMode.onUserInteraction,
             icon: Icons.assignment_turned_in_rounded,
             value: formState.purpose,
             items: const [
@@ -141,16 +134,25 @@ class Step1TypeSelection extends ConsumerWidget {
               'Insurance',
               'Other',
             ],
-            onChanged: (value) =>
-            value != null ? controller.setPurpose(value) : null,
-            validator: (value) =>
-            value == null || value.trim().isEmpty ? 'Please select a purpose' : null,
+            autovalidateMode: autovalidateMode,
+            onChanged: (value) {
+              if (value != null) {
+                controller.setPurpose(value);
+              }
+            },
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return 'Please select a purpose';
+              }
+              return null;
+            },
           ),
           const SizedBox(height: 20),
 
+          // Additional Notes Field
           AppTextField(
             controller: controller.additionalNotesController,
-            autovalidateMode: AutovalidateMode.onUserInteraction,
+            autovalidateMode: autovalidateMode,
             label: 'Additional Notes For Doctor',
             hint: 'Describe specific conditions or background details contextually...',
             icon: Icons.note_alt_outlined,

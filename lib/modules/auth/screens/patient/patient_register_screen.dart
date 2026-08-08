@@ -2,6 +2,7 @@ import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/core/constants/app_constants.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
@@ -326,13 +327,13 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                           },
                         ),
                         const SizedBox(height: 16),
-                        AppDropdownField(
+                        AppDropdownField<String>(
                           label: 'Gender',
                           isRequired: true,
                           hint: 'Select gender',
                           icon: Icons.wc_rounded,
                           value: registerState.selectedGender,
-                          items: const ['Male', 'Female', 'Other'],
+                          items: AppConstants.genderOptions,
                           onChanged: (value) {
                             controllerNotifier.selectGender(value!);
                           },

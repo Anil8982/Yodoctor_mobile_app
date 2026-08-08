@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:yodoctor/core/constants/app_constants.dart';
 import 'package:yodoctor/modules/widgets/app_date_picker_field.dart';
 import 'package:yodoctor/modules/widgets/app_dropdown_field.dart';
 import 'package:yodoctor/modules/widgets/app_text_field.dart';
@@ -24,21 +25,6 @@ class AddFamilyMemberScreen extends ConsumerStatefulWidget {
 }
 
 class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
-  static const List<String> _genderOptions = <String>[
-    "MALE",
-    "FEMALE",
-    "OTHER",
-  ];
-  static const List<String> _bloodGroupOptions = <String>[
-    'A+',
-    'A-',
-    'B+',
-    'B-',
-    'AB+',
-    'AB-',
-    'O+',
-    'O-',
-  ];
   static const List<String> _relationOptions = <String>[
     "FATHER",
     "MOTHER",
@@ -256,13 +242,13 @@ class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
                                     ),
                                     SizedBox(
                                       width: fieldWidth,
-                                      child: AppDropdownField(
+                                      child: AppDropdownField<String>(
                                         label: 'Gender',
                                         isRequired: true,
                                         hint: 'Select gender',
                                         icon: Icons.wc_rounded,
                                         value: _selectedGender,
-                                        items: _genderOptions,
+                                        items: AppConstants.genderOptions,
                                         onChanged: (String? value) => setState(
                                           () => _selectedGender = value,
                                         ),
@@ -294,13 +280,13 @@ class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
                                     ),
                                     SizedBox(
                                       width: fieldWidth,
-                                      child: AppDropdownField(
+                                      child: AppDropdownField<String>(
                                         label: 'Blood Group',
                                         isRequired: true,
                                         hint: 'Select blood group',
                                         icon: Icons.bloodtype_rounded,
                                         value: _selectedBloodGroup,
-                                        items: _bloodGroupOptions,
+                                        items: AppConstants.bloodGroupOptions,
                                         onChanged: (String? value) => setState(
                                           () => _selectedBloodGroup = value,
                                         ),
@@ -314,7 +300,7 @@ class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
                                     ),
                                     SizedBox(
                                       width: fieldWidth,
-                                      child: AppDropdownField(
+                                      child: AppDropdownField<String>(
                                         label: 'Relation',
                                         isRequired: true,
                                         hint: 'Select relation',
