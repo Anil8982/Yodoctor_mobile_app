@@ -6,9 +6,9 @@ import '../models/dashboard/doctor_dashboard_data.dart';
 import '../repositories/doctor_dashboard_repository.dart';
 
 final doctorDashboardProvider =
-AsyncNotifierProvider<DoctorDashboardNotifier, DoctorDashboardData>(
-  DoctorDashboardNotifier.new,
-);
+    AsyncNotifierProvider<DoctorDashboardNotifier, DoctorDashboardData>(
+      DoctorDashboardNotifier.new,
+    );
 
 class DoctorDashboardNotifier extends AsyncNotifier<DoctorDashboardData> {
   static const String _subTag = 'DoctorDashboardNotifier';
@@ -25,16 +25,25 @@ class DoctorDashboardNotifier extends AsyncNotifier<DoctorDashboardData> {
 
   Future<DoctorDashboardData> _fetchDashboard() async {
     final repository = ref.read(doctorDashboardRepositoryProvider);
+
     final response = await repository.getDashboard();
+
+    if (!ref.mounted) {
+      throw Exception('Provider disposed');
+    }
+
     final statusCode = response.statusCode ?? 0;
 
     if (statusCode < 200 || statusCode >= 300) {
-      final errorMsg = response.data["message"] ?? "Failed to load dashboard metrics";
+      final errorMsg =
+          response.data["message"] ?? "Failed to load dashboard metrics";
+
       AppLogger.warning(
         'Dashboard API error response. Status: $statusCode, Message: $errorMsg',
         tag: LogTags.doctor,
         subTag: _subTag,
       );
+
       throw Exception(errorMsg);
     }
 
@@ -99,7 +108,10 @@ class DoctorDashboardNotifier extends AsyncNotifier<DoctorDashboardData> {
       final statusCode = response.statusCode ?? 0;
 
       if (statusCode < 200 || statusCode >= 300) {
-        throw Exception(response.data["message"] ?? "Availability status transaction rejected");
+        throw Exception(
+          response.data["message"] ??
+              "Availability status transaction rejected",
+        );
       }
 
       final fresh = await _fetchDashboard();

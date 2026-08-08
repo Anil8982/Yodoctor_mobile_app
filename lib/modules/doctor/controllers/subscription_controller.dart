@@ -6,6 +6,7 @@ import 'package:yodoctor/modules/doctor/controllers/subscription_status_controll
 import 'package:yodoctor/modules/payment/controllers/razorpay_controller.dart';
 import 'package:yodoctor/modules/doctor/models/subscription/available_plan_model.dart';
 import 'package:yodoctor/modules/doctor/models/subscription/subscription_model.dart';
+import 'package:yodoctor/modules/payment/providers.dart';
 import '../repositories/subscription_repository.dart';
 
 enum PaymentFlowState { idle, processing, success, failed }

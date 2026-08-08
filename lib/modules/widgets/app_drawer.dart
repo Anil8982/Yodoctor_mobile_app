@@ -195,19 +195,22 @@ class GlassDrawerItem extends StatelessWidget {
             ? Border.all(color: colorScheme.primary.withValues(alpha: 0.2), width: 1)
             : null,
       ),
-      child: ListTile(
-        dense: true,
-        visualDensity: const VisualDensity(horizontal: 0, vertical: -1),
-        onTap: onTap,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        leading: Icon(icon, color: itemColor, size: 20),
-        title: Text(
-          label,
-          style: TextStyle(
-            color: foregroundColor ??
-                (selected ? colorScheme.primary : colorScheme.onSurface),
-            fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
-            fontSize: 13.5,
+      child: Material(
+        color: Colors.transparent,
+        child: ListTile(
+          dense: true,
+          visualDensity: const VisualDensity(horizontal: 0, vertical: -1),
+          onTap: onTap,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          leading: Icon(icon, color: itemColor, size: 20),
+          title: Text(
+            label,
+            style: TextStyle(
+              color: foregroundColor ??
+                  (selected ? colorScheme.primary : colorScheme.onSurface),
+              fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+              fontSize: 13.5,
+            ),
           ),
         ),
       ),

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:yodoctor/modules/payment/providers.dart';
 import '../../../modules/patient/models/lab/lab_category_model.dart';
 import '../models/lab/lab_test_model.dart';
 import '../repositories/patient_lab_repository.dart';

@@ -5,19 +5,8 @@ import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
 import 'package:yodoctor/core/providers/app_role_provider.dart';
 import 'package:yodoctor/core/providers/storage_provider.dart';
+import 'package:yodoctor/core/session/app_session_controller.dart';
 import 'package:yodoctor/modules/auth/repositories/doctor_auth_repository.dart';
-import 'package:yodoctor/modules/doctor/controllers/appointment_history_controller.dart';
-import 'package:yodoctor/modules/doctor/controllers/doctor_certificate_controller.dart';
-import 'package:yodoctor/modules/doctor/controllers/doctor_certificate_review_controller.dart';
-import 'package:yodoctor/modules/doctor/controllers/doctor_dashboard_controller.dart';
-import 'package:yodoctor/modules/doctor/controllers/doctor_profile_controller.dart';
-import 'package:yodoctor/modules/doctor/controllers/doctor_qr_controller.dart';
-import 'package:yodoctor/modules/doctor/controllers/incoming_appointment_controller.dart';
-import 'package:yodoctor/modules/doctor/controllers/manual_booking_controller.dart';
-import 'package:yodoctor/modules/doctor/controllers/subscription_controller.dart';
-import 'package:yodoctor/modules/doctor/controllers/subscription_status_controller.dart';
-
-import 'doctor_status_controller.dart';
 
 final doctorLoginControllerProvider =
     AsyncNotifierProvider<DoctorLoginController, Map<String, dynamic>?>(
@@ -144,43 +133,71 @@ class DoctorLoginController extends AsyncNotifier<Map<String, dynamic>?> {
 
   Future<void> logout() async {
     state = const AsyncLoading();
+
     try {
-      final repository = ref.read(doctorAuthRepositoryProvider);
-      await repository.clearAuthSession();
-
-      // 1. Reset runtime verification and status notifiers
-      ref.read(doctorStatusProvider.notifier).reset();
-      ref.read(subscriptionStatusProvider.notifier).reset();
-
-      // 2. Invalidate all Doctor modules and controllers to clear old session data
-      ref.invalidate(doctorSubscriptionProvider);
-      ref.invalidate(incomingAppointmentProvider);
-      ref.invalidate(appointmentHistoryProvider);
-      ref.invalidate(doctorCertificateProvider);
-      ref.invalidate(doctorCertificateReviewProvider);
-      ref.invalidate(doctorDashboardProvider);
-      ref.invalidate(doctorQrProvider);
-      ref.invalidate(doctorProfileProvider);
-      ref.invalidate(manualBookingProvider);
-
-      // 3. Clear application role state
-      ref.read(appRoleProvider.notifier).clearRole();
+      await ref.read(appSessionProvider).logout(AppRole.doctor);
 
       state = const AsyncData(null);
+
       AppLogger.success(
-        'Doctor control profile session tokens and controllers terminated successfully',
+        'Doctor logout completed successfully',
         tag: LogTags.auth,
         subTag: _subTag,
       );
     } catch (e, st) {
       state = AsyncError(e, st);
+
       AppLogger.exception(
         e,
         st,
-        message: 'Session clear failure sequence intercept',
+        message: 'Doctor logout failed',
         tag: LogTags.auth,
         subTag: _subTag,
       );
     }
   }
+
+  // Future<void> logout() async {
+  //   state = const AsyncLoading();
+  //   try {
+  //     final repository = ref.read(doctorAuthRepositoryProvider);
+  //     await repository.clearAuthSession();
+  //
+  //     // 1. Reset runtime verification and status notifiers
+  //     ref.read(doctorStatusProvider.notifier).reset();
+  //     ref.read(subscriptionStatusProvider.notifier).reset();
+  //
+  //     // 2. Invalidate all Doctor modules and controllers to clear old session data
+  //     ref.invalidate(doctorSubscriptionProvider);
+  //     ref.invalidate(incomingAppointmentProvider);
+  //     ref.invalidate(appointmentHistoryProvider);
+  //     ref.invalidate(doctorCertificateProvider);
+  //     ref.invalidate(doctorCertificateReviewProvider);
+  //     ref.invalidate(doctorDashboardProvider);
+  //     ref.invalidate(doctorQrProvider);
+  //     ref.invalidate(doctorProfileProvider);
+  //     ref.invalidate(manualBookingProvider);
+  //
+  //     // 3. Clear application role state
+  //     ref.read(appRoleProvider.notifier).clearRole();
+  //
+  //     state = const AsyncData(null);
+  //     AppLogger.success(
+  //       'Doctor control profile session tokens and controllers terminated successfully',
+  //       tag: LogTags.auth,
+  //       subTag: _subTag,
+  //     );
+  //   } catch (e, st) {
+  //     state = AsyncError(e, st);
+  //     AppLogger.exception(
+  //       e,
+  //       st,
+  //       message: 'Session clear failure sequence intercept',
+  //       tag: LogTags.auth,
+  //       subTag: _subTag,
+  //     );
+  //   }
+  // }
 }
+
+
