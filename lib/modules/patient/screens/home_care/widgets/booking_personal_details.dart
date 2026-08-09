@@ -13,6 +13,7 @@ class BookingPersonalDetails extends ConsumerWidget {
   final TextEditingController phoneController;
   final TextEditingController ageController;
   final TextEditingController addressController;
+  final bool hasSubmitted;
 
   const BookingPersonalDetails({
     super.key,
@@ -21,10 +22,14 @@ class BookingPersonalDetails extends ConsumerWidget {
     required this.phoneController,
     required this.ageController,
     required this.addressController,
+    this.hasSubmitted = false,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final autovalidateMode = hasSubmitted
+        ? AutovalidateMode.onUserInteraction
+        : AutovalidateMode.disabled;
     final notifier = ref.read(homeServiceBookingProvider.notifier);
 
     return Column(
@@ -35,7 +40,7 @@ class BookingPersonalDetails extends ConsumerWidget {
           isRequired: true,
           hint: 'Enter full name',
           icon: Icons.person_rounded,
-          autovalidateMode: AutovalidateMode.onUserInteraction,
+          autovalidateMode: autovalidateMode,
           inputFormatters: [
             SingleSpaceFormatter(),
             LengthLimitingTextInputFormatter(50),
@@ -43,11 +48,11 @@ class BookingPersonalDetails extends ConsumerWidget {
           onChanged: (val) => notifier.updateField(fullName: val),
           validator: (value) {
             if (value == null || value.trim().isEmpty) {
-              return 'Full name is required';
+              return 'Full name required';
             }
             final cleanedValue = value.trim().replaceAll(RegExp(r'\s+'), ' ');
             if (cleanedValue.length < 2) {
-              return "Name should have at least 2 characters";
+              return "Enter a valid name";
             }
             if (!RegExp(r'^[A-Za-z. ]+$').hasMatch(cleanedValue)) {
               return 'Only alphabets are allowed';
@@ -63,7 +68,7 @@ class BookingPersonalDetails extends ConsumerWidget {
           hint: 'Enter contact number',
           icon: Icons.phone_android_rounded,
           keyboardType: TextInputType.phone,
-          autovalidateMode: AutovalidateMode.onUserInteraction,
+          autovalidateMode: autovalidateMode,
           onChanged: (val) => notifier.updateField(contactNumber: val),
           inputFormatters: [
             FilteringTextInputFormatter.digitsOnly,
@@ -73,11 +78,8 @@ class BookingPersonalDetails extends ConsumerWidget {
             if (value == null || value.trim().isEmpty) {
               return 'Phone number is required';
             }
-            if (value.trim().length != 10) {
-              return 'Phone number must be exactly 10 digits';
-            }
             if (!RegExp(r'^[6-9]').hasMatch(value.trim())) {
-              return 'Phone number must start with 6, 7, 8, or 9';
+              return 'Phone no. must start with 6, 7, 8, or 9';
             }
             return null;
           },
@@ -90,7 +92,7 @@ class BookingPersonalDetails extends ConsumerWidget {
           hint: 'Enter age',
           icon: Icons.calendar_today_rounded,
           keyboardType: TextInputType.number,
-          autovalidateMode: AutovalidateMode.onUserInteraction,
+          autovalidateMode: autovalidateMode,
           onChanged: (val) => notifier.updateField(patientAge: val),
           inputFormatters: [
             FilteringTextInputFormatter.digitsOnly,
@@ -122,10 +124,10 @@ class BookingPersonalDetails extends ConsumerWidget {
           isRequired: true,
           hint: 'Select Gender',
           icon: Icons.wc_rounded,
-          autovalidateMode: AutovalidateMode.onUserInteraction,
+          autovalidateMode: autovalidateMode,
           value:
-          bookingState.patientGender == 'Select Gender' ||
-              bookingState.patientGender.isEmpty
+              bookingState.patientGender == 'Select Gender' ||
+                  bookingState.patientGender.isEmpty
               ? null
               : bookingState.patientGender,
           items: const ['Male', 'Female', 'Other'],
@@ -146,17 +148,15 @@ class BookingPersonalDetails extends ConsumerWidget {
           icon: Icons.location_on_rounded,
           maxLines: 2,
           minLines: 1,
-          autovalidateMode: AutovalidateMode.onUserInteraction,
-          inputFormatters: [
-            LengthLimitingTextInputFormatter(300),
-          ],
+          autovalidateMode: autovalidateMode,
+          inputFormatters: [LengthLimitingTextInputFormatter(300)],
           onChanged: (val) => notifier.updateField(address: val),
           validator: (value) {
             if (value == null || value.trim().isEmpty) {
               return 'Address is required';
             }
             if (value.trim().length < 5) {
-              return 'Address should have at least 5 characters';
+              return 'Address at least 5 characters';
             }
             return null;
           },
