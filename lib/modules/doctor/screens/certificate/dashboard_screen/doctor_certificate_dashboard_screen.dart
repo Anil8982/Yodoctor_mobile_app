@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/modules/doctor/controllers/doctor_certificate_controller.dart';
-import 'package:yodoctor/modules/doctor/screens/certificate/widgets/certificate_empty_state.dart';
-import 'package:yodoctor/modules/doctor/screens/certificate/widgets/certificate_shimmer.dart';
-import 'package:yodoctor/modules/doctor/screens/certificate/widgets/certificate_summary_cards.dart';
-import 'package:yodoctor/modules/doctor/screens/certificate/widgets/certificate_toolbar.dart';
-import '../../../../core/utils/app_spacing.dart';
-import '../../../../core/utils/responsive.dart';
-import '../../widgets/doctor_drawer.dart';
-import '../../widgets/doctor_sliver_app_bar.dart';
+import 'package:yodoctor/modules/doctor/screens/certificate/dashboard_screen/widgets/certificate_empty_state.dart';
+import 'package:yodoctor/modules/doctor/screens/certificate/dashboard_screen/widgets/certificate_shimmer.dart';
+import 'package:yodoctor/modules/doctor/screens/certificate/dashboard_screen/widgets/certificate_summary_cards.dart';
+import 'package:yodoctor/modules/doctor/screens/certificate/dashboard_screen/widgets/certificate_toolbar.dart';
+import '../../../../../core/utils/app_spacing.dart';
+import '../../../../../core/utils/responsive.dart';
+import '../../../widgets/doctor_drawer.dart';
+import '../../../widgets/doctor_sliver_app_bar.dart';
 import 'widgets/certificate_list_cards.dart';
-import '../../controllers/doctor_profile_controller.dart';
+import '../../../controllers/doctor_profile_controller.dart';
 
 class DoctorCertificateDashboardScreen extends ConsumerStatefulWidget {
   const DoctorCertificateDashboardScreen({super.key});

@@ -23,7 +23,7 @@ class DoctorCertificateRepository {
     required int id,
     required String doctorNotes,
     required String fitnessStatus,
-    required int validity,
+    required String validity,
   }) {
     return _dio.put(
       '${ApiConstants.approveCertificate}/$id',
