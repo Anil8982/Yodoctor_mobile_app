@@ -6,15 +6,16 @@ class HomeServiceBookingModel {
   final String address;
   final String preferredCaregiverGender;
   final bool needEmergencyService;
-  final String selectedServiceType; // General Nursing, Elderly Care etc.
-  final String durationType; // 1 Day, Multiple Days, Weekly, Monthly
+  final String selectedServiceType;
+  final String durationType;
   final String numberOfDays;
   final DateTime? startDate;
-  final String timePreference; // Morning, Afternoon, Evening, Night
+  final String timePreference;
   final String medicalCondition;
   final String additionalNotes;
   final double? latitude;
   final double? longitude;
+
   const HomeServiceBookingModel({
     this.fullName = '',
     this.contactNumber = '',
@@ -61,15 +62,85 @@ class HomeServiceBookingModel {
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
       preferredCaregiverGender:
-          preferredCaregiverGender ?? this.preferredCaregiverGender,
-      needEmergencyService: needEmergencyService ?? this.needEmergencyService,
-      selectedServiceType: selectedServiceType ?? this.selectedServiceType,
+      preferredCaregiverGender ?? this.preferredCaregiverGender,
+      needEmergencyService:
+      needEmergencyService ?? this.needEmergencyService,
+      selectedServiceType:
+      selectedServiceType ?? this.selectedServiceType,
       durationType: durationType ?? this.durationType,
       numberOfDays: numberOfDays ?? this.numberOfDays,
       startDate: startDate ?? this.startDate,
       timePreference: timePreference ?? this.timePreference,
-      medicalCondition: medicalCondition ?? this.medicalCondition,
-      additionalNotes: additionalNotes ?? this.additionalNotes,
+      medicalCondition:
+      medicalCondition ?? this.medicalCondition,
+      additionalNotes:
+      additionalNotes ?? this.additionalNotes,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'full_name': fullName,
+      'patient_age': int.tryParse(patientAge),
+      'patient_gender': patientGender,
+      'patient_latitude': latitude,
+      'patient_longitude': longitude,
+      'gender_preference': preferredCaregiverGender,
+      'emergency_booking': needEmergencyService,
+      'address': address,
+      'contact_number': contactNumber,
+      'service_type': selectedServiceType,
+      'medical_condition': medicalCondition,
+      'duration_type': durationType,
+      'number_of_days': int.tryParse(numberOfDays),
+      'preferred_date': startDate?.toIso8601String().split('T').first,
+      'time_slot': timePreference,
+      'notes': additionalNotes,
+    };
+  }
+
+}
+
+class HomeCareBookingResponse {
+  final bool success;
+  final String message;
+  final HomeCareBookingData? data;
+
+  const HomeCareBookingResponse({
+    required this.success,
+    required this.message,
+    this.data,
+  });
+
+  factory HomeCareBookingResponse.fromJson(Map<String, dynamic> json) {
+    return HomeCareBookingResponse(
+      success: json['success'] == true,
+      message: json['message']?.toString() ?? '',
+      data: json['data'] != null
+          ? HomeCareBookingData.fromJson(
+        json['data'] as Map<String, dynamic>,
+      )
+          : null,
+    );
+  }
+}
+
+class HomeCareBookingData {
+  final int id;
+  final String bookingId;
+  final String status;
+
+  const HomeCareBookingData({
+    required this.id,
+    required this.bookingId,
+    required this.status,
+  });
+
+  factory HomeCareBookingData.fromJson(Map<String, dynamic> json) {
+    return HomeCareBookingData(
+      id: json['id'] as int,
+      bookingId: json['booking_id']?.toString() ?? '',
+      status: json['status']?.toString() ?? '',
     );
   }
 }

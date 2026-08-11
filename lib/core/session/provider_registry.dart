@@ -27,6 +27,7 @@ import 'package:yodoctor/modules/patient/controllers/certificate_request.dart';
 import 'package:yodoctor/modules/patient/controllers/doctor_detail_controller.dart';
 import 'package:yodoctor/modules/patient/controllers/doctor_listing_controller.dart';
 import 'package:yodoctor/modules/patient/controllers/family_controller.dart';
+import 'package:yodoctor/modules/patient/controllers/home_care_history_controller.dart';
 import 'package:yodoctor/modules/patient/controllers/home_service_controller.dart';
 import 'package:yodoctor/modules/patient/controllers/lab_test_controller.dart';
 import 'package:yodoctor/modules/patient/controllers/patient_dashboard_controller.dart';
@@ -73,6 +74,7 @@ class ProviderRegistry {
     ref.invalidate(patientSearchControllerProvider); // Doctor Search
     ref.invalidate(bookAppointmentControllerProvider); // Appointment Booking
     ref.invalidate(homeServiceBookingProvider); // Home Service Booking
+    ref.invalidate(homeCareHistoryProvider); // Home Care History)
     ref.invalidate(labProvider); // Lab Tests
     ref.invalidate(labBookingProvider); // Lab Booking
     ref.invalidate(certificateProvider); // Certificate
