@@ -109,64 +109,77 @@ class _AppointmentsHistoryScreenState
                           ) {
                             final appointment =
                                 historyState.appointments[index];
+                            final bool statusIsCancel = appointment.status
+                                .toUpperCase()
+                                .contains('CANCEL');
 
                             return Padding(
                               padding: const EdgeInsets.only(bottom: 12.0),
                               child: HistoryAppointmentCard(
                                 appointment: appointment,
-                                onViewDetails: () {
-                                  showAppointmentDetailsDialog(
-                                    context: context,
-                                    appointment: appointment,
-                                    initialRating: notifier.ratingFor(
-                                      appointment.id,
-                                    ),
-                                    initialFeedback: notifier.feedbackFor(
-                                      appointment.id,
-                                    ),
-                                    onSubmitRating:
-                                        (int rating, String feedback) async {
-                                          await notifier.submitRating(
-                                            appointmentId: appointment.id,
-                                            rating: rating,
-                                            feedback: feedback,
-                                          );
-
-                                          if (!context.mounted) {
-                                            return;
-                                          }
-
-                                          AppSnackBar.show(
-                                            message:
-                                                'Thanks! You rated ${appointment.doctorName} $rating stars.',
-                                            type: AppSnackBarType.success,
-                                          );
-                                        },
-                                    onDownloadPrescription: () async {
-                                      try {
-                                        final prescription = await notifier
-                                            .getPrescription(appointment.id);
-
-                                        if (!context.mounted) return;
-
-                                        PrescriptionBottomSheet.show(
-                                          context,
-                                          prescription,
-                                        );
-                                      } catch (e) {
-                                        if (!context.mounted) return;
-                                        AppSnackBar.show(
-                                          message: e.toString().replaceFirst(
-                                            "Exception: ",
-                                            "",
+                                onViewDetails: statusIsCancel
+                                    ? null
+                                    : () {
+                                        showAppointmentDetailsDialog(
+                                          context: context,
+                                          appointment: appointment,
+                                          initialRating: notifier.ratingFor(
+                                            appointment.id,
                                           ),
-                                          type: AppSnackBarType.error,
-                                          bottomMargin: 0,
+                                          initialFeedback: notifier.feedbackFor(
+                                            appointment.id,
+                                          ),
+                                          onSubmitRating:
+                                              (
+                                                int rating,
+                                                String feedback,
+                                              ) async {
+                                                await notifier.submitRating(
+                                                  appointmentId: appointment.id,
+                                                  rating: rating,
+                                                  feedback: feedback,
+                                                );
+
+                                                if (!context.mounted) {
+                                                  return;
+                                                }
+
+                                                AppSnackBar.show(
+                                                  message:
+                                                      'Thanks! You rated ${appointment.doctorName} $rating stars.',
+                                                  type: AppSnackBarType.success,
+                                                );
+                                              },
+                                          onDownloadPrescription: () async {
+                                            try {
+                                              final prescription =
+                                                  await notifier
+                                                      .getPrescription(
+                                                        appointment.id,
+                                                      );
+
+                                              if (!context.mounted) return;
+
+                                              PrescriptionBottomSheet.show(
+                                                context,
+                                                prescription,
+                                              );
+                                            } catch (e) {
+                                              if (!context.mounted) return;
+                                              AppSnackBar.show(
+                                                message: e
+                                                    .toString()
+                                                    .replaceFirst(
+                                                      "Exception: ",
+                                                      "",
+                                                    ),
+                                                type: AppSnackBarType.error,
+                                                bottomMargin: 0,
+                                              );
+                                            }
+                                          },
                                         );
-                                      }
-                                    },
-                                  );
-                                },
+                                      },
                               ),
                             );
                           }, childCount: historyState.appointments.length),
