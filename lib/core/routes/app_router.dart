@@ -23,8 +23,8 @@ import 'package:yodoctor/modules/doctor/models/subscription/subscription_model.d
 import 'package:yodoctor/modules/doctor/screens/appointments/add_prescription_screen.dart';
 import 'package:yodoctor/modules/doctor/screens/appointments/doctor_appointment_history_screen.dart';
 import 'package:yodoctor/modules/doctor/screens/appointments/live_queue_screen.dart';
-import 'package:yodoctor/modules/doctor/screens/certificate/certificate_review_screen.dart';
-import 'package:yodoctor/modules/doctor/screens/certificate/doctor_certificate_dashboard_screen.dart';
+import 'package:yodoctor/modules/doctor/screens/certificate/review_screen/certificate_review_screen.dart';
+import 'package:yodoctor/modules/doctor/screens/certificate/dashboard_screen/doctor_certificate_dashboard_screen.dart';
 import 'package:yodoctor/modules/doctor/screens/dashboard/doctor_dashboard_screen.dart';
 import 'package:yodoctor/modules/doctor/screens/manual_booking/manual_booking_screen.dart';
 import 'package:yodoctor/modules/doctor/screens/subscription/subscription_verification_page.dart';
@@ -47,6 +47,7 @@ import 'package:yodoctor/modules/patient/screens/family/add_family_member_screen
 import 'package:yodoctor/modules/patient/screens/family/family_members_screen.dart';
 import 'package:yodoctor/modules/patient/screens/find_doctors/find_doctors_screen.dart';
 import 'package:yodoctor/modules/patient/screens/history/appointments_history_screen.dart';
+import 'package:yodoctor/modules/patient/screens/home_care/home_care_history_screen.dart';
 import 'package:yodoctor/modules/patient/screens/home_care/home_service_booking_screen.dart';
 import 'package:yodoctor/modules/patient/screens/lab_tests/all_lab_tests_screen.dart';
 import 'package:yodoctor/modules/patient/screens/lab_tests/lab_cart_screen.dart';
@@ -438,6 +439,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.homeServiceBooking,
         builder: (context, state) => const HomeServiceBookingScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.homeCareHistory,
+        name: 'homeCareHistory',
+        builder: (context, state) => const HomeCareHistoryScreen(),
       ),
 
       // ---- Doctor Shared Routes (non-shell) ----

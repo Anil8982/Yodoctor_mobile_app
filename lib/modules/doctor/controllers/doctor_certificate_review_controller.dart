@@ -14,7 +14,7 @@ class DoctorCertificateReviewState {
   final DoctorCertificateDetailModel? detail;
   final List<DoctorDocumentModel> documents;
   final String fitnessStatus;
-  final int validity;
+  final String validity;
   final String? errorMessage;
 
   const DoctorCertificateReviewState({
@@ -23,7 +23,7 @@ class DoctorCertificateReviewState {
     this.detail,
     this.documents = const [],
     this.fitnessStatus = "",
-    this.validity = 30,
+    this.validity = '1 month',
     this.errorMessage,
   });
 
@@ -34,7 +34,7 @@ class DoctorCertificateReviewState {
     bool clearDetail = false,
     List<DoctorDocumentModel>? documents,
     String? fitnessStatus,
-    int? validity,
+    String? validity,
     String? errorMessage,
     bool clearError = false,
   }) {
@@ -51,17 +51,19 @@ class DoctorCertificateReviewState {
 }
 
 final doctorCertificateReviewProvider =
-NotifierProvider<DoctorCertificateReviewNotifier, DoctorCertificateReviewState>(
-  DoctorCertificateReviewNotifier.new,
-);
+    NotifierProvider<
+      DoctorCertificateReviewNotifier,
+      DoctorCertificateReviewState
+    >(DoctorCertificateReviewNotifier.new);
 
-class DoctorCertificateReviewNotifier extends Notifier<DoctorCertificateReviewState> {
+class DoctorCertificateReviewNotifier
+    extends Notifier<DoctorCertificateReviewState> {
   static const String _subTag = 'DoctorCertificateReviewNotifier';
 
   final notesController = TextEditingController();
 
   String get fitnessStatus => state.fitnessStatus;
-  int get validity => state.validity;
+  String get validity => state.validity;
 
   List<dynamic> _parseDirectList(dynamic data) {
     if (data == null) return [];
@@ -73,6 +75,12 @@ class DoctorCertificateReviewNotifier extends Notifier<DoctorCertificateReviewSt
     if (detail.isFinalized) return true;
     final status = detail.status.trim().toUpperCase();
     return ['APPROVED', 'ISSUED', 'REJECTED', 'CANCELLED'].contains(status);
+  }
+
+  void changeValidity(String? value) {
+    if (value == null || value.trim().isEmpty) return;
+
+    state = state.copyWith(validity: value.trim());
   }
 
   @override
@@ -99,8 +107,11 @@ class DoctorCertificateReviewNotifier extends Notifier<DoctorCertificateReviewSt
       final detailRes = await repository.getRequestDetails(requestId);
       final docsRes = await repository.getDocuments(requestId);
 
-      final detailOk = (detailRes.statusCode ?? 0) >= 200 && (detailRes.statusCode ?? 0) < 300;
-      final docsOk = (docsRes.statusCode ?? 0) >= 200 && (docsRes.statusCode ?? 0) < 300;
+      final detailOk =
+          (detailRes.statusCode ?? 0) >= 200 &&
+          (detailRes.statusCode ?? 0) < 300;
+      final docsOk =
+          (docsRes.statusCode ?? 0) >= 200 && (docsRes.statusCode ?? 0) < 300;
 
       if (detailOk && docsOk) {
         final detail = DoctorCertificateDetailModel.fromJson(detailRes.data);
@@ -108,15 +119,15 @@ class DoctorCertificateReviewNotifier extends Notifier<DoctorCertificateReviewSt
         final rawDocs = _parseDirectList(docsRes.data);
         final docs = rawDocs
             .map((e) {
-          try {
-            if (e is Map<String, dynamic>) {
-              return DoctorDocumentModel.fromJson(e);
-            }
-            return null;
-          } catch (_) {
-            return null;
-          }
-        })
+              try {
+                if (e is Map<String, dynamic>) {
+                  return DoctorDocumentModel.fromJson(e);
+                }
+                return null;
+              } catch (_) {
+                return null;
+              }
+            })
             .whereType<DoctorDocumentModel>()
             .toList();
 
@@ -143,7 +154,13 @@ class DoctorCertificateReviewNotifier extends Notifier<DoctorCertificateReviewSt
             detail: detail,
             documents: docs,
             fitnessStatus: detail.fitnessStatus ?? '',
-            validity: detail.validityDays > 0 ? detail.validityDays : 30,
+            validity: detail.validityDays == 30
+                ? '1 month'
+                : detail.validityDays == 90
+                ? '3 months'
+                : detail.validityDays == 180
+                ? '6 months'
+                : '1 month',
           );
         } else {
           notesController.clear();
@@ -152,7 +169,7 @@ class DoctorCertificateReviewNotifier extends Notifier<DoctorCertificateReviewSt
             detail: detail,
             documents: docs,
             fitnessStatus: '',
-            validity: 30,
+            validity: '1 month',
           );
         }
       } else {
@@ -181,12 +198,10 @@ class DoctorCertificateReviewNotifier extends Notifier<DoctorCertificateReviewSt
     }
   }
 
-  void changeFitnessStatus(String value) {
-    state = state.copyWith(fitnessStatus: value);
-  }
+  void changeFitnessStatus(String? value) {
+    if (value == null) return;
 
-  void changeValidity(int days) {
-    state = state.copyWith(validity: days);
+    state = state.copyWith(fitnessStatus: value);
   }
 
   Future<bool> approve() async {
@@ -202,20 +217,20 @@ class DoctorCertificateReviewNotifier extends Notifier<DoctorCertificateReviewSt
     }
 
     // ✅ Validate fitness status before proceeding
-    final fitnessStatusLower = state.fitnessStatus.trim().toLowerCase();
-    if (fitnessStatusLower.isEmpty) {
+    final fitnessStatus = state.fitnessStatus.trim();
+
+    if (fitnessStatus.isEmpty) {
       state = state.copyWith(
         submitting: false,
-        errorMessage: "Please select fitness status",
+        errorMessage: 'Please select fitness status',
       );
       return false;
     }
 
-    // ✅ Validate fitness status values
-    if (!['fit', 'unfit'].contains(fitnessStatusLower)) {
+    if (!CertificateConstants.fitnessStatuses.contains(fitnessStatus)) {
       state = state.copyWith(
         submitting: false,
-        errorMessage: "Invalid fitness status selected",
+        errorMessage: 'Invalid fitness status selected',
       );
       return false;
     }
@@ -227,7 +242,7 @@ class DoctorCertificateReviewNotifier extends Notifier<DoctorCertificateReviewSt
       final response = await repository.approve(
         id: state.detail!.id,
         doctorNotes: notesController.text.trim(),
-        fitnessStatus: fitnessStatusLower,
+        fitnessStatus: fitnessStatus,
         validity: state.validity,
       );
 
@@ -352,4 +367,19 @@ class DoctorCertificateReviewNotifier extends Notifier<DoctorCertificateReviewSt
     if (detail == null) return false;
     return _checkIsFinalized(detail);
   }
+}
+
+class CertificateConstants {
+  static const List<String> fitnessStatuses = [
+    'Fit — No Restrictions',
+    'Fit with Restrictions',
+    'Temporarily Unfit',
+    'Unfit',
+  ];
+
+  static const List<String> validityPeriods = [
+    '1 month',
+    '3 months',
+    '6 months',
+  ];
 }

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:yodoctor/modules/patient/controllers/certificate_request.dart';
-import 'package:yodoctor/modules/patient/models/certificate/patient_doctor_model.dart';
 import 'package:yodoctor/modules/widgets/app_dropdown_field.dart';
+import 'package:yodoctor/modules/widgets/app_search_select_field.dart';
 import 'package:yodoctor/modules/widgets/app_text_field.dart';
 import 'certificate_type_card.dart';
 import 'step_header_helper.dart';
@@ -96,22 +96,24 @@ class Step1TypeSelection extends ConsumerWidget {
           const SizedBox(height: 28),
 
           // Assigned Doctor Dropdown
-          AppDropdownField<PatientDoctorModel>(
+          AppSearchSelectField(
             label: 'Assigned Doctor',
             isRequired: true,
             hint: 'Select Doctor',
             icon: Icons.person_rounded,
-            value: selectedDoctor,
-            items: formState.doctors,
-            itemLabelBuilder: (doctor) => '${doctor.name} (${doctor.specialty})',
+            value: selectedDoctor != null ? '${selectedDoctor.name} (${selectedDoctor.specialty})' : null,
+            items: formState.doctors.map((doctor) => '${doctor.name} (${doctor.specialty})').toList(),
             autovalidateMode: autovalidateMode,
-            onChanged: (value) {
-              if (value != null) {
-                controller.setAssignedDoctor(value);
+            onChanged: (selectedValue) {
+              if (selectedValue != null) {
+                final matchingDoctor = formState.doctors.firstWhere(
+                      (doctor) => '${doctor.name} (${doctor.specialty})' == selectedValue,
+                );
+                controller.setAssignedDoctor(matchingDoctor);
               }
             },
-            validator: (value) {
-              if (value == null) {
+            validator: (val) {
+              if (val == null || val.isEmpty) {
                 return 'Please select an assigned doctor';
               }
               return null;

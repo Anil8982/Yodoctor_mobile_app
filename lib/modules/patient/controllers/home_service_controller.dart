@@ -90,27 +90,8 @@ class HomeServiceBookingNotifier extends Notifier<HomeServiceBookingState> {
 
   Future<bool> createBooking() async {
     if (state.isLoading) return false;
-    state = state.copyWith(isLoading: true, clearError: true);
 
-    final model = state.bookingModel;
-    final payload = {
-      "full_name": model.fullName,
-      "patient_age": int.tryParse(model.patientAge) ?? 0,
-      "patient_gender": model.patientGender,
-      "patient_latitude": model.latitude,
-      "patient_longitude": model.longitude,
-      "gender_preference": model.preferredCaregiverGender,
-      "emergency_booking": model.needEmergencyService,
-      "address": model.address,
-      "contact_number": model.contactNumber,
-      "service_type": model.selectedServiceType,
-      "medical_condition": model.medicalCondition,
-      "duration_type": model.durationType,
-      "number_of_days": int.tryParse(model.numberOfDays) ?? 1,
-      "preferred_date": model.startDate?.toIso8601String().split("T").first,
-      "time_slot": model.timePreference,
-      "notes": model.additionalNotes,
-    };
+    state = state.copyWith(isLoading: true, clearError: true);
 
     AppLogger.info(
       'Submitting home care request pipeline',
@@ -120,37 +101,55 @@ class HomeServiceBookingNotifier extends Notifier<HomeServiceBookingState> {
 
     try {
       final repository = ref.read(patientHomeCareRepositoryProvider);
-      final response = await repository.createBooking(payload);
 
-      final statusCode = response.statusCode;
+      final response = await repository.createBooking(state.bookingModel);
 
-      // 🎯 FIXED FINAL: Removed redundant null-check condition to resolve dead code matching contract analyzer flawlessly
-      if (statusCode! >= 200 && statusCode < 300) {
-        state = state.copyWith(isLoading: false);
-        AppLogger.success(
-          'Home care service instance deployed successfully',
-          tag: LogTags.patient,
-          subTag: _subTag,
-        );
-        return response.data["success"] == true;
-      } else {
-        final msg =
-            response.data["message"] ?? "Booking failed from server edge";
-        state = state.copyWith(errorMessage: msg, isLoading: false);
+      final statusCode = response.statusCode ?? 0;
+      final responseData = response.data as Map<String, dynamic>?;
+
+      if (statusCode >= 200 && statusCode < 300) {
+        final success = responseData?['success'] == true;
+
+        if (success) {
+          state = state.copyWith(isLoading: false);
+
+          AppLogger.success(
+            'Home care booking created successfully',
+            tag: LogTags.patient,
+            subTag: _subTag,
+          );
+
+          return true;
+        }
+
+        final message =
+            responseData?['message']?.toString() ?? 'Booking failed';
+
+        state = state.copyWith(errorMessage: message, isLoading: false);
+
         return false;
       }
+
+      final message =
+          responseData?['message']?.toString() ?? 'Booking failed from server';
+
+      state = state.copyWith(errorMessage: message, isLoading: false);
+
+      return false;
     } catch (e, st) {
       state = state.copyWith(
-        errorMessage: "Booking runtime failure. Retry setup.",
+        errorMessage: 'Unable to create home care booking.',
         isLoading: false,
       );
+
       AppLogger.exception(
         e,
         st,
-        message: 'Home care booking fatal execution failure',
+        message: 'Home care booking failed',
         tag: LogTags.patient,
         subTag: _subTag,
       );
+
       return false;
     }
   }

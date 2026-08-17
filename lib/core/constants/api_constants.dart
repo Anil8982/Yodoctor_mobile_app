@@ -75,8 +75,15 @@ class ApiConstants {
   static const getProfile = '/patient/getprofile';
   static const updateProfile = '/patient/updateProfile';
 
+  // static const bookHomeCare = '/patient/bookhomecare';
+  // static const getHomeCareBookings = '/patient/getbookhomecare';
   static const bookHomeCare = '/patient/bookhomecare';
-  static const getHomeCareBookings = '/patient/getbookhomecare';
+
+  static const getHomeCareHistory = '/patient/homecarehistory';
+  static String getHomeCareBookingDetails(int bookingId) =>
+      '/patient/homecarehistory/$bookingId';
+  static String cancelHomeCareBooking(int bookingId) =>
+      '/patient/homecarehistory/$bookingId/cancel';
 
   static const labCategories = '/patient/lab/categories';
   static const labTests = '/patient/lab/tests';

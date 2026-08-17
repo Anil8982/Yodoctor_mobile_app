@@ -4,6 +4,7 @@ import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
 import 'package:yodoctor/modules/doctor/models/certificate/doctor_certificate_request_model.dart';
 import '../repositories/doctor_certificate_repository.dart';
+import 'doctor_certificate_review_controller.dart';
 
 class CertificateState {
   final bool loading;
@@ -356,7 +357,7 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
     required int id,
     required String notes,
     required String fitnessStatus,
-    required int validity,
+    required String validity,
   }) async {
     // ✅ Validate fitness status
     final fitnessStatusLower = fitnessStatus.trim().toLowerCase();
@@ -369,7 +370,9 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
       return false;
     }
 
-    if (!['fit', 'unfit'].contains(fitnessStatusLower)) {
+    if (!CertificateConstants.fitnessStatuses
+        .map((status) => status.toLowerCase())
+        .contains(fitnessStatusLower)) {
       AppLogger.warning(
         'Invalid fitness status: $fitnessStatusLower',
         tag: LogTags.doctor,

@@ -42,6 +42,7 @@ class AppRoutes {
 
   // Patient - Home Care
   static const String homeServiceBooking = '/patient/home-service-booking';
+  static const String homeCareHistory = '/patient/home-care-history';
 
   // Doctor
   static const String doctorDashboard = '/doctor/dashboard';

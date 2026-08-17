@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/modules/widgets/app_header.dart';
 import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
-import '../../../../core/utils/app_spacing.dart';
-import '../../../../core/utils/responsive.dart';
+import '../../../../../core/utils/app_spacing.dart';
+import '../../../../../core/utils/responsive.dart';
 import 'widgets/certificate_action_form.dart';
 import 'widgets/patient_info_panel.dart';
 import 'widgets/certificate_review_shimmer.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../controllers/doctor_certificate_controller.dart';
-import '../../controllers/doctor_certificate_review_controller.dart';
+import '../../../controllers/doctor_certificate_controller.dart';
+import '../../../controllers/doctor_certificate_review_controller.dart';
 
 class CertificateReviewScreen extends ConsumerStatefulWidget {
   final int requestId;
@@ -36,6 +36,7 @@ class _CertificateReviewScreenState
           .load(widget.requestId);
     });
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -120,13 +121,7 @@ class _CertificateReviewScreenState
                         onFitnessStatusChanged: (value) {
                           notifier.changeFitnessStatus(value);
                         },
-                        onValidityChanged: (value) {
-                          if (value == null) return;
-                          final days = int.parse(
-                            value.split(" ").first,
-                          );
-                          notifier.changeValidity(days);
-                        },
+                        onValidityChanged: notifier.changeValidity,
                         onApprove: () async {
                           if (_formKey.currentState?.validate() !=
                               true) {
@@ -219,12 +214,7 @@ class _CertificateReviewScreenState
                         isSubmitting: isSubmitting,
                         onFitnessStatusChanged:
                         notifier.changeFitnessStatus,
-                        onValidityChanged: (v) {
-                          if (v == null) return;
-                          notifier.changeValidity(
-                            int.parse(v.split(" ").first),
-                          );
-                        },
+                        onValidityChanged: notifier.changeValidity,
                         onApprove: () async {
                           if (_formKey.currentState
                               ?.validate() !=
