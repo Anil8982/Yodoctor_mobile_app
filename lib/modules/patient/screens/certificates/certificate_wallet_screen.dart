@@ -198,9 +198,10 @@ class _CertificateWalletScreenState
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'certificate_wallet_apply_fab',
         onPressed: () {
           notifier.resetForm();
-          context.push(AppRoutes.applyCertificate);
+          context.push(AppRoutes.doctorSelection);
         },
         icon: const Icon(Icons.add_rounded),
         label: const Text('Apply Certificate'),

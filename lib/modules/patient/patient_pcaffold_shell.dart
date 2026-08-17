@@ -38,6 +38,7 @@ class PatientScaffoldShell extends ConsumerWidget {
       floatingActionButton: isKeyboardVisible
           ? null
           : FloatingActionButton(
+        heroTag: 'patient_bottom_nav_fab',
         tooltip: 'Scan QR Code',
         onPressed: () => _openQRScanner(context),
         elevation: 4,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:yodoctor/modules/patient/models/certificate/patient_doctor_model.dart';
 import 'package:yodoctor/modules/widgets/app_header.dart';
 import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 
@@ -13,7 +14,12 @@ import 'widgets/step_3_document_upload.dart';
 import 'widgets/step_4_review_submit.dart';
 
 class ApplyCertificateScreen extends ConsumerStatefulWidget {
-  const ApplyCertificateScreen({super.key});
+  final PatientDoctorModel? initialDoctor;
+
+  const ApplyCertificateScreen({
+    super.key,
+    this.initialDoctor,
+  });
 
   @override
   ConsumerState<ApplyCertificateScreen> createState() =>
@@ -33,9 +39,14 @@ class _ApplyCertificateScreenState
   @override
   void initState() {
     super.initState();
-    Future.microtask(() {
-      ref.read(certificateProvider.notifier).loadDoctors();
-    });
+
+    if (widget.initialDoctor != null) {
+      Future.microtask(() {
+        ref
+            .read(certificateProvider.notifier)
+            .setAssignedDoctor(widget.initialDoctor!);
+      });
+    }
   }
 
   @override
@@ -265,15 +276,22 @@ class _ApplyCertificateScreenState
       }
 
       final success = await notifier.submitRequest();
-      if (success && mounted) {
+
+      if (!mounted) return;
+
+      if (success) {
         AppSnackBar.show(
-          message: 'Certificate Request Dispatched!',
+          message: 'Payment completed and certificate request submitted successfully.',
           type: AppSnackBarType.success,
-          bottomMargin: 1,
         );
 
-        context.pop();
+        return;
       }
+      AppSnackBar.show(
+        message:
+        'We couldn’t complete your certificate request. Please try again in a moment.',
+        type: AppSnackBarType.error,
+      );
     }
   }
 }

@@ -34,12 +34,14 @@ import 'package:yodoctor/modules/doctor/screens/profile/doctor_profile_screen.da
 import 'package:yodoctor/modules/doctor/screens/qr/doctor_qr_screen.dart';
 import 'package:yodoctor/modules/doctor/screens/reviews/doctor_reviews_screen.dart';
 import 'package:yodoctor/modules/doctor/screens/subscription/my_subscription_screen.dart';
+import 'package:yodoctor/modules/patient/models/certificate/patient_doctor_model.dart';
 import 'package:yodoctor/modules/patient/models/family/family_member_model.dart';
 import 'package:yodoctor/modules/patient/models/search/doctor_detail_model.dart';
 import 'package:yodoctor/modules/patient/patient_pcaffold_shell.dart';
 import 'package:yodoctor/modules/patient/screens/appointments/book_appointment_screen.dart';
 import 'package:yodoctor/modules/patient/screens/certificates/apply_certificate_screen.dart';
 import 'package:yodoctor/modules/patient/screens/certificates/certificate_wallet_screen.dart';
+import 'package:yodoctor/modules/patient/screens/certificates/doctor_selection_screen.dart';
 import 'package:yodoctor/modules/patient/screens/certificates/patient_certificate_detail_screen.dart';
 import 'package:yodoctor/modules/patient/screens/dashboard/dashboard_screen.dart';
 import 'package:yodoctor/modules/patient/screens/doctor_detail/doctor_detail_screen.dart';
@@ -390,10 +392,28 @@ final routerProvider = Provider<GoRouter>((ref) {
           return BookAppointmentScreen(doctor: doctor);
         },
       ),
+      // GoRoute(
+      //   parentNavigatorKey: AppRouter.rootNavigatorKey,
+      //   path: AppRoutes.applyCertificate,
+      //   builder: (context, state) => const ApplyCertificateScreen(),
+      // ),
+      GoRoute(
+        parentNavigatorKey: AppRouter.rootNavigatorKey,
+        path: AppRoutes.doctorSelection,
+        builder: (context, state) => const DoctorSelectionScreen(),
+      ),
       GoRoute(
         parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.applyCertificate,
-        builder: (context, state) => const ApplyCertificateScreen(),
+        builder: (context, state) {
+          final doctor = state.extra is PatientDoctorModel
+              ? state.extra as PatientDoctorModel
+              : null;
+
+          return ApplyCertificateScreen(
+            initialDoctor: doctor,
+          );
+        },
       ),
       GoRoute(
         parentNavigatorKey: AppRouter.rootNavigatorKey,

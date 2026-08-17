@@ -1,21 +1,28 @@
+import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
-import '../../../modules/patient/models/certificate/patient_certificate_request_model.dart';
+import 'package:yodoctor/core/routes/app_router.dart';
+import 'package:yodoctor/core/routes/app_routes.dart';
+import 'package:yodoctor/modules/payment/controllers/razorpay_controller.dart';
+import 'package:yodoctor/modules/payment/providers.dart';
 import '../../../modules/patient/models/certificate/patient_certificate_detail_model.dart';
+import '../../../modules/patient/models/certificate/patient_certificate_request_model.dart';
 import '../../../modules/patient/models/certificate/patient_certificate_timeline_model.dart';
 import '../../patient/models/certificate/patient_doctor_model.dart';
-import '../../../core/constants/log_tags.dart';
 import '../repositories/patient_certificate_repository.dart'
     show patientCertificateRepositoryProvider;
-import 'dart:io';
-import 'package:open_filex/open_filex.dart';
 
-// 🎯 Immutable State Structure remains identical
+// 🎯 Immutable State Structure
 class CertificateFormState {
   final List<PatientCertificateRequestModel> allCertificates;
   final bool isLoading;
+  final bool isDoctorsLoading; // Added separate flag for doctors loading state
   final String selectedFilter;
   final String searchQuery;
   final String? selectedType;
@@ -34,6 +41,7 @@ class CertificateFormState {
   CertificateFormState({
     this.allCertificates = const [],
     this.isLoading = false,
+    this.isDoctorsLoading = false, // Initial state set to false or true depending on preference
     this.selectedFilter = 'All',
     this.searchQuery = '',
     this.selectedType,
@@ -63,6 +71,7 @@ class CertificateFormState {
   CertificateFormState copyWith({
     List<PatientCertificateRequestModel>? allCertificates,
     bool? isLoading,
+    bool? isDoctorsLoading,
     String? selectedFilter,
     String? searchQuery,
     String? selectedType,
@@ -81,6 +90,7 @@ class CertificateFormState {
     return CertificateFormState(
       allCertificates: allCertificates ?? this.allCertificates,
       isLoading: isLoading ?? this.isLoading,
+      isDoctorsLoading: isDoctorsLoading ?? this.isDoctorsLoading,
       selectedFilter: selectedFilter ?? this.selectedFilter,
       searchQuery: searchQuery ?? this.searchQuery,
       selectedType: selectedType ?? this.selectedType,
@@ -98,6 +108,11 @@ class CertificateFormState {
     );
   }
 }
+
+final certificateProvider =
+NotifierProvider<CertificateNotifier, CertificateFormState>(
+  CertificateNotifier.new,
+);
 
 class CertificateNotifier extends Notifier<CertificateFormState> {
   final additionalNotesController = TextEditingController();
@@ -153,6 +168,8 @@ class CertificateNotifier extends Notifier<CertificateFormState> {
   }
 
   Future<void> loadDoctors() async {
+    // Set explicit loading flag for doctors to prevent empty-state flashing
+    state = state.copyWith(isDoctorsLoading: true);
     try {
       final repo = ref.read(patientCertificateRepositoryProvider);
       final response = await repo.getDoctors();
@@ -161,9 +178,12 @@ class CertificateNotifier extends Notifier<CertificateFormState> {
         final list = (response.data["doctors"] as List)
             .map((e) => PatientDoctorModel.fromJson(e))
             .toList();
-        state = state.copyWith(doctors: list);
+        state = state.copyWith(doctors: list, isDoctorsLoading: false);
+      } else {
+        state = state.copyWith(isDoctorsLoading: false);
       }
     } catch (e, st) {
+      state = state.copyWith(isDoctorsLoading: false);
       AppLogger.exception(
         e,
         st,
@@ -245,8 +265,8 @@ class CertificateNotifier extends Notifier<CertificateFormState> {
       "dob": state.dateOfBirth == null
           ? null
           : '${state.dateOfBirth!.year}-'
-                '${state.dateOfBirth!.month.toString().padLeft(2, '0')}-'
-                '${state.dateOfBirth!.day.toString().padLeft(2, '0')}',
+          '${state.dateOfBirth!.month.toString().padLeft(2, '0')}-'
+          '${state.dateOfBirth!.day.toString().padLeft(2, '0')}',
       "gender": state.gender,
       "blood_group": state.bloodGroup,
       "height": double.tryParse(heightController.text),
@@ -256,58 +276,204 @@ class CertificateNotifier extends Notifier<CertificateFormState> {
     };
 
     AppLogger.info(
-      "Submitting certificate request",
+      "Submitting certificate request and creating payment order",
       tag: LogTags.patient,
       subTag: _subTag,
     );
-    AppLogger.json(payload, tag: LogTags.patient, subTag: "$_subTag/Payload");
+    AppLogger.json(payload, tag: LogTags.patient, subTag: _subTag);
 
     try {
       final repo = ref.read(patientCertificateRepositoryProvider);
-      final create = await repo.createRequest(payload);
+      final orderResponse = await repo.createPaymentOrder(payload);
 
-      dynamic resId;
-      if (create.data is Map) {
-        if (create.data["data"] != null &&
-            create.data["data"]["requestId"] != null) {
-          resId = create.data["data"]["requestId"];
-        } else {
-          resId = create.data["requestId"];
-        }
-      }
+      final responseData = orderResponse.data is Map
+          ? (orderResponse.data["data"] ?? orderResponse.data)
+          : {};
 
-      if (resId == null) {
+      final String razorpayKeyId =
+          responseData["razorpayKeyId"] ?? responseData["razorpay_key"] ?? '';
+      final String orderId =
+          responseData["orderId"] ?? responseData["order_id"] ?? '';
+      final double totalAmount =
+          double.tryParse(
+            (responseData["totalAmount"] ?? responseData["amount"] ?? 0)
+                .toString(),
+          ) ??
+              0.0;
+      final String certificateType =
+          responseData["certificateType"] ??
+              state.selectedType ??
+              'Certificate Payment';
+
+      if (razorpayKeyId.isEmpty || orderId.isEmpty) {
         throw Exception(
-          "Backend failed to return valid response hash map identifier for requestId.",
+          "Backend failed to return valid payment order identifiers.",
         );
       }
 
-      final int requestId = int.parse(resId.toString());
-      AppLogger.success(
-        "Request created. Starting document streams upload...",
-        tag: LogTags.patient,
-        subTag: _subTag,
+      final context = AppRouter.rootNavigatorKey.currentContext;
+      if (context != null && context.mounted) {
+        context.push(AppRoutes.paymentProcessing);
+      }
+
+      final razorpayController = ref.read(razorpayControllerProvider);
+
+      final completer = Completer<bool>();
+      late final StreamSubscription subscription;
+
+      subscription = razorpayController.events.listen((event) async {
+        if (event is RazorpaySuccess) {
+          subscription.cancel();
+          if (!completer.isCompleted) {
+            try {
+              AppLogger.info(
+                "Payment successful. Verifying certificate payment...",
+                tag: LogTags.patient,
+                subTag: _subTag,
+              );
+
+              final verifyResponse = await repo.verifyPayment(
+                razorpayOrderId: event.orderId ?? orderId,
+                razorpayPaymentId: event.paymentId ?? '',
+                razorpaySignature: event.signature ?? '',
+              );
+
+              final verifyData = verifyResponse.data is Map
+                  ? (verifyResponse.data["data"] ?? verifyResponse.data)
+                  : {};
+
+              dynamic resId =
+                  verifyData["requestId"] ?? verifyData["request_id"];
+              if (resId == null && verifyResponse.data is Map) {
+                resId = verifyResponse.data["requestId"];
+              }
+
+              if (resId == null) {
+                throw Exception(
+                  "Backend failed to return valid response hash map identifier for requestId after verification.",
+                );
+              }
+
+              final int requestId = int.parse(resId.toString());
+              AppLogger.success(
+                "Payment verified. Starting document streams upload...",
+                tag: LogTags.patient,
+                subTag: _subTag,
+              );
+
+              await repo.uploadDocuments(
+                requestId: requestId,
+                profilePhoto: state.uploadedDocs["Profile Photo"],
+                idProof: state.uploadedDocs["Government ID Proof"],
+                medicalReports: state.uploadedDocs["Medical Reports"],
+                prescription: state.uploadedDocs["Prescription"],
+              );
+
+              AppLogger.success(
+                "Certificate workflows synchronization complete",
+                tag: LogTags.patient,
+                subTag: _subTag,
+              );
+
+              await loadMyRequests();
+              resetForm();
+
+              final navContext = AppRouter.rootNavigatorKey.currentContext;
+              if (navContext != null && navContext.mounted) {
+                navContext.go(
+                  AppRoutes.paymentSuccess,
+                  extra: {
+                    'paymentId': event.paymentId,
+                    'planName': certificateType,
+                    'nextRoute': '/',
+                  },
+                );
+              }
+
+              completer.complete(true);
+            } catch (e, st) {
+              state = state.copyWith(isLoading: false);
+              final navContext = AppRouter.rootNavigatorKey.currentContext;
+              if (navContext != null && navContext.mounted) {
+                if (navContext.canPop()) {
+                  navContext.pop();
+                }
+              }
+              AppLogger.exception(
+                e,
+                st,
+                message:
+                'Certificate payment verification or document upload faulted',
+                tag: LogTags.patient,
+                subTag: _subTag,
+              );
+              if (!completer.isCompleted) completer.complete(false);
+            }
+          }
+        } else if (event is RazorpayFailure) {
+          subscription.cancel();
+          state = state.copyWith(isLoading: false);
+          final navContext = AppRouter.rootNavigatorKey.currentContext;
+          if (navContext != null && navContext.mounted) {
+            if (navContext.canPop()) {
+              navContext.pop();
+            }
+          }
+          AppLogger.error(
+            "Razorpay payment failed: ${event.message}",
+            tag: LogTags.patient,
+            subTag: _subTag,
+          );
+          if (!completer.isCompleted) completer.complete(false);
+        } else if (event is RazorpayCancelled) {
+          subscription.cancel();
+          state = state.copyWith(isLoading: false);
+          final navContext = AppRouter.rootNavigatorKey.currentContext;
+          if (navContext != null && navContext.mounted) {
+            if (navContext.canPop()) {
+              navContext.pop();
+            }
+          }
+          AppLogger.warning(
+            "Razorpay payment cancelled by user",
+            tag: LogTags.patient,
+            subTag: _subTag,
+          );
+          if (!completer.isCompleted) completer.complete(false);
+        } else if (event is RazorpayExternalWallet) {
+          subscription.cancel();
+          state = state.copyWith(isLoading: false);
+          final navContext = AppRouter.rootNavigatorKey.currentContext;
+          if (navContext != null && navContext.mounted) {
+            if (navContext.canPop()) {
+              navContext.pop();
+            }
+          }
+          AppLogger.info(
+            "Razorpay external wallet selected: ${event.walletName}",
+            tag: LogTags.patient,
+            subTag: _subTag,
+          );
+          if (!completer.isCompleted) completer.complete(false);
+        }
+      });
+
+      razorpayController.openOrderCheckout(
+        key: razorpayKeyId,
+        orderId: orderId,
+        amount: totalAmount,
+        description: certificateType,
       );
 
-      await repo.uploadDocuments(
-        requestId: requestId,
-        profilePhoto: state.uploadedDocs["Profile Photo"],
-        idProof: state.uploadedDocs["Government ID Proof"],
-        medicalReports: state.uploadedDocs["Medical Reports"],
-        prescription: state.uploadedDocs["Prescription"],
-      );
-
-      AppLogger.success(
-        "Certificate workflows synchronization complete",
-        tag: LogTags.patient,
-        subTag: _subTag,
-      );
-
-      await loadMyRequests();
-      resetForm();
-      return true;
+      return await completer.future;
     } catch (e, st) {
       state = state.copyWith(isLoading: false);
+      final navContext = AppRouter.rootNavigatorKey.currentContext;
+      if (navContext != null && navContext.mounted) {
+        if (navContext.canPop()) {
+          navContext.pop();
+        }
+      }
       AppLogger.exception(
         e,
         st,
@@ -324,12 +490,12 @@ class CertificateNotifier extends Notifier<CertificateFormState> {
     return state.allCertificates.where((cert) {
       final matchesStatus =
           state.selectedFilter == "All" ||
-          cert.status.toLowerCase() == state.selectedFilter.toLowerCase();
+              cert.status.toLowerCase() == state.selectedFilter.toLowerCase();
 
       final matchesSearch =
           state.searchQuery.isEmpty ||
-          cert.certificateType.toLowerCase().contains(state.searchQuery) ||
-          cert.doctorName.toLowerCase().contains(state.searchQuery);
+              cert.certificateType.toLowerCase().contains(state.searchQuery) ||
+              cert.doctorName.toLowerCase().contains(state.searchQuery);
 
       return matchesStatus && matchesSearch;
     }).toList();
@@ -410,8 +576,3 @@ class CertificateNotifier extends Notifier<CertificateFormState> {
     );
   }
 }
-
-final certificateProvider =
-    NotifierProvider<CertificateNotifier, CertificateFormState>(
-      CertificateNotifier.new,
-    );

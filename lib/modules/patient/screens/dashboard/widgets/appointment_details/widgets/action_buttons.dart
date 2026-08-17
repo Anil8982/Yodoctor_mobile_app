@@ -105,13 +105,11 @@ class ActionButtons extends ConsumerWidget {
       AppSnackBar.show(
         message: 'Appointment cancelled successfully',
         type: AppSnackBarType.success,
-        bottomMargin: 0,
       );
     } else {
       final currentState = ref.read(patientDashboardControllerProvider);
       AppSnackBar.show(
         message: currentState.errorMessage ?? "Unable to cancel appointment",
-        bottomMargin: 0,
         type: AppSnackBarType.error,
       );
     }

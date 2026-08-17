@@ -316,7 +316,6 @@ class _AppointmentDetailsSheetState extends State<_AppointmentDetailsSheet> {
                         AppSnackBar.show(
                           message: "Review submitted successfully!",
                           type: AppSnackBarType.success,
-                          bottomMargin: 0,
                         );
                       }
                     } catch (e) {
@@ -325,7 +324,6 @@ class _AppointmentDetailsSheetState extends State<_AppointmentDetailsSheet> {
                         AppSnackBar.show(
                           message: e.toString().replaceFirst("Exception: ", ""),
                           type: AppSnackBarType.error,
-                          bottomMargin: 0,
                         );
                       }
                     }

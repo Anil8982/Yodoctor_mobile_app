@@ -49,6 +49,10 @@ class ApiConstants {
   static const certificateDetail = '/certificate'; // Base for /$id
   static const downloadCertificate = '/certificate/download'; // Base for /$id
   static const allDoctors = '/doctor/alldoctors';
+  static const certificateDoctors = '/certificate/allcertificate-doctors';
+  // --- Certificate Payment (Razorpay) ---
+  static const createCertificatePaymentOrder = '/certificate/payment/order';
+  static const verifyCertificatePayment = '/certificate/payment/verify';
 
   static const patientDashboard = '/patient/dashboard';
   static const cancelAppointment =

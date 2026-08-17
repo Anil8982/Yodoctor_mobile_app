@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:yodoctor/modules/patient/controllers/certificate_request.dart';
 import 'package:yodoctor/modules/widgets/app_dropdown_field.dart';
-import 'package:yodoctor/modules/widgets/app_search_select_field.dart';
 import 'package:yodoctor/modules/widgets/app_text_field.dart';
 import 'certificate_type_card.dart';
 import 'step_header_helper.dart';
@@ -52,14 +51,8 @@ class Step1TypeSelection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // Watch current form state reactively from provider
     final formState = ref.watch(certificateProvider);
-
-    final selectedDoctor = formState.doctors.any(
-          (doctor) => doctor.id == formState.assignedDoctor?.id,
-    )
-        ? formState.doctors.firstWhere(
-          (doctor) => doctor.id == formState.assignedDoctor?.id,
-    )
-        : null;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Form(
       key: formKey,
@@ -95,30 +88,49 @@ class Step1TypeSelection extends ConsumerWidget {
           ),
           const SizedBox(height: 28),
 
-          // Assigned Doctor Dropdown
-          AppSearchSelectField(
-            label: 'Assigned Doctor',
-            isRequired: true,
-            hint: 'Select Doctor',
-            icon: Icons.person_rounded,
-            value: selectedDoctor != null ? '${selectedDoctor.name} (${selectedDoctor.specialty})' : null,
-            items: formState.doctors.map((doctor) => '${doctor.name} (${doctor.specialty})').toList(),
-            autovalidateMode: autovalidateMode,
-            onChanged: (selectedValue) {
-              if (selectedValue != null) {
-                final matchingDoctor = formState.doctors.firstWhere(
-                      (doctor) => '${doctor.name} (${doctor.specialty})' == selectedValue,
-                );
-                controller.setAssignedDoctor(matchingDoctor);
-              }
-            },
-            validator: (val) {
-              if (val == null || val.isEmpty) {
-                return 'Please select an assigned doctor';
-              }
-              return null;
-            },
-          ),
+          if (formState.assignedDoctor != null)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: colorScheme.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.person_rounded, color: colorScheme.primary),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Assigned Doctor',
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '${formState.assignedDoctor!.name} (${formState.assignedDoctor!.specialty})',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: colorScheme.onSurface,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    Icons.check_circle_rounded,
+                    color: colorScheme.primary,
+                    size: 22,
+                  ),
+                ],
+              ),
+            )
+          else
+            const SizedBox.shrink(),
           const SizedBox(height: 20),
 
           // Purpose of Certificate Dropdown
@@ -156,7 +168,8 @@ class Step1TypeSelection extends ConsumerWidget {
             controller: controller.additionalNotesController,
             autovalidateMode: autovalidateMode,
             label: 'Additional Notes For Doctor',
-            hint: 'Describe specific conditions or background details contextually...',
+            hint:
+                'Describe specific conditions or background details contextually...',
             icon: Icons.note_alt_outlined,
             maxLines: 3,
             minLines: 1,

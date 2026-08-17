@@ -239,62 +239,65 @@ class Step4ReviewSubmit extends ConsumerWidget {
   }
 
   Widget _buildDocumentReviewRow(
-    BuildContext context,
-    CertificateFormState formState,
-  ) {
+      BuildContext context,
+      CertificateFormState formState,
+      ) {
     final docs = [
       'Profile Photo',
       'Government ID Proof',
       'Medical Reports',
       'Prescription',
     ];
+
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      physics: const BouncingScrollPhysics(),
-      child: Row(
-        children: docs.map((docKey) {
-          // Extract uploaded documentation directly from immutable state wrapper
-          final fileName = formState.uploadedDocs[docKey];
-          if (fileName == null) return const SizedBox.shrink();
+    return Column(
+      children: docs.map((docKey) {
+        final fileName = formState.uploadedDocs[docKey];
 
-          return Container(
-            margin: const EdgeInsets.only(right: 12),
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: colorScheme.outlineVariant.withValues(alpha: 0.5),
-              ),
-              borderRadius: BorderRadius.circular(14),
-              color: colorScheme.surface,
+        if (fileName == null) {
+          return const SizedBox.shrink();
+        }
+
+        return Container(
+          width: double.infinity,
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: colorScheme.outlineVariant.withValues(alpha: 0.5),
             ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: colorScheme.primaryContainer.withValues(alpha: 0.4),
-                  ),
-                  child: Center(
-                    child: Icon(
-                      Icons.description_rounded,
-                      color: colorScheme.primary,
-                      size: 20,
-                    ),
+            borderRadius: BorderRadius.circular(14),
+            color: colorScheme.surface,
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: colorScheme.primaryContainer.withValues(alpha: 0.4),
+                ),
+                child: Center(
+                  child: Icon(
+                    Icons.description_rounded,
+                    color: colorScheme.primary,
+                    size: 20,
                   ),
                 ),
-                const SizedBox(width: 12),
-                Column(
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       docKey,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: theme.textTheme.bodySmall?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -302,17 +305,19 @@ class Step4ReviewSubmit extends ConsumerWidget {
                     const SizedBox(height: 2),
                     Text(
                       fileName,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ],
                 ),
-              ],
-            ),
-          );
-        }).toList(),
-      ),
+              ),
+            ],
+          ),
+        );
+      }).toList(),
     );
   }
 }

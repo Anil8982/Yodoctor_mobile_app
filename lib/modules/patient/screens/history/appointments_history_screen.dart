@@ -161,7 +161,6 @@ class _AppointmentsHistoryScreenState
                                             "",
                                           ),
                                           type: AppSnackBarType.error,
-                                          bottomMargin: 0,
                                         );
                                       }
                                     },

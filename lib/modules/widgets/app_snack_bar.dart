@@ -28,7 +28,7 @@ class AppSnackBar {
     Color? customAccentColor,
     IconData? customIcon,
     double maxAdaptiveWidth = 420.0,
-    double bottomMargin = 24,
+    // double bottomMargin = 24,
   }) {
     // 1. Throttle Duplicates
     final key = "$type:$message";
@@ -49,6 +49,10 @@ class AppSnackBar {
         ? Theme.of(context).brightness == Brightness.dark
         : WidgetsBinding.instance.platformDispatcher.platformBrightness ==
               Brightness.dark;
+
+    final bottomSafeArea = context != null
+        ? MediaQuery.of(context).padding.bottom
+        : 0.0;
 
     // 2. Haptic
     if (haptic) {
@@ -144,7 +148,12 @@ class AppSnackBar {
             width: 1.5,
           ),
         ),
-        margin: EdgeInsets.fromLTRB(16, 0, 16, bottomMargin),
+        margin: EdgeInsets.fromLTRB(
+          16,
+          0,
+          16,
+          16 + bottomSafeArea,
+        ),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         content: Row(
           children: [
@@ -297,7 +306,7 @@ extension AppSnackBarExtension on BuildContext {
     Duration? duration,
     Color? customAccentColor,
     IconData? customIcon,
-    double maxAdaptiveWidth = 420.0,
+    // double maxAdaptiveWidth = 420.0,
   }) {
     AppSnackBar.show(
       message: message,
@@ -312,7 +321,7 @@ extension AppSnackBarExtension on BuildContext {
       duration: duration,
       customAccentColor: customAccentColor,
       customIcon: customIcon,
-      maxAdaptiveWidth: maxAdaptiveWidth,
+      // maxAdaptiveWidth: maxAdaptiveWidth,
     );
   }
 

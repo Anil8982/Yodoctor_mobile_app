@@ -270,7 +270,6 @@ class _HomeServiceBookingScreenState
                         AppSnackBar.show(
                           message: 'Booking submitted successfully',
                           type: AppSnackBarType.success,
-                          bottomMargin: 0,
                         );
 
                         if (!context.mounted) return;
@@ -286,7 +285,6 @@ class _HomeServiceBookingScreenState
                           currentContextState.errorMessage ??
                               "Booking request failed",
                           type: AppSnackBarType.error,
-                          bottomMargin: 0,
                         );
                       }
                     },

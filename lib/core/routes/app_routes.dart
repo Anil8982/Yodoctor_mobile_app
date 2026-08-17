@@ -29,6 +29,7 @@ class AppRoutes {
   static const String services = '/patient/services';
 
   // Patient - Certificates
+  static const doctorSelection = '/patient/certificate/doctors';
   static const String certificateWallet = '/patient/certificate';
   static const String applyCertificate = '/patient/certificate/apply';
   static const String patientCertificateDetail = '/patient/certificate/detail';
