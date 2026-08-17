@@ -9,7 +9,7 @@ class HistoryAppointmentCard extends StatelessWidget {
   });
 
   final AppointmentHistoryModel appointment;
-  final VoidCallback onViewDetails;
+  final VoidCallback? onViewDetails;
 
   @override
   Widget build(BuildContext context) {
@@ -41,10 +41,10 @@ class HistoryAppointmentCard extends StatelessWidget {
 
   // WIDE LAYOUT (Desktop / Tablet)
   Widget _buildWideLayout(
-      BuildContext context,
-      TextTheme textTheme,
-      ColorScheme colorScheme,
-      ) {
+    BuildContext context,
+    TextTheme textTheme,
+    ColorScheme colorScheme,
+  ) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
@@ -77,10 +77,10 @@ class HistoryAppointmentCard extends StatelessWidget {
 
   // COMPACT LAYOUT (Mobile)
   Widget _buildCompactLayout(
-      BuildContext context,
-      TextTheme textTheme,
-      ColorScheme colorScheme,
-      ) {
+    BuildContext context,
+    TextTheme textTheme,
+    ColorScheme colorScheme,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -116,21 +116,23 @@ class HistoryAppointmentCard extends StatelessWidget {
 
   // DOCTOR INFO SECTION (With Profile Image)
   Widget _buildDoctorInfo(
-      BuildContext context,
-      TextTheme textTheme,
-      ColorScheme colorScheme,
-      ) {
+    BuildContext context,
+    TextTheme textTheme,
+    ColorScheme colorScheme,
+  ) {
     return Row(
       children: <Widget>[
         CircleAvatar(
           radius: 24,
           backgroundColor: colorScheme.primaryContainer,
-          backgroundImage: appointment.profileImage != null &&
-              appointment.profileImage!.isNotEmpty
+          backgroundImage:
+              appointment.profileImage != null &&
+                  appointment.profileImage!.isNotEmpty
               ? NetworkImage(appointment.profileImage!)
               : null,
-          child: appointment.profileImage == null ||
-              appointment.profileImage!.isEmpty
+          child:
+              appointment.profileImage == null ||
+                  appointment.profileImage!.isEmpty
               ? Icon(Icons.person_rounded, color: colorScheme.primary, size: 26)
               : null,
         ),
@@ -175,10 +177,10 @@ class HistoryAppointmentCard extends StatelessWidget {
 
   // DATE & TIME SLOT SECTION
   Widget _buildDateShiftInfo(
-      BuildContext context,
-      TextTheme textTheme,
-      ColorScheme colorScheme,
-      ) {
+    BuildContext context,
+    TextTheme textTheme,
+    ColorScheme colorScheme,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -231,10 +233,10 @@ class HistoryAppointmentCard extends StatelessWidget {
 
   // TOKEN CHIP
   Widget _buildTokenChip(
-      BuildContext context,
-      TextTheme textTheme,
-      ColorScheme colorScheme,
-      ) {
+    BuildContext context,
+    TextTheme textTheme,
+    ColorScheme colorScheme,
+  ) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
@@ -253,13 +255,15 @@ class HistoryAppointmentCard extends StatelessWidget {
 
   // STATUS BADGE (Dynamic Color Handling)
   Widget _buildStatusChip(
-      BuildContext context,
-      TextTheme textTheme,
-      ColorScheme colorScheme,
-      ) {
+    BuildContext context,
+    TextTheme textTheme,
+    ColorScheme colorScheme,
+  ) {
     final String status = appointment.status.toUpperCase();
 
-    Color containerColor = colorScheme.secondaryContainer.withValues(alpha: 0.45);
+    Color containerColor = colorScheme.secondaryContainer.withValues(
+      alpha: 0.45,
+    );
     Color textColor = colorScheme.onSecondaryContainer;
 
     if (status.contains('CANCEL')) {
@@ -291,9 +295,7 @@ class HistoryAppointmentCard extends StatelessWidget {
     return OutlinedButton(
       onPressed: onViewDetails,
       style: OutlinedButton.styleFrom(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         visualDensity: VisualDensity.compact,
       ),

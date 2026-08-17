@@ -29,6 +29,7 @@ class _HomeServiceBookingScreenState
   final _conditionController = TextEditingController();
   final _notesController = TextEditingController();
   bool _showDurationDateError = false;
+  bool _hasSubmitted = false;
 
   @override
   void dispose() {
@@ -78,6 +79,7 @@ class _HomeServiceBookingScreenState
                         phoneController: _phoneController,
                         ageController: _ageController,
                         addressController: _addressController,
+                        hasSubmitted: _hasSubmitted,
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -243,28 +245,29 @@ class _HomeServiceBookingScreenState
                     onPressed: bookingState.isLoading
                         ? null
                         : () async {
-                      if (!(_formKey.currentState?.validate() ?? false)) {
-                        return;
-                      }
-                      setState(() {
-                        _showDurationDateError =
-                            currentModel.durationType.isEmpty ||
-                                currentModel.startDate == null;
-                      });
+                            setState(() => _hasSubmitted = true);
+                            if (!(_formKey.currentState?.validate() ?? false)) {
+                              return;
+                            }
+                            setState(() {
+                              _showDurationDateError =
+                                  currentModel.durationType.isEmpty ||
+                                  currentModel.startDate == null;
+                            });
 
-                      if (_showDurationDateError) {
-                        return;
-                      }
+                            if (_showDurationDateError) {
+                              return;
+                            }
 
-                      final success = await ref
-                          .read(homeServiceBookingProvider.notifier)
-                          .createBooking();
+                            final success = await ref
+                                .read(homeServiceBookingProvider.notifier)
+                                .createBooking();
 
-                      if (!context.mounted) return;
+                            if (!context.mounted) return;
 
-                      final currentContextState = ref.read(
-                        homeServiceBookingProvider,
-                      );
+                            final currentContextState = ref.read(
+                              homeServiceBookingProvider,
+                            );
 
                       if (success) {
                         AppSnackBar.show(
@@ -272,11 +275,11 @@ class _HomeServiceBookingScreenState
                           type: AppSnackBarType.success,
                         );
 
-                        if (!context.mounted) return;
+                              if (!context.mounted) return;
 
-                        ref
-                            .read(homeServiceBookingProvider.notifier)
-                            .resetBooking();
+                              ref
+                                  .read(homeServiceBookingProvider.notifier)
+                                  .resetBooking();
 
                         Navigator.pop(context);
                       } else {
@@ -315,11 +318,11 @@ class _HomeServiceBookingScreenState
   }
 
   Widget _buildCardSection(
-      BuildContext context, {
-        required String title,
-        required IconData icon,
-        required Widget child,
-      }) {
+    BuildContext context, {
+    required String title,
+    required IconData icon,
+    required Widget child,
+  }) {
     final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.all(16),
@@ -357,11 +360,11 @@ class _HomeServiceBookingScreenState
   }
 
   Widget _buildServiceTile(
-      BuildContext context,
-      String title,
-      IconData icon,
-      HomeServiceBookingModel state,
-      ) {
+    BuildContext context,
+    String title,
+    IconData icon,
+    HomeServiceBookingModel state,
+  ) {
     final colorScheme = Theme.of(context).colorScheme;
     final isSel = state.selectedServiceType == title;
     return InkWell(
@@ -407,11 +410,11 @@ class _HomeServiceBookingScreenState
   }
 
   Widget _buildTimeChip(
-      BuildContext context,
-      String label,
-      IconData icon,
-      HomeServiceBookingModel state,
-      ) {
+    BuildContext context,
+    String label,
+    IconData icon,
+    HomeServiceBookingModel state,
+  ) {
     final colorScheme = Theme.of(context).colorScheme;
     final isSel = state.timePreference == label;
     return InkWell(

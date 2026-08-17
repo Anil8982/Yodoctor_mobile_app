@@ -281,25 +281,6 @@ class DoctorProfileNotifier extends Notifier<ProfileFormState> {
     state = state.copyWith(activeDays: days, availableDaysError: false);
   }
 
-  Future<void> pickRegistrationValidTill(BuildContext context) async {
-    final DateTime now = DateTime.now();
-
-    final DateTime initialDate =
-        DateFormat('dd MMM yyyy').tryParse(regValidTillController.text) ??
-        DateTime.now().add(const Duration(days: 365));
-
-    final DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: initialDate,
-      firstDate: now,
-      lastDate: DateTime(2100),
-    );
-    if (pickedDate == null) return;
-
-    final formattedDate = DateFormat('dd MMM yyyy').format(pickedDate);
-    regValidTillController.text = formattedDate;
-  }
-
   Future<bool> saveProfileChanges() async {
     state = state.copyWith(isLoading: true, clearError: true);
     final formattedRegistrationDate = regValidTillController.text.isEmpty
