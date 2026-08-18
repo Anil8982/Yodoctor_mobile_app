@@ -10,10 +10,8 @@ Future<void> showAppointmentQueueDialog({
   return showDialog<void>(
     context: context,
     barrierDismissible: false,
-    builder: (_) => AppointmentQueueDialog(
-      queueInfo: queueInfo,
-      mainContext: context,
-    ),
+    builder: (_) =>
+        AppointmentQueueDialog(queueInfo: queueInfo, mainContext: context),
   );
 }
 
@@ -58,14 +56,19 @@ class AppointmentQueueDialog extends StatelessWidget {
             const SizedBox(height: 20),
             Text(
               'Booking Confirmed!',
-              style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900),
+              style: textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w900,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 4),
             Text(
               '${queueInfo.doctorName} - ${queueInfo.specialty}',
               textAlign: TextAlign.center,
-              style: textTheme.bodySmall?.copyWith(color: colorScheme.outline, fontWeight: FontWeight.w600),
+              style: textTheme.bodySmall?.copyWith(
+                color: colorScheme.outline,
+                fontWeight: FontWeight.w600,
+              ),
             ),
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 16),
@@ -73,7 +76,10 @@ class AppointmentQueueDialog extends StatelessWidget {
             ),
             Text(
               'Patient: ${queueInfo.patientLabel}',
-              style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant, fontWeight: FontWeight.w700),
+              style: textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+                fontWeight: FontWeight.w700,
+              ),
             ),
             const SizedBox(height: 12),
             Container(
@@ -82,22 +88,34 @@ class AppointmentQueueDialog extends StatelessWidget {
               decoration: BoxDecoration(
                 color: colorScheme.surfaceContainerLow,
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.5)),
+                border: Border.all(
+                  color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+                ),
               ),
               child: Column(
                 children: [
                   Text(
                     'YOUR TOKEN',
-                    style: textTheme.labelSmall?.copyWith(color: colorScheme.outline, fontWeight: FontWeight.w900, letterSpacing: 1),
+                    style: textTheme.labelSmall?.copyWith(
+                      color: colorScheme.outline,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1,
+                    ),
                   ),
                   Text(
                     queueInfo.tokenNumber,
-                    style: textTheme.displaySmall?.copyWith(fontWeight: FontWeight.w900, color: colorScheme.primary),
+                    style: textTheme.displaySmall?.copyWith(
+                      fontWeight: FontWeight.w900,
+                      color: colorScheme.primary,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     'Now Serving: ${queueInfo.nowServing}',
-                    style: textTheme.bodySmall?.copyWith(fontWeight: FontWeight.bold, color: colorScheme.onSurfaceVariant),
+                    style: textTheme.bodySmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 ],
               ),
@@ -106,11 +124,18 @@ class AppointmentQueueDialog extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.hourglass_top_rounded, size: 16, color: colorScheme.secondary),
+                Icon(
+                  Icons.hourglass_top_rounded,
+                  size: 16,
+                  color: colorScheme.secondary,
+                ),
                 const SizedBox(width: 6),
                 Text(
                   'Est. Wait Time: ${queueInfo.estimatedWait}',
-                  style: textTheme.bodyMedium?.copyWith(color: colorScheme.secondary, fontWeight: FontWeight.bold),
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.secondary,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ],
             ),
@@ -124,10 +149,12 @@ class AppointmentQueueDialog extends StatelessWidget {
                 },
                 style: FilledButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                 ),
                 child: const Text(
-                  'Back to Dashboard',
+                  'Back to Home',
                   style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
                 ),
               ),

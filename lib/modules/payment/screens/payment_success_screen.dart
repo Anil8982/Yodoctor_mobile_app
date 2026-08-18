@@ -131,7 +131,7 @@ class PaymentSuccessScreen extends ConsumerWidget {
                       ),
                     ),
                     child: const Text(
-                      'Continue to Dashboard',
+                      'Continue to Home',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,

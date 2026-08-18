@@ -31,6 +31,52 @@ class _HomeServiceBookingScreenState
   bool _showDurationDateError = false;
   bool _hasSubmitted = false;
 
+  bool _isTimeSlotDisabled(String label, HomeServiceBookingModel state) {
+    final selectedDate = state.startDate;
+
+    if (selectedDate == null) {
+      return false;
+    }
+
+    final now = DateTime.now();
+    final currentDate = DateTime(now.year, now.month, now.day);
+
+    final bookingDate = DateTime(
+      selectedDate.year,
+      selectedDate.month,
+      selectedDate.day,
+    );
+
+    // Tomorrow or any future date → all slots enabled
+    if (bookingDate.isAfter(currentDate)) {
+      return false;
+    }
+
+    // Selected date is today → compare with current time
+    if (DateUtils.isSameDay(bookingDate, currentDate)) {
+      final currentMinutes = now.hour * 60 + now.minute;
+
+      switch (label) {
+        case 'Morning (6am - 12pm)':
+          return currentMinutes >= 12 * 60;
+
+        case 'Afternoon (12pm - 5pm)':
+          return currentMinutes >= 17 * 60;
+
+        case 'Evening (5pm - 9pm)':
+          return currentMinutes >= 21 * 60;
+
+        case 'Night (9pm - 6am)':
+          return false; // tonight → tomorrow morning
+
+        default:
+          return false;
+      }
+    }
+
+    return true; // Past date
+  }
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -269,11 +315,11 @@ class _HomeServiceBookingScreenState
                               homeServiceBookingProvider,
                             );
 
-                      if (success) {
-                        AppSnackBar.show(
-                          message: 'Booking submitted successfully',
-                          type: AppSnackBarType.success,
-                        );
+                            if (success) {
+                              AppSnackBar.show(
+                                message: 'Booking submitted successfully',
+                                type: AppSnackBarType.success,
+                              );
 
                               if (!context.mounted) return;
 
@@ -281,16 +327,16 @@ class _HomeServiceBookingScreenState
                                   .read(homeServiceBookingProvider.notifier)
                                   .resetBooking();
 
-                        Navigator.pop(context);
-                      } else {
-                        AppSnackBar.show(
-                          message:
-                          currentContextState.errorMessage ??
-                              "Booking request failed",
-                          type: AppSnackBarType.error,
-                        );
-                      }
-                    },
+                              Navigator.pop(context);
+                            } else {
+                              AppSnackBar.show(
+                                message:
+                                    currentContextState.errorMessage ??
+                                    "Booking request failed",
+                                type: AppSnackBarType.error,
+                              );
+                            }
+                          },
                     icon: const Icon(Icons.send_rounded, size: 16),
                     label: const Text(
                       'Submit Booking Request',
@@ -417,38 +463,63 @@ class _HomeServiceBookingScreenState
   ) {
     final colorScheme = Theme.of(context).colorScheme;
     final isSel = state.timePreference == label;
-    return InkWell(
-      onTap: () => ref
-          .read(homeServiceBookingProvider.notifier)
-          .updateField(timePreference: label),
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        decoration: BoxDecoration(
-          color: isSel ? colorScheme.primary : Colors.transparent,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSel ? Colors.transparent : colorScheme.outlineVariant,
+    final isDisabled = _isTimeSlotDisabled(label, state);
+    return Opacity(
+      opacity: isDisabled ? 0.6 : 1.0,
+      child: InkWell(
+        onTap: isDisabled
+            ? null
+            : () => ref
+                  .read(homeServiceBookingProvider.notifier)
+                  .updateField(timePreference: label),
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            color: isSel ? colorScheme.primary : Colors.transparent,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isSel
+                  ? Colors.transparent
+                  : colorScheme.outlineVariant.withValues(alpha: 0.4),
+            ),
+            boxShadow: isSel
+                ? [
+                    BoxShadow(
+                      color: colorScheme.primary.withValues(alpha: 0.1),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ]
+                : null,
           ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              size: 14,
-              color: isSel ? colorScheme.onPrimary : colorScheme.outline,
-            ),
-            const SizedBox(width: 6),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                color: isSel ? colorScheme.onPrimary : null,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                size: 14,
+                color: isSel
+                    ? colorScheme.onPrimary
+                    : isDisabled
+                    ? colorScheme.outline
+                    : colorScheme.onSurface,
               ),
-            ),
-          ],
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: isSel
+                      ? colorScheme.onPrimary
+                      : isDisabled
+                      ? colorScheme.outline
+                      : colorScheme.onSurface,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
