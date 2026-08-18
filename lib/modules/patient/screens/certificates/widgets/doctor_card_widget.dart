@@ -131,7 +131,9 @@ class DoctorCardWidget extends StatelessWidget {
                       const SizedBox(height: 6),
 
                       // Experience + Fee Row
-                      Row(
+                      Wrap(
+                        spacing: 10,
+                        runSpacing: 4,
                         children: [
                           Row(
                             mainAxisSize: MainAxisSize.min,
@@ -152,7 +154,6 @@ class DoctorCardWidget extends StatelessWidget {
                               ),
                             ],
                           ),
-                          const SizedBox(width: 12),
                           Text(
                             'Certificate Fee — ₹${doctor.certificateFee.toStringAsFixed(0)}',
                             style: theme.textTheme.bodySmall?.copyWith(
@@ -180,8 +181,8 @@ class DoctorCardWidget extends StatelessWidget {
                     color: isSelected
                         ? colorScheme.primary
                         : colorScheme.surfaceContainerHighest.withValues(
-                      alpha: 0.6,
-                    ),
+                            alpha: 0.6,
+                          ),
                     border: Border.all(
                       color: isSelected
                           ? colorScheme.primary
@@ -240,22 +241,22 @@ class _DoctorImage extends StatelessWidget {
         height: 60,
         child: imageUrl != null && imageUrl!.trim().isNotEmpty
             ? CachedNetworkImage(
-          imageUrl: imageUrl!,
-          fit: BoxFit.cover,
-          placeholder: (context, url) => Container(
-            color: colorScheme.surfaceContainerHighest,
-            alignment: Alignment.center,
-            child: SizedBox(
-              width: 18,
-              height: 18,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: colorScheme.primary,
-              ),
-            ),
-          ),
-          errorWidget: (context, url, error) => fallback(),
-        )
+                imageUrl: imageUrl!,
+                fit: BoxFit.cover,
+                placeholder: (context, url) => Container(
+                  color: colorScheme.surfaceContainerHighest,
+                  alignment: Alignment.center,
+                  child: SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: colorScheme.primary,
+                    ),
+                  ),
+                ),
+                errorWidget: (context, url, error) => fallback(),
+              )
             : fallback(),
       ),
     );
