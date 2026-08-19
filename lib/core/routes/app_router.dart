@@ -22,7 +22,7 @@ import 'package:yodoctor/modules/doctor/doctor_scaffold_shell.dart';
 import 'package:yodoctor/modules/doctor/models/subscription/subscription_model.dart';
 import 'package:yodoctor/modules/doctor/screens/appointments/add_prescription_screen.dart';
 import 'package:yodoctor/modules/doctor/screens/appointments/doctor_appointment_history_screen.dart';
-import 'package:yodoctor/modules/doctor/screens/appointments/live_queue_screen.dart';
+import 'package:yodoctor/modules/doctor/screens/live_queue/live_queue_screen.dart';
 import 'package:yodoctor/modules/doctor/screens/certificate/review_screen/certificate_review_screen.dart';
 import 'package:yodoctor/modules/doctor/screens/certificate/dashboard_screen/doctor_certificate_dashboard_screen.dart';
 import 'package:yodoctor/modules/doctor/screens/dashboard/doctor_dashboard_screen.dart';
@@ -467,11 +467,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
 
       // ---- Doctor Shared Routes (non-shell) ----
-      GoRoute(
-        parentNavigatorKey: AppRouter.rootNavigatorKey,
-        path: AppRoutes.doctorManualBooking,
-        builder: (context, state) => const ManualBookingScreen(),
-      ),
+
       GoRoute(
         parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.doctorProfile,
@@ -485,7 +481,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.doctorLiveQueue,
-        builder: (context, state) => const LiveQueueScreen(),
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          final tabIndex = extra?['initialIndex'] as int? ?? 0;
+          return LiveQueueScreen(initialIndex: tabIndex);
+        },
       ),
       GoRoute(
         parentNavigatorKey: AppRouter.rootNavigatorKey,
@@ -534,6 +534,11 @@ final routerProvider = Provider<GoRouter>((ref) {
               int.tryParse(state.pathParameters['requestId'] ?? '') ?? 0;
           return CertificateReviewScreen(requestId: requestId);
         },
+      ),
+      GoRoute(
+        parentNavigatorKey: AppRouter.rootNavigatorKey,
+        path: AppRoutes.doctorReviews,
+        builder: (context, state) => const DoctorReviewsScreen(),
       ),
 
       // ---- Admin Routes ----
@@ -661,9 +666,8 @@ final routerProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: AppRoutes.doctorAppointments,
-                builder: (context, state) =>
-                    const DoctorAppointmentHistoryScreen(),
+                path: AppRoutes.doctorManualBooking,
+                builder: (context, state) => const ManualBookingScreen(),
               ),
             ],
           ),
@@ -679,8 +683,9 @@ final routerProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: AppRoutes.doctorReviews,
-                builder: (context, state) => const DoctorReviewsScreen(),
+                path: AppRoutes.doctorAppointments,
+                builder: (context, state) =>
+                const DoctorAppointmentHistoryScreen(),
               ),
             ],
           ),

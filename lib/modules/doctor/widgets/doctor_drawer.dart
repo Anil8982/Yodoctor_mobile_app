@@ -86,7 +86,7 @@ class DoctorDrawer extends ConsumerWidget {
           selected: currentRoute == AppRoutes.doctorManualBooking,
           onTap: () {
             Navigator.pop(context);
-            context.push(AppRoutes.doctorManualBooking);
+            context.go(AppRoutes.doctorManualBooking);
           },
         ),
         GlassDrawerItem(
@@ -95,7 +95,7 @@ class DoctorDrawer extends ConsumerWidget {
           selected: currentRoute == AppRoutes.doctorReviews,
           onTap: () {
             Navigator.pop(context);
-            context.go(AppRoutes.doctorReviews);
+            context.push(AppRoutes.doctorReviews);
           },
         ),
         GlassDrawerItem(

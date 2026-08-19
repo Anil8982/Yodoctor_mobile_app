@@ -34,11 +34,9 @@ class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
     final colorScheme = theme.colorScheme;
     final dashboardAsync = ref.watch(doctorDashboardProvider);
 
-    // Check if we have existing data
     final hasData = dashboardAsync.hasValue;
     final isFirstLoad = dashboardAsync.isLoading && !hasData;
 
-    // Show error only if no data exists
     if (dashboardAsync.hasError && !hasData) {
       return Scaffold(
         backgroundColor: colorScheme.surfaceContainerLow,
@@ -51,7 +49,6 @@ class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
       );
     }
 
-    // Get doctor data from profile provider or use dummy for first load
     final doctorName = hasData
         ? dashboardAsync.value!.doctor.doctorName
         : 'Dr. ';
@@ -71,7 +68,7 @@ class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
             DoctorSliverAppBar(
-              expandedHeight: 180,
+              expandedHeight: 160,
               background: DoctorHeader(
                 name: doctorName,
                 specialty: specialty,
@@ -109,12 +106,15 @@ class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
       physics: const AlwaysScrollableScrollPhysics(),
       padding: EdgeInsets.fromLTRB(
         horizontalPadding,
-        AppSpacing.lg,
+        AppSpacing.md,
         horizontalPadding,
-        AppSpacing.xl + 40,
+        AppSpacing.xxxl + 60,
       ),
-      child: ResponsiveContainer(
-        child: _buildDashboardGrid(context, data, isMobile),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1000),
+          child: _buildDashboardGrid(context, data, isMobile),
+        ),
       ),
     );
   }
@@ -127,240 +127,363 @@ class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    if (isMobile) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: ActionCard(
-                  icon: Icons.format_list_bulleted_rounded,
-                  title: 'Today\'s Queue',
-                  subtitle: 'View and manage live patient queue',
-                  onTap: () => context.push(AppRoutes.doctorLiveQueue),
-                ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildHeroQueueCard(context, data),
+        const SizedBox(height: AppSpacing.md),
+
+        Row(
+          children: [
+            Expanded(
+              child: ActionCard(
+                icon: Icons.book_online_rounded,
+                title: 'Manual Booking',
+                subtitle: 'Register walk-in patient',
+                onTap: () => context.push(AppRoutes.doctorManualBooking),
               ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: ActionCard(
-                  icon: Icons.book_online_rounded,
-                  title: 'Manual Booking',
-                  subtitle: 'Register a walk-in patient manually',
-                  onTap: () => context.push(AppRoutes.doctorManualBooking),
-                ),
+            ),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: ActionCard(
+                icon: Icons.hourglass_empty_rounded,
+                title: 'Pending Requests',
+                subtitle: '${data.pendingRequests} awaiting approval',
+                badgeCount: data.pendingRequests,
+                badgeColor: Colors.orange.shade800,
+                onTap: () {
+                  context.push(
+                    AppRoutes.doctorLiveQueue,
+                    extra: {'initialIndex': 1},
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.md),
+
+        Container(
+          padding: const EdgeInsets.symmetric(
+            vertical: AppSpacing.lg,
+            horizontal: AppSpacing.lg,
+          ),
+          decoration: BoxDecoration(
+            color: colorScheme.surface,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: colorScheme.shadow.withValues(alpha: 0.03),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
               ),
             ],
+            border: Border.all(
+              color: colorScheme.outlineVariant.withValues(alpha: 0.2),
+            ),
           ),
-          const SizedBox(height: AppSpacing.md),
-
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final double cardWidth =
-                  (constraints.maxWidth - AppSpacing.sm) / 2;
-
-              return Wrap(
-                spacing: AppSpacing.sm,
-                runSpacing: AppSpacing.sm,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
                 children: [
-                  SizedBox(
-                    width: cardWidth,
-                    child: StatCard(
-                      count: data.pendingRequests,
-                      label: 'Pending Requests',
-                      badgeText: 'NEW',
-                      type: StatType.pending,
-                      icon: Icons.hourglass_empty_rounded,
+                  Container(
+                    width: 4,
+                    height: 16,
+                    decoration: BoxDecoration(
+                      color: colorScheme.primary,
+                      borderRadius: BorderRadius.circular(2),
                     ),
                   ),
-                  SizedBox(
-                    width: cardWidth,
-                    child: StatCard(
-                      count: data.todayQueue,
-                      label: 'Today\'s Queue',
-                      badgeText: 'TODAY',
-                      type: StatType.queue,
-                      icon: Icons.people_outline_rounded,
-                    ),
-                  ),
-                  SizedBox(
-                    width: constraints.maxWidth,
-                    child: StatCard(
-                      count: data.completedToday,
-                      label: 'Completed Today',
-                      badgeText: 'DONE',
-                      type: StatType.completed,
-                      icon: Icons.check_circle_outline_rounded,
-                      isFullWidth: true,
+                  const SizedBox(width: 8),
+                  Text(
+                    'Today\'s Status Overview',
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: colorScheme.onSurface,
                     ),
                   ),
                 ],
-              );
-            },
-          ),
-
-          const SizedBox(height: AppSpacing.md),
-
-          DirectBookingCard(
-            onShowQR: widget.onShowQR ?? () => context.push(AppRoutes.doctorQr),
-          ),
-          const SizedBox(height: AppSpacing.md),
-
-          Row(
-            children: [
-              Expanded(
-                child: MiniActionCard(
-                  icon: Icons.warning_amber_rounded,
-                  title: 'Emergency Cancellations',
-                  subtitle: 'Cancel remaining slots',
-                  containerColor: colorScheme.errorContainer.withValues(
-                    alpha: 0.4,
-                  ),
-                  foregroundColor: colorScheme.error,
-                  onTap: () {
-                    AppSnackBar.show(
-                      message: 'Emergency cancellations initiated',
-                      type: AppSnackBarType.warning,
-                    );
-                  },
-                ),
               ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: MiniActionCard(
-                  icon: Icons.star_rounded,
-                  title: 'Patient Reviews',
-                  subtitle: 'Read feedback',
-                  containerColor: colorScheme.secondaryContainer.withValues(
-                    alpha: 0.4,
+              const SizedBox(height: AppSpacing.lg),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildStatItem(
+                    context,
+                    count: data.todayQueue.toString(),
+                    label: 'Patients',
+                    icon: Icons.people_outline_rounded,
+                    accentColor: colorScheme.primary,
                   ),
-                  foregroundColor: colorScheme.secondary,
-                  onTap: () {
-                    AppSnackBar.show(
-                      message: 'Reviews list panel coming soon',
-                      type: AppSnackBarType.info,
-                    );
-                  },
-                ),
+                  Container(
+                    height: 32,
+                    width: 1,
+                    color: colorScheme.outlineVariant.withValues(alpha: 0.4),
+                  ),
+                  _buildStatItem(
+                    context,
+                    count: data.pendingRequests.toString(),
+                    label: 'Pending',
+                    icon: Icons.hourglass_empty_rounded,
+                    accentColor: colorScheme.tertiary,
+                  ),
+                  Container(
+                    height: 32,
+                    width: 1,
+                    color: colorScheme.outlineVariant.withValues(alpha: 0.4),
+                  ),
+                  _buildStatItem(
+                    context,
+                    count: data.completedToday.toString(),
+                    label: 'Done',
+                    icon: Icons.check_circle_outline_rounded,
+                    accentColor: Colors.green,
+                  ),
+                ],
               ),
             ],
+          ),
+        ),
+        const SizedBox(height: AppSpacing.md),
+
+        // 4. PATIENT REGISTRATION (QR TOOL)
+        DirectBookingCard(
+          onShowQR: widget.onShowQR ?? () => context.push(AppRoutes.doctorQr),
+        ),
+        const SizedBox(height: AppSpacing.md),
+
+        // 5. EMERGENCY CANCELLATION BUTTON
+        Container(
+          decoration: BoxDecoration(
+            color: colorScheme.errorContainer.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: colorScheme.error.withValues(alpha: 0.15),
+            ),
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                AppSnackBar.show(
+                  message: 'Emergency cancellations initiated',
+                  type: AppSnackBarType.warning,
+                );
+              },
+              borderRadius: BorderRadius.circular(16),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: 14,
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: colorScheme.error.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(
+                        Icons.warning_amber_rounded,
+                        color: colorScheme.error,
+                        size: 18,
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.md),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Emergency Cancellation',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.w700,
+                              color: colorScheme.error,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Cancel remaining slots for today',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      color: colorScheme.error.withValues(alpha: 0.5),
+                      size: 12,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildHeroQueueCard(BuildContext context, dynamic data) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final waitingCount = data.todayQueue;
+    final isAvailable = data.doctor.isAvailable;
+
+    String subtitleText;
+    if (!isAvailable) {
+      subtitleText = 'Queue is currently closed';
+    } else if (waitingCount > 0) {
+      subtitleText = '$waitingCount patient${waitingCount == 1 ? '' : 's'} waiting in live queue';
+    } else {
+      subtitleText = 'No patients waiting currently';
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: colorScheme.shadow.withValues(alpha: 0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
           ),
         ],
-      );
-    } else {
-      return LayoutBuilder(
-        builder: (context, constraints) {
-          final double itemWidth =
-              (constraints.maxWidth - (AppSpacing.md * 2)) / 3;
-
-          return Wrap(
-            spacing: AppSpacing.md,
-            runSpacing: AppSpacing.md,
-            children: [
-              SizedBox(
-                width: itemWidth,
-                height: 140,
-                child: DoctorProfileCard(
-                  name: data.doctor.doctorName,
-                  specialty: data.doctor.specialization,
-                  experienceYears: data.doctor.experienceYears,
-                  rating: 5.0,
-                ),
-              ),
-              SizedBox(
-                width: itemWidth,
-                height: 140,
-                child: ActionCard(
-                  icon: Icons.format_list_bulleted_rounded,
-                  title: 'Today\'s Queue',
-                  subtitle: 'View and manage live patient queue',
-                  onTap: () => context.push(AppRoutes.doctorLiveQueue),
-                ),
-              ),
-              SizedBox(
-                width: itemWidth,
-                height: 140,
-                child: ActionCard(
-                  icon: Icons.book_online_rounded,
-                  title: 'Manual Booking',
-                  subtitle: 'Register a walk-in patient manually',
-                  onTap: () => context.push(AppRoutes.doctorManualBooking),
-                ),
-              ),
-
-              SizedBox(
-                width: itemWidth,
-                child: StatCard(
-                  count: data.pendingRequests,
-                  label: 'Pending Requests',
-                  badgeText: 'NEW',
-                  type: StatType.pending,
-                  icon: Icons.hourglass_empty_rounded,
-                ),
-              ),
-              SizedBox(
-                width: itemWidth,
-                child: StatCard(
-                  count: data.todayQueue,
-                  label: 'Today\'s Queue',
-                  badgeText: 'TODAY',
-                  type: StatType.queue,
-                  icon: Icons.people_outline_rounded,
-                ),
-              ),
-              SizedBox(
-                width: itemWidth,
-                child: StatCard(
-                  count: data.completedToday,
-                  label: 'Completed Today',
-                  badgeText: 'DONE',
-                  type: StatType.completed,
-                  icon: Icons.check_circle_outline_rounded,
-                ),
-              ),
-
-              SizedBox(
-                width: itemWidth,
-                child: DirectBookingCard(
-                  onShowQR:
-                  widget.onShowQR ?? () => context.push(AppRoutes.doctorQr),
-                ),
-              ),
-              SizedBox(
-                width: itemWidth,
-                child: MiniActionCard(
-                  icon: Icons.warning_amber_rounded,
-                  title: 'Emergency Cancellations',
-                  subtitle: 'Cancel remaining slot appointments',
-                  containerColor: colorScheme.errorContainer.withValues(
-                    alpha: 0.4,
+        border: Border.all(
+          color: colorScheme.outlineVariant.withValues(alpha: 0.25),
+        ),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => context.push(AppRoutes.doctorLiveQueue),
+          borderRadius: BorderRadius.circular(20),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: colorScheme.primaryContainer.withValues(alpha: 0.6),
+                    borderRadius: BorderRadius.circular(14),
                   ),
-                  foregroundColor: colorScheme.error,
-                  onTap: () {
-                    AppSnackBar.show(
-                      message: 'Emergency cancellations initiated',
-                      type: AppSnackBarType.warning,
-                    );
-                  },
-                ),
-              ),
-              SizedBox(
-                width: itemWidth,
-                child: MiniActionCard(
-                  icon: Icons.star_rounded,
-                  title: 'Patient Reviews',
-                  subtitle: 'Read feedback from your patients',
-                  containerColor: colorScheme.secondaryContainer.withValues(
-                    alpha: 0.4,
+                  child: Icon(
+                    Icons.format_list_bulleted_rounded,
+                    color: colorScheme.primary,
+                    size: 24,
                   ),
-                  foregroundColor: colorScheme.secondary,
-                  onTap: () => context.push(AppRoutes.doctorReviews),
                 ),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Today\'s Queue',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: colorScheme.onSurface,
+                        ),
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        subtitleText,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: colorScheme.primary.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(
+                      color: colorScheme.primary.withValues(alpha: 0.15),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        waitingCount.toString(),
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: colorScheme.primary,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Icon(
+                        Icons.arrow_forward_rounded,
+                        color: colorScheme.primary,
+                        size: 16,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatItem(
+      BuildContext context, {
+        required String count,
+        required String label,
+        required IconData icon,
+        required Color accentColor,
+      }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: accentColor.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
               ),
-            ],
-          );
-        },
-      );
-    }
+              child: Icon(icon, size: 16, color: accentColor),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              count,
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w800,
+                color: colorScheme.onSurface,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        Text(
+          label,
+          style: theme.textTheme.labelMedium?.copyWith(
+            color: colorScheme.onSurfaceVariant,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
+    );
   }
 }

@@ -2,12 +2,10 @@ import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:yodoctor/modules/widgets/app_header.dart';
 import '../../../../core/utils/app_spacing.dart';
 import '../../../../core/utils/responsive.dart';
-import '../../widgets/doctor_drawer.dart';
-import '../../widgets/doctor_sliver_app_bar.dart';
 import '../../controllers/doctor_review_controller.dart';
-import '../../controllers/doctor_profile_controller.dart';
 
 class DoctorReviewsScreen extends ConsumerStatefulWidget {
   const DoctorReviewsScreen({super.key});
@@ -20,7 +18,6 @@ class DoctorReviewsScreen extends ConsumerStatefulWidget {
 class _DoctorReviewsScreenState extends ConsumerState<DoctorReviewsScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  // 🎯 FIXED IMPROVEMENT: Pure Pagination Scroll Controller Setup
   final ScrollController _scrollController = ScrollController();
 
   @override
@@ -35,7 +32,6 @@ class _DoctorReviewsScreenState extends ConsumerState<DoctorReviewsScreen> {
     super.dispose();
   }
 
-  // 🎯 FIXED IMPROVEMENT: 300px threshold dynamic scroll hook point cleanly
   void _onScroll() {
     if (_scrollController.position.extentAfter < 300) {
       ref.read(doctorReviewProvider.notifier).loadNextPage();
@@ -49,261 +45,234 @@ class _DoctorReviewsScreenState extends ConsumerState<DoctorReviewsScreen> {
     final double horizontalPadding = Responsive.horizontalPadding(context);
     final reviewState = ref.watch(doctorReviewProvider);
     final reviews = reviewState.reviews;
-    final profileState = ref.watch(doctorProfileProvider);
-
-    if (profileState.profile == null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ref.read(doctorProfileProvider.notifier).loadProfile();
-      });
-
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
 
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: colorScheme.surfaceContainerLow,
-      extendBodyBehindAppBar: true,
-      drawer: DoctorDrawer(doctor: profileState.profile),
-      body: NestedScrollView(
-        headerSliverBuilder: (context, innerBoxIsScrolled) {
-          return [
-            DoctorSliverAppBar(
-              expandedHeight: 140.0,
-              background: FlexibleSpaceBar(
-                title: Text(
-                  'Patient Reviews',
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    color: colorScheme.onPrimary,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: -0.5,
-                  ),
+      appBar: AppHeader(
+        title: 'Patient Reviews',
+      ),
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 1200),
+            child: SingleChildScrollView(
+              controller: _scrollController,
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(
+                  horizontalPadding,
+                  AppSpacing.xl,
+                  horizontalPadding,
+                  AppSpacing.xxxl,
                 ),
-                titlePadding: EdgeInsets.only(
-                  left: horizontalPadding + 4,
-                  bottom: AppSpacing.lg,
-                ),
-                centerTitle: false,
-              ),
-            ),
-          ];
-        },
-        body: SafeArea(
-          top: false,
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 1200),
-              child: CustomScrollView(
-                controller: _scrollController, // 🎯 FIXED: Attached controller to capture scrolling metrics
-                physics: const AlwaysScrollableScrollPhysics(),
-                slivers: [
-                  SliverPadding(
-                    padding: EdgeInsets.fromLTRB(
-                      horizontalPadding,
-                      AppSpacing.xl,
-                      horizontalPadding,
-                      AppSpacing.xxxl,
-                    ),
-                    sliver: SliverToBoxAdapter(
-                      child: Align(
-                        alignment: Alignment.topLeft,
-                        child: ConstrainedBox(
-                          constraints: const BoxConstraints(maxWidth: 720),
-                          // 🎯 FIXED UX BUG: Show loader first while first-page initialization executes
-                          child: reviewState.loading && reviews.isEmpty
-                              ? const Center(
-                            child: Padding(
-                              padding: EdgeInsets.all(AppSpacing.xxxl),
-                              child: CircularProgressIndicator(),
-                            ),
-                          )
-                              : reviews.isEmpty
-                              ? Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.all(
-                              AppSpacing.xxxl,
-                            ),
-                            decoration: BoxDecoration(
-                              color: colorScheme.surface,
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(
-                                color: colorScheme.outlineVariant
-                                    .withValues(alpha: 0.3),
-                              ),
-                            ),
-                            alignment: Alignment.center,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  Icons.rate_review_outlined,
-                                  size: 40,
-                                  color: colorScheme.onSurfaceVariant
-                                      .withValues(alpha: 0.4),
-                                ),
-                                const SizedBox(height: AppSpacing.sm),
-                                Text(
-                                  'No reviews yet',
-                                  style: theme.textTheme.titleSmall
-                                      ?.copyWith(
-                                    fontWeight: FontWeight.w700,
-                                    color:
-                                    colorScheme.onSurfaceVariant,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                              : ListView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            padding: EdgeInsets.zero,
-                            itemCount: reviews.length,
-                            itemBuilder: (context, index) {
-                              final review = reviews[index];
-                              return Container(
-                                width: double.infinity,
-                                margin: const EdgeInsets.only(
-                                  bottom: AppSpacing.md,
-                                ),
-                                padding: const EdgeInsets.all(
-                                  AppSpacing.md,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: colorScheme.surface,
-                                  borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(
-                                    color: colorScheme.outlineVariant
-                                        .transparency(0.3),
-                                  ),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      crossAxisAlignment:
-                                      CrossAxisAlignment.center,
-                                      children: [
-                                        CircleAvatar(
-                                          radius: 18,
-                                          backgroundColor: colorScheme
-                                              .primaryContainer,
-                                          child: Text(
-                                            review.patientName
-                                                .substring(0, 1)
-                                                .toUpperCase(),
-                                            style: TextStyle(
-                                              color: colorScheme.primary,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(
-                                          width: AppSpacing.md,
-                                        ),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                review.patientName,
-                                                style: theme
-                                                    .textTheme
-                                                    .bodyLarge
-                                                    ?.copyWith(
-                                                  fontWeight:
-                                                  FontWeight.w600,
-                                                  color: colorScheme
-                                                      .onSurface,
-                                                ),
-                                              ),
-                                              Text(
-                                                DateFormat(
-                                                  'dd MMM yyyy',
-                                                ).format(
-                                                  review.createdAt,
-                                                ),
-                                                style: theme
-                                                    .textTheme
-                                                    .bodySmall
-                                                    ?.copyWith(
-                                                  color: colorScheme
-                                                      .onSurfaceVariant,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Container(
-                                          padding:
-                                          const EdgeInsets.symmetric(
-                                            horizontal: 10,
-                                            vertical: 4,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: Colors.amber
-                                                .transparency(0.15),
-                                            borderRadius:
-                                            BorderRadius.circular(
-                                              100,
-                                            ),
-                                          ),
-                                          child: Row(
-                                            mainAxisSize:
-                                            MainAxisSize.min,
-                                            children: [
-                                              const Icon(
-                                                Icons.star_rounded,
-                                                color: Colors.amber,
-                                                size: 16,
-                                              ),
-                                              const SizedBox(width: 4),
-                                              Text(
-                                                review.rating.toString(),
-                                                style: theme
-                                                    .textTheme
-                                                    .labelMedium
-                                                    ?.copyWith(
-                                                  color: Colors
-                                                      .amber
-                                                      .shade900,
-                                                  fontWeight:
-                                                  FontWeight.w700,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: AppSpacing.md),
-                                    Text(
-                                      review.comment,
-                                      style: theme.textTheme.bodyMedium
-                                          ?.copyWith(
-                                        color: colorScheme
-                                            .onSurfaceVariant,
-                                        height: 1.4,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          ),
+                child: Align(
+                  alignment: Alignment.topLeft,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 720),
+                    // 🎯 FIXED UX BUG: Show loader first while first-page initialization executes
+                    child: reviewState.loading && reviews.isEmpty
+                        ? const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(AppSpacing.xxxl),
+                        child: CircularProgressIndicator(),
+                      ),
+                    )
+                        : reviews.isEmpty
+                        ? Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(
+                        AppSpacing.xxxl,
+                      ),
+                      decoration: BoxDecoration(
+                        color: colorScheme.surface,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: colorScheme.outlineVariant
+                              .withValues(alpha: 0.3),
                         ),
                       ),
+                      alignment: Alignment.center,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.rate_review_outlined,
+                            size: 40,
+                            color: colorScheme.onSurfaceVariant
+                                .withValues(alpha: 0.4),
+                          ),
+                          const SizedBox(height: AppSpacing.sm),
+                          Text(
+                            'No reviews yet',
+                            style: theme.textTheme.titleSmall
+                                ?.copyWith(
+                              fontWeight: FontWeight.w700,
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                        : Column(
+                      children: [
+                        ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          padding: EdgeInsets.zero,
+                          itemCount: reviews.length,
+                          itemBuilder: (context, index) {
+                            final review = reviews[index];
+                            return Container(
+                              width: double.infinity,
+                              margin: const EdgeInsets.only(
+                                bottom: AppSpacing.md,
+                              ),
+                              padding: const EdgeInsets.all(
+                                AppSpacing.md,
+                              ),
+                              decoration: BoxDecoration(
+                                color: colorScheme.surface,
+                                borderRadius:
+                                BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: colorScheme.outlineVariant
+                                      .transparency(0.3),
+                                ),
+                              ),
+                              child: Column(
+                                crossAxisAlignment:
+                                CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.center,
+                                    children: [
+                                      CircleAvatar(
+                                        radius: 18,
+                                        backgroundColor: colorScheme
+                                            .primaryContainer,
+                                        child: Text(
+                                          review.patientName
+                                              .substring(0, 1)
+                                              .toUpperCase(),
+                                          style: TextStyle(
+                                            color:
+                                            colorScheme.primary,
+                                            fontWeight:
+                                            FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        width: AppSpacing.md,
+                                      ),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                          CrossAxisAlignment
+                                              .start,
+                                          children: [
+                                            Text(
+                                              review.patientName,
+                                              style: theme
+                                                  .textTheme
+                                                  .bodyLarge
+                                                  ?.copyWith(
+                                                fontWeight:
+                                                FontWeight.w600,
+                                                color: colorScheme
+                                                    .onSurface,
+                                              ),
+                                            ),
+                                            Text(
+                                              DateFormat(
+                                                'dd MMM yyyy',
+                                              ).format(
+                                                review.createdAt,
+                                              ),
+                                              style: theme
+                                                  .textTheme
+                                                  .bodySmall
+                                                  ?.copyWith(
+                                                color: colorScheme
+                                                    .onSurfaceVariant,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: const EdgeInsets
+                                            .symmetric(
+                                          horizontal: 10,
+                                          vertical: 4,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.amber
+                                              .transparency(0.15),
+                                          borderRadius:
+                                          BorderRadius.circular(
+                                            100,
+                                          ),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize:
+                                          MainAxisSize.min,
+                                          children: [
+                                            const Icon(
+                                              Icons.star_rounded,
+                                              color: Colors.amber,
+                                              size: 16,
+                                            ),
+                                            const SizedBox(
+                                                width: 4),
+                                            Text(
+                                              review.rating
+                                                  .toString(),
+                                              style: theme
+                                                  .textTheme
+                                                  .labelMedium
+                                                  ?.copyWith(
+                                                color: Colors
+                                                    .amber.shade900,
+                                                fontWeight:
+                                                FontWeight.w700,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                      height: AppSpacing.md),
+                                  Text(
+                                    review.comment,
+                                    style: theme.textTheme.bodyMedium
+                                        ?.copyWith(
+                                      color: colorScheme
+                                          .onSurfaceVariant,
+                                      height: 1.4,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                        if (reviewState.loading &&
+                            reviews.isNotEmpty)
+                          const Padding(
+                            padding: EdgeInsets.symmetric(
+                                vertical: AppSpacing.md),
+                            child: Center(
+                                child: CircularProgressIndicator()),
+                          ),
+                      ],
                     ),
                   ),
-                  if (reviewState.loading && reviews.isNotEmpty)
-                    const SliverToBoxAdapter(
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: AppSpacing.md),
-                        child: Center(child: CircularProgressIndicator()),
-                      ),
-                    ),
-                ],
+                ),
               ),
             ),
           ),

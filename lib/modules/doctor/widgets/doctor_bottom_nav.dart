@@ -23,19 +23,20 @@ class DoctorBottomNav extends StatelessWidget {
           label: "Home",
         ),
         NavItemData(
-          icon: Icons.calendar_month_outlined,
-          activeIcon: Icons.calendar_month_rounded,
-          label: "History",
+          icon: Icons.person_add_alt_1_outlined,
+          activeIcon: Icons.person_add_alt_1_rounded,
+          label: "Manual Booking",
         ),
+
         NavItemData(
           icon: Icons.workspace_premium_outlined,
           activeIcon: Icons.workspace_premium_rounded,
           label: "Certificates",
         ),
         NavItemData(
-          icon: Icons.star_outline_rounded,
-          activeIcon: Icons.star_rounded,
-          label: "Reviews",
+          icon: Icons.calendar_month_outlined,
+          activeIcon: Icons.calendar_month_rounded,
+          label: "History",
         ),
       ],
     );

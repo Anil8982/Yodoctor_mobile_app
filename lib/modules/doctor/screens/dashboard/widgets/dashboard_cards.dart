@@ -243,6 +243,7 @@ class StatCard extends StatelessWidget {
   }
 }
 
+
 class ActionCard extends StatelessWidget {
   const ActionCard({
     super.key,
@@ -250,27 +251,57 @@ class ActionCard extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.onTap,
+    this.badgeCount,
+    this.badgeColor,
   });
 
   final IconData icon;
   final String title;
   final String subtitle;
   final VoidCallback onTap;
+  final int? badgeCount; // Optional count
+  final Color? badgeColor; // Optional badge color
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
+    final showBadge = badgeCount != null && badgeCount! > 0;
+
     return _DoctorDashboardCard(
       onTap: onTap,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _IconTile(
-            icon: icon,
-            backgroundColor: colorScheme.primaryContainer,
-            foregroundColor: colorScheme.primary,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _IconTile(
+                icon: icon,
+                backgroundColor: colorScheme.primaryContainer,
+                foregroundColor: colorScheme.primary,
+              ),
+              if (showBadge)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: badgeColor ?? colorScheme.error,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    badgeCount.toString(),
+                    style: TextStyle(
+                      color: colorScheme.onError,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ),
+            ],
           ),
           const SizedBox(height: AppSpacing.xl),
           Text(
