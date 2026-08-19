@@ -1,8 +1,11 @@
+import 'dart:io';
 import 'dart:typed_data';
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:open_filex/open_filex.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:yodoctor/core/network/dio_provider.dart';
 import 'package:yodoctor/modules/widgets/app_header.dart';
 
@@ -29,11 +32,38 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
   Uint8List? _data;
   bool _loading = true;
   String? _error;
+  bool _pdfOpened = false;
 
   @override
   void initState() {
     super.initState();
     _loadDocument();
+  }
+
+  Future<void> _openPdf() async {
+    if (_data == null || _pdfOpened) return;
+
+    try {
+      final directory = await getTemporaryDirectory();
+
+      final file = File('${directory.path}/${widget.fileName}');
+
+      await file.writeAsBytes(_data!);
+
+      _pdfOpened = true;
+
+      final result = await OpenFilex.open(file.path);
+
+      if (mounted && result.type == ResultType.done) {
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (!mounted) return;
+
+      setState(() {
+        _error = 'PDF_OPEN_ERROR';
+      });
+    }
   }
 
   Future<void> _loadDocument() async {
@@ -64,6 +94,9 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
           _loading = false;
         });
       }
+      if (widget.isPdf) {
+        await _openPdf();
+      }
     } catch (e) {
       if (mounted) {
         setState(() {
@@ -85,9 +118,9 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
           : _error != null
           ? _buildError(colorScheme)
           : widget.isImage
-          ? InteractiveViewer(
-        child: Center(child: Image.memory(_data!)),
-      )
+          ? InteractiveViewer(child: Center(child: Image.memory(_data!)))
+          : widget.isPdf
+          ? _buildPdfOpeningView(colorScheme)
           : _buildPlaceholder(colorScheme),
     );
   }
@@ -118,9 +151,9 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
             const SizedBox(height: 24),
             Text(
               isRestricted ? 'Preview Unavailable' : 'Connection Error',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
@@ -150,6 +183,24 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
     );
   }
 
+  Widget _buildPdfOpeningView(ColorScheme colorScheme) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.picture_as_pdf, size: 60, color: Colors.red),
+          const SizedBox(height: 16),
+          const Text(
+            'Opening PDF...',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 16),
+          const CircularProgressIndicator(),
+        ],
+      ),
+    );
+  }
+
   Widget _buildPlaceholder(ColorScheme colorScheme) {
     return Center(
       child: Padding(
@@ -174,9 +225,9 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
             const SizedBox(height: 24),
             Text(
               widget.isPdf ? 'PDF Document' : 'Preview Not Supported',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
