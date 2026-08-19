@@ -47,7 +47,6 @@ import 'package:yodoctor/modules/patient/screens/dashboard/dashboard_screen.dart
 import 'package:yodoctor/modules/patient/screens/doctor_detail/doctor_detail_screen.dart';
 import 'package:yodoctor/modules/patient/screens/family/add_family_member_screen.dart';
 import 'package:yodoctor/modules/patient/screens/family/family_members_screen.dart';
-import 'package:yodoctor/modules/patient/screens/find_doctors/find_doctors_screen.dart';
 import 'package:yodoctor/modules/patient/screens/history/appointments_history_screen.dart';
 import 'package:yodoctor/modules/patient/screens/home_care/home_care_history_screen.dart';
 import 'package:yodoctor/modules/patient/screens/home_care/home_service_booking_screen.dart';
@@ -345,15 +344,6 @@ final routerProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.search,
         builder: (context, state) => const SearchScreen(),
-      ),
-      GoRoute(
-        parentNavigatorKey: AppRouter.rootNavigatorKey,
-        path: AppRoutes.findDoctors,
-        builder: (context, state) {
-          final search = state.uri.queryParameters['q'] ?? '';
-          final city = state.uri.queryParameters['city'] ?? '';
-          return FindDoctorsScreen(search: search, city: city);
-        },
       ),
       GoRoute(
         parentNavigatorKey: AppRouter.rootNavigatorKey,

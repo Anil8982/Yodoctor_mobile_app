@@ -49,19 +49,19 @@ class TokenCard extends StatelessWidget {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        colorScheme.primary.transparency(0.15),
-                        colorScheme.primary.transparency(0.05),
+                        colorScheme.secondary.transparency(0.15),
+                        colorScheme.secondary.transparency(0.05),
                       ],
                     ),
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: colorScheme.primary.transparency(0.2),
+                      color: colorScheme.secondary.transparency(0.2),
                       width: 1,
                     ),
                   ),
                   child: Icon(
                     Icons.confirmation_number_outlined,
-                    color: colorScheme.primary.transparency(0.7),
+                    color: colorScheme.secondary.transparency(0.7),
                     size: 26,
                   ),
                 ),
@@ -102,17 +102,17 @@ class TokenCard extends StatelessWidget {
     return Container(
       height: 130,
       decoration: BoxDecoration(
-        color: colorScheme.surface,
+        color: colorScheme.secondaryContainer.blendWith(colorScheme.surface),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: colorScheme.primary.transparency(0.15),
+          color: colorScheme.secondary.transparency(0.15),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
             color: isDark
                 ? Colors.black.transparency(0.3)
-                : colorScheme.primary.transparency(0.08),
+                : colorScheme.secondary.transparency(0.08),
             blurRadius: 24,
             offset: const Offset(0, 8),
             spreadRadius: -2,
@@ -125,16 +125,13 @@ class TokenCard extends StatelessWidget {
           color: Colors.transparent,
           child: InkWell(
             onTap: () {
-              // Add tap handler for future functionality
             },
-            splashColor: colorScheme.primary.transparency(0.05),
-            highlightColor: colorScheme.primary.transparency(0.02),
+            splashColor: colorScheme.secondary.transparency(0.05),
+            highlightColor: colorScheme.secondary.transparency(0.02),
             child: Row(
               children: [
-                // Left Token Box - Enhanced design
                 _buildTokenNumberBox(theme, colorScheme),
 
-                // Right Content Area
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
@@ -200,7 +197,7 @@ class TokenCard extends StatelessWidget {
                             _buildStatItem(
                               icon: Icons.people_alt_rounded,
                               label: '${token!.patientsAhead ?? "--"} ahead',
-                              color: colorScheme.primary,
+                              color: colorScheme.secondary,
                               theme: theme,
                             ),
                             const SizedBox(width: 16),
@@ -239,13 +236,13 @@ class TokenCard extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            colorScheme.primaryContainer.transparency(0.8),
-            colorScheme.primaryContainer.transparency(0.4),
+            colorScheme.secondary.transparency(0.8),
+            colorScheme.secondary.transparency(0.4),
           ],
         ),
         border: Border(
           right: BorderSide(
-            color: colorScheme.primary.transparency(0.15),
+            color: colorScheme.secondary.transparency(0.15),
             width: 1,
           ),
         ),
@@ -253,20 +250,19 @@ class TokenCard extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Token label with icon
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
                 Icons.confirmation_number_rounded,
                 size: 12,
-                color: colorScheme.primary,
+                color: colorScheme.onSecondary,
               ),
               const SizedBox(width: 4),
               Text(
                 'TOKEN',
                 style: theme.textTheme.labelSmall?.copyWith(
-                  color: colorScheme.primary,
+                  color: colorScheme.onSecondary,
                   fontWeight: FontWeight.w900,
                   letterSpacing: 1.5,
                   fontSize: 10,
@@ -275,17 +271,16 @@ class TokenCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 6),
-          // Token number with subtle shadow
           Text(
             token!.token.toString(),
-            style: theme.textTheme.headlineMedium?.copyWith(
-              color: colorScheme.primary,
-              fontWeight: FontWeight.w900,
+            style: theme.textTheme.headlineLarge?.copyWith(
+              color: colorScheme.onSecondary,
+              fontWeight: FontWeight.bold,
               height: 1,
               letterSpacing: -1,
               shadows: [
                 Shadow(
-                  color: colorScheme.primary.transparency(0.2),
+                  color: colorScheme.secondary.transparency(0.2),
                   offset: const Offset(0, 2),
                   blurRadius: 4,
                 ),
@@ -359,7 +354,7 @@ class TokenCard extends StatelessWidget {
             minHeight: 2.5,
             backgroundColor: colorScheme.surfaceContainerHighest.transparency(0.4),
             valueColor: AlwaysStoppedAnimation<Color>(
-              colorScheme.primary.transparency(0.6),
+              colorScheme.secondary.transparency(0.6),
             ),
           ),
         ),

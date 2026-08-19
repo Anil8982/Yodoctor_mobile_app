@@ -4,7 +4,8 @@ import 'app_field_wrapper.dart';
 import 'app_input_style.dart';
 
 class AppDropdownField<T> extends StatefulWidget {
-  final String label;
+  final String? label;
+  final TextStyle? labelStyle;
   final bool isRequired;
   final bool isOptional;
   final IconData icon;
@@ -21,7 +22,8 @@ class AppDropdownField<T> extends StatefulWidget {
 
   const AppDropdownField({
     super.key,
-    required this.label,
+    this.label,
+    this.labelStyle,
     this.isRequired = false,
     this.isOptional = false,
     required this.icon,
@@ -56,6 +58,7 @@ class _AppDropdownFieldState<T> extends State<AppDropdownField<T>> {
 
     return AppFieldWrapper(
       label: widget.label,
+      labelStyle: widget.labelStyle,
       isRequired: widget.isRequired,
       isOptional: widget.isOptional,
       enabled: widget.enabled,
@@ -92,7 +95,7 @@ class _AppDropdownFieldState<T> extends State<AppDropdownField<T>> {
           hint: widget.hint,
           icon: widget.icon,
           hasError: hasError,
-          isDropdown: true
+          isDropdown: true,
         ),
         items: widget.items
             .map(

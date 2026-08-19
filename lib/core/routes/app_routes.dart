@@ -19,7 +19,6 @@ class AppRoutes {
   // Patient
   static const String dashboard = '/patient/dashboard';
   static const String search = '/patient/search';
-  static const String findDoctors = '/patient/doctors';
   static const String doctorDetail = '/patient/doctors/detail';
   static const String profile = '/patient/profile';
   static const String bookAppointment = '/patient/appointments/book';

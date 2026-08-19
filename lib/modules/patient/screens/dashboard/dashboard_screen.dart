@@ -1,6 +1,5 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
@@ -41,7 +40,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    // 🎯 Watching the new state provider
     final state = ref.watch(patientDashboardControllerProvider);
     final loading = state.isLoading;
     final data = state.dashboardData;
@@ -153,35 +151,40 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               .loadDashboard(),
           color: colorScheme.primary,
           backgroundColor: colorScheme.surface,
-          child: SingleChildScrollView(
+          child: CustomScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
-            padding: EdgeInsets.fromLTRB(
-              horizontal,
-              AppSpacing.lg,
-              horizontal,
-              AppSpacing.xl,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SearchDoctorCard(),
-                const SizedBox(height: AppSpacing.xl),
-                TokenCard(token: data.todayToken),
-                const SizedBox(height: AppSpacing.xl),
-                _buildSectionHeader(
-                  context,
-                  colorScheme,
-                  'Upcoming Appointments',
+            slivers: [
+              SliverPadding(
+                padding: EdgeInsets.fromLTRB(
+                  horizontal,
+                  AppSpacing.lg,
+                  horizontal,
+                  AppSpacing.xl,
                 ),
-                const SizedBox(height: AppSpacing.md),
-                if (loading)
-                  LinearProgressIndicator(
-                    color: colorScheme.primary,
-                    backgroundColor: colorScheme.primaryContainer,
-                  ),
-                _buildAppointmentsContent(data, mobile),
-              ],
-            ),
+                sliver: SliverList(
+                  delegate: SliverChildListDelegate([
+                    TokenCard(token: data.todayToken),
+                    const SizedBox(height: AppSpacing.xl),
+
+                    SearchDoctorCard(isSearch: data.todayToken == null),
+
+                    const SizedBox(height: AppSpacing.xl),
+                    _buildSectionHeader(
+                      context,
+                      colorScheme,
+                      'Upcoming Appointments',
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    if (loading)
+                      LinearProgressIndicator(
+                        color: colorScheme.primary,
+                        backgroundColor: colorScheme.primaryContainer,
+                      ),
+                    _buildAppointmentsContent(data, mobile),
+                  ]),
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -189,10 +192,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   }
 
   Widget _buildSectionHeader(
-      BuildContext context,
-      ColorScheme colorScheme,
-      String title,
-      ) {
+    BuildContext context,
+    ColorScheme colorScheme,
+    String title,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -217,10 +220,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         children: data.appointments
             .map<Widget>(
               (appointment) => Padding(
-            padding: const EdgeInsets.only(bottom: AppSpacing.md),
-            child: AppointmentCard(appointment: appointment),
-          ),
-        )
+                padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                child: AppointmentCard(appointment: appointment),
+              ),
+            )
             .toList(),
       );
     }
@@ -233,10 +236,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           children: data.appointments
               .map<Widget>(
                 (appointment) => SizedBox(
-              width: itemWidth,
-              child: AppointmentCard(appointment: appointment),
-            ),
-          )
+                  width: itemWidth,
+                  child: AppointmentCard(appointment: appointment),
+                ),
+              )
               .toList(),
         );
       },
@@ -306,7 +309,10 @@ class _EmptyAppointments extends StatelessWidget {
               onTap: () => context.push(AppRoutes.search),
               borderRadius: BorderRadius.circular(14),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
                 decoration: BoxDecoration(
                   color: colorScheme.primary,
                   borderRadius: BorderRadius.circular(14),
