@@ -235,7 +235,10 @@ class QueuePatientList extends ConsumerWidget {
     if (status == "COMPLETED" && !appointment.isWalkIn) {
       return FilledButton.tonalIcon(
         onPressed: () => context.push(
-          '${AppRoutes.doctorAddPrescription}/${appointment.id}?name=${Uri.encodeComponent(appointment.patientName)}&token=${Uri.encodeComponent(appointment.tokenNumber)}',
+          '${AppRoutes.doctorAddPrescription.replaceFirst(
+            ':id',
+            appointment.id,
+          )}?name=${Uri.encodeComponent(appointment.patientName)}&token=${Uri.encodeComponent(appointment.tokenNumber)}',
         ),
         icon: Icon(
           appointment.hasPrescription
