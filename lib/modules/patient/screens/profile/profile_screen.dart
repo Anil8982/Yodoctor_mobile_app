@@ -19,6 +19,8 @@ class ProfileScreen extends ConsumerStatefulWidget {
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   bool isEditing = false;
+  String? _selectedImagePath;
+  bool _removeProfileImage = false;
   static const String _subTag = 'ProfileScreen';
 
   void toggleEdit() {
@@ -91,6 +93,20 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             ProfileHeader(
                               user: profileState.user!,
                               isEditing: isEditing,
+                              selectedImagePath: _selectedImagePath,
+                              removeProfileImage: _removeProfileImage,
+                              onImageSelected: (path) {
+                                setState(() {
+                                  _selectedImagePath = path;
+                                  _removeProfileImage = false;
+                                });
+                              },
+                              onRemoveImage: () {
+                                setState(() {
+                                  _selectedImagePath = null;
+                                  _removeProfileImage = true;
+                                });
+                              },
                             ),
                             const SizedBox(height: 32),
                             Form(
@@ -121,13 +137,26 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   if (isEditing)
                     ProfileActionBar(
                       formKey: _formKey,
+
+                      selectedImagePath: _selectedImagePath,
+
+                      removeProfileImage: _removeProfileImage,
+
+                      onDiscardImageChanges: () {
+                        setState(() {
+                          _selectedImagePath = null;
+                          _removeProfileImage = false;
+                        });
+                      },
+
                       onComplete: () {
-                        setState(() => isEditing = false);
-                        AppLogger.info(
-                          'Profile editing mode completed',
-                          tag: LogTags.ui,
-                          subTag: _subTag,
-                        );
+                        if (!mounted) return;
+
+                        setState(() {
+                          _selectedImagePath = null;
+                          _removeProfileImage = false;
+                          isEditing = false;
+                        });
                       },
                     ),
                 ],

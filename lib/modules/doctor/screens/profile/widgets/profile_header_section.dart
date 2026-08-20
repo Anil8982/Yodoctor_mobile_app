@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -10,10 +12,18 @@ class ProfileHeaderSection extends ConsumerWidget {
     super.key,
     this.isEditMode = false,
     this.doctor,
+    this.selectedImagePath,
+    this.removeProfileImage = false,
+    this.onImageSelected,
+    this.onRemoveImage,
   });
 
   final bool isEditMode;
   final dynamic doctor;
+  final String? selectedImagePath;
+  final bool removeProfileImage;
+  final ValueChanged<String>? onImageSelected;
+  final VoidCallback? onRemoveImage;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -47,7 +57,11 @@ class ProfileHeaderSection extends ConsumerWidget {
               Align(
                 alignment: Alignment.topRight,
                 child: IconButton(
-                  icon: const Icon(Icons.close_rounded, color: Colors.white, size: 28),
+                  icon: const Icon(
+                    Icons.close_rounded,
+                    color: Colors.white,
+                    size: 28,
+                  ),
                   onPressed: () => Navigator.pop(context),
                 ),
               ),
@@ -59,10 +73,11 @@ class ProfileHeaderSection extends ConsumerWidget {
                   color: colorScheme.surface,
                   child: imageUrl != null && imageUrl.isNotEmpty
                       ? Image.network(
-                    imageUrl,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, _, _) => _buildLargeFallbackAvatar(colorScheme),
-                  )
+                          imageUrl,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, _, _) =>
+                              _buildLargeFallbackAvatar(colorScheme),
+                        )
                       : _buildLargeFallbackAvatar(colorScheme),
                 ),
               ),
@@ -93,14 +108,7 @@ class ProfileHeaderSection extends ConsumerWidget {
                     source: ImageSource.gallery,
                   );
                   if (image != null) {
-                    final notifier = ref.read(profileImageController.notifier);
-                    final hasImage =
-                        ref.read(profileImageController).value != null;
-                    if (hasImage) {
-                      await notifier.updateImage(image.path);
-                    } else {
-                      await notifier.upload(image.path);
-                    }
+                    onImageSelected?.call(image.path);
                   }
                 },
               ),
@@ -112,7 +120,7 @@ class ProfileHeaderSection extends ConsumerWidget {
                 ),
                 onTap: () async {
                   Navigator.pop(context);
-                  await ref.read(profileImageController.notifier).delete();
+                  onRemoveImage?.call();
                 },
               ),
             ],
@@ -149,6 +157,22 @@ class ProfileHeaderSection extends ConsumerWidget {
                   ),
                   child: imageState.when(
                     data: (imageUrl) {
+                      // User selected Remove
+                      if (removeProfileImage) {
+                        return _buildDefaultAvatar(colorScheme);
+                      }
+                      if (selectedImagePath != null &&
+                          selectedImagePath!.isNotEmpty) {
+                        return CircleAvatar(
+                          radius: 36,
+                          backgroundColor: colorScheme.onPrimary.withValues(
+                            alpha: 0.12,
+                          ),
+                          backgroundImage: FileImage(File(selectedImagePath!)),
+                        );
+                      }
+
+                      // Existing API image
                       if (imageUrl != null && imageUrl.isNotEmpty) {
                         return CircleAvatar(
                           radius: 36,
@@ -158,12 +182,16 @@ class ProfileHeaderSection extends ConsumerWidget {
                           backgroundImage: NetworkImage(imageUrl),
                         );
                       }
+
+                      // No image
                       return _buildDefaultAvatar(colorScheme);
                     },
+
                     loading: () => const CircleAvatar(
                       radius: 36,
                       child: CircularProgressIndicator(),
                     ),
+
                     error: (_, _) => _buildDefaultAvatar(colorScheme),
                   ),
                 ),
@@ -251,11 +279,7 @@ class ProfileHeaderSection extends ConsumerWidget {
     return CircleAvatar(
       radius: 36,
       backgroundColor: colorScheme.onPrimary.withValues(alpha: 0.12),
-      child: Icon(
-        Icons.person_rounded,
-        color: colorScheme.onPrimary,
-        size: 38,
-      ),
+      child: Icon(Icons.person_rounded, color: colorScheme.onPrimary, size: 38),
     );
   }
 

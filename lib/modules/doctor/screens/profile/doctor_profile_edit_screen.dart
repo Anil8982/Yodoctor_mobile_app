@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:yodoctor/core/profile_image/profile_image_controller.dart';
 import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 import '../../controllers/doctor_profile_controller.dart';
 import '../../widgets/doctor_sliver_app_bar.dart';
@@ -26,6 +27,11 @@ class _DoctorProfileEditScreenState
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   late TabController _tabController;
   bool _submittedOnce = false;
+  String? _selectedImagePath;
+  bool _removeProfileImage = false;
+  bool get _hasImageChanges {
+    return _selectedImagePath != null || _removeProfileImage;
+  }
 
   @override
   void initState() {
@@ -72,6 +78,20 @@ class _DoctorProfileEditScreenState
               background: ProfileHeaderSection(
                 doctor: doctor,
                 isEditMode: true,
+                selectedImagePath: _selectedImagePath,
+                removeProfileImage: _removeProfileImage,
+                onImageSelected: (path) {
+                  setState(() {
+                    _selectedImagePath = path;
+                    _removeProfileImage = false;
+                  });
+                },
+                onRemoveImage: () {
+                  setState(() {
+                    _selectedImagePath = null;
+                    _removeProfileImage = true;
+                  });
+                },
               ),
             ),
             SliverPersistentHeader(
@@ -156,10 +176,14 @@ class _DoctorProfileEditScreenState
             ? null
             : () async {
                 enableValidation();
+
                 final isValid = await notifier.validateAllTabs(_tabController);
+
                 if (!isValid) return;
 
-                if (!notifier.hasUnsavedChanges()) {
+                final hasProfileChanges = notifier.hasUnsavedChanges();
+                final hasImageChanges = _hasImageChanges;
+                if (!hasProfileChanges && !hasImageChanges) {
                   if (context.mounted) {
                     AppSnackBar.show(
                       message: 'Profile is already up-to-date! 👌',
@@ -168,9 +192,34 @@ class _DoctorProfileEditScreenState
                   }
                   return;
                 }
-                final success = await notifier.saveProfileChanges();
 
-                if (success && context.mounted) {
+                if (hasProfileChanges) {
+                  final success = await notifier.saveProfileChanges();
+                  if (!success) return;
+                }
+
+                if (hasImageChanges) {
+                  final imageNotifier = ref.read(
+                    profileImageController.notifier,
+                  );
+
+                  if (_removeProfileImage) {
+                    await imageNotifier.delete();
+                  } else if (_selectedImagePath != null &&
+                      _selectedImagePath!.isNotEmpty) {
+                    final imageState = ref.read(profileImageController);
+
+                    final hasExistingImage = imageState.value != null;
+
+                    if (hasExistingImage) {
+                      await imageNotifier.updateImage(_selectedImagePath!);
+                    } else {
+                      await imageNotifier.upload(_selectedImagePath!);
+                    }
+                  }
+                }
+
+                if (context.mounted) {
                   AppSnackBar.show(
                     message: 'Profile updated successfully! 🚀',
                     type: AppSnackBarType.success,
