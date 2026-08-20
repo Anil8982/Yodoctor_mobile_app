@@ -187,9 +187,12 @@ class PatientAuthRepository implements AuthRepository {
   @override
   Future<void> signOut() async {
     try {
-      AppLogger.info('Initiating session cancellation request', tag: LogTags.auth, subTag: _subTag);
-      await _storage.clearToken();
-      await _storage.clearRole();
+      AppLogger.info(
+        'Initiating session cancellation request',
+        tag: LogTags.auth,
+        subTag: _subTag,
+      );
+
       await _storage.clearAll();
 
       AppLogger.success(

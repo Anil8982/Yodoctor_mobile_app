@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
@@ -33,7 +34,6 @@ class SubscriptionStatusState {
   }
 }
 
-// 🎯 NotifierProvider for immediate reactive updates
 final subscriptionStatusProvider =
 NotifierProvider<SubscriptionStatusNotifier, SubscriptionStatusState>(
   SubscriptionStatusNotifier.new,
@@ -45,13 +45,8 @@ class SubscriptionStatusNotifier extends Notifier<SubscriptionStatusState> {
   @override
   SubscriptionStatusState build() {
     final storage = ref.read(storageProvider);
-    final token = storage.getToken();
-
-    if (token == null || token.isEmpty) {
-      return const SubscriptionStatusState(isResolved: false);
-    }
-
     final cachedSub = storage.getActiveSubscription() ?? false;
+
     if (cachedSub) {
       AppLogger.info(
         'Loaded cached subscription from Hive: $cachedSub',
@@ -60,7 +55,6 @@ class SubscriptionStatusNotifier extends Notifier<SubscriptionStatusState> {
       );
     }
 
-    // Return cache immediately so app knows there's a subscription if cached
     return SubscriptionStatusState(
       hasSubscription: cachedSub,
       isResolved: cachedSub,
@@ -80,6 +74,16 @@ class SubscriptionStatusNotifier extends Notifier<SubscriptionStatusState> {
       final repository = ref.read(subscriptionRepositoryProvider);
       final storage = ref.read(storageProvider);
 
+      final token = storage.getToken();
+
+      if (token == null || token.isEmpty) {
+        state = const SubscriptionStatusState(
+          isLoading: false,
+          isResolved: false,
+        );
+        return;
+      }
+
       final response = await repository.getActiveSubscription();
       final statusCode = response.statusCode ?? 0;
 
@@ -87,28 +91,30 @@ class SubscriptionStatusNotifier extends Notifier<SubscriptionStatusState> {
         final data = response.data;
         final hasSub = data["data"]?["hasSubscription"] ?? false;
 
-        // Save fresh status to Hive cache
         await storage.saveActiveSubscription(hasSub);
 
         AppLogger.success(
-          'Active subscription fetched & cached: hasSubscription=$hasSub',
+          'Active subscription fetched & cached: '
+              'hasSubscription=$hasSub',
           tag: LogTags.doctor,
           subTag: _subTag,
         );
 
-        // 🎯 STATE UPDATE: This will instantly trigger router listener!
         state = SubscriptionStatusState(
           hasSubscription: hasSub,
           isLoading: false,
           isResolved: true,
         );
       } else {
-        final cachedSub = storage.getActiveSubscription() ?? false;
+        final cachedSub =
+            storage.getActiveSubscription() ?? false;
+
         state = SubscriptionStatusState(
           hasSubscription: cachedSub,
           isLoading: false,
           isResolved: true,
-          errorMessage: 'Failed to verify subscription from server',
+          errorMessage:
+          'Failed to verify subscription from server',
         );
       }
     } catch (e, st) {
@@ -121,18 +127,22 @@ class SubscriptionStatusNotifier extends Notifier<SubscriptionStatusState> {
       );
 
       final storage = ref.read(storageProvider);
-      final cachedSub = storage.getActiveSubscription() ?? false;
+      final cachedSub =
+          storage.getActiveSubscription() ?? false;
 
       state = SubscriptionStatusState(
         hasSubscription: cachedSub,
         isLoading: false,
         isResolved: true,
-        errorMessage: 'Network error. Using cached subscription status.',
+        errorMessage:
+        'Network error. Using cached subscription status.',
       );
     }
   }
 
   void reset() {
-    state = const SubscriptionStatusState(isResolved: false);
+    state = const SubscriptionStatusState(
+      isResolved: false,
+    );
   }
 }

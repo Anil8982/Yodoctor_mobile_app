@@ -4,7 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/adapters.dart';
-
+import 'core/providers/storage_provider.dart';
+import 'core/storage/storage_service.dart';
 import 'firebase_options.dart';
 import 'core/providers/app_role_provider.dart';
 import 'core/routes/app_router.dart';
@@ -21,6 +22,9 @@ Future<void> main() async {
   await Hive.initFlutter();
   await Hive.openBox('app_storage');
 
+  final storage = StorageService();
+  await storage.initialize();
+
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
@@ -30,7 +34,15 @@ Future<void> main() async {
     ),
   );
 
-  runApp(const ProviderScope(child: YoDoctorApp()));
+  // runApp(const ProviderScope(child: YoDoctorApp()));
+  runApp(
+    ProviderScope(
+      overrides: [
+        storageProvider.overrideWithValue(storage),
+      ],
+      child: const YoDoctorApp(),
+    ),
+  );
 }
 
 class YoDoctorApp extends ConsumerWidget {

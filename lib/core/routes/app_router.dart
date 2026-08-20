@@ -186,48 +186,6 @@ final routerProvider = Provider<GoRouter>((ref) {
       }
 
       // ---- Doctor ----
-      // if (role == 'doctor') {
-      //   final doctorState = ref.read(doctorStatusProvider);
-      //
-      //   // While verification not resolved, stay on splash
-      //   if (!doctorState.isResolved) {
-      //     if (matchedPath != AppRoutes.splash) {
-      //       AppLogger.debug('Router: doctor unresolved → splash',
-      //           tag: LogTags.auth, subTag: 'Router');
-      //       return AppRoutes.splash;
-      //     }
-      //     return null; // Stay on splash
-      //   }
-      //
-      //   // APPROVED: redirect from splash/auth/waiting to dashboard
-      //   if (doctorState.status == 'APPROVED') {
-      //     if (matchedPath == AppRoutes.splash ||
-      //         isAuthScreen(matchedPath) ||
-      //         matchedPath == AppRoutes.waitingApproval) {
-      //       AppLogger.debug('Router: doctor approved → dashboard',
-      //           tag: LogTags.auth, subTag: 'Router');
-      //       return AppRoutes.doctorDashboard;
-      //     }
-      //     return null; // Approved doctor can go anywhere
-      //   }
-      //
-      //   // PENDING or REJECTED (or null with error)
-      //   // Block doctor protected routes
-      //   if (isDoctorProtectedRoute(matchedPath)) {
-      //     AppLogger.debug('Router: doctor not approved → waiting',
-      //         tag: LogTags.auth, subTag: 'Router');
-      //     return AppRoutes.waitingApproval;
-      //   }
-      //   // Redirect all other routes to waiting
-      //   if (matchedPath != AppRoutes.waitingApproval) {
-      //     AppLogger.debug('Router: doctor not approved → waiting',
-      //         tag: LogTags.auth, subTag: 'Router');
-      //     return AppRoutes.waitingApproval;
-      //   }
-      //   return null; // Stay on waiting approval
-      // }
-
-      // ---- Doctor ----
       if (role == 'doctor') {
         final doctorState = ref.read(doctorStatusProvider);
         // final subState = ref.read(subscriptionStatusProvider); // ✅ Direct read for Notifier

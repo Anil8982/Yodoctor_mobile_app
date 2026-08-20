@@ -5,8 +5,48 @@ import 'package:yodoctor/core/debug/app_logger.dart';
 class ApiInterceptor extends Interceptor {
   static const String _subTag = 'ApiInterceptor';
 
+  static const Set<String> _sensitiveKeys = {
+    'token',
+    'accessToken',
+    'access_token',
+    'refreshToken',
+    'refresh_token',
+    'firebaseToken',
+    'firebase_token',
+    'authorization',
+    'password',
+    'confirmPassword',
+    'confirm_password',
+  };
+
+  dynamic _sanitizeForLog(dynamic data) {
+    if (data is Map) {
+      return data.map(
+            (key, value) {
+          if (_sensitiveKeys.contains(key.toString())) {
+            return MapEntry(key, '****** 🤫 sensitive data ******');
+          }
+
+          return MapEntry(
+            key,
+            _sanitizeForLog(value),
+          );
+        },
+      );
+    }
+
+    if (data is List) {
+      return data.map(_sanitizeForLog).toList();
+    }
+
+    return data;
+  }
+
   @override
-  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+  void onRequest(
+      RequestOptions options,
+      RequestInterceptorHandler handler,
+      ) {
     AppLogger.info(
       '➡️ ${options.method} ${options.uri}',
       tag: LogTags.api,
@@ -15,7 +55,7 @@ class ApiInterceptor extends Interceptor {
 
     if (options.data != null) {
       AppLogger.json(
-        options.data,
+        _sanitizeForLog(options.data),
         tag: LogTags.api,
         subTag: _subTag,
       );
@@ -24,28 +64,11 @@ class ApiInterceptor extends Interceptor {
     handler.next(options);
   }
 
-  // @override
-  // void onResponse(Response response, ResponseInterceptorHandler handler) {
-  //   AppLogger.success(
-  //     '✅ ${response.statusCode} ${response.requestOptions.path}',
-  //     tag: LogTags.api,
-  //     subTag: _subTag,
-  //   );
-  //
-  //   // ✅ Print Map OR List responses
-  //   if (response.data != null) {
-  //     AppLogger.json(
-  //       response.data,
-  //       tag: LogTags.api,
-  //       subTag: _subTag,
-  //     );
-  //   }
-  //
-  //   handler.next(response);
-  // }
-
   @override
-  void onResponse(Response response, ResponseInterceptorHandler handler) {
+  void onResponse(
+      Response response,
+      ResponseInterceptorHandler handler,
+      ) {
     AppLogger.success(
       '✅ ${response.statusCode} ${response.requestOptions.path}',
       tag: LogTags.api,
@@ -65,7 +88,7 @@ class ApiInterceptor extends Interceptor {
         );
       } else {
         AppLogger.json(
-          response.data,
+          _sanitizeForLog(response.data),
           tag: LogTags.api,
           subTag: _subTag,
         );
@@ -76,7 +99,10 @@ class ApiInterceptor extends Interceptor {
   }
 
   @override
-  void onError(DioException err, ErrorInterceptorHandler handler) {
+  void onError(
+      DioException err,
+      ErrorInterceptorHandler handler,
+      ) {
     AppLogger.error(
       '❌ ${err.requestOptions.method} ${err.requestOptions.path}',
       tag: LogTags.api,
@@ -85,7 +111,7 @@ class ApiInterceptor extends Interceptor {
 
     if (err.response?.data != null) {
       AppLogger.json(
-        err.response?.data,
+        _sanitizeForLog(err.response?.data),
         tag: LogTags.api,
         subTag: 'ErrorResponse',
       );
