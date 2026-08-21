@@ -2,7 +2,6 @@ import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/providers/app_role_provider.dart';
-import 'package:yodoctor/modules/auth/controllers/doctor_login_controller.dart';
 import 'package:yodoctor/modules/doctor/controllers/subscription_status_controller.dart';
 import 'package:yodoctor/modules/widgets/app_header.dart';
 import 'package:yodoctor/modules/widgets/logout_dialog.dart';
@@ -35,15 +34,7 @@ class SubscriptionVerificationPage extends ConsumerWidget {
             padding: const EdgeInsets.only(right: 12),
             child: TextButton.icon(
               onPressed: () async {
-                final shouldLogout = await showDialog<bool>(
-                  context: context,
-                  builder: (context) => LogoutDialog(role: AppRole.doctor),
-                );
-                if (shouldLogout == true) {
-                  await ref
-                      .read(doctorLoginControllerProvider.notifier)
-                      .logout();
-                }
+                LogoutDialog.show(context, ref, role: AppRole.doctor);
               },
               icon: Icon(
                 Icons.logout_rounded,

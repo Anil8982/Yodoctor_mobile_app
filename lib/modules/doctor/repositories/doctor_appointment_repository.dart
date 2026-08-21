@@ -86,4 +86,18 @@ class DoctorAppointmentRepository {
   Future<Response> autoAcceptAllAppointments() {
     return _dio.put(ApiConstants.autoAccept);
   }
+
+  Future<Response> cancelRemainingAppointments({
+    required String slot,
+    String? reason,
+  }) {
+    return _dio.put(
+      ApiConstants.cancelRemainingAppointments,
+      data: {
+        "slot": slot,
+        if (reason != null && reason.trim().isNotEmpty)
+          "reason": reason.trim(),
+      },
+    );
+  }
 }

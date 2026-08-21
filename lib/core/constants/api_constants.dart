@@ -122,6 +122,10 @@ class ApiConstants {
   static const cancelRemainingAppointments =
       '/doctor/appointments/cancel-remaining';
 
+  // Certificate Service
+  static const String certificateService = '/doctor/get-certificate';
+  static const String saveCertificateService = '/doctor/save-certificate';
+  static const String certificateServiceToggle = '/doctor/certificate/toggle';
   static const certificateRequests = '/certificate/requests';
   static const issuedCertificates = '/certificate/issued';
   static const approveCertificate = '/certificate/approve'; // /$id

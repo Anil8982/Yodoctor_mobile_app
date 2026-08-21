@@ -5,6 +5,7 @@ import 'package:yodoctor/modules/doctor/screens/certificate/dashboard_screen/wid
 import 'package:yodoctor/modules/doctor/screens/certificate/dashboard_screen/widgets/certificate_shimmer.dart';
 import 'package:yodoctor/modules/doctor/screens/certificate/dashboard_screen/widgets/certificate_summary_cards.dart';
 import 'package:yodoctor/modules/doctor/screens/certificate/dashboard_screen/widgets/certificate_toolbar.dart';
+import 'package:yodoctor/modules/doctor/screens/certificate/widgets/certificate_service_bottom_sheet.dart';
 import '../../../../../core/utils/app_spacing.dart';
 import '../../../../../core/utils/responsive.dart';
 import '../../../widgets/doctor_drawer.dart';
@@ -87,6 +88,10 @@ class _DoctorCertificateDashboardScreenState
                 ),
                 centerTitle: false,
               ),
+              extraActionIcon: Icons.settings_outlined,
+              onExtraActionTap: () {
+                CertificateServiceBottomSheet.show(context);
+              },
             ),
           ];
         },

@@ -10,18 +10,20 @@ class DoctorSliverAppBar extends StatelessWidget {
     super.key,
     required this.expandedHeight,
     required this.background,
-
     this.onProfileTap,
     this.onNotificationTap,
     this.isNavBar = true,
+    this.extraActionIcon,
+    this.onExtraActionTap,
   });
 
   final double expandedHeight;
   final Widget background;
-
   final VoidCallback? onProfileTap;
   final VoidCallback? onNotificationTap;
   final bool isNavBar;
+  final IconData? extraActionIcon;
+  final VoidCallback? onExtraActionTap;
 
   @override
   Widget build(BuildContext context) {
@@ -51,11 +53,18 @@ class DoctorSliverAppBar extends StatelessWidget {
             },
           ),
           const Spacer(),
+          if (extraActionIcon != null && onExtraActionTap != null) ...[
+            _DoctorHeaderAction(
+              icon: extraActionIcon!,
+              onTap: onExtraActionTap!,
+            ),
+            const SizedBox(width: 12),
+          ],
           _DoctorHeaderAction(
             icon: Icons.notifications_outlined,
             onTap:
-                onNotificationTap ??
-                () {
+            onNotificationTap ??
+                    () {
                   context.push(AppRoutes.notifications);
                 },
           ),
@@ -63,8 +72,8 @@ class DoctorSliverAppBar extends StatelessWidget {
             const SizedBox(width: 12),
             _DoctorProfileAvatar(
               onTap:
-                  onProfileTap ??
-                  () {
+              onProfileTap ??
+                      () {
                     context.push(AppRoutes.doctorProfile);
                   },
             ),
@@ -80,12 +89,6 @@ class DoctorSliverAppBar extends StatelessWidget {
       ),
     );
   }
-
-  // void _showMessage(BuildContext context, String message) {
-  //   ScaffoldMessenger.of(context).showSnackBar(
-  //     SnackBar(content: Text(message)),
-  //   );
-  // }
 }
 
 class _DoctorHeaderAction extends StatelessWidget {

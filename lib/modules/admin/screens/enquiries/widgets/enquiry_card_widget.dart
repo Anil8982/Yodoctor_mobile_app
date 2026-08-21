@@ -20,16 +20,19 @@ class EnquiryCard extends StatelessWidget {
 
   static const Color adminPrimary = Color(0xFF8A63B5);
 
-  Color _statusColor(String status) {
+  Color _statusColor(BuildContext context, String status) {
     switch (status.toLowerCase()) {
       case "resolved":
-        return AppTheme.success;
+        return AppTheme.success(context);
+
       case "pending":
-        return AppTheme.warning;
+        return AppTheme.pending(context);
+
       case "cancelled":
-        return AppTheme.error;
+        return AppTheme.error(context);
+
       default:
-        return Colors.blueGrey;
+        return AppTheme.info(context);
     }
   }
 
@@ -107,13 +110,13 @@ class EnquiryCard extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                             decoration: BoxDecoration(
-                              color: _statusColor(status).transparency(.12),
+                              color: _statusColor(context, status).transparency(.12),
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Text(
                               status,
                               style: TextStyle(
-                                color: _statusColor(status),
+                                color: _statusColor(context, status),
                                 fontWeight: FontWeight.w600,
                                 fontSize: 12,
                               ),
@@ -156,7 +159,7 @@ class EnquiryCard extends StatelessWidget {
                     children: [
                       Expanded(
                         child: OutlinedButton.icon(
-                          onPressed: onResolve, // ॲक्शन ट्रिगर केली
+                          onPressed: onResolve,
                           icon: const Icon(Icons.check_circle_outline, size: 16),
                           label: const Text("Resolve", style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
                           style: OutlinedButton.styleFrom(

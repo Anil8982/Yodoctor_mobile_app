@@ -129,8 +129,8 @@ class DoctorDrawer extends ConsumerWidget {
           foregroundColor: colorScheme.error,
           onTap: () {
             Navigator.pop(context);
-            LogoutDialog.show(context, role: AppRole.doctor);
-          },
+            LogoutDialog.show(context, ref, role: AppRole.doctor);
+            },
         ),
       ],
     );
