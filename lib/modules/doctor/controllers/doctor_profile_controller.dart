@@ -369,7 +369,9 @@ class DoctorProfileNotifier extends Notifier<ProfileFormState> {
   bool hasUnsavedChanges() {
     final current = state.profile;
     if (current == null) return true;
-
+    final formattedRegistrationDate = current.validTill.isEmpty
+        ? ''
+        : DateFormat('dd MMM yyyy').format(DateTime.parse(current.validTill));
     final isSame =
         nameController.text == current.doctorName &&
         emailController.text == current.email &&
@@ -380,7 +382,7 @@ class DoctorProfileNotifier extends Notifier<ProfileFormState> {
         (int.tryParse(expController.text) ?? 0) == current.experienceYears &&
         regNoController.text == current.licenseNumber &&
         councilController.text == current.stateCouncil &&
-        regValidTillController.text == current.validTill &&
+        regValidTillController.text == formattedRegistrationDate &&
         clinicNameController.text == current.clinicName &&
         cityController.text == current.city &&
         stateController.text == current.state &&

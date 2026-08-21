@@ -87,7 +87,7 @@ class _ManualBookingScreenState extends ConsumerState<ManualBookingScreen> {
                                     ? AutovalidateMode.onUserInteraction
                                     : AutovalidateMode.disabled,
                                 patientNameController:
-                                notifier.patientNameController,
+                                    notifier.patientNameController,
                                 mobileController: notifier.mobileController,
                                 ageController: notifier.ageController,
                                 selectedShift: state.selectedShift,
@@ -111,15 +111,21 @@ class _ManualBookingScreenState extends ConsumerState<ManualBookingScreen> {
                                   if (!context.mounted) return;
 
                                   if (success) {
+                                    setState(() {
+                                      _submittedOnce = false;
+                                    });
                                     AppSnackBar.show(
-                                      message: 'Patient booked successfully! 🚀',
+                                      message:
+                                          'Patient booked successfully! 🚀',
                                       type: AppSnackBarType.success,
                                     );
                                   } else {
-                                    final currentState =
-                                    ref.read(manualBookingProvider);
+                                    final currentState = ref.read(
+                                      manualBookingProvider,
+                                    );
                                     AppSnackBar.show(
-                                      message: currentState.errorMessage ??
+                                      message:
+                                          currentState.errorMessage ??
                                           "Registration failed. Try again.",
                                       type: AppSnackBarType.error,
                                     );
