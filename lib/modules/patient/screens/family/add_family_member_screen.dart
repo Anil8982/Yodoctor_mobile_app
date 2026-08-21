@@ -70,7 +70,10 @@ class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
     if (member == null) return;
 
     _nameController.text = member.fullName;
-    _selectedGender = member.gender;
+    _selectedGender = AppConstants.genderOptions.firstWhere(
+      (gender) => gender.toLowerCase() == member.gender.trim().toLowerCase(),
+      orElse: () => '',
+    );
     _selectedBloodGroup = member.bloodGroup;
     _selectedRelation = member.relation;
     _dobController.text = DateFormat(
@@ -324,7 +327,7 @@ class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
                                         label: 'Height (cm)',
                                         isRequired: true,
                                         hint: 'e.g. 170',
-                                        maxLength: 3,
+                                        maxLength: 5,
                                         icon: Icons.height_rounded,
                                         controller: _heightController,
                                         keyboardType:
