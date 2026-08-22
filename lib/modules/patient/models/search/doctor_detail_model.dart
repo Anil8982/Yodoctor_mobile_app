@@ -29,6 +29,7 @@ class DoctorDetailModel {
   final SessionTimings sessionTimings;
   final String profileImage;
   final List<String> availableDays;
+  final int isAvailable;
 
   DoctorDetailModel({
     required this.doctorId,
@@ -47,6 +48,7 @@ class DoctorDetailModel {
     required this.sessionTimings,
     required this.profileImage,
     required this.availableDays,
+    this.isAvailable = 1,
   });
 
   factory DoctorDetailModel.fromJson(Map<String, dynamic> json) {
@@ -81,8 +83,11 @@ class DoctorDetailModel {
 
       profileImage: json["profile_image"] ?? "",
       availableDays:
-      (json["availableDays"] as List?)?.map((e) => e.toString()).toList() ??
+          (json["availableDays"] as List?)?.map((e) => e.toString()).toList() ??
           [],
+      isAvailable: json["is_available"] is int
+          ? json["is_available"] as int
+          : int.tryParse(json["is_available"]?.toString() ?? "0") ?? 0,
     );
   }
 }
