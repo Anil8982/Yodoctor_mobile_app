@@ -19,7 +19,8 @@ class PatientDrawer extends ConsumerWidget {
     final user = profileState.user;
     final imageState = ref.watch(profileImageController);
 
-    final String drawerName = (user?.fullName != null && user!.fullName.isNotEmpty)
+    final String drawerName =
+        (user?.fullName != null && user!.fullName.isNotEmpty)
         ? user.fullName
         : "Patient";
     final String drawerEmail = (user?.email != null && user!.email.isNotEmpty)
@@ -144,7 +145,7 @@ class PatientDrawer extends ConsumerWidget {
           foregroundColor: colorScheme.error,
           onTap: () {
             Navigator.pop(context);
-            LogoutDialog.show(context, role: AppRole.patient);
+            LogoutDialog.show(context, ref, role: AppRole.patient);
           },
         ),
       ],
@@ -155,11 +156,7 @@ class PatientDrawer extends ConsumerWidget {
     return Container(
       color: Colors.white.withValues(alpha: 0.15),
       alignment: Alignment.center,
-      child: Icon(
-        Icons.person_rounded,
-        color: colorScheme.onPrimary,
-        size: 26,
-      ),
+      child: Icon(Icons.person_rounded, color: colorScheme.onPrimary, size: 26),
     );
   }
 }

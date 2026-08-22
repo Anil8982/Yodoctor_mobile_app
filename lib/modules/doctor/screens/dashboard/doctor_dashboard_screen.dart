@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
-import '../../../widgets/app_snack_bar.dart';
+import 'package:yodoctor/modules/doctor/screens/live_queue/widgets/emergency_cancellation_dialog.dart';
 import 'widgets/doctor_dashboard_shimmer.dart';
 import 'widgets/doctor_header.dart';
 import 'widgets/dashboard_cards.dart';
@@ -266,10 +266,7 @@ class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
             color: Colors.transparent,
             child: InkWell(
               onTap: () {
-                AppSnackBar.show(
-                  message: 'Emergency cancellations initiated',
-                  type: AppSnackBarType.warning,
-                );
+                EmergencyCancellationDialog.show(context, ref);
               },
               borderRadius: BorderRadius.circular(16),
               child: Padding(

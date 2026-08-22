@@ -16,10 +16,29 @@ class AppColors {
   static const Color yoPurpleDark = Color(0xFF6F42A6);
   static const Color yoPurpleLight = Color(0xFFEDE3F8);
 
-  // Statuses & Typography Tokens
+  // ── Status Colors ────────────────────────────────
+
+// Light
   static const Color success = Color(0xFF2E7D32);
-  static const Color error = Color(0xFFD32F2F);
   static const Color warning = Color(0xFFF57F17);
+  static const Color error = Color(0xFFD32F2F);
+  static const Color info = Color(0xFF1565C0);
+  static const Color pending = Color(0xFFEF6C00);
+  static const Color cancelled = Color(0xFF757575);
+  static const Color active = Color(0xFF2E7D32);
+  static const Color inactive = Color(0xFF757575);
+
+  // Dark
+  static const Color successDark = Color(0xFF81C784);
+  static const Color warningDark = Color(0xFFFFB74D);
+  static const Color errorDark = Color(0xFFEF9A9A);
+  static const Color infoDark = Color(0xFF64B5F6);
+  static const Color pendingDark = Color(0xFFFFB74D);
+  static const Color cancelledDark = Color(0xFFBDBDBD);
+  static const Color activeDark = Color(0xFF81C784);
+  static const Color inactiveDark = Color(0xFFBDBDBD);
+
+  // ── Typography Tokens ────────────────────────────
   static const Color textPrimary = Color(0xFF0D1B2A);
   static const Color textSecondary = Color(0xFF546E7A);
   static const Color textHint = Color(0xFF90A4AE);

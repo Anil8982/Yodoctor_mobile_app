@@ -39,26 +39,47 @@ class AppTheme {
   static Color get patientColor => AppColors.yoGreen;
   static Color get patientLight => AppColors.yoGreenLight;
 
-  // Status & Interface Semantics
-  static Color get success => AppColors.success;
-  static Color get error => AppColors.error;
-  static Color get warning => AppColors.warning;
-  static Color get info => AppColors.yoBlue;
+  // Interface Semantics ─────────────────
   static Color get textPrimary => AppColors.textPrimary;
   static Color get textSecondary => AppColors.textSecondary;
   static Color get textHint => AppColors.textHint;
+
   static Color get background => AppColors.background;
   static Color get surface => AppColors.surface;
   static Color get divider => AppColors.divider;
+
   static Color get inputFill => AppColors.inputFill;
   static Color get inputFillGreen => AppColors.inputFillGreen;
 
-  // Reusable background implementation for customized AppBars
-  // static Widget _appBarGradient(LinearGradient gradient) {
-  //   return Container(
-  //     decoration: BoxDecoration(gradient: gradient),
-  //   );
-  // }
+  // ── Adaptive Status Colors ───────────────────────
+
+  static bool _isDark(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark;
+  }
+
+  static Color success(BuildContext context) =>
+      _isDark(context) ? AppColors.successDark : AppColors.success;
+
+  static Color warning(BuildContext context) =>
+      _isDark(context) ? AppColors.warningDark : AppColors.warning;
+
+  static Color error(BuildContext context) =>
+      _isDark(context) ? AppColors.errorDark : AppColors.error;
+
+  static Color info(BuildContext context) =>
+      _isDark(context) ? AppColors.infoDark : AppColors.info;
+
+  static Color pending(BuildContext context) =>
+      _isDark(context) ? AppColors.pendingDark : AppColors.pending;
+
+  static Color cancelled(BuildContext context) =>
+      _isDark(context) ? AppColors.cancelledDark : AppColors.cancelled;
+
+  static Color active(BuildContext context) =>
+      _isDark(context) ? AppColors.activeDark : AppColors.active;
+
+  static Color inactive(BuildContext context) =>
+      _isDark(context) ? AppColors.inactiveDark : AppColors.inactive;
 
   // ── 🩺 1. Doctor Production ThemeData ─────────────────────
   static ThemeData get doctorTheme {

@@ -14,6 +14,9 @@ class LiveQueueState {
   final LiveQueueItem? next;
   final String selectedSlot;
   final String? errorMessage;
+  final bool cancellingRemaining;
+  final String? cancelRemainingMessage;
+  final int? cancelledCount;
 
   const LiveQueueState({
     this.loading = false,
@@ -23,6 +26,9 @@ class LiveQueueState {
     this.next,
     this.selectedSlot = "MORNING",
     this.errorMessage,
+    this.cancellingRemaining = false,
+    this.cancelRemainingMessage,
+    this.cancelledCount,
   });
 
   LiveQueueState copyWith({
@@ -36,6 +42,9 @@ class LiveQueueState {
     String? selectedSlot,
     String? errorMessage,
     bool clearError = false,
+    bool? cancellingRemaining,
+    String? cancelRemainingMessage,
+    int? cancelledCount,
   }) {
     return LiveQueueState(
       loading: loading ?? this.loading,
@@ -45,6 +54,12 @@ class LiveQueueState {
       next: clearNext ? null : (next ?? this.next),
       selectedSlot: selectedSlot ?? this.selectedSlot,
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
+      cancellingRemaining:
+      cancellingRemaining ?? this.cancellingRemaining,
+      cancelRemainingMessage:
+      cancelRemainingMessage ?? this.cancelRemainingMessage,
+      cancelledCount:
+      cancelledCount ?? this.cancelledCount,
     );
   }
 }
@@ -258,6 +273,67 @@ class LiveQueueNotifier extends Notifier<LiveQueueState> {
       final repository = ref.read(doctorAppointmentRepositoryProvider);
       await repository.noShow(slot);
     }, slot);
+  }
+
+  Future<bool> cancelRemainingAppointments({
+    required String slot,
+    String? reason,
+  }) async {
+    state = state.copyWith(
+      cancellingRemaining: true,
+      cancelRemainingMessage: null,
+      cancelledCount: null,
+    );
+
+    try {
+      final repository = ref.read(doctorAppointmentRepositoryProvider);
+
+      final response = await repository.cancelRemainingAppointments(
+        slot: slot,
+        reason: reason,
+      );
+
+      final statusCode = response.statusCode ?? 0;
+
+      if (statusCode >= 200 && statusCode < 300) {
+        final data = response.data;
+        final affected = data['affected'] as int? ?? 0;
+        final message =
+            data['message']?.toString() ?? 'Appointments cancelled';
+
+        state = state.copyWith(
+          cancellingRemaining: false,
+          cancelRemainingMessage: message,
+          cancelledCount: affected,
+        );
+
+        await loadQueue(slot, isRefresh: true);
+
+        return true;
+      }
+
+      state = state.copyWith(
+        cancellingRemaining: false,
+        cancelRemainingMessage: 'Failed to cancel appointments',
+      );
+
+      return false;
+    } catch (e, st) {
+      AppLogger.exception(
+        e,
+        st,
+        message: 'Cancel remaining appointments failed',
+        tag: LogTags.doctor,
+        subTag: _subTag,
+      );
+
+      state = state.copyWith(
+        cancellingRemaining: false,
+        cancelRemainingMessage: 'Something went wrong',
+      );
+
+      return false;
+    }
   }
 
   Future<void> skip(String id, String slot) async {
