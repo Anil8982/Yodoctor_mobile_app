@@ -109,15 +109,16 @@ class _AppointmentsHistoryScreenState
                           ) {
                             final appointment =
                                 historyState.appointments[index];
-                            final bool statusIsCancel = appointment.status
+                            final bool statusIsNotCompleted = !appointment
+                                .status
                                 .toUpperCase()
-                                .contains('CANCEL');
+                                .contains('COMPLETED');
 
                             return Padding(
                               padding: const EdgeInsets.only(bottom: 12.0),
                               child: HistoryAppointmentCard(
                                 appointment: appointment,
-                                onViewDetails: statusIsCancel
+                                onViewDetails: statusIsNotCompleted
                                     ? null
                                     : () {
                                         showAppointmentDetailsDialog(
