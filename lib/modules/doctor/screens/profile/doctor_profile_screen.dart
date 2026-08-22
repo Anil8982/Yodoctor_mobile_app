@@ -43,6 +43,7 @@ class _DoctorProfileScreenState extends ConsumerState<DoctorProfileScreen> {
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
             DoctorSliverAppBar(
+              titleText: 'Profile',
               expandedHeight: 200,
               isNavBar: false,
               background: ProfileHeaderSection(doctor: doctor),

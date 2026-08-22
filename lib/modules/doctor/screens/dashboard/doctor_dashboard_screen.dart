@@ -85,6 +85,7 @@ class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
             DoctorSliverAppBar(
+              titleText: 'Dashboard',
               expandedHeight: 160,
               background: DoctorHeader(
                 name: doctorName,

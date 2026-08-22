@@ -4,7 +4,6 @@ import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 import '../../../../core/utils/responsive.dart';
 import '../../controllers/appointment_history_controller.dart';
 import '../../widgets/custom_sliver_app_bar.dart';
-import '../../widgets/patient_drawer.dart';
 import 'widgets/appointment_details_dialog.dart';
 import 'widgets/history_appointment_card.dart';
 import 'widgets/history_header.dart';
@@ -21,7 +20,6 @@ class AppointmentsHistoryScreen extends ConsumerStatefulWidget {
 
 class _AppointmentsHistoryScreenState
     extends ConsumerState<AppointmentsHistoryScreen> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -43,17 +41,15 @@ class _AppointmentsHistoryScreenState
     final double horizontal = Responsive.horizontalPadding(context);
     final bool isWideScreen = MediaQuery.sizeOf(context).width >= 980;
 
-    return Scaffold(
-      key: _scaffoldKey,
-      drawer: const PatientDrawer(),
-      backgroundColor: theme.scaffoldBackgroundColor,
-      body: NestedScrollView(
+    return Container(
+      color: theme.scaffoldBackgroundColor,
+      child: NestedScrollView(
         physics: const ClampingScrollPhysics(),
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return <Widget>[
             CustomSliverAppBar(
+              titleText: 'History',
               expandedHeight: 220,
-              scaffoldKey: _scaffoldKey,
               background: HistoryHeader(
                 appointmentCount: historyState.appointments.length,
               ),

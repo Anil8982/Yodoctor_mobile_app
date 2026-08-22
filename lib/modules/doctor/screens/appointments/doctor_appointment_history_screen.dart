@@ -55,6 +55,7 @@ class _DoctorAppointmentHistoryScreenState
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
             DoctorSliverAppBar(
+              titleText: 'Appointment History',
               expandedHeight: 140.0,
 
               background: FlexibleSpaceBar(

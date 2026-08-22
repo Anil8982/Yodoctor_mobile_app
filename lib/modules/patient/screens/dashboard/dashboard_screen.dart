@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/modules/patient/screens/dashboard/widgets/patient_header.dart';
 import 'package:yodoctor/modules/patient/widgets/custom_sliver_app_bar.dart';
-import 'package:yodoctor/modules/patient/widgets/patient_drawer.dart';
 
 import '../../../../core/utils/app_spacing.dart';
 import '../../../../core/utils/responsive.dart';
@@ -23,7 +22,6 @@ class DashboardScreen extends ConsumerStatefulWidget {
 }
 
 class _DashboardScreenState extends ConsumerState<DashboardScreen> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -52,17 +50,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     }
 
     if (data == null) {
-      return Scaffold(
-        key: _scaffoldKey,
-        extendBodyBehindAppBar: true,
-        backgroundColor: theme.scaffoldBackgroundColor,
-        drawer: const PatientDrawer(),
-        body: NestedScrollView(
+      return Container(
+        color: theme.scaffoldBackgroundColor,
+        child: NestedScrollView(
           headerSliverBuilder: (context, innerBoxIsScrolled) {
             return [
               CustomSliverAppBar(
+                titleText: 'Dashboard',
                 expandedHeight: 190.0,
-                scaffoldKey: _scaffoldKey,
                 background: const PatientHeader(dashboard: null),
               ),
             ];
@@ -130,17 +125,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     final bool mobile = Responsive.isMobile(context);
     final double horizontal = Responsive.horizontalPadding(context);
 
-    return Scaffold(
-      key: _scaffoldKey,
-      extendBodyBehindAppBar: true,
-      backgroundColor: theme.scaffoldBackgroundColor,
-      drawer: PatientDrawer(),
-      body: NestedScrollView(
+    return Container(
+      color: theme.scaffoldBackgroundColor,
+      child: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
             CustomSliverAppBar(
+              titleText: 'Dashboard',
               expandedHeight: 190.0,
-              scaffoldKey: _scaffoldKey,
               background: PatientHeader(dashboard: data),
             ),
           ];

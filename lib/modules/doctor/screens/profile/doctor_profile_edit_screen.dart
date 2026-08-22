@@ -72,6 +72,7 @@ class _DoctorProfileEditScreenState
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
             DoctorSliverAppBar(
+              titleText: 'Edit Professional Profile',
               expandedHeight: 200.0,
 
               isNavBar: false,

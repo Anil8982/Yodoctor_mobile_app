@@ -7,7 +7,6 @@ import '../../../../core/routes/app_routes.dart';
 import '../../../../core/utils/responsive.dart';
 import '../../controllers/certificate_request.dart';
 import '../../widgets/custom_sliver_app_bar.dart';
-import '../../widgets/patient_drawer.dart';
 import 'widgets/certificate_header.dart';
 import '../../../patient/models/certificate/patient_certificate_request_model.dart';
 
@@ -21,13 +20,11 @@ class CertificateWalletScreen extends ConsumerStatefulWidget {
 
 class _CertificateWalletScreenState
     extends ConsumerState<CertificateWalletScreen> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    // 🎯 Triggers async data load via screen lifecycle instead of build microtasks
     Future.microtask(() {
       ref.read(certificateProvider.notifier).loadMyRequests();
     });
@@ -45,176 +42,170 @@ class _CertificateWalletScreenState
     final colorScheme = theme.colorScheme;
     final horizontalPadding = Responsive.horizontalPadding(context);
 
-    // Watch dynamic state layout values from profile notifier provider
     final formState = ref.watch(certificateProvider);
     final notifier = ref.read(certificateProvider.notifier);
 
-    // Process matching dataset filter pipeline arrays cleanly
     final filteredCertificates = notifier.getFilteredCertificates();
 
-    return Scaffold(
-      key: _scaffoldKey,
-      drawer: PatientDrawer(),
-      backgroundColor: theme.scaffoldBackgroundColor,
-      body: CustomScrollView(
-        physics: const BouncingScrollPhysics(),
-        slivers: <Widget>[
-          CustomSliverAppBar(
-            expandedHeight: 220,
-            scaffoldKey: _scaffoldKey,
-            background: CertificateHeader(
-              certificateCount: filteredCertificates.length,
-              selectedFilter: formState.selectedFilter,
+    return Container(
+      color: theme.scaffoldBackgroundColor,
+      child: NestedScrollView(
+        physics: const ClampingScrollPhysics(),
+        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+          return <Widget>[
+            CustomSliverAppBar(
+              titleText: 'Certificate Wallet',
+              expandedHeight: 220,
+              background: CertificateHeader(
+                certificateCount: filteredCertificates.length,
+                selectedFilter: formState.selectedFilter,
+              ),
             ),
-          ),
-          SliverAppBar(
-            leading: const SizedBox.shrink(),
-            leadingWidth: 0,
-            automaticallyImplyLeading: false,
-            backgroundColor: colorScheme.surface,
-            pinned: false,
-            floating: true,
-            snap: true,
-            scrolledUnderElevation: 0,
-            elevation: 0,
-            toolbarHeight: 120,
-            titleSpacing: 0,
-            title: Container(
-              color: colorScheme.surface,
-              padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ValueListenableBuilder<TextEditingValue>(
-                    valueListenable: _searchController,
-                    builder: (context, value, child) {
-                      return TextField(
-                        controller: _searchController,
-                        onChanged: notifier.setSearchQuery,
-                        style: theme.textTheme.bodyMedium,
-                        decoration: InputDecoration(
-                          hintText: 'Search by type or doctor...',
-                          prefixIcon: const Icon(
-                            Icons.search_rounded,
-                            size: 22,
-                          ),
-                          suffixIcon: value.text.isNotEmpty
-                              ? IconButton(
-                                  icon: const Icon(
-                                    Icons.clear_rounded,
-                                    size: 20,
-                                  ),
-                                  onPressed: () {
-                                    _searchController.clear();
-                                    notifier.setSearchQuery('');
-                                  },
-                                )
-                              : null,
-                          filled: true,
-                          fillColor: theme.colorScheme.surfaceContainerLow,
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 14,
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(14),
-                            borderSide: BorderSide(
-                              color: theme.colorScheme.outlineVariant
-                                  .transparency(0.35),
-                              width: 1.0,
+            SliverAppBar(
+              leading: const SizedBox.shrink(),
+              leadingWidth: 0,
+              automaticallyImplyLeading: false,
+              backgroundColor: colorScheme.surface,
+              pinned: false,
+              floating: true,
+              snap: true,
+              scrolledUnderElevation: 0,
+              elevation: 0,
+              toolbarHeight: 120,
+              titleSpacing: 0,
+              title: Container(
+                color: colorScheme.surface,
+                padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ValueListenableBuilder<TextEditingValue>(
+                      valueListenable: _searchController,
+                      builder: (context, value, child) {
+                        return TextField(
+                          controller: _searchController,
+                          onChanged: notifier.setSearchQuery,
+                          style: theme.textTheme.bodyMedium,
+                          decoration: InputDecoration(
+                            hintText: 'Search by type or doctor...',
+                            prefixIcon: const Icon(
+                              Icons.search_rounded,
+                              size: 22,
                             ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(14),
-                            borderSide: BorderSide(
-                              color: theme.colorScheme.primary,
-                              width: 2.0,
+                            suffixIcon: value.text.isNotEmpty
+                                ? IconButton(
+                              icon: const Icon(
+                                Icons.clear_rounded,
+                                size: 20,
+                              ),
+                              onPressed: () {
+                                _searchController.clear();
+                                notifier.setSearchQuery('');
+                              },
+                            )
+                                : null,
+                            filled: true,
+                            fillColor: theme.colorScheme.surfaceContainerLow,
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 14,
                             ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    physics: const BouncingScrollPhysics(),
-                    child: Row(
-                      children: ['All', 'Pending', 'Approved', 'Rejected'].map((
-                        filter,
-                      ) {
-                        final isSelected = formState.selectedFilter == filter;
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 8.0),
-                          child: FilterChip(
-                            label: Text(filter),
-                            selected: isSelected,
-                            onSelected: (_) => notifier.setFilter(filter),
-                            selectedColor: colorScheme.primaryContainer,
-                            labelStyle: TextStyle(
-                              color: isSelected
-                                  ? colorScheme.onPrimaryContainer
-                                  : colorScheme.onSurface,
-                              fontWeight: isSelected
-                                  ? FontWeight.bold
-                                  : FontWeight.normal,
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14),
+                              borderSide: BorderSide(
+                                color: theme.colorScheme.outlineVariant
+                                    .transparency(0.35),
+                                width: 1.0,
+                              ),
                             ),
-                            showCheckmark: false,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 4,
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14),
+                              borderSide: BorderSide(
+                                color: theme.colorScheme.primary,
+                                width: 2.0,
+                              ),
                             ),
                           ),
                         );
-                      }).toList(),
+                      },
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 12),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      physics: const BouncingScrollPhysics(),
+                      child: Row(
+                        children: ['All', 'Pending', 'Approved', 'Rejected'].map((
+                            filter,
+                            ) {
+                          final isSelected = formState.selectedFilter == filter;
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 8.0),
+                            child: FilterChip(
+                              label: Text(filter),
+                              selected: isSelected,
+                              onSelected: (_) => notifier.setFilter(filter),
+                              selectedColor: colorScheme.primaryContainer,
+                              labelStyle: TextStyle(
+                                color: isSelected
+                                    ? colorScheme.onPrimaryContainer
+                                    : colorScheme.onSurface,
+                                fontWeight: isSelected
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                              ),
+                              showCheckmark: false,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 4,
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-          filteredCertificates.isEmpty
-              ? SliverFillRemaining(
-                  hasScrollBody: false,
-                  child: _buildEmptyState(context, formState.selectedFilter),
-                )
-              : SliverPadding(
-                  padding: EdgeInsets.fromLTRB(
-                    horizontalPadding,
-                    12,
-                    horizontalPadding,
-                    95,
-                  ),
-                  sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate((context, index) {
-                      final cert = filteredCertificates[index];
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 12.0),
-                        child: _buildCertificateCard(context, cert),
-                      );
-                    }, childCount: filteredCertificates.length),
-                  ),
-                ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        heroTag: 'certificate_wallet_apply_fab',
-        onPressed: () {
-          notifier.resetForm();
-          context.push(AppRoutes.doctorSelection);
+          ];
         },
-        icon: const Icon(Icons.add_rounded),
-        label: const Text('Apply Certificate'),
-        backgroundColor: colorScheme.primary,
-        foregroundColor: colorScheme.onPrimary,
+        body: filteredCertificates.isEmpty
+            ? _buildEmptyState(context, formState.selectedFilter)
+            : RefreshIndicator(
+          onRefresh: notifier.loadMyRequests,
+          child: CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics(),
+            ),
+            slivers: <Widget>[
+              SliverPadding(
+                padding: EdgeInsets.fromLTRB(
+                  horizontalPadding,
+                  12,
+                  horizontalPadding,
+                  95,
+                ),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    final cert = filteredCertificates[index];
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 12.0),
+                      child: _buildCertificateCard(context, cert),
+                    );
+                  }, childCount: filteredCertificates.length),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 
   Widget _buildCertificateCard(
-    BuildContext context,
-    PatientCertificateRequestModel cert,
-  ) {
+      BuildContext context,
+      PatientCertificateRequestModel cert,
+      ) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final dateStr = DateFormat('dd MMM yyyy').format(cert.createdAt);

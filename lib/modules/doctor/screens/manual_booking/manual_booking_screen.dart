@@ -33,6 +33,7 @@ class _ManualBookingScreenState extends ConsumerState<ManualBookingScreen> {
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
             DoctorSliverAppBar(
+              titleText: 'Manual Booking',
               expandedHeight: 140.0,
               background: FlexibleSpaceBar(
                 title: Text(

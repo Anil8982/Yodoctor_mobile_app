@@ -66,6 +66,7 @@ class _DoctorCertificateDashboardScreenState
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
             DoctorSliverAppBar(
+              titleText: 'Certificate Requests',
               expandedHeight: 140.0,
               background: FlexibleSpaceBar(
                 title: Text(
