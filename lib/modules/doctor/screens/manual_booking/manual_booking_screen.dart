@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:yodoctor/modules/doctor/controllers/doctor_profile_controller.dart';
 import 'package:yodoctor/modules/doctor/screens/manual_booking/widgets/booking_header.dart';
-import 'package:yodoctor/modules/doctor/widgets/doctor_drawer.dart';
 import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 import '../../../../core/utils/app_spacing.dart';
 import '../../../../core/utils/responsive.dart';
@@ -28,13 +26,10 @@ class _ManualBookingScreenState extends ConsumerState<ManualBookingScreen> {
     final double horizontalPadding = Responsive.horizontalPadding(context);
     final state = ref.watch(manualBookingProvider);
     final notifier = ref.read(manualBookingProvider.notifier);
-    final profileState = ref.watch(doctorProfileProvider);
 
-    return Scaffold(
-      backgroundColor: colorScheme.surface,
-      extendBodyBehindAppBar: true,
-      drawer: DoctorDrawer(doctor: profileState.profile),
-      body: NestedScrollView(
+    return Container(
+      color: colorScheme.surfaceContainerLow,
+      child: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
             DoctorSliverAppBar(

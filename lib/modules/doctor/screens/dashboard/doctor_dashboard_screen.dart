@@ -105,8 +105,14 @@ class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
         body: isFirstLoad
             ? const DoctorDashboardBodyShimmer()
             : RefreshIndicator(
-          onRefresh: () =>
+          onRefresh: () async {
+            await Future.wait([
               ref.read(doctorDashboardProvider.notifier).loadDashboard(),
+              ref
+                  .read(doctorCertificateServiceProvider.notifier)
+                  .loadCertificateService(force: true),
+            ]);
+          },
           child: _buildDashboardContent(context),
         ),
       ),

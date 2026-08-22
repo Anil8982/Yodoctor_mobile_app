@@ -6,14 +6,12 @@ import 'package:yodoctor/modules/doctor/models/appointment/appointment_history_i
 
 import '../../../../core/utils/app_spacing.dart';
 import '../../../../core/utils/responsive.dart';
-import '../../widgets/doctor_drawer.dart';
 import '../../widgets/doctor_sliver_app_bar.dart';
 
 import '../../controllers/appointment_history_controller.dart';
 import 'widgets/history_toolbar.dart';
 import 'widgets/appointment_history_table.dart';
 import 'widgets/mobile_appointment_list.dart';
-import 'package:yodoctor/modules/doctor/controllers/doctor_profile_controller.dart';
 
 class DoctorAppointmentHistoryScreen extends ConsumerStatefulWidget {
   const DoctorAppointmentHistoryScreen({super.key});
@@ -25,7 +23,6 @@ class DoctorAppointmentHistoryScreen extends ConsumerStatefulWidget {
 
 class _DoctorAppointmentHistoryScreenState
     extends ConsumerState<DoctorAppointmentHistoryScreen> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final TextEditingController _searchController = TextEditingController();
 
   @override
@@ -48,18 +45,13 @@ class _DoctorAppointmentHistoryScreenState
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final double horizontalPadding = Responsive.horizontalPadding(context);
-    final profileState = ref.watch(doctorProfileProvider);
     final historyState = ref.watch(appointmentHistoryProvider);
     final historyNotifier = ref.read(appointmentHistoryProvider.notifier);
     final filteredAppointments = historyNotifier.getFilteredHistory();
 
-    return Scaffold(
-      key: _scaffoldKey,
-      backgroundColor: colorScheme.surfaceContainer,
-      extendBodyBehindAppBar: true,
-
-      drawer: DoctorDrawer(doctor: profileState.profile),
-      body: NestedScrollView(
+    return Container(
+      color: colorScheme.surfaceContainerLow,
+      child: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
             DoctorSliverAppBar(

@@ -81,7 +81,7 @@ class CertificateServiceCard extends ConsumerWidget {
     final isActive = service.enabled;
     final successColor = AppTheme.success(context);
 
-    // 3. Active / Loaded State (Exact image content + Premium Compact Layout)
+    // 3. Active / Loaded State
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
@@ -182,7 +182,7 @@ class CertificateServiceCard extends ConsumerWidget {
 
             const SizedBox(height: 14),
 
-            // Description text from the screenshot
+            // Description text
             Text(
               'Allow patients to apply for medical certificates through your profile.',
               style: theme.textTheme.bodyMedium?.copyWith(
@@ -195,7 +195,7 @@ class CertificateServiceCard extends ConsumerWidget {
 
             const SizedBox(height: 14),
 
-            // Fee info string format: Certificate Fee - ₹1
+            // Fee info string format
             RichText(
               text: TextSpan(
                 style: theme.textTheme.bodyMedium?.copyWith(
@@ -216,11 +216,12 @@ class CertificateServiceCard extends ConsumerWidget {
 
             const SizedBox(height: 16),
 
-            // Full-width Outlined Button as shown in the screenshot
+            // Dynamic Action Button based on Active/Inactive state
             SizedBox(
               width: double.infinity,
               height: 46,
-              child: OutlinedButton.icon(
+              child: isActive
+                  ? OutlinedButton.icon(
                 onPressed: () {
                   CertificateServiceBottomSheet.show(context);
                 },
@@ -238,6 +239,26 @@ class CertificateServiceCard extends ConsumerWidget {
                     color: colorScheme.primary,
                     width: 1.2,
                   ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+              )
+                  : FilledButton.icon(
+                onPressed: () {
+                  CertificateServiceBottomSheet.show(context);
+                },
+                icon: const Icon(Icons.play_arrow_rounded, size: 18),
+                label: const Text(
+                  'Start Service',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                style: FilledButton.styleFrom(
+                  backgroundColor: colorScheme.primary,
+                  foregroundColor: colorScheme.onPrimary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),

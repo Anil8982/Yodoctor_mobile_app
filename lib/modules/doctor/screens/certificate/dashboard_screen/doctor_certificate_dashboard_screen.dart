@@ -8,10 +8,8 @@ import 'package:yodoctor/modules/doctor/screens/certificate/dashboard_screen/wid
 import 'package:yodoctor/modules/doctor/screens/certificate/widgets/certificate_service_bottom_sheet.dart';
 import '../../../../../core/utils/app_spacing.dart';
 import '../../../../../core/utils/responsive.dart';
-import '../../../widgets/doctor_drawer.dart';
 import '../../../widgets/doctor_sliver_app_bar.dart';
 import 'widgets/certificate_list_cards.dart';
-import '../../../controllers/doctor_profile_controller.dart';
 
 class DoctorCertificateDashboardScreen extends ConsumerStatefulWidget {
   const DoctorCertificateDashboardScreen({super.key});
@@ -24,7 +22,6 @@ class DoctorCertificateDashboardScreen extends ConsumerStatefulWidget {
 class _DoctorCertificateDashboardScreenState
     extends ConsumerState<DoctorCertificateDashboardScreen>
     with SingleTickerProviderStateMixin {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final TextEditingController _searchController = TextEditingController();
   late TabController _tabController;
 
@@ -57,18 +54,15 @@ class _DoctorCertificateDashboardScreenState
     final certificateState = ref.watch(doctorCertificateProvider);
     final notifier = ref.read(doctorCertificateProvider.notifier);
     final filteredCerts = notifier.filteredCertificates;
-    final profileState = ref.watch(doctorProfileProvider);
 
     final isLoading = certificateState.loading &&
         certificateState.pendingCertificates.isEmpty &&
         certificateState.issuedCertificates.isEmpty;
 
-    return Scaffold(
-      key: _scaffoldKey,
-      backgroundColor: colorScheme.surfaceContainerLow,
-      extendBodyBehindAppBar: true,
-      drawer: DoctorDrawer(doctor: profileState.profile),
-      body: NestedScrollView(
+    return Container(
+      color: colorScheme.surfaceContainerLow,
+
+      child: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
             DoctorSliverAppBar(
