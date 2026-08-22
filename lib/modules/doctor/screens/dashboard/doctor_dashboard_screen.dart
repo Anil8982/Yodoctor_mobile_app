@@ -3,7 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:yodoctor/modules/doctor/controllers/doctor_certificate_service_controller.dart';
 import 'package:yodoctor/modules/doctor/screens/live_queue/widgets/emergency_cancellation_dialog.dart';
+import 'widgets/certificate_service_card.dart';
 import 'widgets/doctor_dashboard_shimmer.dart';
 import 'widgets/doctor_header.dart';
 import 'widgets/dashboard_cards.dart';
@@ -28,6 +31,20 @@ class DoctorDashboardScreen extends ConsumerStatefulWidget {
 }
 
 class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
+
+
+  @override
+  void initState() {
+    super.initState();
+
+    Future.microtask(() {
+      ref
+          .read(doctorCertificateServiceProvider.notifier)
+          .loadCertificateService();
+    });
+  }
+
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -238,7 +255,7 @@ class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
                     count: data.completedToday.toString(),
                     label: 'Done',
                     icon: Icons.check_circle_outline_rounded,
-                    accentColor: Colors.green,
+                    accentColor: AppTheme.success(context),
                   ),
                 ],
               ),
@@ -246,6 +263,10 @@ class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
           ),
         ),
         const SizedBox(height: AppSpacing.md),
+
+        CertificateServiceCard(),
+        const SizedBox(height: AppSpacing.md),
+
 
         // 4. PATIENT REGISTRATION (QR TOOL)
         DirectBookingCard(

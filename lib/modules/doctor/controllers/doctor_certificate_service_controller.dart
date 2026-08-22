@@ -3,10 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/modules/doctor/models/certificate/certificate_service_model.dart';
 import 'package:yodoctor/modules/doctor/repositories/doctor_certificate_service_repository.dart';
 
-final doctorCertificateServiceProvider = NotifierProvider.autoDispose<
-    DoctorCertificateServiceNotifier, CertificateServiceState>(
-  DoctorCertificateServiceNotifier.new,
-);
+final doctorCertificateServiceProvider =
+    NotifierProvider<DoctorCertificateServiceNotifier, CertificateServiceState>(
+      DoctorCertificateServiceNotifier.new,
+    );
 
 class CertificateServiceState {
   final CertificateServiceModel? service;
@@ -74,7 +74,12 @@ class DoctorCertificateServiceNotifier
     return const CertificateServiceState();
   }
 
-  Future<void> loadCertificateService({bool isRetry = false}) async {
+  Future<void> loadCertificateService({bool isRetry = false, bool force = false}) async {
+    // Already loaded → unnecessary API call नको
+    if (!force && state.service != null) {
+      return;
+    }
+
     state = state.copyWith(
       isLoading: true,
       clearError: !isRetry,
@@ -107,7 +112,8 @@ class DoctorCertificateServiceNotifier
         service: service,
         isLoading: false,
         draftEnabled: service.enabled,
-        draftFeeText: service.fee > 0 ? service.fee.toStringAsFixed(0) : '',
+        draftFeeText:
+        service.fee > 0 ? service.fee.toStringAsFixed(0) : '',
         draftInstructions: service.instructions ?? '',
         clearError: true,
       );
@@ -118,7 +124,6 @@ class DoctorCertificateServiceNotifier
       );
     }
   }
-
   void updateDraftFee(String feeText) {
     state = state.copyWith(
       draftFeeText: feeText,
@@ -240,30 +245,27 @@ class DoctorCertificateServiceNotifier
         draftFeeText: service.fee > 0 ? service.fee.toStringAsFixed(0) : '',
         draftInstructions: service.instructions ?? '',
         saveMessage:
-        responseData['message'] ?? 'Certificate service saved successfully',
+            responseData['message'] ?? 'Certificate service saved successfully',
         clearError: true,
       );
 
       return true;
     } catch (e) {
-      state = state.copyWith(
-        isSaving: false,
-        errorMessage: _errorMessage(e),
-      );
+      state = state.copyWith(isSaving: false, errorMessage: _errorMessage(e));
 
       return false;
     }
   }
 
   void clearMessages() {
-    state = state.copyWith(
-      clearError: true,
-      clearSaveMessage: true,
-    );
+    state = state.copyWith(clearError: true, clearSaveMessage: true);
   }
 
   Future<void> retry() async {
-    await loadCertificateService(isRetry: true);
+    await loadCertificateService(
+      isRetry: true,
+      force: true,
+    );
   }
 
   String _errorMessage(Object error) {
