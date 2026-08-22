@@ -189,7 +189,9 @@ class _DoctorDetailScreenState extends ConsumerState<DoctorDetailScreen> {
     return SizedBox(
       width: double.infinity,
       child: FilledButton.icon(
-        onPressed: () => _openBookAppointment(context, doctor),
+        onPressed: doctor.isAvailable == 1
+            ? () => _openBookAppointment(context, doctor)
+            : null,
         style: FilledButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(

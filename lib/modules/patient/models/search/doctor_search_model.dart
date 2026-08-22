@@ -8,6 +8,7 @@ class DoctorSearchModel {
   final double consultationFee;
   final int experience;
   final String profileImage;
+  final int isAvailable;
 
   DoctorSearchModel({
     required this.doctorId,
@@ -19,6 +20,7 @@ class DoctorSearchModel {
     required this.consultationFee,
     required this.experience,
     required this.profileImage,
+    this.isAvailable = 1,
   });
 
   factory DoctorSearchModel.fromJson(Map<String, dynamic> json) {
@@ -32,6 +34,7 @@ class DoctorSearchModel {
       consultationFee: double.tryParse("${json["consultationFee"] ?? 0}") ?? 0,
       experience: json["experience"] ?? 0,
       profileImage: json["profile_image"] ?? "",
+      isAvailable: json["is_available"] ?? 0,
     );
   }
 

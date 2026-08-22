@@ -35,7 +35,8 @@ class _DoctorHeaderCardState extends State<DoctorHeaderCard> {
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
 
-    final bool hasImage = widget.doctor.profileImage.isNotEmpty &&
+    final bool hasImage =
+        widget.doctor.profileImage.isNotEmpty &&
         widget.doctor.profileImage.startsWith('http');
 
     return Container(
@@ -65,7 +66,8 @@ class _DoctorHeaderCardState extends State<DoctorHeaderCard> {
               Container(
                 width: 76,
                 height: 76,
-                clipBehavior: Clip.antiAlias, // इमेज बॉर्डरच्या बाहेर जाऊ नये म्हणून कडक कटिंग
+                clipBehavior: Clip
+                    .antiAlias, // इमेज बॉर्डरच्या बाहेर जाऊ नये म्हणून कडक कटिंग
                 decoration: BoxDecoration(
                   color: colorScheme.primaryContainer.transparency(0.35),
                   borderRadius: BorderRadius.circular(18),
@@ -76,26 +78,26 @@ class _DoctorHeaderCardState extends State<DoctorHeaderCard> {
                 ),
                 child: hasImage
                     ? Image.network(
-                  widget.doctor.profileImage,
-                  fit: BoxFit.cover,
-                  // 🎯 SAFE ERROR CATCH: S3 एरर किंवा इंटरनेट बंद असल्यास पहिल्यासारखा बॅकअप रेंडर होईल!
-                  errorBuilder: (context, error, stackTrace) {
-                    return _buildInitialAvatar(textTheme, colorScheme);
-                  },
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return Center(
-                      child: SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: colorScheme.primary,
-                        ),
-                      ),
-                    );
-                  },
-                )
+                        widget.doctor.profileImage,
+                        fit: BoxFit.cover,
+                        // 🎯 SAFE ERROR CATCH: S3 एरर किंवा इंटरनेट बंद असल्यास पहिल्यासारखा बॅकअप रेंडर होईल!
+                        errorBuilder: (context, error, stackTrace) {
+                          return _buildInitialAvatar(textTheme, colorScheme);
+                        },
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Center(
+                            child: SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: colorScheme.primary,
+                              ),
+                            ),
+                          );
+                        },
+                      )
                     : _buildInitialAvatar(textTheme, colorScheme),
               ),
               const SizedBox(width: 16),
@@ -161,7 +163,9 @@ class _DoctorHeaderCardState extends State<DoctorHeaderCard> {
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
-                  'Available',
+                  widget.doctor.isAvailable == 1
+                      ? 'Available'
+                      : 'Not Available',
                   style: textTheme.labelSmall?.copyWith(
                     color: colorScheme.onSecondaryContainer,
                     fontWeight: FontWeight.w900,

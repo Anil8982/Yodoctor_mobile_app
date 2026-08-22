@@ -145,7 +145,7 @@ class DoctorCard extends StatelessWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: FilledButton(
-                      onPressed: onBookTap,
+                      onPressed: doctor.isAvailable == 1 ? onBookTap : null,
                       style: FilledButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         shape: RoundedRectangleBorder(
