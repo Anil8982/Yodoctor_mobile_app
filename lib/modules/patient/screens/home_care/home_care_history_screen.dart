@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/modules/patient/controllers/home_care_history_controller.dart';
+import 'package:yodoctor/modules/patient/screens/home_care/widgets/cancel_booking_dialog.dart';
 import 'package:yodoctor/modules/widgets/app_header.dart';
 import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 
@@ -93,10 +94,10 @@ class _HomeCareHistoryScreenState extends ConsumerState<HomeCareHistoryScreen> {
                                     },
                                     onCancel: isTerminal
                                         ? null
-                                        : () => _confirmCancelBooking(
+                                        : () => CancelBookingDialog.show(
                                             context,
                                             ref,
-                                            booking.id,
+                                            bookingId: booking.id,
                                           ),
                                   );
                                 },
@@ -160,65 +161,5 @@ class _HomeCareHistoryScreenState extends ConsumerState<HomeCareHistoryScreen> {
     ).then((_) {
       ref.read(homeCareHistoryProvider.notifier).clearSelectedBooking();
     });
-  }
-
-  void _confirmCancelBooking(
-    BuildContext context,
-    WidgetRef ref,
-    int bookingId,
-  ) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        backgroundColor: colorScheme.surface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text(
-          'Cancel Booking',
-          style: TextStyle(
-            color: colorScheme.onSurface,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        content: Text(
-          'Are you sure you want to cancel this home care booking?',
-          style: TextStyle(color: colorScheme.onSurfaceVariant),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: Text('No', style: TextStyle(color: colorScheme.primary)),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(dialogContext);
-              AppSnackBar.show(
-                message: 'Cancelling booking...',
-                type: AppSnackBarType.loading,
-                dismissible: false,
-              );
-
-              final success = await ref
-                  .read(homeCareHistoryProvider.notifier)
-                  .cancelBooking(bookingId);
-
-              AppSnackBar.hide();
-
-              if (success && context.mounted) {
-                AppSnackBar.show(
-                  message: 'Booking cancelled successfully',
-                  type: AppSnackBarType.success,
-                );
-              }
-            },
-            child: Text(
-              'Yes, Cancel',
-              style: TextStyle(color: colorScheme.error),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }

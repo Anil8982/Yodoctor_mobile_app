@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:yodoctor/core/profile_image/profile_image_controller.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
 import 'package:yodoctor/modules/doctor/controllers/doctor_profile_controller.dart';
+import 'package:yodoctor/modules/doctor/screens/profile/widgets/preview_profile_image_dialog.dart';
 
 class ProfileHeaderSection extends ConsumerWidget {
   const ProfileHeaderSection({
@@ -46,45 +47,7 @@ class ProfileHeaderSection extends ConsumerWidget {
         : (doctor?.degree ?? '');
 
     void showImagePreview(BuildContext context, String? imageUrl) {
-      showDialog(
-        context: context,
-        builder: (context) => Dialog(
-          backgroundColor: Colors.transparent,
-          insetPadding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Align(
-                alignment: Alignment.topRight,
-                child: IconButton(
-                  icon: const Icon(
-                    Icons.close_rounded,
-                    color: Colors.white,
-                    size: 28,
-                  ),
-                  onPressed: () => Navigator.pop(context),
-                ),
-              ),
-              const SizedBox(height: 8),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: Container(
-                  constraints: const BoxConstraints(maxHeight: 500),
-                  color: colorScheme.surface,
-                  child: imageUrl != null && imageUrl.isNotEmpty
-                      ? Image.network(
-                          imageUrl,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, _, _) =>
-                              _buildLargeFallbackAvatar(colorScheme),
-                        )
-                      : _buildLargeFallbackAvatar(colorScheme),
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
+      PreviewProfileImageDialog.show(context, imageUrl: imageUrl);
     }
 
     Future<void> showImageOptions(BuildContext context) async {
@@ -280,20 +243,6 @@ class ProfileHeaderSection extends ConsumerWidget {
       radius: 36,
       backgroundColor: colorScheme.onPrimary.withValues(alpha: 0.12),
       child: Icon(Icons.person_rounded, color: colorScheme.onPrimary, size: 38),
-    );
-  }
-
-  Widget _buildLargeFallbackAvatar(ColorScheme colorScheme) {
-    return Container(
-      width: 200,
-      height: 200,
-      alignment: Alignment.center,
-      color: colorScheme.surfaceContainerHighest,
-      child: Icon(
-        Icons.person_rounded,
-        color: colorScheme.onSurfaceVariant,
-        size: 100,
-      ),
     );
   }
 }
