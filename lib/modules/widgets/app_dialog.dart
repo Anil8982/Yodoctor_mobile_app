@@ -13,6 +13,7 @@ class AppDialog extends StatelessWidget {
   final bool showCancel;
   final Color? customAccentColor;
   final List<Widget>? extraActions;
+  final bool barrierDismissible;
 
   const AppDialog({
     super.key,
@@ -27,6 +28,7 @@ class AppDialog extends StatelessWidget {
     this.showCancel = true,
     this.customAccentColor,
     this.extraActions,
+    this.barrierDismissible = false,
   });
 
   // Easy static helper to show the dialog anywhere
@@ -43,9 +45,11 @@ class AppDialog extends StatelessWidget {
     bool showCancel = true,
     Color? customAccentColor,
     List<Widget>? extraActions,
+    bool barrierDismissible = false,
   }) {
     return showDialog(
       context: context,
+      barrierDismissible: barrierDismissible,
       barrierColor: Colors.black.withValues(alpha: 0.6),
       builder: (context) => AppDialog(
         title: title,
@@ -59,6 +63,7 @@ class AppDialog extends StatelessWidget {
         showCancel: showCancel,
         customAccentColor: customAccentColor,
         extraActions: extraActions,
+        barrierDismissible: barrierDismissible,
       ),
     );
   }
@@ -69,7 +74,8 @@ class AppDialog extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
 
-    final Color accentColor = customAccentColor ??
+    final Color accentColor =
+        customAccentColor ??
         (isDestructive ? colorScheme.error : colorScheme.primary);
 
     return Dialog(
@@ -204,9 +210,13 @@ class AppDialog extends StatelessWidget {
                         if (showCancel) ...[
                           Flexible(
                             child: TextButton(
-                              onPressed: onCancel ?? () => Navigator.pop(context),
+                              onPressed:
+                                  onCancel ?? () => Navigator.pop(context),
                               style: TextButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 18,
+                                  vertical: 12,
+                                ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
@@ -234,10 +244,15 @@ class AppDialog extends StatelessWidget {
                             },
                             style: FilledButton.styleFrom(
                               backgroundColor: accentColor,
-                              foregroundColor: isDestructive ? colorScheme.onError : colorScheme.onPrimary,
+                              foregroundColor: isDestructive
+                                  ? colorScheme.onError
+                                  : colorScheme.onPrimary,
                               elevation: 2,
                               shadowColor: accentColor.withValues(alpha: 0.3),
-                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                                vertical: 14,
+                              ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(14),
                               ),
