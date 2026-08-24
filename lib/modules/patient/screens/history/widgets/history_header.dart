@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../core/utils/app_spacing.dart';
-import '../../../../widgets/gradient_background.dart';
 
 class HistoryHeader extends StatelessWidget {
   const HistoryHeader({super.key, required this.appointmentCount});
@@ -14,13 +13,18 @@ class HistoryHeader extends StatelessWidget {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final double topPadding = MediaQuery.of(context).padding.top;
 
-    return GradientBackground(
-      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(32)),
+    return Container(
       padding: EdgeInsets.fromLTRB(
         AppSpacing.xl,
         topPadding + 60,
         AppSpacing.xl,
         AppSpacing.lg,
+      ),
+      decoration: BoxDecoration(
+        color: colorScheme.primary,
+        borderRadius: const BorderRadius.vertical(
+          bottom: Radius.circular(32),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -42,7 +46,10 @@ class HistoryHeader extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 8,
+            ),
             decoration: BoxDecoration(
               color: colorScheme.onPrimary.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(12),

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../../core/profile_image/profile_image_controller.dart';
-import '../../../../../core/theme/app_theme.dart';
-import '../../../../../core/utils/app_spacing.dart';
-import '../../../../widgets/gradient_background.dart';
+import 'package:yodoctor/core/profile_image/profile_image_controller.dart';
+import 'package:yodoctor/core/utils/app_spacing.dart';
 
 class DoctorHeader extends ConsumerWidget {
   const DoctorHeader({
@@ -31,14 +29,18 @@ class DoctorHeader extends ConsumerWidget {
 
     final imageState = ref.watch(profileImageController);
 
-    return GradientBackground(
-      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(32)),
-      colors: AppTheme.doctorGradient.colors,
+    return Container(
       padding: EdgeInsets.fromLTRB(
         AppSpacing.lg,
         topPadding + 45,
         AppSpacing.lg,
         AppSpacing.xl,
+      ),
+      decoration: BoxDecoration(
+        color: colorScheme.primary,
+        borderRadius: const BorderRadius.vertical(
+          bottom: Radius.circular(32),
+        ),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -192,9 +194,9 @@ class DoctorHeader extends ConsumerWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    final activeColor = colorScheme.secondary;
-    final inactiveColor = colorScheme.error;
-    final fgColor = isAvailable ? activeColor : inactiveColor;
+    final fgColor = isAvailable ? colorScheme.onSecondary : colorScheme.onError;
+    final bgColor = isAvailable ? colorScheme.secondaryContainer : colorScheme.errorContainer;
+    final handleColor = isAvailable ? colorScheme.secondary : colorScheme.error;
     final textLabel = isAvailable ? 'Live' : 'Busy';
 
     return GestureDetector(
@@ -206,13 +208,11 @@ class DoctorHeader extends ConsumerWidget {
         height: 32,
         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
         decoration: BoxDecoration(
-          color: isAvailable
-              ? colorScheme.secondaryContainer
-              : colorScheme.errorContainer,
+          color: bgColor,
           borderRadius: BorderRadius.circular(100),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.06),
+              color: colorScheme.shadow.withValues(alpha: 0.08),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -221,6 +221,7 @@ class DoctorHeader extends ConsumerWidget {
         child: Stack(
           alignment: Alignment.center,
           children: [
+            // Text position and styling
             AnimatedPositioned(
               duration: const Duration(milliseconds: 220),
               curve: Curves.easeInOut,
@@ -237,7 +238,7 @@ class DoctorHeader extends ConsumerWidget {
                 child: AnimatedDefaultTextStyle(
                   duration: const Duration(milliseconds: 180),
                   style: theme.textTheme.labelMedium!.copyWith(
-                    color: fgColor,
+                    color: isAvailable ? colorScheme.onSecondaryContainer : colorScheme.onErrorContainer,
                     fontWeight: FontWeight.w900,
                     fontSize: 10.5,
                     letterSpacing: 0.3,
@@ -247,6 +248,7 @@ class DoctorHeader extends ConsumerWidget {
               ),
             ),
 
+            // Sliding Handle Circle with Icon
             AnimatedAlign(
               duration: const Duration(milliseconds: 220),
               curve: const Cubic(0.2, 0.8, 0.2, 1.0),
@@ -258,11 +260,11 @@ class DoctorHeader extends ConsumerWidget {
                 width: 24,
                 height: 24,
                 decoration: BoxDecoration(
-                  color: fgColor,
+                  color: handleColor,
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: fgColor.withValues(alpha: 0.25),
+                      color: handleColor.withValues(alpha: 0.25),
                       blurRadius: 6,
                       offset: const Offset(0, 3),
                     ),
@@ -273,17 +275,16 @@ class DoctorHeader extends ConsumerWidget {
                     duration: const Duration(milliseconds: 180),
                     transitionBuilder:
                         (Widget child, Animation<double> animation) {
-                          return ScaleTransition(
-                            scale: animation,
-                            child: child,
-                          );
-                        },
-                    key: ValueKey<bool>(isAvailable),
+                      return ScaleTransition(
+                        scale: animation,
+                        child: child,
+                      );
+                    },
                     child: Icon(
                       isAvailable ? Icons.check_rounded : Icons.close_rounded,
                       key: ValueKey<bool>(isAvailable),
                       size: 14,
-                      color: colorScheme.surface,
+                      color: fgColor,
                     ),
                   ),
                 ),

@@ -76,7 +76,7 @@ class _AppointmentsHistoryScreenState
                       SliverPadding(
                         padding: EdgeInsets.fromLTRB(
                           horizontal,
-                          12,
+                          20,
                           horizontal,
                           0,
                         ),
@@ -94,9 +94,9 @@ class _AppointmentsHistoryScreenState
                       SliverPadding(
                         padding: EdgeInsets.fromLTRB(
                           horizontal,
-                          12,
+                          20,
                           horizontal,
-                          95,
+                          30,
                         ),
                         sliver: SliverList(
                           delegate: SliverChildBuilderDelegate((

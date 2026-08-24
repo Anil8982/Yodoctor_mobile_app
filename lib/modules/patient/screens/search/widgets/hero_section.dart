@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
-import 'package:yodoctor/modules/widgets/gradient_background.dart';
 
 import 'doctor_search_widget.dart';
 
@@ -14,10 +13,11 @@ class HeroSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final topPadding = MediaQuery.of(context).padding.top;
 
-    return GradientBackground(
-      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(0)),
+    return Container(
+      color: colorScheme.primary,
       padding: EdgeInsets.fromLTRB(
         AppSpacing.xl,
         topPadding + 70,

@@ -3,7 +3,6 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
-import '../../../core/theme/app_theme.dart';
 
 class CustomSliverAppBar extends StatefulWidget {
   const CustomSliverAppBar({
@@ -101,7 +100,7 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar> {
             ],
           ),
           flexibleSpace: Container(
-            decoration: BoxDecoration(gradient: AppTheme.patientGradient),
+            color: colorScheme.primary,
             child: FlexibleSpaceBar(
               stretchModes: const [StretchMode.zoomBackground],
               background: widget.background,

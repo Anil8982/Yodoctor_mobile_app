@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/constants/app_assets.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
-import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/auth/screens/landing/widgets/yo_role_btn.dart';
 
 class LandingScreen extends StatefulWidget {
@@ -21,7 +20,7 @@ class _LandingScreenState extends State<LandingScreen> {
 
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(gradient: AppTheme.backgroundGradient),
+        color: colorScheme.surface,
         child: SafeArea(
           top: false,
           child: LayoutBuilder(
@@ -102,7 +101,9 @@ class _LandingScreenState extends State<LandingScreen> {
                                         ),
                                         padding: const EdgeInsets.all(4),
                                         child: ClipRRect(
-                                          borderRadius: BorderRadius.circular(55),
+                                          borderRadius: BorderRadius.circular(
+                                            55,
+                                          ),
                                           child: Image.asset(
                                             AppAssets.logoV(context),
                                             fit: BoxFit.contain,
@@ -136,7 +137,7 @@ class _LandingScreenState extends State<LandingScreen> {
                                         ),
                                       ],
                                     ),
-                                    const SizedBox(height: 8,)
+                                    const SizedBox(height: 8),
                                   ],
                                 ),
                               ),

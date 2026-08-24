@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:yodoctor/core/theme/app_theme.dart';
 
 import '../../../../../core/utils/app_spacing.dart';
-import '../../widgets/gradient_background.dart';
 
 class AdminHeader extends ConsumerWidget {
   const AdminHeader({super.key});
@@ -18,9 +16,7 @@ class AdminHeader extends ConsumerWidget {
 
     // final dashboardStateAsync = ref.watch(adminDashboardProvider);
 
-    return GradientBackground(
-      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(32)),
-      colors: AppTheme.adminGradient.colors,
+    return Container(
       padding: EdgeInsets.fromLTRB(
         AppSpacing.xl,
         topPadding + 50,

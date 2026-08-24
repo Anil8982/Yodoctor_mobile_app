@@ -10,7 +10,6 @@ import 'package:yodoctor/modules/auth/screens/doctor/register_steps/step4_practi
 import 'package:yodoctor/modules/auth/screens/doctor/register_steps/step5_consultation.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/register_steps/step6_documents.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/register_steps/step7_declaration.dart';
-import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 import '../../controllers/doctor_register_controller.dart';
@@ -141,7 +140,7 @@ class _DoctorRegisterScreenState extends ConsumerState<DoctorRegisterScreen>
                   tag: 'docAppBar',
                   child: Container(
                     decoration: BoxDecoration(
-                      gradient: AppTheme.doctorGradient,
+                      color: colorScheme.secondary,
                       borderRadius: const BorderRadius.only(
                         bottomLeft: Radius.circular(28),
                         bottomRight: Radius.circular(28),
@@ -170,14 +169,14 @@ class _DoctorRegisterScreenState extends ConsumerState<DoctorRegisterScreen>
                                     width: 40,
                                     height: 40,
                                     decoration: BoxDecoration(
-                                      color: colorScheme.onPrimary.transparency(
+                                      color: colorScheme.onSecondary.transparency(
                                         0.25,
                                       ),
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: Icon(
                                       Icons.arrow_back_rounded,
-                                      color: colorScheme.onPrimary,
+                                      color: colorScheme.onSecondary,
                                     ),
                                   ),
                                 ),
@@ -189,14 +188,14 @@ class _DoctorRegisterScreenState extends ConsumerState<DoctorRegisterScreen>
                                         text: 'Yo',
                                         style: textTheme.titleLarge?.copyWith(
                                           fontWeight: FontWeight.w800,
-                                          color: colorScheme.onPrimary,
+                                          color: colorScheme.onSecondary,
                                         ),
                                       ),
                                       TextSpan(
                                         text: 'Doctor',
                                         style: textTheme.titleLarge?.copyWith(
                                           fontWeight: FontWeight.w800,
-                                          color: colorScheme.onPrimary
+                                          color: colorScheme.onSecondary
                                               .withValues(alpha: 0.6),
                                         ),
                                       ),
@@ -210,7 +209,7 @@ class _DoctorRegisterScreenState extends ConsumerState<DoctorRegisterScreen>
                                     child: Text(
                                       '${_currentStep + 1}/${_stepLabels.length}',
                                       style: textTheme.labelMedium?.copyWith(
-                                        color: colorScheme.onPrimary,
+                                        color: colorScheme.onSecondary,
                                         fontWeight: FontWeight.w700,
                                       ),
                                     ),
@@ -226,7 +225,7 @@ class _DoctorRegisterScreenState extends ConsumerState<DoctorRegisterScreen>
                               _stepLabels[_currentStep],
                               key: ValueKey(_currentStep),
                               style: textTheme.titleMedium?.copyWith(
-                                color: colorScheme.onPrimary,
+                                color: colorScheme.onSecondary,
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
@@ -441,22 +440,22 @@ class _DoctorRegisterScreenState extends ConsumerState<DoctorRegisterScreen>
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: done || active
-                        ? colorScheme.onPrimary
-                        : colorScheme.onPrimary.transparency(0.3),
+                        ? colorScheme.onSecondary
+                        : colorScheme.onSecondary.transparency(0.3),
                   ),
                   child: Center(
                     child: done
                         ? Icon(
                             Icons.check,
                             size: 12,
-                            color: colorScheme.primary,
+                            color: colorScheme.secondary,
                           )
                         : Text(
                             '${i + 1}',
                             style: textTheme.labelSmall?.copyWith(
                               color: active
                                   ? colorScheme.primary
-                                  : colorScheme.onPrimary.transparency(0.7),
+                                  : colorScheme.onSecondary.transparency(0.7),
                               fontWeight: FontWeight.w800,
                             ),
                           ),
@@ -467,8 +466,8 @@ class _DoctorRegisterScreenState extends ConsumerState<DoctorRegisterScreen>
                     child: Container(
                       height: 2,
                       color: i < _currentStep
-                          ? colorScheme.onPrimary
-                          : colorScheme.onPrimary.transparency(0.3),
+                          ? colorScheme.onSecondary
+                          : colorScheme.onSecondary.transparency(0.3),
                     ),
                   ),
               ],

@@ -30,6 +30,7 @@ class _CertificateServiceBottomSheetState
   late final TextEditingController _instructionsController;
   final _feeFormKey = GlobalKey<FormState>();
   bool _hasAttemptedLoad = false;
+  bool _isSyncingControllers = false;
 
   @override
   void initState() {
@@ -38,34 +39,57 @@ class _CertificateServiceBottomSheetState
     _feeController = TextEditingController();
     _instructionsController = TextEditingController();
 
-    // Add listeners to update draft state on text changes
-    _feeController.addListener(() {
-      ref
-          .read(doctorCertificateServiceProvider.notifier)
-          .updateDraftFee(_feeController.text);
-    });
-
-    _instructionsController.addListener(() {
-      ref
-          .read(doctorCertificateServiceProvider.notifier)
-          .updateDraftInstructions(_instructionsController.text);
-    });
+    // Add named listeners to update draft state on text changes
+    _feeController.addListener(_onFeeChanged);
+    _instructionsController.addListener(_onInstructionsChanged);
 
     Future.microtask(_loadData);
+  }
+
+  void _onFeeChanged() {
+    if (_isSyncingControllers) return;
+
+    ref
+        .read(doctorCertificateServiceProvider.notifier)
+        .updateDraftFee(_feeController.text);
+  }
+
+  void _onInstructionsChanged() {
+    if (_isSyncingControllers) return;
+
+    ref
+        .read(doctorCertificateServiceProvider.notifier)
+        .updateDraftInstructions(_instructionsController.text);
+  }
+
+  void _syncControllers({
+    required String fee,
+    required String instructions,
+  }) {
+    if (!mounted) return;
+
+    _isSyncingControllers = true;
+
+    _feeController.text = fee;
+    _instructionsController.text = instructions;
+
+    _isSyncingControllers = false;
   }
 
   void _loadData() {
     final state = ref.read(doctorCertificateServiceProvider);
 
     if (state.hasService) {
-      _feeController.text = state.draftFeeText.isNotEmpty
-          ? state.draftFeeText
-          : state.service!.fee > 0
-          ? state.service!.fee.toStringAsFixed(0)
-          : '';
-      _instructionsController.text = state.draftInstructions.isNotEmpty
-          ? state.draftInstructions
-          : state.service!.instructions ?? '';
+      _syncControllers(
+        fee: state.draftFeeText.isNotEmpty
+            ? state.draftFeeText
+            : state.service!.fee > 0
+            ? state.service!.fee.toStringAsFixed(0)
+            : '',
+        instructions: state.draftInstructions.isNotEmpty
+            ? state.draftInstructions
+            : state.service!.instructions ?? '',
+      );
       return;
     }
 
@@ -77,6 +101,9 @@ class _CertificateServiceBottomSheetState
 
   @override
   void dispose() {
+    _feeController.removeListener(_onFeeChanged);
+    _instructionsController.removeListener(_onInstructionsChanged);
+
     _feeController.dispose();
     _instructionsController.dispose();
     super.dispose();
@@ -92,8 +119,10 @@ class _CertificateServiceBottomSheetState
         if (!mounted) return;
 
         if (next.service != null && previous?.service != next.service) {
-          _feeController.text = next.draftFeeText;
-          _instructionsController.text = next.draftInstructions;
+          _syncControllers(
+            fee: next.draftFeeText,
+            instructions: next.draftInstructions,
+          );
         }
 
         if (next.saveMessage != null &&
@@ -491,7 +520,6 @@ class _CertificateServiceBottomSheetState
         .setLocalEnabled(enabled: value);
 
     if (!success && mounted) {
-      // Trigger form validation to show the error
       _feeFormKey.currentState?.validate();
     }
   }

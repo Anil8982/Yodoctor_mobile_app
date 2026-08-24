@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../core/utils/app_spacing.dart';
-import '../../../../widgets/gradient_background.dart';
 
 class FamilyHeader extends StatelessWidget {
   const FamilyHeader({super.key, required this.membersCount});
@@ -13,9 +12,14 @@ class FamilyHeader extends StatelessWidget {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final TextTheme textTheme = Theme.of(context).textTheme;
 
-    return GradientBackground(
-      borderRadius: const BorderRadius.all(Radius.circular(24)),
+    return Container(
       padding: const EdgeInsets.all(AppSpacing.xl),
+      decoration: BoxDecoration(
+        color: colorScheme.primary,
+        borderRadius: const BorderRadius.all(
+          Radius.circular(24),
+        ),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -29,7 +33,6 @@ class FamilyHeader extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 6),
-
           Text(
             'Monitor and manage medical data for your linked family profiles.',
             style: textTheme.bodySmall?.copyWith(
@@ -39,7 +42,10 @@ class FamilyHeader extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 8,
+            ),
             decoration: BoxDecoration(
               color: colorScheme.onPrimary.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(12),

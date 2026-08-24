@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/modules/patient/controllers/home_service_controller.dart';
-import 'package:yodoctor/modules/patient/screens/home_care/widgets/booking_header.dart';
 import 'package:yodoctor/modules/widgets/app_header.dart';
 import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 import 'package:yodoctor/modules/widgets/app_text_field.dart';
@@ -112,8 +111,31 @@ class _HomeServiceBookingScreenState
                   physics: const BouncingScrollPhysics(),
                   padding: const EdgeInsets.all(16),
                   children: [
-                    const BookingHeader(),
-                    const SizedBox(height: 20),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'HOME HEALTHCARE SERVICES',
+                            style: theme.textTheme.labelMedium?.copyWith(
+                              color: colorScheme.primary,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.8,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            'Schedule a nurse, home care, or consultation at your doorstep.',
+                            style: theme.textTheme.bodyLarge?.copyWith(
+                              color: colorScheme.onSurface,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 10),
 
                     _buildCardSection(
                       context,
