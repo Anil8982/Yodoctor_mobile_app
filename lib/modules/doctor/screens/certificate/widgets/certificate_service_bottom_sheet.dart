@@ -31,6 +31,7 @@ class _CertificateServiceBottomSheetState
   final _feeFormKey = GlobalKey<FormState>();
   bool _hasAttemptedLoad = false;
   bool _isSyncingControllers = false;
+  bool _controllersDisposed = false;
 
   @override
   void initState() {
@@ -47,7 +48,7 @@ class _CertificateServiceBottomSheetState
   }
 
   void _onFeeChanged() {
-    if (_isSyncingControllers) return;
+    if (_isSyncingControllers || _controllersDisposed) return;
 
     ref
         .read(doctorCertificateServiceProvider.notifier)
@@ -55,7 +56,7 @@ class _CertificateServiceBottomSheetState
   }
 
   void _onInstructionsChanged() {
-    if (_isSyncingControllers) return;
+    if (_isSyncingControllers || _controllersDisposed) return;
 
     ref
         .read(doctorCertificateServiceProvider.notifier)
@@ -66,7 +67,7 @@ class _CertificateServiceBottomSheetState
     required String fee,
     required String instructions,
   }) {
-    if (!mounted) return;
+    if (!mounted || _controllersDisposed) return;
 
     _isSyncingControllers = true;
 
@@ -101,6 +102,8 @@ class _CertificateServiceBottomSheetState
 
   @override
   void dispose() {
+    _controllersDisposed = true; // Guard set केला
+
     _feeController.removeListener(_onFeeChanged);
     _instructionsController.removeListener(_onInstructionsChanged);
 
@@ -116,7 +119,7 @@ class _CertificateServiceBottomSheetState
     ref.listen<CertificateServiceState>(
       doctorCertificateServiceProvider,
           (previous, next) {
-        if (!mounted) return;
+        if (!mounted || _controllersDisposed) return;
 
         if (next.service != null && previous?.service != next.service) {
           _syncControllers(

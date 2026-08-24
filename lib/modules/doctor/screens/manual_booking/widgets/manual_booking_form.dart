@@ -27,6 +27,7 @@ class ManualBookingForm extends StatelessWidget {
   final ValueChanged<String?> onShiftChanged;
   final VoidCallback onSubmit;
   final bool loading;
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -69,7 +70,6 @@ class ManualBookingForm extends StatelessWidget {
               return null;
             },
           ),
-
           const SizedBox(height: AppSpacing.xl),
           AppTextField(
             isOptional: true,
@@ -106,20 +106,20 @@ class ManualBookingForm extends StatelessWidget {
               ),
               child: loading
                   ? const SizedBox(
-                      width: 22,
-                      height: 22,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
-                      ),
-                    )
+                width: 22,
+                height: 22,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
+              )
                   : const Text(
-                      "Confirm Booking",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w900,
-                        fontSize: 16,
-                      ),
-                    ),
+                "Confirm Booking",
+                style: TextStyle(
+                  fontWeight: FontWeight.w900,
+                  fontSize: 16,
+                ),
+              ),
             ),
           ),
         ],
@@ -157,8 +157,8 @@ class ManualBookingForm extends StatelessWidget {
                     color: isSelected
                         ? colorScheme.primaryContainer.withValues(alpha: 0.6)
                         : colorScheme.surfaceContainerHighest.withValues(
-                            alpha: 0.3,
-                          ),
+                      alpha: 0.3,
+                    ),
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
                       color: isSelected

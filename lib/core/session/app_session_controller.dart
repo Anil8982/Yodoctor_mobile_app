@@ -25,6 +25,8 @@ class AppSessionController {
 
     await ref.read(appRoleProvider.notifier).clearRole();
 
+    await Future<void>.delayed(const Duration(milliseconds: 500));
+
     ProviderRegistry.invalidateAll(ref);
   }
 }
