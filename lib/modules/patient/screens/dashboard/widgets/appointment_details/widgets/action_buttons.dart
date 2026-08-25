@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:yodoctor/modules/patient/controllers/patient_dashboard_controller.dart';
 import 'package:yodoctor/modules/patient/models/dashboard/appointment_model.dart';
-import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
+import 'package:yodoctor/modules/patient/screens/dashboard/widgets/appointment_details/widgets/cancel_appointment_dialog.dart';
 
 class ActionButtons extends ConsumerWidget {
   final AppointmentModel appointment;
@@ -21,7 +20,7 @@ class ActionButtons extends ConsumerWidget {
 
     return Column(
       children: [
-        _buildCancelButton(context, ref, colorScheme),
+        _buildCancelButton(context, ref, appointment, colorScheme),
         const SizedBox(height: 12),
         _buildCloseButton(colorScheme),
       ],
@@ -31,13 +30,18 @@ class ActionButtons extends ConsumerWidget {
   Widget _buildCancelButton(
     BuildContext context,
     WidgetRef ref,
+    AppointmentModel appointment,
     ColorScheme colorScheme,
   ) {
     return SizedBox(
       width: double.infinity,
       height: 56,
       child: ElevatedButton.icon(
-        onPressed: () => _handleCancel(context, ref),
+        onPressed: () => CancelAppointmentDialog.show(
+          context,
+          ref,
+          appointment: appointment,
+        ),
         icon: const Icon(Icons.cancel_outlined, size: 20),
         label: const Text(
           'Cancel Appointment',
@@ -87,96 +91,6 @@ class ActionButtons extends ConsumerWidget {
             borderRadius: BorderRadius.circular(18),
           ),
         ),
-      ),
-    );
-  }
-
-  Future<void> _handleCancel(BuildContext context, WidgetRef ref) async {
-    final confirmed = await _showConfirmDialog(context);
-    if (confirmed != true || !context.mounted) return;
-
-    final notifier = ref.read(patientDashboardControllerProvider.notifier);
-    final success = await notifier.cancelAppointment(appointment.id);
-
-    if (!context.mounted) return;
-
-    if (success) {
-      Navigator.pop(context);
-      AppSnackBar.show(
-        message: 'Appointment cancelled successfully',
-        type: AppSnackBarType.success,
-      );
-    } else {
-      final currentState = ref.read(patientDashboardControllerProvider);
-      AppSnackBar.show(
-        message: currentState.errorMessage ?? "Unable to cancel appointment",
-        type: AppSnackBarType.error,
-      );
-    }
-  }
-
-  Future<bool?> _showConfirmDialog(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        backgroundColor: colorScheme.surface,
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: colorScheme.error.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(
-                Icons.warning_rounded,
-                color: colorScheme.error,
-                size: 24,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: const Text(
-                'Cancel Appointment',
-                style: TextStyle(fontWeight: FontWeight.w800),
-              ),
-            ),
-          ],
-        ),
-        content: Text(
-          "Are you sure you want to cancel this appointment?\n\nThis action cannot be undone.",
-          style: TextStyle(color: colorScheme.onSurfaceVariant, height: 1.5),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, false),
-            child: Text(
-              "Keep",
-              style: TextStyle(
-                color: colorScheme.primary,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          FilledButton(
-            onPressed: () => Navigator.pop(dialogContext, true),
-            style: FilledButton.styleFrom(
-              backgroundColor: colorScheme.error,
-              foregroundColor: colorScheme.onError,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            child: const Text(
-              "Cancel Appointment",
-              style: TextStyle(fontWeight: FontWeight.w700),
-            ),
-          ),
-        ],
       ),
     );
   }

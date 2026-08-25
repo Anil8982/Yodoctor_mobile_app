@@ -5,12 +5,12 @@ import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
 import 'package:yodoctor/modules/patient/controllers/book_appointment_controller.dart';
 import 'package:yodoctor/modules/patient/controllers/family_controller.dart';
+import 'package:yodoctor/modules/patient/screens/appointments/widgets/appointment_queue_dialog.dart';
 import 'package:yodoctor/modules/widgets/app_header.dart';
 import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 import '../../../../core/routes/app_routes.dart';
 import '../../models/search/doctor_detail_model.dart';
 import 'models/appointment_queue_info.dart';
-import 'widgets/appointment_queue_dialog.dart';
 import 'widgets/appointment_bottom_bar.dart';
 import 'widgets/date_timeline_picker.dart';
 import 'widgets/doctor_info_card.dart';
@@ -70,9 +70,8 @@ class BookAppointmentScreen extends ConsumerWidget {
         .bookingStatus
         .value;
     final currentState = ref.read(bookAppointmentControllerProvider);
-
-    showAppointmentQueueDialog(
-      context: context,
+    AppointmentQueueDialog.show(
+      context,
       queueInfo: AppointmentQueueInfo(
         doctorName: doctor.doctorName,
         specialty: doctor.specialization,
