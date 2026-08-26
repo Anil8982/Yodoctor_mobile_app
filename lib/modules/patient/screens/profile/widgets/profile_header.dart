@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:yodoctor/core/profile_image/profile_image_controller.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import '../models/patient_model.dart';
 
 class ProfileHeader extends ConsumerWidget {
@@ -52,10 +53,10 @@ class ProfileHeader extends ConsumerWidget {
             ),
 
             ListTile(
-              leading: const Icon(Icons.delete, color: Colors.red),
-              title: const Text(
+              leading: Icon(Icons.delete, color: AppTheme.red),
+              title: Text(
                 'Remove Photo',
-                style: TextStyle(color: Colors.red),
+                style: TextStyle(color: AppTheme.red),
               ),
               onTap: () {
                 Navigator.pop(context);
@@ -121,9 +122,9 @@ class ProfileHeader extends ConsumerWidget {
                     child: CircularProgressIndicator(),
                   ),
 
-                  error: (_, _) => const CircleAvatar(
+                  error: (_, _) => CircleAvatar(
                     radius: 65,
-                    child: Icon(Icons.error, color: Colors.red),
+                    child: Icon(Icons.error, color: AppTheme.red),
                   ),
                 ),
               ),
@@ -137,14 +138,14 @@ class ProfileHeader extends ConsumerWidget {
                     border: Border.all(color: colorScheme.surface, width: 3),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.2),
+                        color: AppTheme.black.withValues(alpha: 0.2),
                         blurRadius: 5,
                       ),
                     ],
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.edit_rounded,
-                    color: Colors.white,
+                    color: AppTheme.white,
                     size: 24,
                   ),
                 ),

@@ -205,7 +205,6 @@
 //   );
 // }
 
-
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
@@ -251,6 +250,16 @@ class AppTheme {
 
   static Color get inputFill => AppColors.inputFill;
   static Color get inputFillGreen => AppColors.inputFillGreen;
+
+  // colors- Material Colors
+  static Color get white => Colors.white;
+  static Color get black => Colors.black;
+  static Color get transparent => Colors.transparent;
+  static MaterialColor get grey => Colors.grey;
+  static MaterialColor get green => Colors.green;
+  static MaterialColor get red => Colors.red;
+  static MaterialColor get orange => Colors.orange;
+  static MaterialColor get amber => Colors.amber;
 
   // Adaptive status colors
   static bool _isDark(BuildContext context) {
@@ -356,7 +365,9 @@ class AppTheme {
       appBarTheme: AppBarTheme(
         elevation: 0,
         scrolledUnderElevation: 0,
-        backgroundColor: isDark ? colorScheme.surfaceContainer : colorScheme.primary,
+        backgroundColor: isDark
+            ? colorScheme.surfaceContainer
+            : colorScheme.primary,
         foregroundColor: isDark ? colorScheme.onSurface : colorScheme.onPrimary,
         centerTitle: false,
       ),
@@ -364,39 +375,55 @@ class AppTheme {
       cardTheme: CardThemeData(
         color: colorScheme.surfaceContainerHigh,
         elevation: isDark ? 4 : 2,
-        shadowColor: isDark ? Colors.black.transparency(0.5) : Colors.black.transparency(0.05),
+        shadowColor: isDark
+            ? Colors.black.transparency(0.5)
+            : Colors.black.transparency(0.05),
         shape: RoundedRectangleBorder(
           borderRadius: const BorderRadius.all(Radius.circular(24)),
-          side: isDark ? BorderSide(color: colorScheme.outlineVariant, width: 1) : BorderSide.none,
+          side: isDark
+              ? BorderSide(color: colorScheme.outlineVariant, width: 1)
+              : BorderSide.none,
         ),
       ),
 
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: isDark ? colorScheme.surfaceContainerHigh : colorScheme.surface,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        hintStyle: TextStyle(color: isDark ? AppColors.darkTextHint : AppColors.textHint),
+        fillColor: isDark
+            ? colorScheme.surfaceContainerHigh
+            : colorScheme.surface,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
+        hintStyle: TextStyle(
+          color: isDark ? AppColors.darkTextHint : AppColors.textHint,
+        ),
         border: OutlineInputBorder(
           borderRadius: const BorderRadius.all(Radius.circular(16)),
-          borderSide: isDark ? BorderSide(color: colorScheme.outlineVariant) : BorderSide.none,
+          borderSide: isDark
+              ? BorderSide(color: colorScheme.outlineVariant)
+              : BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: const BorderRadius.all(Radius.circular(16)),
-          borderSide: isDark ? BorderSide(color: colorScheme.outlineVariant) : BorderSide.none,
+          borderSide: isDark
+              ? BorderSide(color: colorScheme.outlineVariant)
+              : BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: const BorderRadius.all(Radius.circular(16)),
-          borderSide: BorderSide(
-            color: colorScheme.primary,
-            width: 1.4,
-          ),
+          borderSide: BorderSide(color: colorScheme.primary, width: 1.4),
         ),
       ),
 
       chipTheme: ChipThemeData(
-        backgroundColor: isDark ? colorScheme.surfaceContainerHighest : colorScheme.surfaceContainerHigh,
+        backgroundColor: isDark
+            ? colorScheme.surfaceContainerHighest
+            : colorScheme.surfaceContainerHigh,
         selectedColor: colorScheme.primaryContainer,
-        side: isDark ? BorderSide(color: colorScheme.outlineVariant) : BorderSide.none,
+        side: isDark
+            ? BorderSide(color: colorScheme.outlineVariant)
+            : BorderSide.none,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(12)),
         ),
@@ -428,26 +455,90 @@ class AppTheme {
 
   // Typography
   static TextTheme _buildTextTheme(bool isDark, ColorScheme colorScheme) {
-    final primaryTextColor = isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
-    final secondaryTextColor = isDark ? AppColors.darkTextSecondary : AppColors.textSecondary;
+    final primaryTextColor = isDark
+        ? AppColors.darkTextPrimary
+        : AppColors.textPrimary;
+    final secondaryTextColor = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.textSecondary;
     final hintTextColor = isDark ? AppColors.darkTextHint : AppColors.textHint;
 
     return TextTheme(
-      displayLarge: TextStyle(fontSize: 57, fontWeight: FontWeight.w400, color: primaryTextColor),
-      displayMedium: TextStyle(fontSize: 45, fontWeight: FontWeight.w400, color: primaryTextColor),
-      displaySmall: TextStyle(fontSize: 36, fontWeight: FontWeight.w400, color: primaryTextColor),
-      headlineLarge: TextStyle(fontSize: 32, fontWeight: FontWeight.w600, color: primaryTextColor),
-      headlineMedium: TextStyle(fontSize: 28, fontWeight: FontWeight.w500, color: primaryTextColor),
-      headlineSmall: TextStyle(fontSize: 24, fontWeight: FontWeight.w500, color: primaryTextColor),
-      titleLarge: TextStyle(fontSize: 22, fontWeight: FontWeight.w500, color: primaryTextColor),
-      titleMedium: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: primaryTextColor),
-      titleSmall: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: primaryTextColor),
-      bodyLarge: TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: primaryTextColor),
-      bodyMedium: TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: secondaryTextColor),
-      bodySmall: TextStyle(fontSize: 12, fontWeight: FontWeight.w400, color: hintTextColor),
-      labelLarge: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: primaryTextColor),
-      labelMedium: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: secondaryTextColor),
-      labelSmall: TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: hintTextColor),
+      displayLarge: TextStyle(
+        fontSize: 57,
+        fontWeight: FontWeight.w400,
+        color: primaryTextColor,
+      ),
+      displayMedium: TextStyle(
+        fontSize: 45,
+        fontWeight: FontWeight.w400,
+        color: primaryTextColor,
+      ),
+      displaySmall: TextStyle(
+        fontSize: 36,
+        fontWeight: FontWeight.w400,
+        color: primaryTextColor,
+      ),
+      headlineLarge: TextStyle(
+        fontSize: 32,
+        fontWeight: FontWeight.w600,
+        color: primaryTextColor,
+      ),
+      headlineMedium: TextStyle(
+        fontSize: 28,
+        fontWeight: FontWeight.w500,
+        color: primaryTextColor,
+      ),
+      headlineSmall: TextStyle(
+        fontSize: 24,
+        fontWeight: FontWeight.w500,
+        color: primaryTextColor,
+      ),
+      titleLarge: TextStyle(
+        fontSize: 22,
+        fontWeight: FontWeight.w500,
+        color: primaryTextColor,
+      ),
+      titleMedium: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.w500,
+        color: primaryTextColor,
+      ),
+      titleSmall: TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+        color: primaryTextColor,
+      ),
+      bodyLarge: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.w400,
+        color: primaryTextColor,
+      ),
+      bodyMedium: TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w400,
+        color: secondaryTextColor,
+      ),
+      bodySmall: TextStyle(
+        fontSize: 12,
+        fontWeight: FontWeight.w400,
+        color: hintTextColor,
+      ),
+      labelLarge: TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+        color: primaryTextColor,
+      ),
+      labelMedium: TextStyle(
+        fontSize: 12,
+        fontWeight: FontWeight.w500,
+        color: secondaryTextColor,
+      ),
+      labelSmall: TextStyle(
+        fontSize: 11,
+        fontWeight: FontWeight.w500,
+        color: hintTextColor,
+      ),
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 
 import 'package:yodoctor/modules/auth/controllers/doctor_register_controller.dart';
 import 'package:yodoctor/modules/auth/models/doctor_register_model.dart';
@@ -28,19 +29,23 @@ class _Step7DeclarationState extends ConsumerState<Step7Declaration> {
   final _declarations = const [
     {
       'key': 'accurate',
-      'text': 'I declare that all information provided is accurate and true to my knowledge.',
+      'text':
+          'I declare that all information provided is accurate and true to my knowledge.',
     },
     {
       'key': 'display',
-      'text': 'I authorize Yo Doctor to display my professional credentials publicly for patient booking.',
+      'text':
+          'I authorize Yo Doctor to display my professional credentials publicly for patient booking.',
     },
     {
       'key': 'privacy',
-      'text': 'I consent to the processing and secure storage of my personal data as per Privacy Policy.',
+      'text':
+          'I consent to the processing and secure storage of my personal data as per Privacy Policy.',
     },
     {
       'key': 'terms',
-      'text': "I agree to the platform's Terms of Service, Cancellation, and Refund policies.",
+      'text':
+          "I agree to the platform's Terms of Service, Cancellation, and Refund policies.",
     },
   ];
 
@@ -80,9 +85,9 @@ class _Step7DeclarationState extends ConsumerState<Step7Declaration> {
 
   bool get _allChecked =>
       widget.data.declAccurate &&
-          widget.data.declDisplay &&
-          widget.data.declPrivacy &&
-          widget.data.declTerms;
+      widget.data.declDisplay &&
+      widget.data.declPrivacy &&
+      widget.data.declTerms;
 
   Future<void> _handleSubmit() async {
     if (!_allChecked) {
@@ -116,7 +121,8 @@ class _Step7DeclarationState extends ConsumerState<Step7Declaration> {
         StepTitle(
           icon: Icons.gavel_outlined,
           title: 'Legal Declarations',
-          subtitle: 'Please review and accept all terms before final submission',
+          subtitle:
+              'Please review and accept all terms before final submission',
           color: colorScheme.primary,
         ),
         const SizedBox(height: 20),
@@ -128,7 +134,7 @@ class _Step7DeclarationState extends ConsumerState<Step7Declaration> {
           return Padding(
             padding: const EdgeInsets.only(bottom: 12),
             child: Material(
-              color: Colors.transparent,
+              color: AppTheme.transparent,
               borderRadius: BorderRadius.circular(16),
               child: InkWell(
                 onTap: isSubmitting ? null : () => _toggleDeclaration(key),
@@ -157,21 +163,25 @@ class _Step7DeclarationState extends ConsumerState<Step7Declaration> {
                         height: 24,
                         margin: const EdgeInsets.only(top: 2),
                         decoration: BoxDecoration(
-                          color: checked ? colorScheme.primary : Colors.transparent,
+                          color: checked
+                              ? colorScheme.primary
+                              : AppTheme.transparent,
                           borderRadius: BorderRadius.circular(6),
                           border: Border.all(
                             color: checked
                                 ? colorScheme.primary
-                                : colorScheme.onSurfaceVariant.transparency(0.6),
+                                : colorScheme.onSurfaceVariant.transparency(
+                                    0.6,
+                                  ),
                             width: 2,
                           ),
                         ),
                         child: checked
                             ? Icon(
-                          Icons.check_rounded,
-                          color: colorScheme.primary.contrastColor,
-                          size: 16,
-                        )
+                                Icons.check_rounded,
+                                color: colorScheme.primary.contrastColor,
+                                size: 16,
+                              )
                             : null,
                       ),
                       const SizedBox(width: 14),
@@ -180,7 +190,9 @@ class _Step7DeclarationState extends ConsumerState<Step7Declaration> {
                           decl['text']!,
                           style: textTheme.bodyMedium?.copyWith(
                             height: 1.45,
-                            fontWeight: checked ? FontWeight.w600 : FontWeight.normal,
+                            fontWeight: checked
+                                ? FontWeight.w600
+                                : FontWeight.normal,
                             color: checked
                                 ? colorScheme.onSurface
                                 : colorScheme.onSurfaceVariant,
@@ -202,13 +214,15 @@ class _Step7DeclarationState extends ConsumerState<Step7Declaration> {
             decoration: BoxDecoration(
               color: colorScheme.error.transparency(0.06),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: colorScheme.error.transparency(0.2),
-              ),
+              border: Border.all(color: colorScheme.error.transparency(0.2)),
             ),
             child: Row(
               children: [
-                Icon(Icons.info_outline_rounded, color: colorScheme.error, size: 18),
+                Icon(
+                  Icons.info_outline_rounded,
+                  color: colorScheme.error,
+                  size: 18,
+                ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
@@ -243,22 +257,22 @@ class _Step7DeclarationState extends ConsumerState<Step7Declaration> {
             ),
             child: isSubmitting
                 ? SizedBox(
-              width: 22,
-              height: 22,
-              child: CircularProgressIndicator(
-                color: colorScheme.primary.contrastColor,
-                strokeWidth: 2.5,
-              ),
-            )
+                    width: 22,
+                    height: 22,
+                    child: CircularProgressIndicator(
+                      color: colorScheme.primary.contrastColor,
+                      strokeWidth: 2.5,
+                    ),
+                  )
                 : Text(
-              'Submit Registration',
-              style: textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w800,
-                color: _allChecked
-                    ? colorScheme.primary.contrastColor
-                    : colorScheme.onSurface.transparency(0.38),
-              ),
-            ),
+                    'Submit Registration',
+                    style: textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: _allChecked
+                          ? colorScheme.primary.contrastColor
+                          : colorScheme.onSurface.transparency(0.38),
+                    ),
+                  ),
           ),
         ),
         const SizedBox(height: 12),

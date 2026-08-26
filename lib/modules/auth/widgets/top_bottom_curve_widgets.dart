@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 
 class DoctorAvatar extends StatelessWidget {
   final Color color;
@@ -12,12 +13,12 @@ class DoctorAvatar extends StatelessWidget {
       width: 110,
       height: 110,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.white,
         shape: BoxShape.circle,
-        border: Border.all(color: Colors.white, width: 4),
+        border: Border.all(color: AppTheme.white, width: 4),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: .12),
+            color: AppTheme.black.withValues(alpha: .12),
             blurRadius: 14,
             offset: const Offset(0, 6),
           ),
@@ -70,7 +71,7 @@ class _TopBackgroundPainter extends CustomPainter {
       ..style = PaintingStyle.fill;
 
     final shadowPaint = Paint()
-      ..color = Colors.black.withValues(alpha: .08)
+      ..color = AppTheme.black.withValues(alpha: .08)
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 18);
 
     // Fixed header height

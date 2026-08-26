@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 
 class StatusChipSelector extends StatelessWidget {
   const StatusChipSelector({
@@ -22,7 +23,9 @@ class StatusChipSelector extends StatelessWidget {
         'icon': Icons.check_circle_outline_rounded,
         'selectedIcon': Icons.check_circle_rounded,
         'activeBg': isDark ? const Color(0xFF132E23) : const Color(0xFFE8F5E9),
-        'activeBorder': isDark ? const Color(0xFF2E7D32) : const Color(0xFF4CAF50),
+        'activeBorder': isDark
+            ? const Color(0xFF2E7D32)
+            : const Color(0xFF4CAF50),
         'activeFg': isDark ? const Color(0xFF81C784) : const Color(0xFF2E7D32),
       },
       {
@@ -31,7 +34,9 @@ class StatusChipSelector extends StatelessWidget {
         'icon': Icons.cancel_outlined,
         'selectedIcon': Icons.cancel_rounded,
         'activeBg': isDark ? const Color(0xFF331619) : const Color(0xFFFFEBEE),
-        'activeBorder': isDark ? const Color(0xFFC62828) : const Color(0xFFEF5350),
+        'activeBorder': isDark
+            ? const Color(0xFFC62828)
+            : const Color(0xFFEF5350),
         'activeFg': isDark ? const Color(0xFFE57373) : const Color(0xFFC62828),
       },
       {
@@ -40,7 +45,9 @@ class StatusChipSelector extends StatelessWidget {
         'icon': Icons.hourglass_empty_rounded,
         'selectedIcon': Icons.hourglass_full_rounded,
         'activeBg': isDark ? const Color(0xFF332712) : const Color(0xFFFFF8E1),
-        'activeBorder': isDark ? const Color(0xFFF57F17) : const Color(0xFFFFB74D),
+        'activeBorder': isDark
+            ? const Color(0xFFF57F17)
+            : const Color(0xFFFFB74D),
         'activeFg': isDark ? const Color(0xFFFFD54F) : const Color(0xFFE65100),
       },
     ];
@@ -82,7 +89,7 @@ class StatusChipSelector extends StatelessWidget {
                 ? const Color(0xFF1E2124)
                 : const Color(0xFFF4F5F7);
             final inactiveBorder = isDark
-                ? Colors.white10
+                ? AppTheme.white.withValues(alpha: 0.1)
                 : const Color(0xFFE0E0E0);
             final inactiveFg = isDark
                 ? const Color(0xFF9E9E9E)
@@ -95,7 +102,7 @@ class StatusChipSelector extends StatelessWidget {
                 ),
                 height: 44,
                 child: Material(
-                  color: Colors.transparent,
+                  color: AppTheme.transparent,
                   child: InkWell(
                     onTap: () => onChanged(option['value']),
                     borderRadius: BorderRadius.circular(12),
@@ -114,7 +121,9 @@ class StatusChipSelector extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(
-                            isSelected ? option['selectedIcon'] : option['icon'],
+                            isSelected
+                                ? option['selectedIcon']
+                                : option['icon'],
                             size: 16,
                             color: isSelected ? activeFg : inactiveFg,
                           ),

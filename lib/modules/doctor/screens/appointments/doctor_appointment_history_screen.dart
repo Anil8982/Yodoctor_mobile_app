@@ -2,6 +2,7 @@ import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/doctor/models/appointment/appointment_history_item.dart';
 
 import '../../../../core/utils/app_spacing.dart';
@@ -218,13 +219,13 @@ class _DoctorAppointmentHistoryScreenState
         ? colorScheme.secondary
         : cancelled
         ? colorScheme.error
-        : Colors.orange;
+        : AppTheme.orange;
 
     final background = completed
         ? colorScheme.secondaryContainer
         : cancelled
         ? colorScheme.errorContainer
-        : Colors.orange.transparency(0.15);
+        : AppTheme.orange.transparency(0.15);
 
     return Container(
       padding: const EdgeInsets.symmetric(

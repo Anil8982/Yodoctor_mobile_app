@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import '../../../../core/utils/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../controllers/doctor_profile_controller.dart';
@@ -216,7 +217,7 @@ class _DoctorProfileScreenState extends ConsumerState<DoctorProfileScreen> {
                                 ),
                                 Icon(
                                   Icons.check_circle,
-                                  color: Colors.green,
+                                  color: AppTheme.green,
                                   size: 18,
                                 ),
                               ],

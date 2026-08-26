@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
 import 'package:yodoctor/modules/widgets/app_field_wrapper.dart';
 import 'package:yodoctor/modules/widgets/app_text_field.dart';
@@ -105,21 +106,21 @@ class ManualBookingForm extends StatelessWidget {
                 elevation: 0,
               ),
               child: loading
-                  ? const SizedBox(
-                width: 22,
-                height: 22,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Colors.white,
-                ),
-              )
+                  ? SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: AppTheme.white,
+                      ),
+                    )
                   : const Text(
-                "Confirm Booking",
-                style: TextStyle(
-                  fontWeight: FontWeight.w900,
-                  fontSize: 16,
-                ),
-              ),
+                      "Confirm Booking",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w900,
+                        fontSize: 16,
+                      ),
+                    ),
             ),
           ),
         ],
@@ -157,13 +158,13 @@ class ManualBookingForm extends StatelessWidget {
                     color: isSelected
                         ? colorScheme.primaryContainer.withValues(alpha: 0.6)
                         : colorScheme.surfaceContainerHighest.withValues(
-                      alpha: 0.3,
-                    ),
+                            alpha: 0.3,
+                          ),
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
                       color: isSelected
                           ? colorScheme.primary
-                          : Colors.transparent,
+                          : AppTheme.transparent,
                       width: isSelected ? 1.5 : 0,
                     ),
                   ),

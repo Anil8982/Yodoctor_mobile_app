@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 
 final GlobalKey<ScaffoldMessengerState> appScaffoldMessengerKey =
     GlobalKey<ScaffoldMessengerState>();
@@ -88,7 +89,7 @@ class AppSnackBar {
         textColor = isDarkMode
             ? const Color(0xFFA7F3D0)
             : const Color(0xFF065F46);
-        cardBgColor = isDarkMode ? const Color(0xFF064E3B) : Colors.white;
+        cardBgColor = isDarkMode ? const Color(0xFF064E3B) : AppTheme.white;
         break;
 
       case AppSnackBarType.error:
@@ -98,7 +99,7 @@ class AppSnackBar {
         textColor = isDarkMode
             ? const Color(0xFFFECACA)
             : const Color(0xFF991B1B);
-        cardBgColor = isDarkMode ? const Color(0xFF7F1D1D) : Colors.white;
+        cardBgColor = isDarkMode ? const Color(0xFF7F1D1D) : AppTheme.white;
         break;
 
       case AppSnackBarType.warning:
@@ -107,15 +108,15 @@ class AppSnackBar {
         textColor = isDarkMode
             ? const Color(0xFFFDE68A)
             : const Color(0xFF92400E);
-        cardBgColor = isDarkMode ? const Color(0xFF78350F) : Colors.white;
+        cardBgColor = isDarkMode ? const Color(0xFF78350F) : AppTheme.white;
         break;
 
       case AppSnackBarType.loading:
         accentColor = customAccentColor ?? const Color(0xFF6366F1);
         iconData = Icons.hourglass_empty_rounded;
         snackDuration = duration ?? const Duration(hours: 1);
-        textColor = isDarkMode ? Colors.white : const Color(0xFF0F172A);
-        cardBgColor = isDarkMode ? const Color(0xFF1E293B) : Colors.white;
+        textColor = isDarkMode ? AppTheme.white : const Color(0xFF0F172A);
+        cardBgColor = isDarkMode ? const Color(0xFF1E293B) : AppTheme.white;
         break;
 
       case AppSnackBarType.info:
@@ -124,7 +125,7 @@ class AppSnackBar {
         textColor = isDarkMode
             ? const Color(0xFFBFDBFE)
             : const Color(0xFF1E40AF);
-        cardBgColor = isDarkMode ? const Color(0xFF1E3A8A) : Colors.white;
+        cardBgColor = isDarkMode ? const Color(0xFF1E3A8A) : AppTheme.white;
         break;
     }
 
@@ -148,12 +149,7 @@ class AppSnackBar {
             width: 1.5,
           ),
         ),
-        margin: EdgeInsets.fromLTRB(
-          16,
-          0,
-          16,
-          16 + bottomSafeArea,
-        ),
+        margin: EdgeInsets.fromLTRB(16, 0, 16, 16 + bottomSafeArea),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         content: Row(
           children: [

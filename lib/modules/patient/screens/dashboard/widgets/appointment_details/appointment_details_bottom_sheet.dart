@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/patient/models/dashboard/appointment_model.dart';
 import 'widgets/doctor_profile_card.dart';
 import 'widgets/info_section.dart';
@@ -7,13 +8,13 @@ import 'widgets/action_buttons.dart';
 import 'widgets/appointment_header.dart';
 
 void showAppointmentDetailsBottomSheet(
-    BuildContext context,
-    AppointmentModel appointment,
-    ) {
+  BuildContext context,
+  AppointmentModel appointment,
+) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
-    backgroundColor: Colors.transparent,
+    backgroundColor: AppTheme.transparent,
     isDismissible: true,
     builder: (_) => AppointmentDetailsBottomSheet(appointment: appointment),
   );
@@ -42,7 +43,7 @@ class AppointmentDetailsBottomSheet extends ConsumerWidget {
             boxShadow: [
               BoxShadow(
                 color: isDark
-                    ? Colors.black54
+                    ? AppTheme.black.withValues(alpha: 0.54)
                     : colorScheme.shadow.withValues(alpha: 0.15),
                 blurRadius: 30,
                 offset: const Offset(0, -10),

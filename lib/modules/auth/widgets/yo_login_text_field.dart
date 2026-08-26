@@ -1,5 +1,6 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 
 class YoLoginTextField extends StatefulWidget {
   final Color color;
@@ -73,7 +74,9 @@ class _YoLoginTextFieldState extends State<YoLoginTextField> {
             border: Border.all(
               color: _errorText != null
                   ? colorScheme.error
-                  : (_isFocused && widget.enabled ? widget.color : colorScheme.outlineVariant),
+                  : (_isFocused && widget.enabled
+                        ? widget.color
+                        : colorScheme.outlineVariant),
               width: _isFocused && widget.enabled || _errorText != null ? 2 : 1,
             ),
           ),
@@ -92,7 +95,9 @@ class _YoLoginTextFieldState extends State<YoLoginTextField> {
                 ),
                 child: Icon(
                   widget.prefixIcon,
-                  color: widget.enabled ? Colors.white : colorScheme.onSurfaceVariant.transparency(0.5),
+                  color: widget.enabled
+                      ? AppTheme.white
+                      : colorScheme.onSurfaceVariant.transparency(0.5),
                   size: 22,
                 ),
               ),
@@ -139,25 +144,30 @@ class _YoLoginTextFieldState extends State<YoLoginTextField> {
                     filled: false,
                     isDense: true,
 
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 13),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 13,
+                    ),
                     errorStyle: const TextStyle(height: 0, fontSize: 0),
 
                     suffixIcon: widget.isPassword && widget.enabled
                         ? Padding(
-                      padding: const EdgeInsets.only(right: 4),
-                      child: IconButton(
-                        icon: Icon(
-                          _obscure ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                          color: widget.color,
-                          size: 22,
-                        ),
-                        onPressed: () {
-                          setState(() => _obscure = !_obscure);
-                        },
-                        constraints: const BoxConstraints(),
-                        padding: EdgeInsets.zero,
-                      ),
-                    )
+                            padding: const EdgeInsets.only(right: 4),
+                            child: IconButton(
+                              icon: Icon(
+                                _obscure
+                                    ? Icons.visibility_outlined
+                                    : Icons.visibility_off_outlined,
+                                color: widget.color,
+                                size: 22,
+                              ),
+                              onPressed: () {
+                                setState(() => _obscure = !_obscure);
+                              },
+                              constraints: const BoxConstraints(),
+                              padding: EdgeInsets.zero,
+                            ),
+                          )
                         : null,
                   ),
                 ),
@@ -169,12 +179,16 @@ class _YoLoginTextFieldState extends State<YoLoginTextField> {
           height: 20,
           child: _errorText != null && _errorText!.isNotEmpty
               ? Padding(
-            padding: const EdgeInsets.only(left: 12, top: 4),
-            child: Text(
-              _errorText!,
-              style: TextStyle(color: colorScheme.error, fontSize: 12, fontWeight: FontWeight.w500),
-            ),
-          )
+                  padding: const EdgeInsets.only(left: 12, top: 4),
+                  child: Text(
+                    _errorText!,
+                    style: TextStyle(
+                      color: colorScheme.error,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                )
               : const SizedBox.shrink(),
         ),
       ],

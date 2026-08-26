@@ -1,5 +1,6 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import '../../../../../core/utils/app_spacing.dart';
 import '../../../models/dashboard/appointment_model.dart';
 import 'appointment_details/appointment_details_bottom_sheet.dart';
@@ -20,7 +21,7 @@ class AppointmentCard extends StatelessWidget {
     final bool isAccepted = appointment.status == 'ACCEPTED';
     final Color statusColor = isAccepted
         ? colorScheme.tertiary
-        : Colors.amber.shade700;
+        : AppTheme.amber.shade700;
     final Color statusBg = isAccepted
         ? colorScheme.tertiaryContainer
         : colorScheme.errorContainer;
@@ -41,7 +42,7 @@ class AppointmentCard extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: isDark
-                ? Colors.black26
+                ? AppTheme.black.withValues(alpha: 0.26)
                 : colorScheme.shadow.transparency(0.04),
             blurRadius: 18,
             offset: const Offset(0, 6),
@@ -49,7 +50,7 @@ class AppointmentCard extends StatelessWidget {
         ],
       ),
       child: Material(
-        color: Colors.transparent,
+        color: AppTheme.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(24),
           onTap: () {

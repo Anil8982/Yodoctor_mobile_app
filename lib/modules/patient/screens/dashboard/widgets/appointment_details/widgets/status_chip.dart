@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 
 class StatusChip extends StatelessWidget {
   final String status;
@@ -17,9 +18,7 @@ class StatusChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: statusBg,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: statusColor.withValues(alpha: 0.3),
-        ),
+        border: Border.all(color: statusColor.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -52,7 +51,7 @@ class StatusChip extends StatelessWidget {
       case 'ACCEPTED':
         return colorScheme.tertiary;
       case 'PENDING':
-        return Colors.amber.shade700;
+        return AppTheme.amber.shade700;
       default:
         return colorScheme.error;
     }

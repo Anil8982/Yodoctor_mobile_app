@@ -1,6 +1,7 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/doctor/models/subscription/available_plan_model.dart';
 import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 import '../../../controllers/subscription_controller.dart';
@@ -52,7 +53,7 @@ class AvailablePlansSection extends ConsumerWidget {
           const SizedBox(height: 16),
           Expanded(
             child: Scaffold(
-              backgroundColor: Colors.transparent,
+              backgroundColor: AppTheme.transparent,
               body: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
                 padding: const EdgeInsets.only(left: 24, right: 24, bottom: 24),
@@ -195,7 +196,7 @@ class AvailablePlansSection extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isActive ? colorScheme.primaryContainer : Colors.transparent,
+          color: isActive ? colorScheme.primaryContainer : AppTheme.transparent,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Row(
@@ -214,13 +215,13 @@ class AvailablePlansSection extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: Colors.amber,
+                  color: AppTheme.amber,
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
                   'SAVE 20%',
                   style: theme.textTheme.labelSmall?.copyWith(
-                    color: Colors.black,
+                    color: AppTheme.black,
                     fontWeight: FontWeight.bold,
                     fontSize: 10,
                   ),
@@ -247,7 +248,7 @@ class AvailablePlansSection extends ConsumerWidget {
         color: colorScheme.surfaceContainerHigh,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.transparency(0.08),
+            color: AppTheme.black.transparency(0.08),
             blurRadius: 10,
             offset: const Offset(0, -4),
           ),
@@ -323,7 +324,7 @@ class AvailablePlansSection extends ConsumerWidget {
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppTheme.transparent,
       isScrollControlled: true,
       builder: (context) => Container(
         constraints: BoxConstraints(
@@ -399,13 +400,13 @@ class AvailablePlansSection extends ConsumerWidget {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.amber.transparency(0.15),
+                              color: AppTheme.amber.transparency(0.15),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
                               'BEST VALUE',
                               style: theme.textTheme.labelSmall?.copyWith(
-                                color: Colors.amber.shade700,
+                                color: AppTheme.amber.shade700,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 10,
                                 letterSpacing: 0.5,
@@ -489,13 +490,13 @@ class AvailablePlansSection extends ConsumerWidget {
                                     vertical: 2,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Colors.green.transparency(0.15),
+                                    color: AppTheme.green.transparency(0.15),
                                     borderRadius: BorderRadius.circular(6),
                                   ),
                                   child: Text(
                                     'Save ${((1 - plan.currentPrice / plan.originalPrice) * 100).toInt()}%',
                                     style: theme.textTheme.labelSmall?.copyWith(
-                                      color: Colors.green,
+                                      color: AppTheme.green,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -550,7 +551,7 @@ class AvailablePlansSection extends ConsumerWidget {
                         icon: Icons.discount_rounded,
                         label: 'Discount',
                         value: plan.discountPercentage,
-                        valueColor: Colors.green,
+                        valueColor: AppTheme.green,
                       ),
                     _buildBreakdownTile(
                       context,
@@ -581,7 +582,7 @@ class AvailablePlansSection extends ConsumerWidget {
                                 padding: const EdgeInsets.all(6),
                                 decoration: BoxDecoration(
                                   color: feature.included
-                                      ? Colors.green.transparency(0.1)
+                                      ? AppTheme.green.transparency(0.1)
                                       : colorScheme.onSurfaceVariant
                                             .transparency(0.1),
                                   borderRadius: BorderRadius.circular(8),
@@ -592,7 +593,7 @@ class AvailablePlansSection extends ConsumerWidget {
                                       : Icons.close_rounded,
                                   size: 16,
                                   color: feature.included
-                                      ? Colors.green
+                                      ? AppTheme.green
                                       : colorScheme.onSurfaceVariant
                                             .transparency(0.4),
                                 ),
@@ -626,8 +627,8 @@ class AvailablePlansSection extends ConsumerWidget {
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           color: isDark
-                              ? Colors.white.transparency(0.03)
-                              : Colors.black.transparency(0.02),
+                              ? AppTheme.white.transparency(0.03)
+                              : AppTheme.black.transparency(0.02),
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Row(

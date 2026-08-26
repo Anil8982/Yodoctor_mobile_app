@@ -64,6 +64,9 @@ class ProfileDropdownField extends StatelessWidget {
           );
         }).toList(),
         decoration: InputDecoration(
+          filled: true,
+          fillColor: Colors.transparent,
+
           labelText: label,
           labelStyle: TextStyle(
             color: activeColor,

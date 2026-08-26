@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 
 class PaymentProcessingScreen extends ConsumerWidget {
   const PaymentProcessingScreen({super.key});
@@ -44,7 +45,7 @@ class PaymentProcessingScreen extends ConsumerWidget {
                 Text(
                   'Do not close the app',
                   style: theme.textTheme.labelMedium?.copyWith(
-                    color: Colors.orange,
+                    color: AppTheme.orange,
                     fontWeight: FontWeight.bold,
                   ),
                 ),

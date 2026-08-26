@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/patient/controllers/home_service_controller.dart';
 import 'package:yodoctor/modules/widgets/app_header.dart';
 import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
@@ -449,7 +450,7 @@ class _HomeServiceBookingScreenState
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isSel
-                ? Colors.transparent
+                ? AppTheme.transparent
                 : colorScheme.outlineVariant.withValues(alpha: 0.3),
           ),
         ),
@@ -498,11 +499,11 @@ class _HomeServiceBookingScreenState
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           decoration: BoxDecoration(
-            color: isSel ? colorScheme.primary : Colors.transparent,
+            color: isSel ? colorScheme.primary : AppTheme.transparent,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: isSel
-                  ? Colors.transparent
+                  ? AppTheme.transparent
                   : colorScheme.outlineVariant.withValues(alpha: 0.4),
             ),
             boxShadow: isSel

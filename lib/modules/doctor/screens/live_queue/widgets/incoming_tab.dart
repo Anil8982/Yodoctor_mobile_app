@@ -1,6 +1,7 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
 import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 import '../../../controllers/incoming_appointment_controller.dart';
@@ -57,13 +58,9 @@ class _IncomingTabState extends ConsumerState<IncomingTab> {
               parent: BouncingScrollPhysics(),
             ),
             child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: constraints.maxHeight,
-              ),
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
               child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.md,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -101,7 +98,9 @@ class _IncomingTabState extends ConsumerState<IncomingTab> {
                               avatar: Icon(
                                 icon,
                                 size: 16,
-                                color: selected ? colorScheme.onPrimaryContainer : colorScheme.onSurfaceVariant,
+                                color: selected
+                                    ? colorScheme.onPrimaryContainer
+                                    : colorScheme.onSurfaceVariant,
                               ),
                               label: Text(
                                 index == 0
@@ -114,14 +113,24 @@ class _IncomingTabState extends ConsumerState<IncomingTab> {
                                   selectedFilter = index;
                                 });
                               },
-                              backgroundColor: colorScheme.surfaceContainerHighest.transparency(0.5),
+                              backgroundColor: colorScheme
+                                  .surfaceContainerHighest
+                                  .transparency(0.5),
                               selectedColor: colorScheme.primaryContainer,
                               side: BorderSide(
-                                color: selected ? Colors.transparent : colorScheme.outlineVariant.transparency(0.5),
+                                color: selected
+                                    ? AppTheme.transparent
+                                    : colorScheme.outlineVariant.transparency(
+                                        0.5,
+                                      ),
                               ),
                               labelStyle: TextStyle(
-                                fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-                                color: selected ? colorScheme.onPrimaryContainer : colorScheme.onSurface,
+                                fontWeight: selected
+                                    ? FontWeight.w600
+                                    : FontWeight.w400,
+                                color: selected
+                                    ? colorScheme.onPrimaryContainer
+                                    : colorScheme.onSurface,
                               ),
                             ),
                           );
@@ -137,20 +146,20 @@ class _IncomingTabState extends ConsumerState<IncomingTab> {
                         onPressed: state.loading
                             ? null
                             : () async {
-                          final ok = await notifier.autoAcceptAll();
-                          if (!context.mounted) return;
-                          if (ok) {
-                            AppSnackBar.show(
-                              message: 'All appointments auto-accepted',
-                              type: AppSnackBarType.success,
-                            );
-                          } else {
-                            AppSnackBar.show(
-                              message: 'Auto-accept failed',
-                              type: AppSnackBarType.error,
-                            );
-                          }
-                        },
+                                final ok = await notifier.autoAcceptAll();
+                                if (!context.mounted) return;
+                                if (ok) {
+                                  AppSnackBar.show(
+                                    message: 'All appointments auto-accepted',
+                                    type: AppSnackBarType.success,
+                                  );
+                                } else {
+                                  AppSnackBar.show(
+                                    message: 'Auto-accept failed',
+                                    type: AppSnackBarType.error,
+                                  );
+                                }
+                              },
                         icon: const Icon(Icons.done_all_rounded),
                         label: const Text("Auto Accept All"),
                       ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/patient/models/home_care/home_care_history_model.dart';
 
 class HomeCareHistoryCard extends StatelessWidget {
@@ -32,14 +33,16 @@ class HomeCareHistoryCard extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: colorScheme.shadow.withValues(alpha: isEmergency ? 0.06 : 0.03),
+            color: colorScheme.shadow.withValues(
+              alpha: isEmergency ? 0.06 : 0.03,
+            ),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Material(
-        color: Colors.transparent,
+        color: AppTheme.transparent,
         borderRadius: BorderRadius.circular(24),
         child: InkWell(
           onTap: onTap,
@@ -59,7 +62,9 @@ class HomeCareHistoryCard extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.all(6),
                             decoration: BoxDecoration(
-                              color: colorScheme.primary.withValues(alpha: 0.08),
+                              color: colorScheme.primary.withValues(
+                                alpha: 0.08,
+                              ),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Icon(
@@ -89,15 +94,24 @@ class HomeCareHistoryCard extends StatelessWidget {
                       children: [
                         if (isEmergency) ...[
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 5,
+                            ),
                             decoration: BoxDecoration(
-                              color: colorScheme.errorContainer.withValues(alpha: 0.7),
+                              color: colorScheme.errorContainer.withValues(
+                                alpha: 0.7,
+                              ),
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(Icons.emergency_rounded, size: 12, color: colorScheme.error),
+                                Icon(
+                                  Icons.emergency_rounded,
+                                  size: 12,
+                                  color: colorScheme.error,
+                                ),
                                 const SizedBox(width: 4),
                                 Text(
                                   'Emergency',
@@ -121,7 +135,9 @@ class HomeCareHistoryCard extends StatelessWidget {
 
                 // Service Title
                 Text(
-                  booking.serviceType.isNotEmpty ? booking.serviceType : 'Home Care Service',
+                  booking.serviceType.isNotEmpty
+                      ? booking.serviceType
+                      : 'Home Care Service',
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w800,
                     color: colorScheme.onSurface,
@@ -134,7 +150,9 @@ class HomeCareHistoryCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.25),
+                    color: colorScheme.surfaceContainerHighest.withValues(
+                      alpha: 0.25,
+                    ),
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: Row(
@@ -220,9 +238,15 @@ class HomeCareHistoryCard extends StatelessWidget {
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 colors: [
-                                  colorScheme.outlineVariant.withValues(alpha: 0.0),
-                                  colorScheme.outlineVariant.withValues(alpha: 0.3),
-                                  colorScheme.outlineVariant.withValues(alpha: 0.0),
+                                  colorScheme.outlineVariant.withValues(
+                                    alpha: 0.0,
+                                  ),
+                                  colorScheme.outlineVariant.withValues(
+                                    alpha: 0.3,
+                                  ),
+                                  colorScheme.outlineVariant.withValues(
+                                    alpha: 0.0,
+                                  ),
                                 ],
                               ),
                             ),
@@ -239,13 +263,17 @@ class HomeCareHistoryCard extends StatelessWidget {
                           Icon(
                             Icons.touch_app_rounded,
                             size: 14,
-                            color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+                            color: colorScheme.onSurfaceVariant.withValues(
+                              alpha: 0.6,
+                            ),
                           ),
                           const SizedBox(width: 6),
                           Text(
                             'Tap for full details',
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                              color: colorScheme.onSurfaceVariant.withValues(
+                                alpha: 0.7,
+                              ),
                               fontSize: 11,
                               fontWeight: FontWeight.w500,
                             ),
@@ -267,12 +295,18 @@ class HomeCareHistoryCard extends StatelessWidget {
                           ),
                         ),
                         style: OutlinedButton.styleFrom(
-                          backgroundColor: colorScheme.errorContainer.withValues(alpha: 0.1),
-                          side: BorderSide(color: colorScheme.error.withValues(alpha: 0.3)),
+                          backgroundColor: colorScheme.errorContainer
+                              .withValues(alpha: 0.1),
+                          side: BorderSide(
+                            color: colorScheme.error.withValues(alpha: 0.3),
+                          ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
                           minimumSize: Size.zero,
                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         ),

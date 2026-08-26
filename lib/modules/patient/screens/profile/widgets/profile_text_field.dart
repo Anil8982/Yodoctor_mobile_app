@@ -1,6 +1,7 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 
 class ProfileTextField extends StatelessWidget {
   final String label;
@@ -33,6 +34,9 @@ class ProfileTextField extends StatelessWidget {
         inputFormatters: inputFormatters,
         validator: validator,
         decoration: InputDecoration(
+          filled: true,
+          fillColor: Colors.transparent,
+
           labelText: label,
           hintText: controller.text.trim().isEmpty
               ? (isEditing ? 'Enter $label' : 'Not provided')
@@ -42,7 +46,7 @@ class ProfileTextField extends StatelessWidget {
             fontWeight: FontWeight.w800,
             fontSize: 12,
           ),
-          errorStyle: const TextStyle(fontSize: 12, color: Colors.red),
+          errorStyle: TextStyle(fontSize: 12, color: AppTheme.error(context)),
 
           prefixIcon: Padding(
             padding: const EdgeInsets.only(right: 12.0),
@@ -69,21 +73,21 @@ class ProfileTextField extends StatelessWidget {
 
           suffixIcon: isEditing
               ? Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: Icon(
-              Icons.edit_note_rounded,
-              color: colorScheme.primary,
-              size: 22,
-            ),
-          )
+                  padding: const EdgeInsets.only(right: 16.0),
+                  child: Icon(
+                    Icons.edit_note_rounded,
+                    color: colorScheme.primary,
+                    size: 22,
+                  ),
+                )
               : null,
 
           border: InputBorder.none,
           enabledBorder: InputBorder.none,
           focusedBorder: isEditing
               ? UnderlineInputBorder(
-            borderSide: BorderSide(color: colorScheme.primary, width: 2),
-          )
+                  borderSide: BorderSide(color: colorScheme.primary, width: 2),
+                )
               : InputBorder.none,
 
           contentPadding: const EdgeInsets.symmetric(vertical: 12),

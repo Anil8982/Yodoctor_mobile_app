@@ -1,6 +1,7 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 
 class DocumentUploadTile extends StatelessWidget {
   const DocumentUploadTile({
@@ -88,7 +89,7 @@ class DocumentUploadTile extends StatelessWidget {
               ),
             ),
             child: Material(
-              color: Colors.transparent,
+              color: AppTheme.transparent,
               child: InkWell(
                 onTap: isUploading || isUploaded
                     ? null

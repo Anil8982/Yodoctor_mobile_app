@@ -2,6 +2,7 @@ import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/patient/controllers/qr_scanner_controller.dart';
 
 class QrScannerSheet extends ConsumerStatefulWidget {
@@ -11,7 +12,7 @@ class QrScannerSheet extends ConsumerStatefulWidget {
     return showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppTheme.transparent,
       builder: (context) => const QrScannerSheet(),
     );
   }
@@ -66,14 +67,14 @@ class _QrScannerSheetState extends ConsumerState<QrScannerSheet> {
           // 2. Cut-out Overlay
           ColorFiltered(
             colorFilter: ColorFilter.mode(
-              Colors.black.transparency(0.7),
+              AppTheme.black.transparency(0.7),
               BlendMode.srcOut,
             ),
             child: Stack(
               children: [
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.black.transparency(0.5),
+                    color: AppTheme.black.transparency(0.5),
                     backgroundBlendMode: BlendMode.dstOut,
                   ),
                 ),
@@ -82,7 +83,7 @@ class _QrScannerSheetState extends ConsumerState<QrScannerSheet> {
                     width: 220,
                     height: 220,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppTheme.white,
                       borderRadius: BorderRadius.circular(28),
                     ),
                   ),
@@ -121,17 +122,17 @@ class _QrScannerSheetState extends ConsumerState<QrScannerSheet> {
           if (state.isLoading)
             Positioned.fill(
               child: Container(
-                color: Colors.black.transparency(0.7),
+                color: AppTheme.black.transparency(0.7),
                 child: Center(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const CircularProgressIndicator(color: Colors.white),
+                      CircularProgressIndicator(color: AppTheme.white),
                       const SizedBox(height: 16),
                       Text(
                         'Verifying...',
                         style: textTheme.titleMedium?.copyWith(
-                          color: Colors.white,
+                          color: AppTheme.white,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -152,15 +153,15 @@ class _QrScannerSheetState extends ConsumerState<QrScannerSheet> {
                 Text(
                   "Scan Doctor QR",
                   style: textTheme.titleMedium?.copyWith(
-                    color: Colors.white,
+                    color: AppTheme.white,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 IconButton(
                   style: IconButton.styleFrom(
-                    backgroundColor: Colors.white.transparency(0.1),
+                    backgroundColor: AppTheme.white.transparency(0.1),
                   ),
-                  icon: const Icon(Icons.close, color: Colors.white, size: 20),
+                  icon: Icon(Icons.close, color: AppTheme.white, size: 20),
                   onPressed: () => Navigator.pop(context),
                 ),
               ],
@@ -203,7 +204,9 @@ class _QrScannerSheetState extends ConsumerState<QrScannerSheet> {
                   state.isCooldownActive
                       ? "Scanner will resume shortly..."
                       : "Align the QR code within the frame",
-                  style: textTheme.bodySmall?.copyWith(color: Colors.white70),
+                  style: textTheme.bodySmall?.copyWith(
+                    color: AppTheme.white.withValues(alpha: 0.70),
+                  ),
                 ),
               ],
             ),

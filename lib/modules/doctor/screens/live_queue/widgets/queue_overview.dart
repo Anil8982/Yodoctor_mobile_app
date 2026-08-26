@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
 import '../../../controllers/live_queue_controller.dart';
 
@@ -62,7 +63,9 @@ class _QueueOverviewState extends ConsumerState<QueueOverview> {
                     child: const Icon(Icons.keyboard_arrow_down_rounded),
                   ),
                   splashRadius: 20,
-                  tooltip: _isExpanded ? "Collapse Overview" : "Expand Overview",
+                  tooltip: _isExpanded
+                      ? "Collapse Overview"
+                      : "Expand Overview",
                 ),
               ],
             ),
@@ -116,11 +119,11 @@ class _QueueOverviewState extends ConsumerState<QueueOverview> {
   }
 
   Widget _buildShiftButton(
-      String text,
-      QueueShift shift,
-      ColorScheme colorScheme,
-      WidgetRef ref,
-      ) {
+    String text,
+    QueueShift shift,
+    ColorScheme colorScheme,
+    WidgetRef ref,
+  ) {
     final selectedSlot = ref.watch(
       liveQueueProvider.select((state) => state.selectedSlot),
     );
@@ -139,7 +142,7 @@ class _QueueOverviewState extends ConsumerState<QueueOverview> {
         curve: Curves.easeInOut,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? colorScheme.primary : Colors.transparent,
+          color: isSelected ? colorScheme.primary : AppTheme.transparent,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Text(
@@ -157,12 +160,12 @@ class _QueueOverviewState extends ConsumerState<QueueOverview> {
   }
 
   Widget _buildCounterCards(
-      int total,
-      int waiting,
-      int done,
-      ColorScheme colorScheme,
-      ThemeData theme,
-      ) {
+    int total,
+    int waiting,
+    int done,
+    ColorScheme colorScheme,
+    ThemeData theme,
+  ) {
     return Row(
       children: [
         Expanded(
@@ -180,7 +183,7 @@ class _QueueOverviewState extends ConsumerState<QueueOverview> {
             'Waiting',
             waiting.toString(),
             colorScheme.surfaceContainerLow,
-            Colors.orange.shade800,
+            AppTheme.orange.shade800,
             theme,
           ),
         ),
@@ -190,7 +193,7 @@ class _QueueOverviewState extends ConsumerState<QueueOverview> {
             'Done',
             done.toString(),
             colorScheme.surfaceContainerLow,
-            Colors.green.shade800,
+            AppTheme.green.shade800,
             theme,
           ),
         ),
@@ -199,21 +202,18 @@ class _QueueOverviewState extends ConsumerState<QueueOverview> {
   }
 
   Widget _buildCounterCard(
-      String label,
-      String count,
-      Color bgColor,
-      Color textColor,
-      ThemeData theme,
-      ) {
+    String label,
+    String count,
+    Color bgColor,
+    Color textColor,
+    ThemeData theme,
+  ) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
       decoration: BoxDecoration(
         color: Color.alphaBlend(textColor.withValues(alpha: 0.06), bgColor),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: textColor.withValues(alpha: 0.2),
-          width: 1.2,
-        ),
+        border: Border.all(color: textColor.withValues(alpha: 0.2), width: 1.2),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -250,7 +250,7 @@ class _QueueOverviewState extends ConsumerState<QueueOverview> {
           child: _actionCard(
             title: "Skip",
             icon: Icons.skip_next_rounded,
-            color: Colors.orange,
+            color: AppTheme.orange,
             isEnabled: isEnabled,
             onTap: isEnabled ? () => notifier.skip(current.id, slot) : null,
           ),
@@ -260,7 +260,7 @@ class _QueueOverviewState extends ConsumerState<QueueOverview> {
           child: _actionCard(
             title: "No Show",
             icon: Icons.person_off_rounded,
-            color: Colors.red,
+            color: AppTheme.red,
             isEnabled: isEnabled,
             onTap: isEnabled ? () => notifier.noShow(slot) : null,
           ),
@@ -279,7 +279,7 @@ class _QueueOverviewState extends ConsumerState<QueueOverview> {
     return Opacity(
       opacity: isEnabled ? 1.0 : 0.45,
       child: Material(
-        color: Colors.transparent,
+        color: AppTheme.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(20),
           onTap: onTap,

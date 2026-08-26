@@ -267,7 +267,7 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.transparency(0.04),
+            color: AppTheme.black.transparency(0.04),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),

@@ -31,8 +31,6 @@ class DoctorDashboardScreen extends ConsumerStatefulWidget {
 }
 
 class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
-
-
   @override
   void initState() {
     super.initState();
@@ -43,7 +41,6 @@ class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
           .loadCertificateService();
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -106,16 +103,16 @@ class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
         body: isFirstLoad
             ? const DoctorDashboardBodyShimmer()
             : RefreshIndicator(
-          onRefresh: () async {
-            await Future.wait([
-              ref.read(doctorDashboardProvider.notifier).loadDashboard(),
-              ref
-                  .read(doctorCertificateServiceProvider.notifier)
-                  .loadCertificateService(force: true),
-            ]);
-          },
-          child: _buildDashboardContent(context),
-        ),
+                onRefresh: () async {
+                  await Future.wait([
+                    ref.read(doctorDashboardProvider.notifier).loadDashboard(),
+                    ref
+                        .read(doctorCertificateServiceProvider.notifier)
+                        .loadCertificateService(force: true),
+                  ]);
+                },
+                child: _buildDashboardContent(context),
+              ),
       ),
     );
   }
@@ -144,10 +141,10 @@ class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
   }
 
   Widget _buildDashboardGrid(
-      BuildContext context,
-      dynamic data,
-      bool isMobile,
-      ) {
+    BuildContext context,
+    dynamic data,
+    bool isMobile,
+  ) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -174,7 +171,7 @@ class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
                 title: 'Pending Requests',
                 subtitle: '${data.pendingRequests} awaiting approval',
                 badgeCount: data.pendingRequests,
-                badgeColor: Colors.orange.shade800,
+                badgeColor: AppTheme.orange.shade800,
                 onTap: () {
                   context.push(
                     AppRoutes.doctorLiveQueue,
@@ -274,7 +271,6 @@ class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
         CertificateServiceCard(),
         const SizedBox(height: AppSpacing.md),
 
-
         // 4. PATIENT REGISTRATION (QR TOOL)
         DirectBookingCard(
           onShowQR: widget.onShowQR ?? () => context.push(AppRoutes.doctorQr),
@@ -291,7 +287,7 @@ class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
             ),
           ),
           child: Material(
-            color: Colors.transparent,
+            color: AppTheme.transparent,
             child: InkWell(
               onTap: () {
                 EmergencyCancellationDialog.show(context, ref);
@@ -363,7 +359,8 @@ class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
     if (!isAvailable) {
       subtitleText = 'Queue is currently closed';
     } else if (waitingCount > 0) {
-      subtitleText = '$waitingCount patient${waitingCount == 1 ? '' : 's'} waiting in live queue';
+      subtitleText =
+          '$waitingCount patient${waitingCount == 1 ? '' : 's'} waiting in live queue';
     } else {
       subtitleText = 'No patients waiting currently';
     }
@@ -384,7 +381,7 @@ class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
         ),
       ),
       child: Material(
-        color: Colors.transparent,
+        color: AppTheme.transparent,
         child: InkWell(
           onTap: () => context.push(AppRoutes.doctorLiveQueue),
           borderRadius: BorderRadius.circular(20),
@@ -467,12 +464,12 @@ class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
   }
 
   Widget _buildStatItem(
-      BuildContext context, {
-        required String count,
-        required String label,
-        required IconData icon,
-        required Color accentColor,
-      }) {
+    BuildContext context, {
+    required String count,
+    required String label,
+    required IconData icon,
+    required Color accentColor,
+  }) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 

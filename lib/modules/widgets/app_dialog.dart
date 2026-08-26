@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 
 class AppDialog extends StatelessWidget {
   final String title;
@@ -50,7 +51,7 @@ class AppDialog extends StatelessWidget {
     return showDialog(
       context: context,
       barrierDismissible: barrierDismissible,
-      barrierColor: Colors.black.withValues(alpha: 0.6),
+      barrierColor: AppTheme.black.withValues(alpha: 0.6),
       builder: (context) => AppDialog(
         title: title,
         content: content,
@@ -79,7 +80,7 @@ class AppDialog extends StatelessWidget {
         (isDestructive ? colorScheme.error : colorScheme.primary);
 
     return Dialog(
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppTheme.transparent,
       elevation: 0,
       insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
       child: Container(
@@ -87,7 +88,7 @@ class AppDialog extends StatelessWidget {
           borderRadius: BorderRadius.circular(28),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.15),
+              color: AppTheme.black.withValues(alpha: 0.15),
               blurRadius: 30,
               offset: const Offset(0, 10),
               spreadRadius: 5,

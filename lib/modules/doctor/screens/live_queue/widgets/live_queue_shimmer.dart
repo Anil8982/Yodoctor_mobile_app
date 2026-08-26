@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
 import 'package:yodoctor/modules/widgets/app_shimmer.dart';
 
@@ -77,7 +78,7 @@ class LiveQueueShimmer extends StatelessWidget {
             padding: const EdgeInsets.all(AppSpacing.md),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: Colors.grey.withValues(alpha: 0.15)),
+              border: Border.all(color: AppTheme.grey.withValues(alpha: 0.15)),
             ),
             child: Column(
               children: [
@@ -111,7 +112,9 @@ class LiveQueueShimmer extends StatelessWidget {
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: Colors.grey.withValues(alpha: 0.15)),
+                border: Border.all(
+                  color: AppTheme.grey.withValues(alpha: 0.15),
+                ),
               ),
               child: Row(
                 children: [

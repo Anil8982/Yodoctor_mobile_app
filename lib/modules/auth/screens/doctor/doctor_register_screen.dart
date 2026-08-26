@@ -2,6 +2,7 @@ import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/auth/models/doctor_register_model.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/register_steps/step1_personal.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/register_steps/step2_professional.dart';
@@ -169,9 +170,8 @@ class _DoctorRegisterScreenState extends ConsumerState<DoctorRegisterScreen>
                                     width: 40,
                                     height: 40,
                                     decoration: BoxDecoration(
-                                      color: colorScheme.onSecondary.transparency(
-                                        0.25,
-                                      ),
+                                      color: colorScheme.onSecondary
+                                          .transparency(0.25),
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: Icon(
@@ -406,7 +406,7 @@ class _DoctorRegisterScreenState extends ConsumerState<DoctorRegisterScreen>
             ),
             if (registerState.isLoading)
               Container(
-                color: Colors.black.transparency(0.3),
+                color: AppTheme.black.transparency(0.3),
                 child: const Center(child: CircularProgressIndicator()),
               ),
           ],

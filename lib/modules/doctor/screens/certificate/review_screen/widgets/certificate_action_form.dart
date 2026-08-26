@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
 import 'package:yodoctor/modules/doctor/controllers/doctor_certificate_review_controller.dart';
 import 'package:yodoctor/modules/doctor/models/certificate/doctor_certificate_detail_model.dart';
@@ -53,7 +54,11 @@ class CertificateActionForm extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Header
-              _buildSectionLabel(context, 'CERTIFICATE DETAILS', Icons.assignment_rounded),
+              _buildSectionLabel(
+                context,
+                'CERTIFICATE DETAILS',
+                Icons.assignment_rounded,
+              ),
               const SizedBox(height: 20),
               Divider(
                 color: colorScheme.outlineVariant.withValues(alpha: 0.2),
@@ -95,9 +100,10 @@ class CertificateActionForm extends StatelessWidget {
                 isRequired: true,
                 hint: 'Select validity period',
                 icon: Icons.calendar_today_rounded,
-                value: CertificateConstants.validityPeriods.contains(
-                  validityPeriod.trim(),
-                )
+                value:
+                    CertificateConstants.validityPeriods.contains(
+                      validityPeriod.trim(),
+                    )
                     ? validityPeriod.trim()
                     : null,
                 items: CertificateConstants.validityPeriods,
@@ -119,9 +125,10 @@ class CertificateActionForm extends StatelessWidget {
                 isRequired: true,
                 hint: 'Select fitness assessment status',
                 icon: Icons.health_and_safety_rounded,
-                value: CertificateConstants.fitnessStatuses.contains(
-                  selectedFitnessStatus.trim(),
-                )
+                value:
+                    CertificateConstants.fitnessStatuses.contains(
+                      selectedFitnessStatus.trim(),
+                    )
                     ? selectedFitnessStatus.trim()
                     : null,
                 items: CertificateConstants.fitnessStatuses,
@@ -141,7 +148,8 @@ class CertificateActionForm extends StatelessWidget {
               AppTextField(
                 label: "DOCTOR'S CLINICAL NOTES",
                 isRequired: true,
-                hint: 'Add your clinical findings, observations and recommendations...',
+                hint:
+                    'Add your clinical findings, observations and recommendations...',
                 icon: Icons.notes_rounded,
                 controller: notesController,
                 minLines: 3,
@@ -181,23 +189,25 @@ class CertificateActionForm extends StatelessWidget {
                     backgroundColor: colorScheme.primary,
                     foregroundColor: colorScheme.onPrimary,
                     elevation: 0,
-                    shadowColor: Colors.transparent,
+                    shadowColor: AppTheme.transparent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
                   ),
                   icon: isSubmitting
                       ? SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: colorScheme.onPrimary,
-                    ),
-                  )
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: colorScheme.onPrimary,
+                          ),
+                        )
                       : const Icon(Icons.verified_rounded, size: 20),
                   label: Text(
-                    isSubmitting ? 'Processing Request...' : 'Approve & Generate Certificate',
+                    isSubmitting
+                        ? 'Processing Request...'
+                        : 'Approve & Generate Certificate',
                     style: theme.textTheme.labelLarge?.copyWith(
                       fontWeight: FontWeight.w800,
                       color: colorScheme.onPrimary,
@@ -217,7 +227,9 @@ class CertificateActionForm extends StatelessWidget {
                   onPressed: isSubmitting ? null : onReject,
                   style: OutlinedButton.styleFrom(
                     foregroundColor: colorScheme.error,
-                    backgroundColor: colorScheme.errorContainer.withValues(alpha: 0.08),
+                    backgroundColor: colorScheme.errorContainer.withValues(
+                      alpha: 0.08,
+                    ),
                     elevation: 0,
                     side: BorderSide(
                       color: colorScheme.error.withValues(alpha: 0.25),
@@ -229,13 +241,13 @@ class CertificateActionForm extends StatelessWidget {
                   ),
                   icon: isSubmitting
                       ? SizedBox(
-                    width: 18,
-                    height: 18,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: colorScheme.error,
-                    ),
-                  )
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: colorScheme.error,
+                          ),
+                        )
                       : const Icon(Icons.close_rounded, size: 18),
                   label: Text(
                     'Reject Request',
@@ -266,7 +278,9 @@ class CertificateActionForm extends StatelessWidget {
                     text: TextSpan(
                       text: 'Fields marked with ',
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                        color: colorScheme.onSurfaceVariant.withValues(
+                          alpha: 0.7,
+                        ),
                         fontSize: 11,
                         fontWeight: FontWeight.w500,
                       ),
@@ -279,9 +293,7 @@ class CertificateActionForm extends StatelessWidget {
                             fontSize: 12,
                           ),
                         ),
-                        const TextSpan(
-                          text: 'are required before processing.',
-                        ),
+                        const TextSpan(text: 'are required before processing.'),
                       ],
                     ),
                   ),
@@ -299,11 +311,7 @@ class CertificateActionForm extends StatelessWidget {
 
     return Row(
       children: [
-        Icon(
-          icon,
-          size: 18,
-          color: colorScheme.primary,
-        ),
+        Icon(icon, size: 18, color: colorScheme.primary),
         const SizedBox(width: 10),
         Text(
           label,
@@ -318,12 +326,12 @@ class CertificateActionForm extends StatelessWidget {
   }
 
   Widget _buildInfoField(
-      BuildContext context, {
-        required String label,
-        required String value,
-        required IconData icon,
-        int maxLines = 1,
-      }) {
+    BuildContext context, {
+    required String label,
+    required String value,
+    required IconData icon,
+    int maxLines = 1,
+  }) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 

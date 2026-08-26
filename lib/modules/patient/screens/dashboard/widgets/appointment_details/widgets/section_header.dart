@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 
 class SectionHeader extends StatelessWidget {
   final IconData icon;
   final String title;
 
-  const SectionHeader({
-    super.key,
-    required this.icon,
-    required this.title,
-  });
+  const SectionHeader({super.key, required this.icon, required this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +39,7 @@ class SectionHeader extends StatelessWidget {
             gradient: LinearGradient(
               colors: [
                 colorScheme.primary.withValues(alpha: 0.5),
-                Colors.transparent,
+                AppTheme.transparent,
               ],
             ),
             borderRadius: BorderRadius.circular(1),

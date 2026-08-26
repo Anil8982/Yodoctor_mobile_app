@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
 import 'package:yodoctor/modules/doctor/controllers/live_queue_controller.dart';
 import 'package:yodoctor/modules/doctor/models/appointment/live_queue_model.dart';
@@ -127,12 +128,12 @@ class QueuePatientList extends ConsumerWidget {
 
   Color _getStatusColor(String status) {
     return switch (status) {
-      "ACCEPTED" => Colors.green,
+      "ACCEPTED" => AppTheme.green,
       "IN_PROGRESS" => Colors.blue,
       "COMPLETED" => Colors.teal,
-      "CANCELLED" => Colors.red,
-      "SKIPPED" => Colors.orange,
-      _ => Colors.grey,
+      "CANCELLED" => AppTheme.red,
+      "SKIPPED" => AppTheme.orange,
+      _ => AppTheme.grey,
     };
   }
 
@@ -235,10 +236,7 @@ class QueuePatientList extends ConsumerWidget {
     if (status == "COMPLETED" && !appointment.isWalkIn) {
       return FilledButton.tonalIcon(
         onPressed: () => context.push(
-          '${AppRoutes.doctorAddPrescription.replaceFirst(
-            ':id',
-            appointment.id,
-          )}?name=${Uri.encodeComponent(appointment.patientName)}&token=${Uri.encodeComponent(appointment.tokenNumber)}',
+          '${AppRoutes.doctorAddPrescription.replaceFirst(':id', appointment.id)}?name=${Uri.encodeComponent(appointment.patientName)}&token=${Uri.encodeComponent(appointment.tokenNumber)}',
         ),
         icon: Icon(
           appointment.hasPrescription

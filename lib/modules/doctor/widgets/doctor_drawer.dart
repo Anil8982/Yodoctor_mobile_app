@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/profile_image/profile_image_controller.dart';
 import 'package:yodoctor/core/providers/app_role_provider.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/doctor/models/dashboard/doctor_profile_model.dart';
 import 'package:yodoctor/modules/widgets/app_drawer.dart';
 import 'package:yodoctor/modules/widgets/logout_dialog.dart';
@@ -64,7 +65,8 @@ class DoctorDrawer extends ConsumerWidget {
         GlassDrawerItem(
           icon: Icons.person_outline_rounded,
           label: 'Doctor Profile',
-          selected: currentRoute.contains('profile') ||
+          selected:
+              currentRoute.contains('profile') ||
               currentRoute.contains('doctorprofilesection'),
           onTap: () {
             Navigator.pop(context);
@@ -130,7 +132,7 @@ class DoctorDrawer extends ConsumerWidget {
           onTap: () {
             Navigator.pop(context);
             LogoutDialog.show(context, ref, role: AppRole.doctor);
-            },
+          },
         ),
       ],
     );
@@ -138,7 +140,7 @@ class DoctorDrawer extends ConsumerWidget {
 
   Widget _buildDefaultAvatar(ColorScheme colorScheme) {
     return Container(
-      color: Colors.white.withValues(alpha: 0.15),
+      color: AppTheme.white.withValues(alpha: 0.15),
       alignment: Alignment.center,
       child: Icon(
         Icons.medical_services_rounded,

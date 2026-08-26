@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
 import '../../../controllers/incoming_appointment_controller.dart';
 import '../../../controllers/live_queue_controller.dart';
@@ -9,10 +10,7 @@ import 'incoming_tab.dart';
 class LiveQueueView extends ConsumerStatefulWidget {
   final int initialIndex;
 
-  const LiveQueueView({
-    super.key,
-    this.initialIndex = 0,
-  });
+  const LiveQueueView({super.key, this.initialIndex = 0});
 
   @override
   ConsumerState<LiveQueueView> createState() => _LiveQueueViewState();
@@ -88,7 +86,7 @@ class _LiveQueueViewState extends ConsumerState<LiveQueueView>
                         vertical: 2,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.orange.shade800,
+                        color: AppTheme.orange.shade800,
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
@@ -142,10 +140,7 @@ class _LiveQueueViewState extends ConsumerState<LiveQueueView>
         Expanded(
           child: TabBarView(
             controller: _tabController,
-            children: const [
-              QueueTab(),
-              IncomingTab(),
-            ],
+            children: const [QueueTab(), IncomingTab()],
           ),
         ),
       ],

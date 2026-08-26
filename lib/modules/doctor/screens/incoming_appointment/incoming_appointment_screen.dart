@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/widgets/app_header.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
 import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
@@ -75,11 +76,11 @@ class _IncomingAppointmentScreenState
                     ),
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      color: Colors.transparent,
+                      color: AppTheme.transparent,
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: .01),
+                          color: AppTheme.black.withValues(alpha: .01),
                           blurRadius: 20,
                           offset: const Offset(0, 8),
                         ),
@@ -115,7 +116,11 @@ class _IncomingAppointmentScreenState
 
                             return ChoiceChip(
                               showCheckmark: false,
-                              avatar: Icon(icon, size: 16, color: Colors.black),
+                              avatar: Icon(
+                                icon,
+                                size: 16,
+                                color: AppTheme.black,
+                              ),
                               label: Text(
                                 index == 0
                                     ? "All (${state.appointments.length})"
@@ -132,7 +137,7 @@ class _IncomingAppointmentScreenState
                               side: BorderSide.none,
                               labelStyle: TextStyle(
                                 fontWeight: FontWeight.w400,
-                                color: Colors.black,
+                                color: AppTheme.black,
                               ),
                             );
                           }),
@@ -177,7 +182,7 @@ class _IncomingAppointmentScreenState
                                 Icon(
                                   Icons.calendar_today,
                                   size: 60,
-                                  color: Colors.grey,
+                                  color: AppTheme.grey,
                                 ),
 
                                 const SizedBox(height: AppSpacing.lg),
@@ -190,7 +195,7 @@ class _IncomingAppointmentScreenState
                                   "New appointment requests will appear here.",
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
-                                    color: Colors.grey.shade600,
+                                    color: AppTheme.grey.shade600,
                                     fontSize: 15,
                                   ),
                                 ),

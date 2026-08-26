@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 
 class DrawerHeaderData {
   final String title;
@@ -49,7 +50,7 @@ class AppDrawer extends StatelessWidget {
 
     return Drawer(
       backgroundColor: colorScheme.surface,
-      surfaceTintColor: Colors.transparent,
+      surfaceTintColor: AppTheme.transparent,
       child: SafeArea(
         bottom: false,
         child: Column(
@@ -69,7 +70,7 @@ class AppDrawer extends StatelessWidget {
                 ),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.3),
+                  color: AppTheme.white.withValues(alpha: 0.3),
                   width: 1.2,
                 ),
                 boxShadow: [
@@ -86,10 +87,10 @@ class AppDrawer extends StatelessWidget {
                     width: 50,
                     height: 50,
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.2),
+                      color: AppTheme.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(14),
                       border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.4),
+                        color: AppTheme.white.withValues(alpha: 0.4),
                       ),
                     ),
                     child: ClipRRect(
@@ -119,7 +120,9 @@ class AppDrawer extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: theme.textTheme.bodySmall?.copyWith(
-                            color: colorScheme.onPrimary.withValues(alpha: 0.85),
+                            color: colorScheme.onPrimary.withValues(
+                              alpha: 0.85,
+                            ),
                             fontWeight: FontWeight.w500,
                             fontSize: 12,
                           ),
@@ -138,7 +141,10 @@ class AppDrawer extends StatelessWidget {
             // Navigation Items List
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 children: items,
               ),
             ),
@@ -181,7 +187,8 @@ class GlassDrawerItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final itemColor = foregroundColor ??
+    final itemColor =
+        foregroundColor ??
         (selected ? colorScheme.primary : colorScheme.onSurfaceVariant);
 
     return Container(
@@ -189,24 +196,30 @@ class GlassDrawerItem extends StatelessWidget {
       decoration: BoxDecoration(
         color: selected
             ? colorScheme.primaryContainer.withValues(alpha: 0.4)
-            : Colors.transparent,
+            : AppTheme.transparent,
         borderRadius: BorderRadius.circular(12),
         border: selected
-            ? Border.all(color: colorScheme.primary.withValues(alpha: 0.2), width: 1)
+            ? Border.all(
+                color: colorScheme.primary.withValues(alpha: 0.2),
+                width: 1,
+              )
             : null,
       ),
       child: Material(
-        color: Colors.transparent,
+        color: AppTheme.transparent,
         child: ListTile(
           dense: true,
           visualDensity: const VisualDensity(horizontal: 0, vertical: -1),
           onTap: onTap,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           leading: Icon(icon, color: itemColor, size: 20),
           title: Text(
             label,
             style: TextStyle(
-              color: foregroundColor ??
+              color:
+                  foregroundColor ??
                   (selected ? colorScheme.primary : colorScheme.onSurface),
               fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
               fontSize: 13.5,
@@ -228,10 +241,10 @@ class GlassBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.18),
+        color: AppTheme.white.withValues(alpha: 0.18),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.3),
+          color: AppTheme.white.withValues(alpha: 0.3),
           width: 0.8,
         ),
       ),
@@ -239,8 +252,8 @@ class GlassBadge extends StatelessWidget {
         label.toUpperCase(),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
-        style: const TextStyle(
-          color: Colors.white,
+        style: TextStyle(
+          color: AppTheme.white,
           fontSize: 8.5,
           fontWeight: FontWeight.w800,
           letterSpacing: 0.5,

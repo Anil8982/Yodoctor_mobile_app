@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:yodoctor/core/profile_image/profile_image_controller.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
 import 'package:yodoctor/modules/doctor/controllers/doctor_profile_controller.dart';
 import 'package:yodoctor/modules/doctor/screens/profile/widgets/preview_profile_image_dialog.dart';
@@ -76,10 +77,10 @@ class ProfileHeaderSection extends ConsumerWidget {
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.delete, color: Colors.red),
-                title: const Text(
+                leading: Icon(Icons.delete, color: AppTheme.red),
+                title: Text(
                   'Remove Photo',
-                  style: TextStyle(color: Colors.red),
+                  style: TextStyle(color: AppTheme.red),
                 ),
                 onTap: () async {
                   Navigator.pop(context);

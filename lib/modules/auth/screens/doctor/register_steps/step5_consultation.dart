@@ -2,6 +2,7 @@ import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 
 import 'package:yodoctor/modules/auth/controllers/doctor_register_controller.dart';
 import 'package:yodoctor/modules/auth/models/doctor_register_model.dart';
@@ -116,10 +117,12 @@ class _Step5ConsultationState extends ConsumerState<Step5Consultation> {
     widget.data.fee = _feeCtrl.text.trim();
 
     widget.data.morningEnabled =
-        widget.data.morningStart.isNotEmpty && widget.data.morningEnd.isNotEmpty;
+        widget.data.morningStart.isNotEmpty &&
+        widget.data.morningEnd.isNotEmpty;
 
     widget.data.eveningEnabled =
-        widget.data.eveningStart.isNotEmpty && widget.data.eveningEnd.isNotEmpty;
+        widget.data.eveningStart.isNotEmpty &&
+        widget.data.eveningEnd.isNotEmpty;
 
     if (!widget.data.morningEnabled && !widget.data.eveningEnabled) {
       AppSnackBar.show(
@@ -166,7 +169,8 @@ class _Step5ConsultationState extends ConsumerState<Step5Consultation> {
           StepTitle(
             icon: Icons.schedule_outlined,
             title: 'Consultation Settings',
-            subtitle: 'Configure consultation fees, slot timings, and availability',
+            subtitle:
+                'Configure consultation fees, slot timings, and availability',
             color: colorScheme.primary,
           ),
           const SizedBox(height: 24),
@@ -190,12 +194,17 @@ class _Step5ConsultationState extends ConsumerState<Step5Consultation> {
           const SizedBox(height: 24),
 
           // Average Consultation Duration
-          const SectionLabel(label: 'Average Consultation Duration', isRequired: true),
+          const SectionLabel(
+            label: 'Average Consultation Duration',
+            isRequired: true,
+          ),
           const SizedBox(height: 12),
           Wrap(
             spacing: 10,
             runSpacing: 10,
-            children: ['10 mins', '15 mins', '20 mins', '30 mins'].map((duration) {
+            children: ['10 mins', '15 mins', '20 mins', '30 mins'].map((
+              duration,
+            ) {
               final selected = widget.data.duration == duration;
               return GestureDetector(
                 onTap: () => setState(() => widget.data.duration = duration),
@@ -241,7 +250,7 @@ class _Step5ConsultationState extends ConsumerState<Step5Consultation> {
               final selected = widget.data.selectedDays.contains(day['value']);
               return GestureDetector(
                 onTap: () => setState(
-                      () => selected
+                  () => selected
                       ? widget.data.selectedDays.remove(day['value'])
                       : widget.data.selectedDays.add(day['value']!),
                 ),
@@ -291,9 +300,9 @@ class _Step5ConsultationState extends ConsumerState<Step5Consultation> {
               children: [
                 Row(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.wb_sunny_rounded,
-                      color: Colors.amber,
+                      color: AppTheme.amber,
                       size: 20,
                     ),
                     const SizedBox(width: 8),

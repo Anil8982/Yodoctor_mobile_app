@@ -1,5 +1,6 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 
 class UploadBox extends StatelessWidget {
   final IconData icon;
@@ -24,9 +25,9 @@ class UploadBox extends StatelessWidget {
     final bool isDone = uploadedFile != null && uploadedFile!.isNotEmpty;
 
     final activeColor = isDone
-        ? (colorScheme.tertiary != Colors.transparent
-        ? colorScheme.tertiary
-        : Colors.green)
+        ? (colorScheme.tertiary != AppTheme.transparent
+              ? colorScheme.tertiary
+              : AppTheme.green)
         : colorScheme.primary;
 
     final bgColor = isDone

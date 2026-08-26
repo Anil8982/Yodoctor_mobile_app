@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/providers/app_role_provider.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/core/profile_image/profile_image_controller.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/widgets/app_drawer.dart';
 import '../controllers/profile_controller.dart';
 import '../../widgets/logout_dialog.dart';
@@ -154,7 +155,7 @@ class PatientDrawer extends ConsumerWidget {
 
   Widget _buildDefaultAvatar(ColorScheme colorScheme) {
     return Container(
-      color: Colors.white.withValues(alpha: 0.15),
+      color: AppTheme.white.withValues(alpha: 0.15),
       alignment: Alignment.center,
       child: Icon(Icons.person_rounded, color: colorScheme.onPrimary, size: 26),
     );

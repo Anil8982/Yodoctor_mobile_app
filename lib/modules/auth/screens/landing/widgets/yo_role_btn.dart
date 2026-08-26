@@ -118,35 +118,30 @@
 //   }
 // }
 
-
 import 'package:flutter/material.dart';
 import 'package:yodoctor/core/constants/app_assets.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 
 class YoRoleButton extends StatelessWidget {
   final bool isDoctor;
   final VoidCallback onTap;
 
-  const YoRoleButton({
-    super.key,
-    required this.isDoctor,
-    required this.onTap,
-  });
+  const YoRoleButton({super.key, required this.isDoctor, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    final Color buttonColor =
-    isDoctor ? colorScheme.secondary : colorScheme.primary;
+    final Color buttonColor = isDoctor
+        ? colorScheme.secondary
+        : colorScheme.primary;
 
     final title = isDoctor ? 'I am a Doctor' : 'I am a Patient';
     final subtitle = isDoctor
         ? 'Manage patients & schedules'
         : 'Book appointments & track health';
-    final imagePath = isDoctor
-        ? AppAssets.doctorIcon
-        : AppAssets.patientIcon;
+    final imagePath = isDoctor ? AppAssets.doctorIcon : AppAssets.patientIcon;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -163,12 +158,12 @@ class YoRoleButton extends StatelessWidget {
           ],
         ),
         child: Material(
-          color: Colors.transparent,
+          color: AppTheme.transparent,
           child: InkWell(
             onTap: onTap,
             borderRadius: BorderRadius.circular(20),
             splashColor: colorScheme.onPrimary.withValues(alpha: 0.15),
-            highlightColor: Colors.transparent,
+            highlightColor: AppTheme.transparent,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 18),
               child: SizedBox(
