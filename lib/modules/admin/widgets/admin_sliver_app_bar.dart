@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import 'package:yodoctor/core/theme/app_theme.dart';
 
 class AdminSliverAppBar extends StatelessWidget {
   const AdminSliverAppBar({
@@ -55,9 +54,7 @@ class AdminSliverAppBar extends StatelessWidget {
       ),
 
       flexibleSpace: Container(
-        decoration: BoxDecoration(
-          gradient: AppTheme.adminGradient,
-        ),
+        decoration: BoxDecoration(color: colorScheme.primary),
         child: FlexibleSpaceBar(
           stretchModes: const [StretchMode.zoomBackground],
           background: background,

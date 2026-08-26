@@ -11,6 +11,7 @@ import 'package:yodoctor/modules/auth/controllers/patient_register_controller.da
 import 'package:yodoctor/modules/doctor/controllers/appointment_history_controller.dart';
 import 'package:yodoctor/modules/doctor/controllers/doctor_certificate_controller.dart';
 import 'package:yodoctor/modules/doctor/controllers/doctor_certificate_review_controller.dart';
+import 'package:yodoctor/modules/doctor/controllers/doctor_certificate_service_controller.dart';
 import 'package:yodoctor/modules/doctor/controllers/doctor_dashboard_controller.dart';
 import 'package:yodoctor/modules/doctor/controllers/doctor_profile_controller.dart';
 import 'package:yodoctor/modules/doctor/controllers/doctor_qr_controller.dart';
@@ -64,6 +65,7 @@ class ProviderRegistry {
     ref.invalidate(doctorSubscriptionProvider); // Subscription
     ref.invalidate(doctorReviewProvider); // Reviews
     ref.invalidate(liveQueueProvider); // Live Queue
+    ref.invalidate(doctorCertificateServiceProvider); // Certificate Service
 
     // Patient
     ref.invalidate(patientDashboardControllerProvider); // Dashboard

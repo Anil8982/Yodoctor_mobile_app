@@ -4,8 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 
-import '../../../core/theme/app_theme.dart';
-
 class DoctorSliverAppBar extends StatefulWidget {
   const DoctorSliverAppBar({
     super.key,
@@ -44,7 +42,6 @@ class _DoctorSliverAppBarState extends State<DoctorSliverAppBar> {
             ? (constraints.scrollOffset / maxScrollExtent).clamp(0.0, 1.0)
             : 0.0;
 
-        // 70% close (0.7) te 100% close (1.0) paryant opacity map keli
         final double titleOpacity = ((expandRatio - 0.7) / 0.3).clamp(0.0, 1.0);
         final bool showTitle = titleOpacity > 0.0;
 
@@ -121,7 +118,7 @@ class _DoctorSliverAppBarState extends State<DoctorSliverAppBar> {
             ],
           ),
           flexibleSpace: Container(
-            decoration: BoxDecoration(gradient: AppTheme.doctorGradient),
+            color: colorScheme.primary,
             child: FlexibleSpaceBar(
               stretchModes: const [StretchMode.zoomBackground],
               background: widget.background,

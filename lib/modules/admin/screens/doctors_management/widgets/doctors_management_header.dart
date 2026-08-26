@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:yodoctor/core/theme/app_theme.dart';
 import '../../../../../../core/utils/app_spacing.dart';
-import '../../../../widgets/gradient_background.dart';
 
 class DoctorsManagementHeader extends StatelessWidget {
   const DoctorsManagementHeader({super.key});
@@ -12,14 +10,18 @@ class DoctorsManagementHeader extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final topPadding = MediaQuery.of(context).padding.top;
 
-    return GradientBackground(
-      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(32)),
-        colors: AppTheme.adminGradient.colors,
+    return Container(
       padding: EdgeInsets.fromLTRB(
         AppSpacing.xl,
         topPadding + 50,
         AppSpacing.xl,
         AppSpacing.xl,
+      ),
+      decoration: BoxDecoration(
+        color: colorScheme.primary,
+        borderRadius: const BorderRadius.vertical(
+          bottom: Radius.circular(32),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:yodoctor/modules/patient/models/family/family_member_model.dart';
 import 'member_info_tag.dart';
-import '../../../models/family/family_member_model.dart';
 
 class FamilyMemberCard extends StatelessWidget {
   const FamilyMemberCard({
@@ -243,13 +243,16 @@ class FamilyMemberCard extends StatelessWidget {
                         onPressed: onDelete == null
                             ? null
                             : () {
-                                Navigator.pop(modalContext);
-                                onDelete?.call();
-                              },
+                          Navigator.pop(modalContext);
+                          onDelete?.call();
+                        },
                         icon: const Icon(Icons.delete_outline_rounded),
                         label: const Text('Remove'),
                         style: FilledButton.styleFrom(
-                          foregroundColor: colorScheme.error,
+                          backgroundColor: colorScheme.errorContainer,
+                          foregroundColor: colorScheme.onErrorContainer,
+                          disabledBackgroundColor: colorScheme.surfaceContainerHighest,
+                          disabledForegroundColor: colorScheme.onSurfaceVariant,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
@@ -263,9 +266,9 @@ class FamilyMemberCard extends StatelessWidget {
                         onPressed: onEdit == null
                             ? null
                             : () {
-                                Navigator.pop(modalContext);
-                                onEdit?.call();
-                              },
+                          Navigator.pop(modalContext);
+                          onEdit?.call();
+                        },
                         icon: const Icon(Icons.edit_rounded),
                         label: const Text('Update'),
                         style: FilledButton.styleFrom(
@@ -287,13 +290,13 @@ class FamilyMemberCard extends StatelessWidget {
   }
 
   Widget _buildInfoBox(
-    BuildContext context,
-    IconData icon,
-    String label,
-    String value,
-    double width, {
-    bool isError = false,
-  }) {
+      BuildContext context,
+      IconData icon,
+      String label,
+      String value,
+      double width, {
+        bool isError = false,
+      }) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
@@ -322,7 +325,7 @@ class FamilyMemberCard extends StatelessWidget {
                 Text(
                   label,
                   style: textTheme.labelSmall?.copyWith(
-                    color: colorScheme.outline,
+                    color: colorScheme.onSurfaceVariant,
                   ),
                 ),
                 Text(

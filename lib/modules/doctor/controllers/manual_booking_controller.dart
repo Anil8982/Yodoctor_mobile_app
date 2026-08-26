@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
@@ -32,17 +31,12 @@ class ManualBookingState {
 }
 
 final manualBookingProvider =
-    NotifierProvider<ManualBookingNotifier, ManualBookingState>(
-      ManualBookingNotifier.new,
-    );
+NotifierProvider<ManualBookingNotifier, ManualBookingState>(
+  ManualBookingNotifier.new,
+);
 
 class ManualBookingNotifier extends Notifier<ManualBookingState> {
   static const String _subTag = 'ManualBookingNotifier';
-
-  final formKey = GlobalKey<FormState>();
-  final patientNameController = TextEditingController();
-  final mobileController = TextEditingController();
-  final ageController = TextEditingController();
 
   @override
   ManualBookingState build() {
@@ -51,11 +45,6 @@ class ManualBookingNotifier extends Notifier<ManualBookingState> {
       tag: LogTags.doctor,
       subTag: _subTag,
     );
-    ref.onDispose(() {
-      patientNameController.dispose();
-      mobileController.dispose();
-      ageController.dispose();
-    });
 
     return ManualBookingState(selectedShift: _getDefaultShift());
   }
@@ -73,10 +62,14 @@ class ManualBookingNotifier extends Notifier<ManualBookingState> {
     state = state.copyWith(selectedShift: shift);
   }
 
-  Future<bool> submit() async {
-    if (!formKey.currentState!.validate() || state.loading) {
+  Future<bool> submit({
+    required String patientName,
+    required String mobile,
+    required String age,
+  }) async {
+    if (state.loading) {
       AppLogger.warning(
-        'Form validation failed or submission blocked due to loading state',
+        'Submission blocked due to loading state',
         tag: LogTags.doctor,
         subTag: _subTag,
       );
@@ -89,9 +82,9 @@ class ManualBookingNotifier extends Notifier<ManualBookingState> {
         ? "MORNING"
         : "EVENING";
     final payload = {
-      "patientName": patientNameController.text.trim(),
-      "patientMobile": mobileController.text.trim(),
-      "patientAge": int.tryParse(ageController.text) ?? 0,
+      "patientName": patientName,
+      "patientMobile": mobile,
+      "patientAge": int.tryParse(age) ?? 0,
       "slot": mappedSlot,
     };
 
@@ -109,9 +102,9 @@ class ManualBookingNotifier extends Notifier<ManualBookingState> {
     try {
       final repository = ref.read(manualBookingRepositoryProvider);
       final response = await repository.bookPatient(
-        patientName: patientNameController.text.trim(),
-        patientMobile: mobileController.text.trim(),
-        patientAge: int.tryParse(ageController.text) ?? 0,
+        patientName: patientName,
+        patientMobile: mobile,
+        patientAge: int.tryParse(age) ?? 0,
         slot: mappedSlot,
       );
 
@@ -123,10 +116,6 @@ class ManualBookingNotifier extends Notifier<ManualBookingState> {
           tag: LogTags.doctor,
           subTag: _subTag,
         );
-
-        patientNameController.clear();
-        mobileController.clear();
-        ageController.clear();
 
         state = ManualBookingState(selectedShift: _getDefaultShift());
         return true;

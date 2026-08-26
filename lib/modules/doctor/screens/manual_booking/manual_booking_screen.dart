@@ -17,7 +17,19 @@ class ManualBookingScreen extends ConsumerStatefulWidget {
 }
 
 class _ManualBookingScreenState extends ConsumerState<ManualBookingScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _patientNameController = TextEditingController();
+  final _mobileController = TextEditingController();
+  final _ageController = TextEditingController();
   bool _submittedOnce = false;
+
+  @override
+  void dispose() {
+    _patientNameController.dispose();
+    _mobileController.dispose();
+    _ageController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,14 +90,14 @@ class _ManualBookingScreenState extends ConsumerState<ManualBookingScreen> {
                               const BookingHeader(),
                               const SizedBox(height: AppSpacing.xxl),
                               ManualBookingForm(
-                                formKey: notifier.formKey,
+                                formKey: _formKey,
                                 autovalidateMode: _submittedOnce
                                     ? AutovalidateMode.onUserInteraction
                                     : AutovalidateMode.disabled,
                                 patientNameController:
-                                    notifier.patientNameController,
-                                mobileController: notifier.mobileController,
-                                ageController: notifier.ageController,
+                                _patientNameController,
+                                mobileController: _mobileController,
+                                ageController: _ageController,
                                 selectedShift: state.selectedShift,
                                 loading: state.loading,
                                 onShiftChanged: (value) {
@@ -97,12 +109,16 @@ class _ManualBookingScreenState extends ConsumerState<ManualBookingScreen> {
                                   setState(() {
                                     _submittedOnce = true;
                                   });
-                                  if (!notifier.formKey.currentState!
-                                      .validate()) {
+                                  if (!_formKey.currentState!.validate()) {
                                     return;
                                   }
 
-                                  final success = await notifier.submit();
+                                  final success = await notifier.submit(
+                                    patientName:
+                                    _patientNameController.text.trim(),
+                                    mobile: _mobileController.text.trim(),
+                                    age: _ageController.text.trim(),
+                                  );
 
                                   if (!context.mounted) return;
 
@@ -110,9 +126,12 @@ class _ManualBookingScreenState extends ConsumerState<ManualBookingScreen> {
                                     setState(() {
                                       _submittedOnce = false;
                                     });
+                                    _patientNameController.clear();
+                                    _mobileController.clear();
+                                    _ageController.clear();
                                     AppSnackBar.show(
                                       message:
-                                          'Patient booked successfully! 🚀',
+                                      'Patient booked successfully! 🚀',
                                       type: AppSnackBarType.success,
                                     );
                                   } else {
@@ -121,7 +140,7 @@ class _ManualBookingScreenState extends ConsumerState<ManualBookingScreen> {
                                     );
                                     AppSnackBar.show(
                                       message:
-                                          currentState.errorMessage ??
+                                      currentState.errorMessage ??
                                           "Registration failed. Try again.",
                                       type: AppSnackBarType.error,
                                     );

@@ -34,7 +34,6 @@ Future<void> main() async {
     ),
   );
 
-  // runApp(const ProviderScope(child: YoDoctorApp()));
   runApp(
     ProviderScope(
       overrides: [
@@ -58,19 +57,22 @@ class YoDoctorApp extends ConsumerWidget {
       title: 'YoDoctor',
       debugShowCheckedModeBanner: false,
       routerConfig: goRouter,
-      theme: _getThemeForRole(currentRole),
-      themeMode: ThemeMode.light,
+      theme: _getThemeForRole(currentRole, Brightness.light),
+      darkTheme: _getThemeForRole(currentRole, Brightness.dark),
+      themeMode: ThemeMode.system,
     );
   }
 
-  ThemeData _getThemeForRole(AppRole role) {
+  ThemeData _getThemeForRole(AppRole role, Brightness brightness) {
+    final isDark = brightness == Brightness.dark;
+
     switch (role) {
       case AppRole.doctor:
-        return AppTheme.doctorTheme;
+        return isDark ? AppTheme.doctorDarkTheme : AppTheme.doctorTheme;
       case AppRole.admin:
-        return AppTheme.adminTheme;
+        return isDark ? AppTheme.adminDarkTheme : AppTheme.adminTheme;
       case AppRole.patient:
-        return AppTheme.patientTheme;
+        return isDark ? AppTheme.patientDarkTheme : AppTheme.patientTheme;
     }
   }
 }

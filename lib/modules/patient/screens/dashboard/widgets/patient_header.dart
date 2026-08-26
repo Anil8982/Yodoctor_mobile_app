@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../core/utils/app_spacing.dart';
-import '../../../../widgets/gradient_background.dart';
 import '../../../models/dashboard/dashboard_model.dart';
 
 class PatientHeader extends StatelessWidget {
@@ -15,22 +14,26 @@ class PatientHeader extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final topPadding = MediaQuery.of(context).padding.top;
 
-    final String safePatientName = dashboard?.patientName ?? "YoDoctor";
+    final String safePatientName = dashboard?.patientName ?? 'YoDoctor';
 
-    return GradientBackground(
-      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(32)),
+    return Container(
       padding: EdgeInsets.fromLTRB(
         AppSpacing.xl,
         topPadding + 50,
         AppSpacing.xl,
         AppSpacing.xl,
       ),
+      decoration: BoxDecoration(
+        color: colorScheme.primary,
+        borderRadius: const BorderRadius.vertical(
+          bottom: Radius.circular(32),
+        ),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const SizedBox(height: 10),
-
           Text(
             safePatientName,
             style: theme.textTheme.headlineMedium?.copyWith(
@@ -38,14 +41,15 @@ class PatientHeader extends StatelessWidget {
               fontWeight: FontWeight.w800,
             ),
           ),
-
           const SizedBox(height: AppSpacing.md),
-
           if (dashboard != null)
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 8,
+              ),
               decoration: BoxDecoration(
-                color: colorScheme.onPrimary.withValues(alpha: .15),
+                color: colorScheme.onPrimary.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
@@ -58,7 +62,7 @@ class PatientHeader extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    "${dashboard!.upcomingCount} upcoming visits",
+                    '${dashboard!.upcomingCount} upcoming visits',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: colorScheme.onPrimary,
                       fontWeight: FontWeight.w700,
@@ -68,9 +72,8 @@ class PatientHeader extends StatelessWidget {
               ),
             )
           else
-
             Text(
-              "Patient Dashboard",
+              'Patient Dashboard',
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onPrimary.withValues(alpha: 0.8),
                 fontWeight: FontWeight.w600,

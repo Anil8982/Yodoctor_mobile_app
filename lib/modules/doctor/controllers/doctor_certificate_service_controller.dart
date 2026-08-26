@@ -4,9 +4,9 @@ import 'package:yodoctor/modules/doctor/models/certificate/certificate_service_m
 import 'package:yodoctor/modules/doctor/repositories/doctor_certificate_service_repository.dart';
 
 final doctorCertificateServiceProvider =
-    NotifierProvider<DoctorCertificateServiceNotifier, CertificateServiceState>(
-      DoctorCertificateServiceNotifier.new,
-    );
+NotifierProvider<DoctorCertificateServiceNotifier, CertificateServiceState>(
+  DoctorCertificateServiceNotifier.new,
+);
 
 class CertificateServiceState {
   final CertificateServiceModel? service;
@@ -65,12 +65,13 @@ class CertificateServiceState {
 
 class DoctorCertificateServiceNotifier
     extends Notifier<CertificateServiceState> {
-  late final DoctorCertificateServiceRepository _repository;
+
+  // Late final ऐवजी getter वापरला जेणेकरून state reset / rebuild वेळी error येणार नाही
+  DoctorCertificateServiceRepository get _repository =>
+      ref.read(doctorCertificateServiceRepositoryProvider);
 
   @override
   CertificateServiceState build() {
-    _repository = ref.read(doctorCertificateServiceRepositoryProvider);
-
     return const CertificateServiceState();
   }
 
@@ -124,6 +125,7 @@ class DoctorCertificateServiceNotifier
       );
     }
   }
+
   void updateDraftFee(String feeText) {
     state = state.copyWith(
       draftFeeText: feeText,
@@ -245,7 +247,7 @@ class DoctorCertificateServiceNotifier
         draftFeeText: service.fee > 0 ? service.fee.toStringAsFixed(0) : '',
         draftInstructions: service.instructions ?? '',
         saveMessage:
-            responseData['message'] ?? 'Certificate service saved successfully',
+        responseData['message'] ?? 'Certificate service saved successfully',
         clearError: true,
       );
 

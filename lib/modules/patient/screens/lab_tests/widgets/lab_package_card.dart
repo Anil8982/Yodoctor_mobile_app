@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/patient/models/lab/lab_test_model.dart';
 
 class LabPackageCard extends StatelessWidget {
@@ -88,15 +89,15 @@ class LabPackageCard extends StatelessWidget {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.green,
+                    color: AppTheme.success(context),
                     borderRadius: BorderRadius.circular(100),
                   ),
                   child: Text(
                     '${package.discountPercentage}% OFF',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 9,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: AppTheme.onSuccess(context),
                     ),
                   ),
                 ),
@@ -109,7 +110,6 @@ class LabPackageCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 🎯 FIX: Title आणि Subtitle ची एकूण उंची फिक्स केली, जेणेकरून बटन्स हलणार नाहीत!
                   SizedBox(
                     height: 52,
                     child: Column(
@@ -132,9 +132,7 @@ class LabPackageCard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             style: theme.textTheme.bodySmall?.copyWith(
                               fontSize: 11,
-                              color: colorScheme.onSurfaceVariant.withValues(
-                                alpha: 0.8,
-                              ),
+                              color: colorScheme.onSurfaceVariant,
                               height: 1.2,
                             ),
                           ),
@@ -148,7 +146,7 @@ class LabPackageCard extends StatelessWidget {
                       Icon(
                         Icons.analytics_outlined,
                         size: 12,
-                        color: colorScheme.outline,
+                        color: colorScheme.onSurfaceVariant,
                       ),
                       const SizedBox(width: 4),
                       Flexible(
@@ -158,7 +156,7 @@ class LabPackageCard extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           style: theme.textTheme.bodySmall?.copyWith(
                             fontSize: 10,
-                            color: colorScheme.outline,
+                            color: colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ),
@@ -168,10 +166,10 @@ class LabPackageCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.check_circle_rounded,
                           size: 11,
-                          color: Colors.green,
+                          color: AppTheme.success(context),
                         ),
                         const SizedBox(width: 4),
                         Expanded(
@@ -181,7 +179,7 @@ class LabPackageCard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             style: theme.textTheme.bodySmall?.copyWith(
                               fontSize: 9,
-                              color: Colors.green,
+                              color: AppTheme.success(context),
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -189,9 +187,6 @@ class LabPackageCard extends StatelessWidget {
                       ],
                     ),
                   ],
-
-                  // 🎯 FIX: किंमत आणि बटन्स नेहमी तळाशी स्थिर राहतील
-                  // const SizedBox(height: 12),
                   const Spacer(),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.baseline,
@@ -208,7 +203,7 @@ class LabPackageCard extends StatelessWidget {
                       Text(
                         '₹${package.originalPrice.toInt()}',
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: colorScheme.outline,
+                          color: colorScheme.onSurfaceVariant,
                           decoration: TextDecoration.lineThrough,
                           fontSize: 11,
                         ),
@@ -237,7 +232,7 @@ class LabPackageCard extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
-                                color: colorScheme.onSurfaceVariant,
+                                color: colorScheme.onSurface,
                               ),
                             ),
                           ),
