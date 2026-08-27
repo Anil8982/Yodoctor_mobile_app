@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/patient/models/dashboard/appointment_model.dart';
 import 'status_chip.dart';
 
@@ -32,10 +33,7 @@ class DoctorProfileCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          _DoctorAvatar(
-            appointment: appointment,
-            colorScheme: colorScheme,
-          ),
+          _DoctorAvatar(appointment: appointment, colorScheme: colorScheme),
           const SizedBox(width: 16),
           Expanded(
             child: _DoctorInfo(
@@ -53,10 +51,7 @@ class _DoctorAvatar extends StatelessWidget {
   final AppointmentModel appointment;
   final ColorScheme colorScheme;
 
-  const _DoctorAvatar({
-    required this.appointment,
-    required this.colorScheme,
-  });
+  const _DoctorAvatar({required this.appointment, required this.colorScheme});
 
   @override
   Widget build(BuildContext context) {
@@ -104,7 +99,7 @@ class _DoctorAvatar extends StatelessWidget {
                   strokeWidth: 2,
                   value: loadingProgress.expectedTotalBytes != null
                       ? loadingProgress.cumulativeBytesLoaded /
-                      loadingProgress.expectedTotalBytes!
+                            loadingProgress.expectedTotalBytes!
                       : null,
                 ),
               ),
@@ -184,11 +179,7 @@ class _StatusBadge extends StatelessWidget {
           color: statusColor,
           borderRadius: BorderRadius.circular(10),
         ),
-        child: Icon(
-          _getStatusIcon(status),
-          size: 12,
-          color: Colors.white,
-        ),
+        child: Icon(_getStatusIcon(status), size: 12, color: AppTheme.white),
       ),
     );
   }
@@ -198,10 +189,7 @@ class _DoctorInfo extends StatelessWidget {
   final AppointmentModel appointment;
   final ColorScheme colorScheme;
 
-  const _DoctorInfo({
-    required this.appointment,
-    required this.colorScheme,
-  });
+  const _DoctorInfo({required this.appointment, required this.colorScheme});
 
   @override
   Widget build(BuildContext context) {
@@ -221,7 +209,11 @@ class _DoctorInfo extends StatelessWidget {
         const SizedBox(height: 4),
         Row(
           children: [
-            Icon(Icons.medical_services_rounded, size: 14, color: colorScheme.primary),
+            Icon(
+              Icons.medical_services_rounded,
+              size: 14,
+              color: colorScheme.primary,
+            ),
             const SizedBox(width: 4),
             Flexible(
               child: Text(
@@ -246,7 +238,7 @@ Color _getStatusColor(String status, ColorScheme colorScheme) {
     case 'ACCEPTED':
       return colorScheme.tertiary;
     case 'PENDING':
-      return Colors.amber.shade700;
+      return AppTheme.amber.shade700;
     default:
       return colorScheme.error;
   }

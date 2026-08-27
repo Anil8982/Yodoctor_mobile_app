@@ -247,7 +247,7 @@ class LabPackageCard extends StatelessWidget {
                             style: OutlinedButton.styleFrom(
                               backgroundColor: isInCart
                                   ? colorScheme.primary
-                                  : Colors.transparent,
+                                  : AppTheme.transparent,
                               side: BorderSide(color: colorScheme.primary),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),

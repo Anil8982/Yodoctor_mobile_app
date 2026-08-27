@@ -247,6 +247,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:chroma_kit/chroma_kit.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/doctor/models/subscription/available_plan_model.dart';
 import '../../../controllers/subscription_controller.dart';
 
@@ -319,7 +320,7 @@ class SubscriptionPricingCard extends ConsumerWidget {
         ),
         boxShadow: isSelected
             ? [
-                Colors.black.shadow(
+                AppTheme.black.shadow(
                   opacity: isDarkMode ? 0.2 : 0.04,
                   blurRadius: 16,
                   offset: const Offset(0, 6),
@@ -476,13 +477,13 @@ class SubscriptionPricingCard extends ConsumerWidget {
                       vertical: 3,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.amber.transparency(0.2),
+                      color: AppTheme.amber.transparency(0.2),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
                       'BEST',
                       style: theme.textTheme.labelSmall?.copyWith(
-                        color: Colors.amber.shade700,
+                        color: AppTheme.amber.shade700,
                         fontWeight: FontWeight.bold,
                         fontSize: 10,
                         letterSpacing: 0.5,
@@ -557,7 +558,7 @@ class SubscriptionPricingCard extends ConsumerWidget {
         Text(
           'Save ${((1 - plan.currentPrice / plan.originalPrice) * 100).toInt()}%',
           style: theme.textTheme.labelSmall?.copyWith(
-            color: Colors.green,
+            color: AppTheme.green,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -603,7 +604,7 @@ class SubscriptionPricingCard extends ConsumerWidget {
                       : Icons.remove_circle_outline_rounded,
                   size: 18,
                   color: feature.included
-                      ? (isSelected ? activeColor : Colors.green)
+                      ? (isSelected ? activeColor : AppTheme.green)
                       : colorScheme.onSurfaceVariant.transparency(0.4),
                 ),
                 const SizedBox(width: 10),
@@ -650,7 +651,7 @@ class SubscriptionPricingCard extends ConsumerWidget {
         onPressed: () =>
             ref.read(doctorSubscriptionProvider.notifier).selectNewPlan(plan),
         style: OutlinedButton.styleFrom(
-          backgroundColor: isSelected ? activeColor : Colors.transparent,
+          backgroundColor: isSelected ? activeColor : AppTheme.transparent,
           foregroundColor: isSelected ? headerTextColor : activeColor,
           side: BorderSide(color: activeColor, width: 1.5),
           shape: RoundedRectangleBorder(

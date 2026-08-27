@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:yodoctor/core/network/dio_provider.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/widgets/app_header.dart';
 
 class DocumentViewerScreen extends ConsumerStatefulWidget {
@@ -138,14 +139,14 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: isRestricted
-                    ? Colors.orange.transparency(0.1)
+                    ? AppTheme.orange.transparency(0.1)
                     : colorScheme.errorContainer.transparency(0.3),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 isRestricted ? Icons.lock_outline : Icons.wifi_off,
                 size: 48,
-                color: isRestricted ? Colors.orange : colorScheme.error,
+                color: isRestricted ? AppTheme.orange : colorScheme.error,
               ),
             ),
             const SizedBox(height: 24),
@@ -188,7 +189,7 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.picture_as_pdf, size: 60, color: Colors.red),
+          Icon(Icons.picture_as_pdf, size: 60, color: AppTheme.red),
           const SizedBox(height: 16),
           const Text(
             'Opening PDF...',
@@ -212,14 +213,16 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: widget.isPdf
-                    ? Colors.red.transparency(0.1)
+                    ? AppTheme.red.transparency(0.1)
                     : colorScheme.surfaceContainerHighest,
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 widget.isPdf ? Icons.picture_as_pdf : Icons.insert_drive_file,
                 size: 48,
-                color: widget.isPdf ? Colors.red : colorScheme.onSurfaceVariant,
+                color: widget.isPdf
+                    ? AppTheme.red
+                    : colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 24),

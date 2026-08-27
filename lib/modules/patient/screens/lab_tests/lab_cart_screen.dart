@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/patient/controllers/lab_test_controller.dart';
 import 'package:yodoctor/modules/widgets/app_header.dart';
 
@@ -238,7 +239,7 @@ class LabCartScreen extends ConsumerWidget {
                                 'You Save',
                                 '- ₹${totalSavings.toInt()}',
                                 isBold: false,
-                                textColor: Colors.green,
+                                textColor: AppTheme.green,
                               ),
                               const SizedBox(height: 12),
                               Container(
@@ -247,25 +248,27 @@ class LabCartScreen extends ConsumerWidget {
                                   vertical: 10,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Colors.green.withValues(alpha: 0.08),
+                                  color: AppTheme.green.withValues(alpha: 0.08),
                                   borderRadius: BorderRadius.circular(12),
                                   border: Border.all(
-                                    color: Colors.green.withValues(alpha: 0.2),
+                                    color: AppTheme.green.withValues(
+                                      alpha: 0.2,
+                                    ),
                                   ),
                                 ),
                                 child: Row(
                                   children: [
-                                    const Icon(
+                                    Icon(
                                       Icons.local_offer_outlined,
-                                      color: Colors.green,
+                                      color: AppTheme.green,
                                       size: 16,
                                     ),
                                     const SizedBox(width: 8),
                                     Expanded(
                                       child: Text(
                                         'Great deal! You\'re saving $averageDiscount% on this order.',
-                                        style: const TextStyle(
-                                          color: Colors.green,
+                                        style: TextStyle(
+                                          color: AppTheme.green,
                                           fontSize: 11,
                                           fontWeight: FontWeight.w600,
                                         ),

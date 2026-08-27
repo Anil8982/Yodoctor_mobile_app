@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
 import 'package:yodoctor/core/utils/responsive.dart';
 import 'package:yodoctor/modules/widgets/app_shimmer.dart';
@@ -17,24 +18,24 @@ class FindDoctorsShimmer extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: horizontal),
         child: mobile
             ? Column(
-          mainAxisSize: MainAxisSize.min,
-          children: List.generate(
-            6,
-                (index) => _buildDoctorCardShimmer(),
-          ),
-        )
+                mainAxisSize: MainAxisSize.min,
+                children: List.generate(
+                  6,
+                  (index) => _buildDoctorCardShimmer(),
+                ),
+              )
             : GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: desktop ? 3 : 2,
-            mainAxisSpacing: AppSpacing.sm,
-            crossAxisSpacing: AppSpacing.sm,
-            childAspectRatio: desktop ? 1.4 : 1.1,
-          ),
-          itemCount: 6,
-          itemBuilder: (context, index) => _buildDoctorCardShimmer(),
-        ),
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: desktop ? 3 : 2,
+                  mainAxisSpacing: AppSpacing.sm,
+                  crossAxisSpacing: AppSpacing.sm,
+                  childAspectRatio: desktop ? 1.4 : 1.1,
+                ),
+                itemCount: 6,
+                itemBuilder: (context, index) => _buildDoctorCardShimmer(),
+              ),
       ),
     );
   }
@@ -44,7 +45,7 @@ class FindDoctorsShimmer extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: AppSpacing.md),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.white,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
@@ -60,7 +61,7 @@ class FindDoctorsShimmer extends StatelessWidget {
                 width: 60,
                 height: 60,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppTheme.white,
                   borderRadius: BorderRadius.circular(14),
                 ),
               ),
@@ -75,7 +76,7 @@ class FindDoctorsShimmer extends StatelessWidget {
                       width: 140,
                       height: 16,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: AppTheme.white,
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
@@ -84,7 +85,7 @@ class FindDoctorsShimmer extends StatelessWidget {
                       width: 90,
                       height: 12,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: AppTheme.white,
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
@@ -93,7 +94,7 @@ class FindDoctorsShimmer extends StatelessWidget {
                       width: 110,
                       height: 12,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: AppTheme.white,
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
@@ -110,7 +111,7 @@ class FindDoctorsShimmer extends StatelessWidget {
             height: 38,
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppTheme.white,
               borderRadius: BorderRadius.circular(12),
             ),
           ),
@@ -124,7 +125,7 @@ class FindDoctorsShimmer extends StatelessWidget {
                 child: Container(
                   height: 42,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppTheme.white,
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
@@ -134,7 +135,7 @@ class FindDoctorsShimmer extends StatelessWidget {
                 child: Container(
                   height: 42,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppTheme.white,
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),

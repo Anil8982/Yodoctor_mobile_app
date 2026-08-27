@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import '../../../../core/routes/app_routes.dart';
 import '../../../../core/utils/responsive.dart';
 import '../../controllers/certificate_request.dart';
@@ -94,15 +95,15 @@ class _CertificateWalletScreenState
                             ),
                             suffixIcon: value.text.isNotEmpty
                                 ? IconButton(
-                              icon: const Icon(
-                                Icons.clear_rounded,
-                                size: 20,
-                              ),
-                              onPressed: () {
-                                _searchController.clear();
-                                notifier.setSearchQuery('');
-                              },
-                            )
+                                    icon: const Icon(
+                                      Icons.clear_rounded,
+                                      size: 20,
+                                    ),
+                                    onPressed: () {
+                                      _searchController.clear();
+                                      notifier.setSearchQuery('');
+                                    },
+                                  )
                                 : null,
                             filled: true,
                             fillColor: theme.colorScheme.surfaceContainerLow,
@@ -134,33 +135,34 @@ class _CertificateWalletScreenState
                       scrollDirection: Axis.horizontal,
                       physics: const BouncingScrollPhysics(),
                       child: Row(
-                        children: ['All', 'Pending', 'Approved', 'Rejected'].map((
-                            filter,
-                            ) {
-                          final isSelected = formState.selectedFilter == filter;
-                          return Padding(
-                            padding: const EdgeInsets.only(right: 8.0),
-                            child: FilterChip(
-                              label: Text(filter),
-                              selected: isSelected,
-                              onSelected: (_) => notifier.setFilter(filter),
-                              selectedColor: colorScheme.primaryContainer,
-                              labelStyle: TextStyle(
-                                color: isSelected
-                                    ? colorScheme.onPrimaryContainer
-                                    : colorScheme.onSurface,
-                                fontWeight: isSelected
-                                    ? FontWeight.bold
-                                    : FontWeight.normal,
-                              ),
-                              showCheckmark: false,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 6,
-                                vertical: 4,
-                              ),
-                            ),
-                          );
-                        }).toList(),
+                        children: ['All', 'Pending', 'Approved', 'Rejected']
+                            .map((filter) {
+                              final isSelected =
+                                  formState.selectedFilter == filter;
+                              return Padding(
+                                padding: const EdgeInsets.only(right: 8.0),
+                                child: FilterChip(
+                                  label: Text(filter),
+                                  selected: isSelected,
+                                  onSelected: (_) => notifier.setFilter(filter),
+                                  selectedColor: colorScheme.primaryContainer,
+                                  labelStyle: TextStyle(
+                                    color: isSelected
+                                        ? colorScheme.onPrimaryContainer
+                                        : colorScheme.onSurface,
+                                    fontWeight: isSelected
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                  ),
+                                  showCheckmark: false,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                    vertical: 4,
+                                  ),
+                                ),
+                              );
+                            })
+                            .toList(),
                       ),
                     ),
                   ],
@@ -172,40 +174,40 @@ class _CertificateWalletScreenState
         body: filteredCertificates.isEmpty
             ? _buildEmptyState(context, formState.selectedFilter)
             : RefreshIndicator(
-          onRefresh: notifier.loadMyRequests,
-          child: CustomScrollView(
-            physics: const AlwaysScrollableScrollPhysics(
-              parent: BouncingScrollPhysics(),
-            ),
-            slivers: <Widget>[
-              SliverPadding(
-                padding: EdgeInsets.fromLTRB(
-                  horizontalPadding,
-                  12,
-                  horizontalPadding,
-                  95,
-                ),
-                sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate((context, index) {
-                    final cert = filteredCertificates[index];
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 12.0),
-                      child: _buildCertificateCard(context, cert),
-                    );
-                  }, childCount: filteredCertificates.length),
+                onRefresh: notifier.loadMyRequests,
+                child: CustomScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(
+                    parent: BouncingScrollPhysics(),
+                  ),
+                  slivers: <Widget>[
+                    SliverPadding(
+                      padding: EdgeInsets.fromLTRB(
+                        horizontalPadding,
+                        12,
+                        horizontalPadding,
+                        95,
+                      ),
+                      sliver: SliverList(
+                        delegate: SliverChildBuilderDelegate((context, index) {
+                          final cert = filteredCertificates[index];
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 12.0),
+                            child: _buildCertificateCard(context, cert),
+                          );
+                        }, childCount: filteredCertificates.length),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
       ),
     );
   }
 
   Widget _buildCertificateCard(
-      BuildContext context,
-      PatientCertificateRequestModel cert,
-      ) {
+    BuildContext context,
+    PatientCertificateRequestModel cert,
+  ) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final dateStr = DateFormat('dd MMM yyyy').format(cert.createdAt);
@@ -230,7 +232,7 @@ class _CertificateWalletScreenState
         case 'APPROVED':
           return colorScheme.primary;
         case 'PENDING':
-          return Colors.orange;
+          return AppTheme.orange;
         case 'REJECTED':
           return colorScheme.error;
         default:

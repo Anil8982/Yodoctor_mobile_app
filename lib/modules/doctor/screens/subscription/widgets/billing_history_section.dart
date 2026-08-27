@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/doctor/models/subscription/subscription_model.dart';
 
 class BillingHistorySection extends StatelessWidget {
@@ -29,7 +30,11 @@ class BillingHistorySection extends StatelessWidget {
           // 📋 Header with count badge
           Row(
             children: [
-              Icon(Icons.receipt_long_rounded, size: 22, color: colorScheme.primary),
+              Icon(
+                Icons.receipt_long_rounded,
+                size: 22,
+                color: colorScheme.primary,
+              ),
               const SizedBox(width: 8),
               Text(
                 'Billing History',
@@ -140,7 +145,7 @@ class BillingHistorySection extends StatelessWidget {
     final isMobile = MediaQuery.of(context).size.width < 600;
 
     return Material(
-      color: Colors.transparent,
+      color: AppTheme.transparent,
       child: InkWell(
         onTap: () {
           // 🎯 Future: Navigate to invoice detail
@@ -342,15 +347,15 @@ class BillingHistorySection extends StatelessWidget {
   Color _getStatusColor(String status, ColorScheme colorScheme) {
     switch (status.toLowerCase()) {
       case 'paid':
-        return Colors.green;
+        return AppTheme.green;
       case 'pending':
-        return Colors.orange;
+        return AppTheme.orange;
       case 'failed':
         return colorScheme.error;
       case 'refunded':
         return Colors.blue;
       case 'cancelled':
-        return Colors.grey;
+        return AppTheme.grey;
       default:
         return colorScheme.onSurfaceVariant;
     }

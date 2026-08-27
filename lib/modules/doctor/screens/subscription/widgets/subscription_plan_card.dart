@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:chroma_kit/chroma_kit.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/doctor/models/subscription/subscription_model.dart';
 
 class SubscriptionPlanCard extends StatelessWidget {
@@ -55,7 +56,7 @@ class SubscriptionPlanCard extends StatelessWidget {
               top: -40,
               child: CircleAvatar(
                 radius: 100,
-                backgroundColor: Colors.white.transparency(0.05),
+                backgroundColor: AppTheme.white.transparency(0.05),
               ),
             ),
             Padding(
@@ -81,7 +82,7 @@ class SubscriptionPlanCard extends StatelessWidget {
             Text(
               'CURRENT PLAN',
               style: textTheme.labelMedium?.copyWith(
-                color: Colors.white.transparency(0.65),
+                color: AppTheme.white.transparency(0.65),
                 fontWeight: FontWeight.w800,
                 letterSpacing: 1.5,
               ),
@@ -89,10 +90,10 @@ class SubscriptionPlanCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
               decoration: BoxDecoration(
-                color: Colors.white.transparency(0.18),
+                color: AppTheme.white.transparency(0.18),
                 borderRadius: BorderRadius.circular(30),
                 border: Border.all(
-                  color: Colors.white.transparency(0.25),
+                  color: AppTheme.white.transparency(0.25),
                   width: 1,
                 ),
               ),
@@ -107,7 +108,7 @@ class SubscriptionPlanCard extends StatelessWidget {
                   Text(
                     'Active',
                     style: textTheme.labelLarge?.copyWith(
-                      color: Colors.white,
+                      color: AppTheme.white,
                       fontWeight: FontWeight.w900,
                       letterSpacing: 0.3,
                     ),
@@ -121,7 +122,7 @@ class SubscriptionPlanCard extends StatelessWidget {
         Text(
           plan.title,
           style: textTheme.headlineLarge?.copyWith(
-            color: Colors.white,
+            color: AppTheme.white,
             fontWeight: FontWeight.w900,
             letterSpacing: -0.5,
           ),
@@ -130,7 +131,7 @@ class SubscriptionPlanCard extends StatelessWidget {
         Text(
           plan.type.toUpperCase(),
           style: textTheme.labelMedium?.copyWith(
-            color: Colors.white.transparency(0.75),
+            color: AppTheme.white.transparency(0.75),
             fontWeight: FontWeight.w700,
             letterSpacing: 1.0,
           ),
@@ -140,14 +141,14 @@ class SubscriptionPlanCard extends StatelessWidget {
           children: [
             Icon(
               Icons.calendar_today_rounded,
-              color: Colors.white.transparency(0.8),
+              color: AppTheme.white.transparency(0.8),
               size: 16,
             ),
             const SizedBox(width: 8),
             Text(
               'Next Billing: ${DateFormat('dd MMM yyyy').format(plan.nextBillingDate)}',
               style: textTheme.bodyMedium?.copyWith(
-                color: Colors.white,
+                color: AppTheme.white,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -159,10 +160,10 @@ class SubscriptionPlanCard extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.white.transparency(0.07),
+              color: AppTheme.white.transparency(0.07),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: Colors.white.transparency(0.12),
+                color: AppTheme.white.transparency(0.12),
                 width: 1,
               ),
             ),
@@ -173,14 +174,14 @@ class SubscriptionPlanCard extends StatelessWidget {
                   children: [
                     Icon(
                       Icons.auto_awesome_rounded,
-                      color: Colors.white.transparency(0.7),
+                      color: AppTheme.white.transparency(0.7),
                       size: 14,
                     ),
                     const SizedBox(width: 6),
                     Text(
                       'UPCOMING PLAN',
                       style: textTheme.labelSmall?.copyWith(
-                        color: Colors.white.transparency(0.7),
+                        color: AppTheme.white.transparency(0.7),
                         fontWeight: FontWeight.w800,
                         letterSpacing: 1.1,
                       ),
@@ -191,7 +192,7 @@ class SubscriptionPlanCard extends StatelessWidget {
                 Text(
                   plan.upcomingPlan!.title,
                   style: textTheme.titleMedium?.copyWith(
-                    color: Colors.white,
+                    color: AppTheme.white,
                     fontWeight: FontWeight.w900,
                   ),
                 ),
@@ -199,7 +200,7 @@ class SubscriptionPlanCard extends StatelessWidget {
                 Text(
                   'Starts automatically on ${DateFormat('dd MMM yyyy').format(plan.upcomingPlan!.startDate)}',
                   style: textTheme.bodySmall?.copyWith(
-                    color: Colors.white.transparency(0.75),
+                    color: AppTheme.white.transparency(0.75),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -226,7 +227,7 @@ class SubscriptionPlanCard extends StatelessWidget {
               child: Text(
                 'SUBSCRIPTION STATUS',
                 style: textTheme.labelMedium?.copyWith(
-                  color: Colors.white.transparency(0.75),
+                  color: AppTheme.white.transparency(0.75),
                   fontWeight: FontWeight.w800,
                   letterSpacing: 1.5,
                 ),
@@ -235,10 +236,10 @@ class SubscriptionPlanCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
               decoration: BoxDecoration(
-                color: Colors.white.transparency(0.18),
+                color: AppTheme.white.transparency(0.18),
                 borderRadius: BorderRadius.circular(30),
                 border: Border.all(
-                  color: Colors.white.transparency(0.25),
+                  color: AppTheme.white.transparency(0.25),
                   width: 1,
                 ),
               ),
@@ -253,7 +254,7 @@ class SubscriptionPlanCard extends StatelessWidget {
                   Text(
                     'Inactive',
                     style: textTheme.labelLarge?.copyWith(
-                      color: Colors.white,
+                      color: AppTheme.white,
                       fontWeight: FontWeight.w900,
                       letterSpacing: 0.3,
                     ),
@@ -267,7 +268,7 @@ class SubscriptionPlanCard extends StatelessWidget {
         Text(
           'No Active Plan',
           style: textTheme.headlineLarge?.copyWith(
-            color: Colors.white,
+            color: AppTheme.white,
             fontWeight: FontWeight.w900,
             letterSpacing: -0.5,
           ),
@@ -276,7 +277,7 @@ class SubscriptionPlanCard extends StatelessWidget {
         Text(
           'Unlock full access to patient records, appointments, and telemedicine features by activating a plan.',
           style: textTheme.bodyMedium?.copyWith(
-            color: Colors.white.transparency(0.85),
+            color: AppTheme.white.transparency(0.85),
             height: 1.4,
           ),
         ),
@@ -286,7 +287,7 @@ class SubscriptionPlanCard extends StatelessWidget {
           child: ElevatedButton.icon(
             onPressed: onUpgradePressed,
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
+              backgroundColor: AppTheme.white,
               foregroundColor: const Color(0xFFE65100),
               elevation: 0,
               shape: RoundedRectangleBorder(

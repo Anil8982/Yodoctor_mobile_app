@@ -6,15 +6,13 @@ import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 import 'package:yodoctor/modules/widgets/app_text_field.dart';
 
 class CertificateServiceBottomSheet extends ConsumerStatefulWidget {
-  const CertificateServiceBottomSheet({
-    super.key,
-  });
+  const CertificateServiceBottomSheet({super.key});
 
   static Future<void> show(BuildContext context) {
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppTheme.transparent,
       builder: (_) => const CertificateServiceBottomSheet(),
     );
   }
@@ -63,10 +61,7 @@ class _CertificateServiceBottomSheetState
         .updateDraftInstructions(_instructionsController.text);
   }
 
-  void _syncControllers({
-    required String fee,
-    required String instructions,
-  }) {
+  void _syncControllers({required String fee, required String instructions}) {
     if (!mounted || _controllersDisposed) return;
 
     _isSyncingControllers = true;
@@ -116,39 +111,37 @@ class _CertificateServiceBottomSheetState
   Widget build(BuildContext context) {
     final state = ref.watch(doctorCertificateServiceProvider);
 
-    ref.listen<CertificateServiceState>(
-      doctorCertificateServiceProvider,
-          (previous, next) {
-        if (!mounted || _controllersDisposed) return;
+    ref.listen<CertificateServiceState>(doctorCertificateServiceProvider, (
+      previous,
+      next,
+    ) {
+      if (!mounted || _controllersDisposed) return;
 
-        if (next.service != null && previous?.service != next.service) {
-          _syncControllers(
-            fee: next.draftFeeText,
-            instructions: next.draftInstructions,
-          );
-        }
+      if (next.service != null && previous?.service != next.service) {
+        _syncControllers(
+          fee: next.draftFeeText,
+          instructions: next.draftInstructions,
+        );
+      }
 
-        if (next.saveMessage != null &&
-            previous?.saveMessage != next.saveMessage) {
-          context.showSuccessSnackBar(next.saveMessage!);
-        }
+      if (next.saveMessage != null &&
+          previous?.saveMessage != next.saveMessage) {
+        context.showSuccessSnackBar(next.saveMessage!);
+      }
 
-        if (next.errorMessage != null &&
-            previous?.errorMessage != next.errorMessage &&
-            next.hasService) {
-          context.showErrorSnackBar(next.errorMessage!);
-        }
-      },
-    );
+      if (next.errorMessage != null &&
+          previous?.errorMessage != next.errorMessage &&
+          next.hasService) {
+        context.showErrorSnackBar(next.errorMessage!);
+      }
+    });
 
     return SafeArea(
       top: false,
       child: Container(
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
-          borderRadius: const BorderRadius.vertical(
-            top: Radius.circular(28),
-          ),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         ),
         child: Padding(
           padding: EdgeInsets.fromLTRB(
@@ -195,12 +188,8 @@ class _CertificateServiceBottomSheetState
                         children: [
                           Text(
                             'Certificate Service',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleLarge
-                                ?.copyWith(
-                              fontWeight: FontWeight.w700,
-                            ),
+                            style: Theme.of(context).textTheme.titleLarge
+                                ?.copyWith(fontWeight: FontWeight.w700),
                           ),
                           const SizedBox(height: 3),
                           Text(
@@ -214,8 +203,9 @@ class _CertificateServiceBottomSheetState
                       onPressed: () => Navigator.of(context).pop(),
                       icon: const Icon(Icons.close_rounded),
                       style: IconButton.styleFrom(
-                        foregroundColor:
-                        Theme.of(context).colorScheme.onSurfaceVariant,
+                        foregroundColor: Theme.of(
+                          context,
+                        ).colorScheme.onSurfaceVariant,
                         backgroundColor: Theme.of(context)
                             .colorScheme
                             .surfaceContainerHighest
@@ -246,9 +236,9 @@ class _CertificateServiceBottomSheetState
   }
 
   Widget _buildStatusBanner(
-      BuildContext context,
-      CertificateServiceState state,
-      ) {
+    BuildContext context,
+    CertificateServiceState state,
+  ) {
     // Error state (only when no service loaded and after first attempt)
     if (state.errorMessage != null && !state.hasService && _hasAttemptedLoad) {
       return Container(
@@ -296,21 +286,19 @@ class _CertificateServiceBottomSheetState
               TextButton.icon(
                 onPressed: () {
                   _hasAttemptedLoad = true;
-                  ref
-                      .read(doctorCertificateServiceProvider.notifier)
-                      .retry();
+                  ref.read(doctorCertificateServiceProvider.notifier).retry();
                 },
                 icon: const Icon(Icons.refresh_rounded, size: 18),
                 label: const Text(
                   'Retry',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: TextStyle(fontWeight: FontWeight.w700),
                 ),
                 style: TextButton.styleFrom(
                   foregroundColor: Theme.of(context).colorScheme.error,
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                 ),
               ),
           ],
@@ -318,15 +306,10 @@ class _CertificateServiceBottomSheetState
       );
     }
 
-    return const SizedBox.shrink(
-      key: ValueKey('no_banner'),
-    );
+    return const SizedBox.shrink(key: ValueKey('no_banner'));
   }
 
-  Widget _buildContent(
-      BuildContext context,
-      CertificateServiceState state,
-      ) {
+  Widget _buildContent(BuildContext context, CertificateServiceState state) {
     final isDisabled = state.isLoading || state.isSaving;
 
     return Column(
@@ -344,9 +327,7 @@ class _CertificateServiceBottomSheetState
             hint: 'Enter fee amount',
             icon: Icons.currency_rupee,
             controller: _feeController,
-            keyboardType: const TextInputType.numberWithOptions(
-              decimal: true,
-            ),
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
             enabled: !isDisabled,
             validator: (value) {
               if (!state.isEnabled) return null;
@@ -373,14 +354,14 @@ class _CertificateServiceBottomSheetState
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color:
-            Theme.of(context).colorScheme.primary.withValues(alpha: 0.06),
+            color: Theme.of(
+              context,
+            ).colorScheme.primary.withValues(alpha: 0.06),
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: Theme.of(context)
-                  .colorScheme
-                  .primary
-                  .withValues(alpha: 0.15),
+              color: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.15),
             ),
           ),
           child: Row(
@@ -396,10 +377,9 @@ class _CertificateServiceBottomSheetState
                 child: Text(
                   'Patients will pay the certificate fee plus the platform fee when submitting an application.',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .primary
-                        .withValues(alpha: 0.9),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.9),
                     height: 1.3,
                   ),
                 ),
@@ -425,9 +405,7 @@ class _CertificateServiceBottomSheetState
                 ),
                 child: const Text(
                   'Cancel',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: TextStyle(fontWeight: FontWeight.w700),
                 ),
               ),
             ),
@@ -444,20 +422,16 @@ class _CertificateServiceBottomSheetState
                 ),
                 child: state.isSaving
                     ? const SizedBox(
-                  width: 22,
-                  height: 22,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2.5,
-                  ),
-                )
+                        width: 22,
+                        height: 22,
+                        child: CircularProgressIndicator(strokeWidth: 2.5),
+                      )
                     : Text(
-                  state.hasService && state.isEnabled
-                      ? 'Save Changes'
-                      : 'Save & Enable',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
+                        state.hasService && state.isEnabled
+                            ? 'Save Changes'
+                            : 'Save & Enable',
+                        style: const TextStyle(fontWeight: FontWeight.w700),
+                      ),
               ),
             ),
           ],
@@ -466,25 +440,20 @@ class _CertificateServiceBottomSheetState
     );
   }
 
-  Widget _buildStatusCard(
-      BuildContext context,
-      CertificateServiceState state,
-      ) {
+  Widget _buildStatusCard(BuildContext context, CertificateServiceState state) {
     final isDisabled = state.isLoading || state.isSaving;
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Theme.of(context)
-            .colorScheme
-            .surfaceContainerHighest
-            .withValues(alpha: 0.3),
+        color: Theme.of(
+          context,
+        ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: Theme.of(context)
-              .colorScheme
-              .outlineVariant
-              .withValues(alpha: 0.5),
+          color: Theme.of(
+            context,
+          ).colorScheme.outlineVariant.withValues(alpha: 0.5),
         ),
       ),
       child: Row(
@@ -495,9 +464,9 @@ class _CertificateServiceBottomSheetState
               children: [
                 Text(
                   'Certificate Service',
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(height: 4),
                 Text(
@@ -528,8 +497,9 @@ class _CertificateServiceBottomSheetState
   }
 
   Future<void> _save() async {
-    final success =
-    await ref.read(doctorCertificateServiceProvider.notifier).save();
+    final success = await ref
+        .read(doctorCertificateServiceProvider.notifier)
+        .save();
 
     if (!mounted) return;
 

@@ -2,6 +2,7 @@ import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 // import 'package:lottie/lottie.dart'; // Optional: for animation
 
 class PaymentSuccessScreen extends ConsumerWidget {
@@ -41,13 +42,13 @@ class PaymentSuccessScreen extends ConsumerWidget {
                         width: 120,
                         height: 120,
                         decoration: BoxDecoration(
-                          color: Colors.green.transparency(0.1),
+                          color: AppTheme.green.transparency(0.1),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.check_circle_rounded,
                           size: 80,
-                          color: Colors.green,
+                          color: AppTheme.green,
                         ),
                       ),
                     );
@@ -107,7 +108,7 @@ class PaymentSuccessScreen extends ConsumerWidget {
                           context,
                           label: 'Status',
                           value: 'Active',
-                          valueColor: Colors.green,
+                          valueColor: AppTheme.green,
                         ),
                       ],
                     ),
@@ -124,8 +125,8 @@ class PaymentSuccessScreen extends ConsumerWidget {
                       context.go(nextRoute);
                     },
                     style: FilledButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
+                      backgroundColor: AppTheme.green,
+                      foregroundColor: AppTheme.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
                       ),

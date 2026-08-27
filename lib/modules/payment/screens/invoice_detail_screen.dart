@@ -3,6 +3,7 @@ import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/doctor/models/subscription/subscription_model.dart';
 import 'package:yodoctor/modules/widgets/app_header.dart';
 import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
@@ -137,15 +138,15 @@ class _InvoiceDetailScreenState extends ConsumerState<InvoiceDetailScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: isPaid
-            ? Colors.green.transparency(0.1)
-            : Colors.orange.transparency(0.1),
+            ? AppTheme.green.transparency(0.1)
+            : AppTheme.orange.transparency(0.1),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: isPaid ? Colors.green : Colors.orange),
+        border: Border.all(color: isPaid ? AppTheme.green : AppTheme.orange),
       ),
       child: Text(
         status.toUpperCase(),
         style: TextStyle(
-          color: isPaid ? Colors.green : Colors.orange,
+          color: isPaid ? AppTheme.green : AppTheme.orange,
           fontWeight: FontWeight.bold,
           fontSize: 12,
         ),

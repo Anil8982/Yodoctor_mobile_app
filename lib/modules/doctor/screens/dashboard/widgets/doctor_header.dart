@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/profile_image/profile_image_controller.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
 
 class DoctorHeader extends ConsumerWidget {
@@ -38,9 +39,7 @@ class DoctorHeader extends ConsumerWidget {
       ),
       decoration: BoxDecoration(
         color: colorScheme.primary,
-        borderRadius: const BorderRadius.vertical(
-          bottom: Radius.circular(32),
-        ),
+        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(32)),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -153,7 +152,7 @@ class DoctorHeader extends ConsumerWidget {
                               Icon(
                                 Icons.star_rounded,
                                 size: 12,
-                                color: Colors.amber.shade400,
+                                color: AppTheme.amber.shade400,
                               ),
                               const SizedBox(width: 2),
                               Text(
@@ -195,7 +194,9 @@ class DoctorHeader extends ConsumerWidget {
     final colorScheme = theme.colorScheme;
 
     final fgColor = isAvailable ? colorScheme.onSecondary : colorScheme.onError;
-    final bgColor = isAvailable ? colorScheme.secondaryContainer : colorScheme.errorContainer;
+    final bgColor = isAvailable
+        ? colorScheme.secondaryContainer
+        : colorScheme.errorContainer;
     final handleColor = isAvailable ? colorScheme.secondary : colorScheme.error;
     final textLabel = isAvailable ? 'Live' : 'Busy';
 
@@ -238,7 +239,9 @@ class DoctorHeader extends ConsumerWidget {
                 child: AnimatedDefaultTextStyle(
                   duration: const Duration(milliseconds: 180),
                   style: theme.textTheme.labelMedium!.copyWith(
-                    color: isAvailable ? colorScheme.onSecondaryContainer : colorScheme.onErrorContainer,
+                    color: isAvailable
+                        ? colorScheme.onSecondaryContainer
+                        : colorScheme.onErrorContainer,
                     fontWeight: FontWeight.w900,
                     fontSize: 10.5,
                     letterSpacing: 0.3,
@@ -275,11 +278,11 @@ class DoctorHeader extends ConsumerWidget {
                     duration: const Duration(milliseconds: 180),
                     transitionBuilder:
                         (Widget child, Animation<double> animation) {
-                      return ScaleTransition(
-                        scale: animation,
-                        child: child,
-                      );
-                    },
+                          return ScaleTransition(
+                            scale: animation,
+                            child: child,
+                          );
+                        },
                     child: Icon(
                       isAvailable ? Icons.check_rounded : Icons.close_rounded,
                       key: ValueKey<bool>(isAvailable),

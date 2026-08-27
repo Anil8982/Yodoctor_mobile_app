@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/patient/controllers/lab_test_controller.dart';
 import 'package:yodoctor/modules/patient/models/lab/lab_test_model.dart';
 import 'package:yodoctor/modules/widgets/app_header.dart';
@@ -211,13 +212,13 @@ class _LabTestDetailsScreenState extends ConsumerState<LabTestDetailsScreen> {
                                       vertical: 4,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: Colors.green,
+                                      color: AppTheme.green,
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Text(
                                       "${(((test.price - test.offerPrice) / test.price) * 100).round()}% OFF",
-                                      style: const TextStyle(
-                                        color: Colors.white,
+                                      style: TextStyle(
+                                        color: AppTheme.white,
                                         fontSize: 11,
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -282,8 +283,8 @@ class _LabTestDetailsScreenState extends ConsumerState<LabTestDetailsScreen> {
                                   const SizedBox(width: 10),
                                   Text(
                                     'Save ₹${(test.price - test.offerPrice).toInt()}',
-                                    style: const TextStyle(
-                                      color: Colors.green,
+                                    style: TextStyle(
+                                      color: AppTheme.green,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 13,
                                     ),
@@ -344,9 +345,9 @@ class _LabTestDetailsScreenState extends ConsumerState<LabTestDetailsScreen> {
                               ...test.includes.map(
                                 (e) => ListTile(
                                   dense: true,
-                                  leading: const Icon(
+                                  leading: Icon(
                                     Icons.check_circle,
-                                    color: Colors.green,
+                                    color: AppTheme.green,
                                   ),
                                   title: Text(e),
                                 ),

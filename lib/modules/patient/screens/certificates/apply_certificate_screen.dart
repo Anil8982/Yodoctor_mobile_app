@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/patient/models/certificate/patient_doctor_model.dart';
 import 'package:yodoctor/modules/widgets/app_header.dart';
 import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
@@ -16,10 +17,7 @@ import 'widgets/step_4_review_submit.dart';
 class ApplyCertificateScreen extends ConsumerStatefulWidget {
   final PatientDoctorModel? initialDoctor;
 
-  const ApplyCertificateScreen({
-    super.key,
-    this.initialDoctor,
-  });
+  const ApplyCertificateScreen({super.key, this.initialDoctor});
 
   @override
   ConsumerState<ApplyCertificateScreen> createState() =>
@@ -129,7 +127,7 @@ class _ApplyCertificateScreenState
           color: colorScheme.surface,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
+              color: AppTheme.black.withValues(alpha: 0.04),
               blurRadius: 10,
               offset: const Offset(0, -4),
             ),
@@ -174,12 +172,12 @@ class _ApplyCertificateScreenState
                   ),
                 ),
                 child: formState.isLoading
-                    ? const SizedBox(
+                    ? SizedBox(
                         width: 24,
                         height: 24,
                         child: CircularProgressIndicator(
                           strokeWidth: 2.5,
-                          color: Colors.white,
+                          color: AppTheme.white,
                         ),
                       )
                     : Text(_currentStep == 4 ? 'Submit Request' : 'Continue'),
@@ -281,7 +279,8 @@ class _ApplyCertificateScreenState
 
       if (success) {
         AppSnackBar.show(
-          message: 'Payment completed and certificate request submitted successfully.',
+          message:
+              'Payment completed and certificate request submitted successfully.',
           type: AppSnackBarType.success,
         );
 
@@ -289,7 +288,7 @@ class _ApplyCertificateScreenState
       }
       AppSnackBar.show(
         message:
-        'We couldn’t complete your certificate request. Please try again in a moment.',
+            'We couldn’t complete your certificate request. Please try again in a moment.',
         type: AppSnackBarType.error,
       );
     }

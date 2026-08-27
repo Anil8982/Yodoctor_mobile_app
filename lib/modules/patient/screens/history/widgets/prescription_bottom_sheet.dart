@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 
 class PrescriptionBottomSheet extends StatelessWidget {
   final Map<String, dynamic> prescription;
 
-  const PrescriptionBottomSheet({
-    super.key,
-    required this.prescription,
-  });
+  const PrescriptionBottomSheet({super.key, required this.prescription});
 
-  static Future<void> show(BuildContext context, Map<String, dynamic> prescription) {
+  static Future<void> show(
+    BuildContext context,
+    Map<String, dynamic> prescription,
+  ) {
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppTheme.transparent,
       builder: (context) => PrescriptionBottomSheet(prescription: prescription),
     );
   }
@@ -66,7 +67,9 @@ class PrescriptionBottomSheet extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: colorScheme.primaryContainer.withValues(alpha: 0.6),
+                      color: colorScheme.primaryContainer.withValues(
+                        alpha: 0.6,
+                      ),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
@@ -91,7 +94,9 @@ class PrescriptionBottomSheet extends StatelessWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+                  color: colorScheme.surfaceContainerHighest.withValues(
+                    alpha: 0.3,
+                  ),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
                     color: colorScheme.outlineVariant.withValues(alpha: 0.3),
@@ -134,7 +139,9 @@ class PrescriptionBottomSheet extends StatelessWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+                  color: colorScheme.surfaceContainerHighest.withValues(
+                    alpha: 0.3,
+                  ),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
                     color: colorScheme.outlineVariant.withValues(alpha: 0.3),
@@ -187,10 +194,7 @@ class PrescriptionBottomSheet extends StatelessWidget {
                   ),
                   child: const Text(
                     "Close",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
-                    ),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                   ),
                 ),
               ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/patient/controllers/home_care_history_controller.dart';
 import 'package:yodoctor/modules/patient/screens/home_care/widgets/cancel_booking_dialog.dart';
 import 'package:yodoctor/modules/widgets/app_header.dart';
@@ -49,65 +50,65 @@ class _HomeCareHistoryScreenState extends ConsumerState<HomeCareHistoryScreen> {
       }
     });
 
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: theme.scaffoldBackgroundColor,
-        appBar: const AppHeader(title: 'Home Care History'),
-        body: SafeArea(
-          child: Column(
-            children: [
-              const HomeCareHistoryFilter(),
-              Expanded(
-                child:
-                    state.isLoading &&
-                        state.isRefreshing == false &&
-                        filteredBookings.isEmpty
-                    ? const HomeCareHistoryShimmer()
-                    : RefreshIndicator(
-                        color: colorScheme.primary,
-                        onRefresh: () => notifier.fetchHistory(isRefresh: true),
-                        child: filteredBookings.isEmpty
-                            ? HomeCareHistoryEmpty(
-                                onBookNew: () {
-                                  context.push(AppRoutes.homeServiceBooking);
-                                },
-                              )
-                            : ListView.builder(
-                                physics: const AlwaysScrollableScrollPhysics(
-                                  parent: BouncingScrollPhysics(),
-                                ),
-                                padding: const EdgeInsets.all(16),
-                                itemCount: filteredBookings.length,
-                                itemBuilder: (context, index) {
-                                  final booking = filteredBookings[index];
-                                  final isTerminal =
-                                      booking.status.toUpperCase() ==
-                                          'CANCELLED' ||
-                                      booking.status.toUpperCase() ==
-                                          'COMPLETED';
-
-                                  return HomeCareHistoryCard(
-                                    booking: booking,
-                                    onTap: () {
-                                      notifier.fetchBookingDetails(booking.id);
-                                      _showDetailsBottomSheet(context);
-                                    },
-                                    onCancel: isTerminal
-                                        ? null
-                                        : () => CancelBookingDialog.show(
-                                            context,
-                                            ref,
-                                            bookingId: booking.id,
-                                          ),
-                                  );
-                                },
+    return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
+      appBar: const AppHeader(title: 'Home Care History'),
+      body: SafeArea(
+        child: Column(
+          children: [
+            const SizedBox(height: 10),
+            const HomeCareHistoryFilter(),
+            Expanded(
+              child:
+                  state.isLoading &&
+                      state.isRefreshing == false &&
+                      filteredBookings.isEmpty
+                  ? const HomeCareHistoryShimmer()
+                  : RefreshIndicator(
+                      color: colorScheme.primary,
+                      onRefresh: () => notifier.fetchHistory(isRefresh: true),
+                      child: filteredBookings.isEmpty
+                          ? HomeCareHistoryEmpty(
+                              onBookNew: () {
+                                context.push(AppRoutes.homeServiceBooking);
+                              },
+                            )
+                          : ListView.builder(
+                              physics: const AlwaysScrollableScrollPhysics(
+                                parent: BouncingScrollPhysics(),
                               ),
-                      ),
-              ),
-            ],
-          ),
+                              padding: const EdgeInsets.all(16),
+                              itemCount: filteredBookings.length,
+                              itemBuilder: (context, index) {
+                                final booking = filteredBookings[index];
+                                final isTerminal =
+                                    booking.status.toUpperCase() ==
+                                        'CANCELLED' ||
+                                    booking.status.toUpperCase() == 'COMPLETED';
+
+                                return HomeCareHistoryCard(
+                                  booking: booking,
+                                  onTap: () {
+                                    notifier.fetchBookingDetails(booking.id);
+                                    _showDetailsBottomSheet(context);
+                                  },
+                                  onCancel: isTerminal
+                                      ? null
+                                      : () => CancelBookingDialog.show(
+                                          context,
+                                          ref,
+                                          bookingId: booking.id,
+                                        ),
+                                );
+                              },
+                            ),
+                    ),
+            ),
+          ],
         ),
-        bottomNavigationBar: Container(
+      ),
+      bottomNavigationBar: SafeArea(
+        child: Container(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
           decoration: BoxDecoration(
             color: theme.cardColor,
@@ -156,7 +157,7 @@ class _HomeCareHistoryScreenState extends ConsumerState<HomeCareHistoryScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppTheme.transparent,
       builder: (context) => const HomeCareBookingDetails(),
     ).then((_) {
       ref.read(homeCareHistoryProvider.notifier).clearSelectedBooking();

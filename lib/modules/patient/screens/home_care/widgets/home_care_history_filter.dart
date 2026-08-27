@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/patient/controllers/home_care_history_controller.dart';
 
 class HomeCareHistoryFilter extends ConsumerWidget {
@@ -28,7 +29,7 @@ class HomeCareHistoryFilter extends ConsumerWidget {
           final isSelected = state.selectedFilter == filter;
 
           return Material(
-            color: Colors.transparent,
+            color: AppTheme.transparent,
             child: InkWell(
               onTap: () => notifier.setFilter(filter),
               borderRadius: BorderRadius.circular(50),
@@ -40,7 +41,9 @@ class HomeCareHistoryFilter extends ConsumerWidget {
                 decoration: BoxDecoration(
                   color: isSelected
                       ? colorScheme.primary
-                      : colorScheme.surfaceContainerHighest.withValues(alpha: 0.35),
+                      : colorScheme.surfaceContainerHighest.withValues(
+                          alpha: 0.35,
+                        ),
                   borderRadius: BorderRadius.circular(50),
                   border: Border.all(
                     color: isSelected
@@ -50,18 +53,20 @@ class HomeCareHistoryFilter extends ConsumerWidget {
                   ),
                   boxShadow: isSelected
                       ? [
-                    BoxShadow(
-                      color: colorScheme.primary.withValues(alpha: 0.25),
-                      blurRadius: 8,
-                      offset: const Offset(0, 3),
-                    ),
-                  ]
+                          BoxShadow(
+                            color: colorScheme.primary.withValues(alpha: 0.25),
+                            blurRadius: 8,
+                            offset: const Offset(0, 3),
+                          ),
+                        ]
                       : [],
                 ),
                 child: Text(
                   filter,
                   style: theme.textTheme.labelMedium?.copyWith(
-                    color: isSelected ? colorScheme.onPrimary : colorScheme.onSurfaceVariant,
+                    color: isSelected
+                        ? colorScheme.onPrimary
+                        : colorScheme.onSurfaceVariant,
                     fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
                     letterSpacing: 0.2,
                   ),

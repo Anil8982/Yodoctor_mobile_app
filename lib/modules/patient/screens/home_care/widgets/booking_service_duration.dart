@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/patient/models/home_care/home_service_booking_model.dart';
 import 'package:yodoctor/modules/patient/controllers/home_service_controller.dart';
 import 'package:yodoctor/modules/widgets/app_text_field.dart';
@@ -30,8 +31,8 @@ class BookingServiceDuration extends ConsumerWidget {
           scrollDirection: Axis.horizontal,
           child: Row(
             children: ['1 Day', 'Multiple Days', 'Weekly', 'Monthly'].map((
-                type,
-                ) {
+              type,
+            ) {
               final isSel = bookingState.durationType == type;
               return Padding(
                 padding: const EdgeInsets.only(right: 6),
@@ -71,38 +72,39 @@ class BookingServiceDuration extends ConsumerWidget {
                 },
                 child: isMultipleDays
                     ? Padding(
-                  key: const ValueKey('multiple_days_field'),
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: AppTextField(
-                    controller: daysController,
-                    label: 'Number of Days',
-                    isRequired: true,
-                    hint: 'Enter days',
-                    icon: Icons.tag_rounded,
-                    keyboardType: TextInputType.number,
-                    autovalidateMode: AutovalidateMode.onUserInteraction,
-                    inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly,
-                      LengthLimitingTextInputFormatter(3),
-                    ],
-                    onChanged: (val) => notifier.updateField(numberOfDays: val),
-                    validator: (value) {
-                      if (bookingState.durationType == 'Multiple Days') {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'Required';
-                        }
-                        final days = int.tryParse(value.trim());
-                        if (days == null || days <= 0) {
-                          return 'Invalid days';
-                        }
-                        if (days > 365) {
-                          return 'Max 365 days';
-                        }
-                      }
-                      return null;
-                    },
-                  ),
-                )
+                        key: const ValueKey('multiple_days_field'),
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: AppTextField(
+                          controller: daysController,
+                          label: 'Number of Days',
+                          isRequired: true,
+                          hint: 'Enter days',
+                          icon: Icons.tag_rounded,
+                          keyboardType: TextInputType.number,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                            LengthLimitingTextInputFormatter(3),
+                          ],
+                          onChanged: (val) =>
+                              notifier.updateField(numberOfDays: val),
+                          validator: (value) {
+                            if (bookingState.durationType == 'Multiple Days') {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Required';
+                              }
+                              final days = int.tryParse(value.trim());
+                              if (days == null || days <= 0) {
+                                return 'Invalid days';
+                              }
+                              if (days > 365) {
+                                return 'Max 365 days';
+                              }
+                            }
+                            return null;
+                          },
+                        ),
+                      )
                     : const SizedBox.shrink(key: ValueKey('empty_space')),
               ),
             ),
@@ -138,7 +140,7 @@ class BookingServiceDuration extends ConsumerWidget {
                   : bookingState.startDate == null
                   ? 'Please select start date'
                   : '',
-              style: const TextStyle(color: Colors.red, fontSize: 12),
+              style: TextStyle(color: AppTheme.red, fontSize: 12),
             ),
           ),
       ],

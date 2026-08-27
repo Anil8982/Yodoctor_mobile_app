@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
 import 'package:yodoctor/modules/patient/controllers/patient_search_controller.dart';
 import 'package:yodoctor/modules/patient/screens/search/widgets/search_suggestions_overlay.dart';
@@ -10,7 +11,8 @@ import '../../../../widgets/app_search_field.dart';
 
 class DoctorSearchWidget extends ConsumerStatefulWidget {
   final bool isHero;
-  final VoidCallback? onSearchOverride; // 🎯 Optional custom callback for search action
+  final VoidCallback?
+  onSearchOverride; // 🎯 Optional custom callback for search action
 
   const DoctorSearchWidget({
     super.key,
@@ -112,8 +114,8 @@ class _DoctorSearchWidgetState extends ConsumerState<DoctorSearchWidget>
     final queryString = queryParams.entries
         .map(
           (e) =>
-      '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
-    )
+              '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
+        )
         .join('&');
 
     context.push('${AppRoutes.search}?$queryString');
@@ -180,15 +182,15 @@ class _DoctorSearchWidgetState extends ConsumerState<DoctorSearchWidget>
                   ),
                   suffixIcon: value.text.isNotEmpty
                       ? IconButton(
-                    icon: const Icon(Icons.clear_rounded, size: 20),
-                    onPressed: () {
-                      _locationController.clear();
-                      notifier.updateLocation('');
-                      if (widget.onSearchOverride != null) {
-                        widget.onSearchOverride!();
-                      }
-                    },
-                  )
+                          icon: const Icon(Icons.clear_rounded, size: 20),
+                          onPressed: () {
+                            _locationController.clear();
+                            notifier.updateLocation('');
+                            if (widget.onSearchOverride != null) {
+                              widget.onSearchOverride!();
+                            }
+                          },
+                        )
                       : null,
                 );
               },
@@ -216,15 +218,15 @@ class _DoctorSearchWidgetState extends ConsumerState<DoctorSearchWidget>
                         ),
                         suffixIcon: value.text.isNotEmpty
                             ? IconButton(
-                          icon: const Icon(Icons.clear_rounded, size: 20),
-                          onPressed: () {
-                            _searchController.clear();
-                            notifier.updateSearch('');
-                            if (widget.onSearchOverride != null) {
-                              widget.onSearchOverride!();
-                            }
-                          },
-                        )
+                                icon: const Icon(Icons.clear_rounded, size: 20),
+                                onPressed: () {
+                                  _searchController.clear();
+                                  notifier.updateSearch('');
+                                  if (widget.onSearchOverride != null) {
+                                    widget.onSearchOverride!();
+                                  }
+                                },
+                              )
                             : null,
                       );
                     },
@@ -241,13 +243,13 @@ class _DoctorSearchWidgetState extends ConsumerState<DoctorSearchWidget>
   }
 
   void _updateOverlays(
-      bool hasSearchSuggestions,
-      bool hasCitySuggestions,
-      dynamic searchState,
-      dynamic notifier,
-      ColorScheme colorScheme,
-      double screenWidth,
-      ) {
+    bool hasSearchSuggestions,
+    bool hasCitySuggestions,
+    dynamic searchState,
+    dynamic notifier,
+    ColorScheme colorScheme,
+    double screenWidth,
+  ) {
     _removeOverlays();
 
     // Search field suggestions - always below
@@ -256,12 +258,15 @@ class _DoctorSearchWidgetState extends ConsumerState<DoctorSearchWidget>
     final searchOffset = const Offset(0, 8);
 
     // Location field suggestions - depends on isHero
-    final locationTargetAnchor =
-    widget.isHero ? Alignment.bottomLeft : Alignment.topLeft;
-    final locationFollowerAnchor =
-    widget.isHero ? Alignment.topLeft : Alignment.bottomLeft;
-    final locationOffset =
-    widget.isHero ? const Offset(0, 8) : const Offset(0, -8);
+    final locationTargetAnchor = widget.isHero
+        ? Alignment.bottomLeft
+        : Alignment.topLeft;
+    final locationFollowerAnchor = widget.isHero
+        ? Alignment.topLeft
+        : Alignment.bottomLeft;
+    final locationOffset = widget.isHero
+        ? const Offset(0, 8)
+        : const Offset(0, -8);
 
     if (hasSearchSuggestions) {
       _searchOverlayEntry = OverlayEntry(
@@ -352,21 +357,25 @@ class _DoctorSearchWidgetState extends ConsumerState<DoctorSearchWidget>
         height: 56,
         width: 56,
         decoration: BoxDecoration(
-          color: widget.isHero ? colorScheme.primaryContainer : colorScheme.surface,
+          color: widget.isHero
+              ? colorScheme.primaryContainer
+              : colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
           boxShadow: widget.isHero
               ? null
               : [
-            BoxShadow(
-              color: Colors.black.transparency(0.08),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
-            ),
-          ],
+                  BoxShadow(
+                    color: AppTheme.black.transparency(0.08),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
         ),
         child: Icon(
           Icons.arrow_forward_rounded,
-          color: widget.isHero ? colorScheme.onPrimaryContainer : colorScheme.primary,
+          color: widget.isHero
+              ? colorScheme.onPrimaryContainer
+              : colorScheme.primary,
         ),
       ),
     );

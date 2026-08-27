@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 
 class InfoCard extends StatelessWidget {
   final IconData icon;
@@ -33,7 +34,7 @@ class InfoCard extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: isDark
-                ? Colors.black26
+                ? AppTheme.black.withValues(alpha: 0.26)
                 : colorScheme.shadow.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),

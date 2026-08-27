@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
 import 'package:yodoctor/modules/doctor/screens/incoming_appointment/widgets/right_curve_clipper.dart';
 
@@ -35,10 +36,10 @@ class IncomingAppointmentCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.onPrimary,
         borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: Colors.grey.shade300, width: 1),
+        border: Border.all(color: AppTheme.grey.shade300, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: .08),
+            color: AppTheme.black.withValues(alpha: .08),
             blurRadius: 24,
             offset: const Offset(0, 12),
           ),
@@ -60,9 +61,9 @@ class IncomingAppointmentCard extends StatelessWidget {
                         width: 175,
                         height: 175,
                         color: isAccepted
-                            ? Colors.green.shade100
+                            ? AppTheme.green.shade100
                             : isPending
-                            ? Colors.orange.shade100
+                            ? AppTheme.orange.shade100
                             : Colors.blue.shade100,
                       ),
                     ),
@@ -77,9 +78,9 @@ class IncomingAppointmentCard extends StatelessWidget {
                           : Icons.access_time_rounded,
                       size: 32,
                       color: isAccepted
-                          ? Colors.green.withValues(alpha: .25)
+                          ? AppTheme.green.withValues(alpha: .25)
                           : isPending
-                          ? Colors.orange.withValues(alpha: .25)
+                          ? AppTheme.orange.withValues(alpha: .25)
                           : Colors.blue.withValues(alpha: .25),
                     ),
                   ),
@@ -149,7 +150,7 @@ class IncomingAppointmentCard extends StatelessWidget {
                                       ? Icons.wb_sunny_outlined
                                       : Icons.nightlight_outlined,
                                   color: isMorning
-                                      ? Colors.orange
+                                      ? AppTheme.orange
                                       : Colors.deepPurple,
                                   size: 18,
                                 ),
@@ -164,23 +165,25 @@ class IncomingAppointmentCard extends StatelessWidget {
                                           .substring(1)
                                           .toLowerCase(),
                                   style: TextStyle(
-                                    color: Colors.grey.shade700,
+                                    color: AppTheme.grey.shade700,
                                     fontSize: 12,
                                   ),
                                 ),
 
-                                const Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 10),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                  ),
                                   child: Text(
                                     "|",
-                                    style: TextStyle(color: Colors.grey),
+                                    style: TextStyle(color: AppTheme.grey),
                                   ),
                                 ),
 
-                                const Icon(
+                                Icon(
                                   Icons.calendar_today_outlined,
                                   size: 17,
-                                  color: Colors.grey,
+                                  color: AppTheme.grey,
                                 ),
 
                                 const SizedBox(width: AppSpacing.xxs),
@@ -217,7 +220,7 @@ class IncomingAppointmentCard extends StatelessWidget {
                   const SizedBox(height: 5),
 
                   Divider(
-                    color: Colors.grey.shade300,
+                    color: AppTheme.grey.shade300,
                     thickness: 1,
                     endIndent: 22,
                   ),
@@ -229,23 +232,23 @@ class IncomingAppointmentCard extends StatelessWidget {
                         vertical: 5,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.green.shade50,
+                        color: AppTheme.green.shade50,
                         borderRadius: BorderRadius.circular(30),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
-                        children: const [
+                        children: [
                           CircleAvatar(
                             radius: 4,
-                            backgroundColor: Colors.green,
+                            backgroundColor: AppTheme.green,
                           ),
 
-                          SizedBox(width: 6),
+                          const SizedBox(width: 6),
 
                           Text(
                             "ACCEPTED",
                             style: TextStyle(
-                              color: Colors.green,
+                              color: AppTheme.green,
                               fontWeight: FontWeight.bold,
                               fontSize: 12,
                             ),
@@ -263,22 +266,22 @@ class IncomingAppointmentCard extends StatelessWidget {
                             vertical: 5,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.orange.shade50,
+                            color: AppTheme.orange.shade50,
                             borderRadius: BorderRadius.circular(30),
                           ),
                           child: Row(
-                            children: const [
+                            children: [
                               CircleAvatar(
                                 radius: 4,
-                                backgroundColor: Colors.orange,
+                                backgroundColor: AppTheme.orange,
                               ),
 
-                              SizedBox(width: 6),
+                              const SizedBox(width: 6),
 
                               Text(
                                 "PENDING",
                                 style: TextStyle(
-                                  color: Colors.orange,
+                                  color: AppTheme.orange,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 12,
                                 ),
@@ -317,8 +320,8 @@ class IncomingAppointmentCard extends StatelessWidget {
                                 icon: const Icon(Icons.cancel),
                                 label: const Text("Reject"),
                                 style: OutlinedButton.styleFrom(
-                                  foregroundColor: Colors.red,
-                                  side: const BorderSide(color: Colors.red),
+                                  foregroundColor: colorScheme.error,
+                                  side: BorderSide(color: colorScheme.error),
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 5,
                                     vertical: 0,

@@ -1,5 +1,6 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 
 import '../../../../../core/utils/app_spacing.dart';
 
@@ -124,7 +125,7 @@ class DoctorProfileCard extends StatelessWidget {
                     Icon(
                       Icons.star_rounded,
                       size: 14,
-                      color: Colors.amber.shade700,
+                      color: AppTheme.amber.shade700,
                     ),
                   ],
                 ),
@@ -243,7 +244,6 @@ class StatCard extends StatelessWidget {
   }
 }
 
-
 class ActionCard extends StatelessWidget {
   const ActionCard({
     super.key,
@@ -340,7 +340,7 @@ class DirectBookingCard extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     return Material(
-      color: Colors.transparent,
+      color: AppTheme.transparent,
       borderRadius: BorderRadius.circular(24),
       child: InkWell(
         onTap: onShowQR,

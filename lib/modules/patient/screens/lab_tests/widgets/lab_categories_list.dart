@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 
 import '../../../models/lab/lab_category_model.dart';
 
@@ -80,7 +81,7 @@ class LabCategoriesList extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 side: BorderSide(
                   color: isSelected
-                      ? Colors.transparent
+                      ? AppTheme.transparent
                       : colorScheme.outlineVariant,
                 ),
               ),

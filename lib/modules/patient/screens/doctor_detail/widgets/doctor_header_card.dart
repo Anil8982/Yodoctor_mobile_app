@@ -1,5 +1,6 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import '../../../models/search/doctor_detail_model.dart';
 
 class DoctorHeaderCard extends StatefulWidget {
@@ -50,7 +51,7 @@ class _DoctorHeaderCardState extends State<DoctorHeaderCard> {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.transparency(0.02),
+            color: AppTheme.black.transparency(0.02),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -177,22 +178,18 @@ class _DoctorHeaderCardState extends State<DoctorHeaderCard> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                 decoration: BoxDecoration(
-                  color: Colors.amber.transparency(0.15),
+                  color: AppTheme.amber.transparency(0.15),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(
-                      Icons.star_rounded,
-                      color: Colors.amber,
-                      size: 12,
-                    ),
+                    Icon(Icons.star_rounded, color: AppTheme.amber, size: 12),
                     const SizedBox(width: 2),
                     Text(
                       '${widget.doctor.rating}',
                       style: textTheme.labelSmall?.copyWith(
-                        color: Colors.amber[900],
+                        color: AppTheme.amber[900],
                         fontWeight: FontWeight.w900,
                         fontSize: 10,
                       ),
@@ -274,7 +271,7 @@ class _DoctorHeaderCardState extends State<DoctorHeaderCard> {
                     horizontal: 6,
                     vertical: 4,
                   ),
-                  color: Colors.transparent,
+                  color: AppTheme.transparent,
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [

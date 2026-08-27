@@ -1,5 +1,6 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import '../../../models/dashboard/today_token_model.dart';
 
 class TokenCard extends StatelessWidget {
@@ -20,7 +21,11 @@ class TokenCard extends StatelessWidget {
     return _buildActiveToken(theme, colorScheme, isDark);
   }
 
-  Widget _buildEmptyState(ThemeData theme, ColorScheme colorScheme, bool isDark) {
+  Widget _buildEmptyState(
+    ThemeData theme,
+    ColorScheme colorScheme,
+    bool isDark,
+  ) {
     return Container(
       height: 110,
       padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -98,7 +103,11 @@ class TokenCard extends StatelessWidget {
     );
   }
 
-  Widget _buildActiveToken(ThemeData theme, ColorScheme colorScheme, bool isDark) {
+  Widget _buildActiveToken(
+    ThemeData theme,
+    ColorScheme colorScheme,
+    bool isDark,
+  ) {
     return Container(
       height: 130,
       decoration: BoxDecoration(
@@ -111,7 +120,7 @@ class TokenCard extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: isDark
-                ? Colors.black.transparency(0.3)
+                ? AppTheme.black.transparency(0.3)
                 : colorScheme.secondary.transparency(0.08),
             blurRadius: 24,
             offset: const Offset(0, 8),
@@ -122,10 +131,9 @@ class TokenCard extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(24),
         child: Material(
-          color: Colors.transparent,
+          color: AppTheme.transparent,
           child: InkWell(
-            onTap: () {
-            },
+            onTap: () {},
             splashColor: colorScheme.secondary.transparency(0.05),
             highlightColor: colorScheme.secondary.transparency(0.02),
             child: Row(
@@ -134,7 +142,10 @@ class TokenCard extends StatelessWidget {
 
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 18,
+                      vertical: 16,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -212,7 +223,9 @@ class TokenCard extends StatelessWidget {
                             Icon(
                               Icons.refresh_rounded,
                               size: 12,
-                              color: colorScheme.onSurfaceVariant.transparency(0.3),
+                              color: colorScheme.onSurfaceVariant.transparency(
+                                0.3,
+                              ),
                             ),
                           ],
                         ),
@@ -352,7 +365,9 @@ class TokenCard extends StatelessWidget {
           child: LinearProgressIndicator(
             value: progress,
             minHeight: 2.5,
-            backgroundColor: colorScheme.surfaceContainerHighest.transparency(0.4),
+            backgroundColor: colorScheme.surfaceContainerHighest.transparency(
+              0.4,
+            ),
             valueColor: AlwaysStoppedAnimation<Color>(
               colorScheme.secondary.transparency(0.6),
             ),
@@ -371,11 +386,7 @@ class TokenCard extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(
-          icon,
-          size: 14,
-          color: color.transparency(0.8),
-        ),
+        Icon(icon, size: 14, color: color.transparency(0.8)),
         const SizedBox(width: 5),
         Text(
           label,

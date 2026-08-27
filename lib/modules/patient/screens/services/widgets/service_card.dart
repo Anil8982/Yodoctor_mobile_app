@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/patient/screens/services/models/services_model.dart';
 import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 
@@ -15,7 +16,7 @@ class ServiceCard extends StatelessWidget {
     final textTheme = theme.textTheme;
 
     return Material(
-      color: Colors.transparent,
+      color: AppTheme.transparent,
       borderRadius: BorderRadius.circular(24),
       child: InkWell(
         onTap: () {
@@ -32,8 +33,8 @@ class ServiceCard extends StatelessWidget {
           }
         },
         borderRadius: BorderRadius.circular(24),
-        splashColor: Colors.white.withValues(alpha: 0.15),
-        highlightColor: Colors.white.withValues(alpha: 0.05),
+        splashColor: AppTheme.white.withValues(alpha: 0.15),
+        highlightColor: AppTheme.white.withValues(alpha: 0.05),
         child: Ink(
           height: 165,
           decoration: BoxDecoration(
@@ -65,7 +66,7 @@ class ServiceCard extends StatelessWidget {
                     width: 90,
                     height: 90,
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.08),
+                      color: AppTheme.white.withValues(alpha: 0.08),
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -76,7 +77,7 @@ class ServiceCard extends StatelessWidget {
                   child: Icon(
                     service.icon,
                     size: 54,
-                    color: Colors.white.withValues(alpha: 0.07),
+                    color: AppTheme.white.withValues(alpha: 0.07),
                   ),
                 ),
                 Padding(
@@ -93,24 +94,24 @@ class ServiceCard extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.15),
+                              color: AppTheme.white.withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(14),
                             ),
                             child: Icon(
                               service.icon,
-                              color: Colors.white,
+                              color: AppTheme.white,
                               size: 26,
                             ),
                           ),
                           Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.2),
+                              color: AppTheme.white.withValues(alpha: 0.2),
                               shape: BoxShape.circle,
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.arrow_forward_ios_rounded,
-                              color: Colors.white,
+                              color: AppTheme.white,
                               size: 10,
                             ),
                           ),
@@ -127,7 +128,7 @@ class ServiceCard extends StatelessWidget {
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: textTheme.titleMedium?.copyWith(
-                                color: Colors.white,
+                                color: AppTheme.white,
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: 0.2,
                                 height: 1.15,
@@ -139,7 +140,7 @@ class ServiceCard extends StatelessWidget {
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: textTheme.bodySmall?.copyWith(
-                                color: Colors.white.withValues(alpha: 0.8),
+                                color: AppTheme.white.withValues(alpha: 0.8),
                                 letterSpacing: 0.3,
                                 height: 1.15,
                               ),

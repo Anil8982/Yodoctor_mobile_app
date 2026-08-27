@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/patient/controllers/booking_controller.dart';
 import 'package:yodoctor/modules/patient/controllers/lab_test_controller.dart';
 import 'package:yodoctor/modules/widgets/app_header.dart';
@@ -81,7 +82,7 @@ class _LabSlotBookingScreenState extends ConsumerState<LabSlotBookingScreen> {
     final cartItems = labState.cart;
     final double totalPayable = cartItems.fold(
       0,
-          (sum, item) => sum + item.currentPrice,
+      (sum, item) => sum + item.currentPrice,
     );
 
     return Scaffold(
@@ -164,7 +165,7 @@ class _LabSlotBookingScreenState extends ConsumerState<LabSlotBookingScreen> {
                   padding: const EdgeInsets.only(top: 8),
                   child: Text(
                     validationMessage!,
-                    style: const TextStyle(color: Colors.red, fontSize: 12),
+                    style: TextStyle(color: AppTheme.red, fontSize: 12),
                   ),
                 ),
               LabBookingBottomBar(

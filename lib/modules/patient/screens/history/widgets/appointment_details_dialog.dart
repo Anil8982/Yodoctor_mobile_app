@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/widgets/app_text_field.dart';
 import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 import '../../../models/history/appointment_history_model.dart';
@@ -14,7 +15,7 @@ Future<void> showAppointmentDetailsDialog({
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
-    backgroundColor: Colors.transparent,
+    backgroundColor: AppTheme.transparent,
     builder: (context) => _AppointmentDetailsSheet(
       appointment: appointment,
       initialRating: initialRating,
@@ -110,7 +111,9 @@ class _AppointmentDetailsSheetState extends State<_AppointmentDetailsSheet> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+                  color: colorScheme.surfaceContainerHighest.withValues(
+                    alpha: 0.3,
+                  ),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
                     color: colorScheme.outlineVariant.withValues(alpha: 0.3),
@@ -122,7 +125,9 @@ class _AppointmentDetailsSheetState extends State<_AppointmentDetailsSheet> {
                       height: 52,
                       width: 52,
                       decoration: BoxDecoration(
-                        color: colorScheme.primaryContainer.withValues(alpha: 0.6),
+                        color: colorScheme.primaryContainer.withValues(
+                          alpha: 0.6,
+                        ),
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Icon(
@@ -168,7 +173,9 @@ class _AppointmentDetailsSheetState extends State<_AppointmentDetailsSheet> {
                                   vertical: 2,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: colorScheme.primary.withValues(alpha: 0.1),
+                                  color: colorScheme.primary.withValues(
+                                    alpha: 0.1,
+                                  ),
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: Text(
@@ -192,7 +199,7 @@ class _AppointmentDetailsSheetState extends State<_AppointmentDetailsSheet> {
 
               // View Prescription Banner Button
               Material(
-                color: Colors.transparent,
+                color: AppTheme.transparent,
                 child: InkWell(
                   onTap: widget.onDownloadPrescription,
                   borderRadius: BorderRadius.circular(16),
@@ -202,7 +209,9 @@ class _AppointmentDetailsSheetState extends State<_AppointmentDetailsSheet> {
                       vertical: 14,
                     ),
                     decoration: BoxDecoration(
-                      color: colorScheme.secondaryContainer.withValues(alpha: 0.4),
+                      color: colorScheme.secondaryContainer.withValues(
+                        alpha: 0.4,
+                      ),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
                         color: colorScheme.secondary.withValues(alpha: 0.2),
@@ -276,7 +285,9 @@ class _AppointmentDetailsSheetState extends State<_AppointmentDetailsSheet> {
                       isSelected
                           ? Icons.star_rounded
                           : Icons.star_outline_rounded,
-                      color: isSelected ? const Color(0xFFFFB300) : colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+                      color: isSelected
+                          ? const Color(0xFFFFB300)
+                          : colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
                       size: 34,
                     ),
                   );
@@ -304,30 +315,33 @@ class _AppointmentDetailsSheetState extends State<_AppointmentDetailsSheet> {
                   onPressed: _selectedRating == 0 || _isSubmitting
                       ? null
                       : () async {
-                    final nav = Navigator.of(context);
-                    setState(() => _isSubmitting = true);
-                    try {
-                      await widget.onSubmitRating(
-                        _selectedRating,
-                        _feedbackController.text.trim(),
-                      );
-                      if (mounted) {
-                        nav.pop();
-                        AppSnackBar.show(
-                          message: "Review submitted successfully!",
-                          type: AppSnackBarType.success,
-                        );
-                      }
-                    } catch (e) {
-                      if (mounted) {
-                        setState(() => _isSubmitting = false);
-                        AppSnackBar.show(
-                          message: e.toString().replaceFirst("Exception: ", ""),
-                          type: AppSnackBarType.error,
-                        );
-                      }
-                    }
-                  },
+                          final nav = Navigator.of(context);
+                          setState(() => _isSubmitting = true);
+                          try {
+                            await widget.onSubmitRating(
+                              _selectedRating,
+                              _feedbackController.text.trim(),
+                            );
+                            if (mounted) {
+                              nav.pop();
+                              AppSnackBar.show(
+                                message: "Review submitted successfully!",
+                                type: AppSnackBarType.success,
+                              );
+                            }
+                          } catch (e) {
+                            if (mounted) {
+                              setState(() => _isSubmitting = false);
+                              AppSnackBar.show(
+                                message: e.toString().replaceFirst(
+                                  "Exception: ",
+                                  "",
+                                ),
+                                type: AppSnackBarType.error,
+                              );
+                            }
+                          }
+                        },
                   style: FilledButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
@@ -339,30 +353,30 @@ class _AppointmentDetailsSheetState extends State<_AppointmentDetailsSheet> {
                     duration: const Duration(milliseconds: 200),
                     child: _isSubmitting
                         ? SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2.5,
-                        color: colorScheme.onPrimary,
-                      ),
-                    )
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.5,
+                              color: colorScheme.onPrimary,
+                            ),
+                          )
                         : const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.check_circle_outline_rounded,
-                          size: 20,
-                        ),
-                        SizedBox(width: 8),
-                        Text(
-                          'Save Feedback',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.check_circle_outline_rounded,
+                                size: 20,
+                              ),
+                              SizedBox(width: 8),
+                              Text(
+                                'Save Feedback',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
-                    ),
                   ),
                 ),
               ),

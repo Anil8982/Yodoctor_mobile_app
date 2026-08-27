@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/constants/app_assets.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/auth/screens/landing/widgets/yo_role_btn.dart';
 
 class LandingScreen extends StatefulWidget {
@@ -62,7 +63,7 @@ class _LandingScreenState extends State<LandingScreen> {
                                   height: 120,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
-                                    color: Colors.white.transparency(0.15),
+                                    color: AppTheme.white.transparency(0.15),
                                   ),
                                 ),
                               ),
@@ -74,7 +75,7 @@ class _LandingScreenState extends State<LandingScreen> {
                                   height: 160,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
-                                    color: Colors.white.transparency(0.1),
+                                    color: AppTheme.white.transparency(0.1),
                                   ),
                                 ),
                               ),
@@ -91,9 +92,11 @@ class _LandingScreenState extends State<LandingScreen> {
                                         decoration: BoxDecoration(
                                           color: colorScheme.surfaceContainer,
                                           shape: BoxShape.circle,
-                                          boxShadow: const [
+                                          boxShadow: [
                                             BoxShadow(
-                                              color: Colors.black12,
+                                              color: AppTheme.black.withValues(
+                                                alpha: 0.12,
+                                              ),
                                               blurRadius: 12,
                                               offset: Offset(0, 4),
                                             ),
@@ -132,7 +135,9 @@ class _LandingScreenState extends State<LandingScreen> {
                                         const SizedBox(width: 8),
                                         Icon(
                                           Icons.favorite_rounded,
-                                          color: Colors.white.transparency(0.8),
+                                          color: AppTheme.white.transparency(
+                                            0.8,
+                                          ),
                                           size: 18,
                                         ),
                                       ],

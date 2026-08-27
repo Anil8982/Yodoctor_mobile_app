@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
 import 'package:yodoctor/modules/doctor/controllers/doctor_profile_controller.dart';
 import 'package:yodoctor/modules/widgets/app_text_field.dart';
@@ -115,7 +116,9 @@ class ConsultationTimingsTab extends ConsumerWidget {
               autovalidateMode: autovalidateMode,
               onChanged: (selectedList) {
                 for (final day in weekDays) {
-                  final isCurrentlySelected = formState.activeDays.contains(day);
+                  final isCurrentlySelected = formState.activeDays.contains(
+                    day,
+                  );
                   final shouldBeSelected = selectedList.contains(day);
                   if (isCurrentlySelected != shouldBeSelected) {
                     controller.toggleDay(day);
@@ -130,11 +133,11 @@ class ConsultationTimingsTab extends ConsumerWidget {
               },
             ),
             if (formState.availableDaysError)
-              const Padding(
-                padding: EdgeInsets.only(top: 6, left: 4),
+              Padding(
+                padding: const EdgeInsets.only(top: 6, left: 4),
                 child: Text(
                   'Please select at least one available day',
-                  style: TextStyle(color: Colors.red, fontSize: 12),
+                  style: TextStyle(color: colorScheme.error, fontSize: 12),
                 ),
               ),
             const SizedBox(height: AppSpacing.xxxl),

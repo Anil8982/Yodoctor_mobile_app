@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 
 class AppointmentHeader extends StatelessWidget {
   const AppointmentHeader({super.key});
@@ -17,9 +18,19 @@ class AppointmentHeader extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildTitleLine('Appointment', textTheme, colorScheme.onSurface, FontWeight.w900),
+              _buildTitleLine(
+                'Appointment',
+                textTheme,
+                colorScheme.onSurface,
+                FontWeight.w900,
+              ),
               const SizedBox(height: 2),
-              _buildTitleLine('Details', textTheme, colorScheme.primary, FontWeight.w300),
+              _buildTitleLine(
+                'Details',
+                textTheme,
+                colorScheme.primary,
+                FontWeight.w300,
+              ),
             ],
           ),
           _CloseButton(colorScheme: colorScheme),
@@ -29,11 +40,11 @@ class AppointmentHeader extends StatelessWidget {
   }
 
   Widget _buildTitleLine(
-      String text,
-      TextTheme textTheme,
-      Color color,
-      FontWeight weight,
-      ) {
+    String text,
+    TextTheme textTheme,
+    Color color,
+    FontWeight weight,
+  ) {
     return Text(
       text,
       style: textTheme.titleLarge?.copyWith(
@@ -54,7 +65,7 @@ class _CloseButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.transparent,
+      color: AppTheme.transparent,
       child: InkWell(
         onTap: () => Navigator.of(context).pop(),
         borderRadius: BorderRadius.circular(50),

@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/patient/screens/search/widgets/doctor_search_widget.dart';
 
 class SearchDoctorCard extends StatelessWidget {
@@ -17,7 +18,7 @@ class SearchDoctorCard extends StatelessWidget {
 
     if (!isSearch) {
       return Material(
-        color: Colors.transparent,
+        color: AppTheme.transparent,
         child: InkWell(
           onTap: () => context.push(AppRoutes.search),
           borderRadius: BorderRadius.circular(28),
@@ -91,7 +92,7 @@ class SearchDoctorCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(99),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.transparency(0.08),
+                            color: AppTheme.black.transparency(0.08),
                             blurRadius: 8,
                             offset: const Offset(0, 4),
                           ),
@@ -126,7 +127,7 @@ class SearchDoctorCard extends StatelessWidget {
     }
 
     return Material(
-      color: Colors.transparent,
+      color: AppTheme.transparent,
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(24),

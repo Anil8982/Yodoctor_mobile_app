@@ -1,5 +1,6 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 
 class ProfileDatePickerField extends StatefulWidget {
   final String label;
@@ -36,7 +37,7 @@ class _ProfileDatePickerFieldState extends State<ProfileDatePickerField> {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       width: double.infinity,
-      decoration: const BoxDecoration(color: Colors.transparent),
+      decoration: BoxDecoration(color: AppTheme.transparent),
 
       child: InkWell(
         onTap: widget.isEditing
