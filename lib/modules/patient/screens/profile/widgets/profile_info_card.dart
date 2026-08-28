@@ -1,7 +1,6 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:yodoctor/core/theme/app_theme.dart';
 
 import '../../../controllers/profile_controller.dart';
 import 'profile_date_picker_field.dart';
@@ -36,7 +35,7 @@ class ProfileInfoCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(28),
         side: BorderSide(color: colorScheme.outlineVariant.transparency(0.4)),
       ),
-      color: AppTheme.white,
+      color: colorScheme.surface,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
         child: Column(

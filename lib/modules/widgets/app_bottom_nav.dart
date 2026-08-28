@@ -46,7 +46,7 @@ class AppBottomNav extends StatelessWidget {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: colorScheme.shadow.withValues(alpha: 0.1),
+                  color: colorScheme.shadow.withValues(alpha: 0.5),
                   blurRadius: 8,
                   offset: const Offset(0, -2),
                 ),

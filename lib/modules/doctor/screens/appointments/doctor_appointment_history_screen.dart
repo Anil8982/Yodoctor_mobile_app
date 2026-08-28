@@ -1,9 +1,8 @@
-import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/doctor/models/appointment/appointment_history_item.dart';
+import 'package:yodoctor/modules/widgets/status_chip.dart';
 
 import '../../../../core/utils/app_spacing.dart';
 import '../../../../core/utils/responsive.dart';
@@ -210,40 +209,12 @@ class _DoctorAppointmentHistoryScreenState
   }
 
   Widget _buildStatusChip(String status) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final statusUpper = status.toUpperCase();
-    final completed = statusUpper == 'COMPLETED';
-    final cancelled = statusUpper == 'CANCELLED';
+    final resolvedStatus = status.isNotEmpty
+        ? status[0].toUpperCase() + status.substring(1)
+        : 'Pending';
 
-    final foreground = completed
-        ? colorScheme.secondary
-        : cancelled
-        ? colorScheme.error
-        : AppTheme.orange;
-
-    final background = completed
-        ? colorScheme.secondaryContainer
-        : cancelled
-        ? colorScheme.errorContainer
-        : AppTheme.orange.transparency(0.15);
-
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.md,
-        vertical: AppSpacing.xs,
-      ),
-      decoration: BoxDecoration(
-        color: background,
-        borderRadius: BorderRadius.circular(99),
-        border: Border.all(color: foreground.withValues(alpha: 0.2)),
-      ),
-      child: Text(
-        status,
-        style: Theme.of(context).textTheme.labelMedium?.copyWith(
-          color: foreground,
-          fontWeight: FontWeight.w800,
-        ),
-      ),
+    return StatusChip(
+      status: resolvedStatus,
     );
   }
 
@@ -269,61 +240,11 @@ class _DoctorAppointmentHistoryScreenState
     );
   }
 
-  // void _openPrescription(AppointmentHistoryItem appointment) {
-  //   showModalBottomSheet<void>(
-  //     context: context,
-  //     showDragHandle: true,
-  //     builder: (context) {
-  //       final theme = Theme.of(context);
-  //       final colorScheme = theme.colorScheme;
-  //
-  //       return Padding(
-  //         padding: const EdgeInsets.fromLTRB(AppSpacing.xl, 0, AppSpacing.xl, AppSpacing.xxl),
-  //         child: Column(
-  //           mainAxisSize: MainAxisSize.min,
-  //           children: [
-  //             Icon(Icons.receipt_long_rounded, size: 44, color: colorScheme.primary),
-  //             const SizedBox(height: AppSpacing.md),
-  //             Text(
-  //               'Prescription',
-  //               style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900),
-  //             ),
-  //             const SizedBox(height: AppSpacing.xs),
-  //             Text(
-  //               'Create a prescription for ${_patientName(appointment.patientLabel)}.',
-  //               textAlign: TextAlign.center,
-  //               style: theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
-  //             ),
-  //             const SizedBox(height: AppSpacing.xl),
-  //             SizedBox(
-  //               width: double.infinity,
-  //               child: FilledButton.icon(
-  //                 onPressed: () {
-  //                   Navigator.pop(context);
-  //                   _showMessage('Prescription editor coming soon');
-  //                 },
-  //                 icon: const Icon(Icons.add_rounded),
-  //                 label: const Text('Create Prescription'),
-  //               ),
-  //             ),
-  //           ],
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
-
   void _openPrescription(AppointmentHistoryItem appointment) {
     context.push(
       '/doctor/add-prescription/${appointment.id}?name=${Uri.encodeComponent(appointment.patientLabel)}&token=${Uri.encodeComponent(appointment.tokenNumber)}',
     );
   }
-  //
-  // void _showMessage(String message) {
-  //   ScaffoldMessenger.of(context).showSnackBar(
-  //     SnackBar(content: Text(message)),
-  //   );
-  // }
 
   String _patientName(String label) {
     return label.replaceAll(RegExp(r'\s*\([^)]*\)'), '').trim();

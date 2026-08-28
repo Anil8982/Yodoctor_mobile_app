@@ -24,12 +24,6 @@ class AppointmentBottomBar extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        border: Border(
-          top: BorderSide(
-            color: colorScheme.outlineVariant.withValues(alpha: 0.4),
-            width: 1,
-          ),
-        ),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -40,7 +34,7 @@ class AppointmentBottomBar extends StatelessWidget {
               Text(
                 'Consultation Fee',
                 style: textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.outline,
+                  color: colorScheme.onSurfaceVariant,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -66,27 +60,27 @@ class AppointmentBottomBar extends StatelessWidget {
               ),
               child: isLoading
                   ? SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2.5,
-                        color: colorScheme.onPrimary,
-                      ),
-                    )
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.5,
+                  color: colorScheme.onPrimary,
+                ),
+              )
                   : const Text(
-                      'Confirm Appointment',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w900,
-                        fontSize: 16,
-                      ),
-                    ),
+                'Confirm Appointment',
+                style: TextStyle(
+                  fontWeight: FontWeight.w900,
+                  fontSize: 16,
+                ),
+              ),
             ),
           ),
           const SizedBox(height: 8),
           Text(
             'Payable at clinic during visit',
             style: textTheme.bodySmall?.copyWith(
-              color: colorScheme.outline,
+              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
               fontStyle: FontStyle.italic,
             ),
           ),

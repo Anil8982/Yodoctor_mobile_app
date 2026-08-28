@@ -54,9 +54,6 @@ class DateTimelinePicker extends StatelessWidget {
                             ? colorScheme.surfaceContainerHighest.transparency(0.2)
                             : (isSelected ? colorScheme.primary : colorScheme.surfaceContainerLow),
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: isSelected ? colorScheme.primary : colorScheme.outlineVariant.transparency(0.3),
-                        ),
                       ),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
@@ -66,7 +63,7 @@ class DateTimelinePicker extends StatelessWidget {
                             style: textTheme.labelMedium?.copyWith(
                               color: isSelected
                                   ? colorScheme.onPrimary
-                                  : colorScheme.outline.withValues(alpha: onDateSelected == null ? 0.4 : 1.0),
+                                  : colorScheme.onSurfaceVariant.withValues(alpha: onDateSelected == null ? 0.4 : 0.8),
                               fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
                             ),
                           ),

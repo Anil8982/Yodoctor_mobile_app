@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
 import 'package:yodoctor/modules/doctor/models/certificate/doctor_certificate_detail_model.dart';
 import 'package:yodoctor/modules/doctor/models/certificate/doctor_document_model.dart';
+import 'package:yodoctor/modules/widgets/status_chip.dart';
 import '../../dashboard_screen/widgets/document_preview_tile.dart';
 
 class PatientInfoPanel extends StatelessWidget {
@@ -82,28 +83,10 @@ class PatientInfoPanel extends StatelessWidget {
                 ),
               ),
               if (isReadOnly) ...[
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: certificate.isApproved
-                        ? colorScheme.primaryContainer.withValues(alpha: 0.3)
-                        : colorScheme.errorContainer.withValues(alpha: 0.3),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    certificate.status.isNotEmpty ? certificate.status.toUpperCase() : 'PENDING',
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: certificate.isApproved
-                          ? colorScheme.primary
-                          : colorScheme.error,
-                      fontWeight: FontWeight.w900,
-                      fontSize: 10,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
+                StatusChip(
+                  status: certificate.status.isNotEmpty
+                      ? certificate.status[0].toUpperCase() + certificate.status.substring(1)
+                      : 'Pending',
                 ),
               ],
             ],
@@ -343,28 +326,11 @@ class PatientInfoPanel extends StatelessWidget {
             // Fitness Status
             _buildSectionLabel(context, 'FITNESS STATUS', Icons.health_and_safety_rounded),
             const SizedBox(height: 6),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              decoration: BoxDecoration(
-                color: certificate.fitnessStatus?.toUpperCase().contains('FIT') == true
-                    ? colorScheme.primaryContainer.withValues(alpha: 0.3)
-                    : colorScheme.errorContainer.withValues(alpha: 0.3),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: certificate.fitnessStatus?.toUpperCase().contains('FIT') == true
-                      ? colorScheme.primary.withValues(alpha: 0.2)
-                      : colorScheme.error.withValues(alpha: 0.2),
-                ),
-              ),
-              child: Text(
-                certificate.fitnessStatus?.isNotEmpty == true ? certificate.fitnessStatus! : 'N/A',
-                style: theme.textTheme.labelMedium?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  color: certificate.fitnessStatus?.toUpperCase().contains('FIT') == true
-                      ? colorScheme.primary
-                      : colorScheme.error,
-                  fontSize: 12,
-                ),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: StatusChip(
+                status: certificate.fitnessStatus?.isNotEmpty == true ? certificate.fitnessStatus! : 'fit',
+                isSmall: true,
               ),
             ),
           ],

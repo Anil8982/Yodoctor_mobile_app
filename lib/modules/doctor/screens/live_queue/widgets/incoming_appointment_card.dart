@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
-import 'package:yodoctor/modules/doctor/screens/incoming_appointment/widgets/right_curve_clipper.dart';
+import 'package:yodoctor/modules/widgets/status_chip.dart';
 
 import '../../../../patient/models/appointment/incoming_appointment_model.dart';
 
@@ -36,21 +36,20 @@ class IncomingAppointmentCard extends StatelessWidget {
 
     final formattedSlot = slotText.isNotEmpty
         ? slotText.substring(0, 1).toUpperCase() +
-              slotText.substring(1).toLowerCase()
+        slotText.substring(1).toLowerCase()
         : '';
 
-    // Accepted asel tar card la green tint/border, pending asel tar orange/normal
-    final cardBgColor = isAccepted
-        ? AppTheme.green.shade50.withValues(alpha: 0.5)
-        : colorScheme.surface;
+    final successColor = AppTheme.success(context);
+    final warningColor = AppTheme.warning(context);
+    final infoColor = AppTheme.info(context);
 
     final borderColor = isAccepted
-        ? AppTheme.green.shade300
+        ? successColor.withValues(alpha: 0.4)
         : colorScheme.outlineVariant.withValues(alpha: 0.4);
 
     return Container(
       decoration: BoxDecoration(
-        color: colorScheme.onPrimary,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(28),
         border: Border.all(color: borderColor, width: 1),
         boxShadow: [
@@ -75,10 +74,10 @@ class IncomingAppointmentCard extends StatelessWidget {
                 clipper: RightCurveClipper(),
                 child: Container(
                   color: isAccepted
-                      ? AppTheme.green.shade100
+                      ? successColor.withValues(alpha: 0.12)
                       : isPending
-                      ? AppTheme.orange.shade100
-                      : Colors.blue.shade100,
+                      ? warningColor.withValues(alpha: 0.12)
+                      : infoColor.withValues(alpha: 0.12),
                 ),
               ),
             ),
@@ -91,10 +90,10 @@ class IncomingAppointmentCard extends StatelessWidget {
                     : Icons.access_time_rounded,
                 size: 32,
                 color: isAccepted
-                    ? AppTheme.green.withValues(alpha: .25)
+                    ? successColor.withValues(alpha: 0.25)
                     : isPending
-                    ? AppTheme.orange.withValues(alpha: .25)
-                    : Colors.blue.withValues(alpha: .25),
+                    ? warningColor.withValues(alpha: 0.25)
+                    : infoColor.withValues(alpha: 0.25),
               ),
             ),
 
@@ -114,7 +113,7 @@ class IncomingAppointmentCard extends StatelessWidget {
                           shape: BoxShape.circle,
                           border: Border.all(
                             color: isAccepted
-                                ? AppTheme.green.shade300
+                                ? successColor.withValues(alpha: 0.4)
                                 : colorScheme.primary.withValues(alpha: 0.25),
                             width: 2,
                           ),
@@ -122,28 +121,28 @@ class IncomingAppointmentCard extends StatelessWidget {
                         child: CircleAvatar(
                           radius: 24,
                           backgroundColor: isAccepted
-                              ? AppTheme.green.shade100
+                              ? successColor.withValues(alpha: 0.15)
                               : colorScheme.primaryContainer,
                           backgroundImage:
-                              appointment.profileImage != null &&
-                                  appointment.profileImage!.isNotEmpty
+                          appointment.profileImage != null &&
+                              appointment.profileImage!.isNotEmpty
                               ? NetworkImage(appointment.profileImage!)
                               : null,
                           child:
-                              appointment.profileImage == null ||
-                                  appointment.profileImage!.isEmpty
+                          appointment.profileImage == null ||
+                              appointment.profileImage!.isEmpty
                               ? Text(
-                                  appointment.patientName.isNotEmpty
-                                      ? appointment.patientName[0].toUpperCase()
-                                      : 'P',
-                                  style: TextStyle(
-                                    color: isAccepted
-                                        ? AppTheme.green.shade800
-                                        : colorScheme.onPrimaryContainer,
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                )
+                            appointment.patientName.isNotEmpty
+                                ? appointment.patientName[0].toUpperCase()
+                                : 'P',
+                            style: TextStyle(
+                              color: isAccepted
+                                  ? successColor
+                                  : colorScheme.onPrimaryContainer,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          )
                               : null,
                         ),
                       ),
@@ -170,7 +169,7 @@ class IncomingAppointmentCard extends StatelessWidget {
                                       ? Icons.wb_sunny_rounded
                                       : Icons.nightlight_round_outlined,
                                   color: isMorning
-                                      ? AppTheme.amber.shade700
+                                      ? warningColor
                                       : colorScheme.secondary,
                                   size: 14,
                                 ),
@@ -220,18 +219,16 @@ class IncomingAppointmentCard extends StatelessWidget {
                         ),
                         decoration: BoxDecoration(
                           color: isAccepted
-                              ? AppTheme.green.shade100
-                              : colorScheme.primaryContainer.withValues(
-                                  alpha: 0.7,
-                                ),
+                              ? successColor.withValues(alpha: 0.15)
+                              : colorScheme.secondaryContainer,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
                           "#${appointment.tokenNumber.toString().padLeft(2, '0')}",
                           style: theme.textTheme.labelMedium?.copyWith(
                             color: isAccepted
-                                ? AppTheme.green.shade800
-                                : colorScheme.primary,
+                                ? successColor
+                                : colorScheme.onSecondaryContainer,
                             fontWeight: FontWeight.w800,
                           ),
                         ),
@@ -243,7 +240,7 @@ class IncomingAppointmentCard extends StatelessWidget {
 
                   Divider(
                     color: isAccepted
-                        ? AppTheme.green.shade200
+                        ? successColor.withValues(alpha: 0.2)
                         : colorScheme.outlineVariant.withValues(alpha: 0.3),
                     thickness: 1,
                     endIndent: 22,
@@ -257,39 +254,15 @@ class IncomingAppointmentCard extends StatelessWidget {
                       padding: const EdgeInsets.only(right: 45),
                       child: Row(
                         children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppTheme.green.shade100,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                CircleAvatar(
-                                  radius: 3.5,
-                                  backgroundColor: AppTheme.green,
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  "ACCEPTED",
-                                  style: TextStyle(
-                                    color: AppTheme.green,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 11,
-                                  ),
-                                ),
-                              ],
-                            ),
+                          StatusChip(
+                            status: appointment.status,
+                            isSmall: true,
                           ),
                           const Spacer(),
                           Text(
                             "Appointment Confirmed",
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color: AppTheme.green.shade700,
+                              color: successColor,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -302,38 +275,9 @@ class IncomingAppointmentCard extends StatelessWidget {
                       padding: const EdgeInsets.only(right: 55),
                       child: Row(
                         children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppTheme.orange.shade50,
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: AppTheme.orange.shade200.withValues(
-                                  alpha: 0.5,
-                                ),
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                CircleAvatar(
-                                  radius: 3.5,
-                                  backgroundColor: AppTheme.orange,
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  "PENDING",
-                                  style: TextStyle(
-                                    color: AppTheme.orange,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 11,
-                                  ),
-                                ),
-                              ],
-                            ),
+                          StatusChip(
+                            status: appointment.status,
+                            isSmall: true,
                           ),
 
                           const Spacer(),
@@ -370,8 +314,8 @@ class IncomingAppointmentCard extends StatelessWidget {
                             icon: const Icon(Icons.check_rounded, size: 15),
                             label: const Text("Accept"),
                             style: FilledButton.styleFrom(
-                              backgroundColor: const Color(0xff1BCB7F),
-                              foregroundColor: AppTheme.white,
+                              backgroundColor: successColor,
+                              foregroundColor: AppTheme.onSuccess(context),
                               elevation: 0,
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 10,
@@ -399,4 +343,33 @@ class IncomingAppointmentCard extends StatelessWidget {
       ),
     );
   }
+}
+
+class RightCurveClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+
+    path.moveTo(0, 0);
+    path.lineTo(size.width, 0);
+    path.lineTo(size.width, size.height);
+
+    path.lineTo(size.width * 0.28, size.height);
+
+    path.cubicTo(
+      size.width * 0.72,
+      size.height * 0.92,
+      size.width * 0.95,
+      size.height * 0.42,
+      size.width,
+      0,
+    );
+
+    path.close();
+
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }

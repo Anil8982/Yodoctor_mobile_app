@@ -1,6 +1,7 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:yodoctor/modules/widgets/status_chip.dart';
 import '../../../models/search/doctor_detail_model.dart';
 
 class DoctorHeaderCard extends StatefulWidget {
@@ -15,7 +16,6 @@ class DoctorHeaderCard extends StatefulWidget {
 class _DoctorHeaderCardState extends State<DoctorHeaderCard> {
   bool _isAboutExpanded = false;
 
-  // 🎯 HELPER WIDGET BY SATYAM STUDIOS: नावाचं पहिलं आद्यक्षर दाखवण्यासाठी फॉलबॅक विजेट
   Widget _buildInitialAvatar(TextTheme textTheme, ColorScheme colorScheme) {
     return Center(
       child: Text(
@@ -81,7 +81,6 @@ class _DoctorHeaderCardState extends State<DoctorHeaderCard> {
                     ? Image.network(
                         widget.doctor.profileImage,
                         fit: BoxFit.cover,
-                        // 🎯 SAFE ERROR CATCH: S3 एरर किंवा इंटरनेट बंद असल्यास पहिल्यासारखा बॅकअप रेंडर होईल!
                         errorBuilder: (context, error, stackTrace) {
                           return _buildInitialAvatar(textTheme, colorScheme);
                         },
@@ -157,22 +156,15 @@ class _DoctorHeaderCardState extends State<DoctorHeaderCard> {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: colorScheme.secondaryContainer.transparency(0.8),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  widget.doctor.isAvailable == 1
-                      ? 'Available'
-                      : 'Not Available',
-                  style: textTheme.labelSmall?.copyWith(
-                    color: colorScheme.onSecondaryContainer,
-                    fontWeight: FontWeight.w900,
-                    fontSize: 10,
-                  ),
-                ),
+              StatusChip(
+                status: widget.doctor.isAvailable == 1 ? 'Available' : 'Not Available',
+                isSmall: true,
+                customColor: widget.doctor.isAvailable == 1
+                    ? AppTheme.success(context)
+                    : AppTheme.error(context),
+                icon: widget.doctor.isAvailable == 1
+                    ? Icons.check_circle_rounded
+                    : Icons.cancel_rounded,
               ),
               const SizedBox(width: 4),
               Container(

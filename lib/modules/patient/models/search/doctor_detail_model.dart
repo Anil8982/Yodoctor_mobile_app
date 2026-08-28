@@ -53,7 +53,6 @@ class DoctorDetailModel {
 
   factory DoctorDetailModel.fromJson(Map<String, dynamic> json) {
     return DoctorDetailModel(
-      // 🎯 FIXED BY SATYAM STUDIOS: Converted int explicitly to String to match model definition and avoid subtype crashes
       doctorId: json["doctorId"]?.toString() ?? "0",
 
       doctorName: json["doctorName"] ?? "",

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:yodoctor/modules/widgets/status_chip.dart';
 import '../../../models/history/appointment_history_model.dart';
 
 class HistoryAppointmentCard extends StatelessWidget {
@@ -41,10 +43,10 @@ class HistoryAppointmentCard extends StatelessWidget {
 
   // WIDE LAYOUT (Desktop / Tablet)
   Widget _buildWideLayout(
-    BuildContext context,
-    TextTheme textTheme,
-    ColorScheme colorScheme,
-  ) {
+      BuildContext context,
+      TextTheme textTheme,
+      ColorScheme colorScheme,
+      ) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
@@ -62,7 +64,10 @@ class HistoryAppointmentCard extends StatelessWidget {
         ),
         Expanded(
           flex: 3,
-          child: _buildStatusChip(context, textTheme, colorScheme),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: StatusChip(status: appointment.status),
+          ),
         ),
         Expanded(
           flex: 2,
@@ -77,10 +82,10 @@ class HistoryAppointmentCard extends StatelessWidget {
 
   // COMPACT LAYOUT (Mobile)
   Widget _buildCompactLayout(
-    BuildContext context,
-    TextTheme textTheme,
-    ColorScheme colorScheme,
-  ) {
+      BuildContext context,
+      TextTheme textTheme,
+      ColorScheme colorScheme,
+      ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -100,7 +105,7 @@ class HistoryAppointmentCard extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            _buildStatusChip(context, textTheme, colorScheme),
+            StatusChip(status: appointment.status),
             const SizedBox(width: 10),
             Expanded(
               child: Align(
@@ -114,25 +119,24 @@ class HistoryAppointmentCard extends StatelessWidget {
     );
   }
 
-  // DOCTOR INFO SECTION (With Profile Image)
   Widget _buildDoctorInfo(
-    BuildContext context,
-    TextTheme textTheme,
-    ColorScheme colorScheme,
-  ) {
+      BuildContext context,
+      TextTheme textTheme,
+      ColorScheme colorScheme,
+      ) {
     return Row(
       children: <Widget>[
         CircleAvatar(
           radius: 24,
           backgroundColor: colorScheme.primaryContainer,
           backgroundImage:
-              appointment.profileImage != null &&
-                  appointment.profileImage!.isNotEmpty
+          appointment.profileImage != null &&
+              appointment.profileImage!.isNotEmpty
               ? NetworkImage(appointment.profileImage!)
               : null,
           child:
-              appointment.profileImage == null ||
-                  appointment.profileImage!.isEmpty
+          appointment.profileImage == null ||
+              appointment.profileImage!.isEmpty
               ? Icon(Icons.person_rounded, color: colorScheme.primary, size: 26)
               : null,
         ),
@@ -175,12 +179,17 @@ class HistoryAppointmentCard extends StatelessWidget {
     );
   }
 
-  // DATE & TIME SLOT SECTION
   Widget _buildDateShiftInfo(
-    BuildContext context,
-    TextTheme textTheme,
-    ColorScheme colorScheme,
-  ) {
+      BuildContext context,
+      TextTheme textTheme,
+      ColorScheme colorScheme,
+      ) {
+    final String slotText = appointment.appointmentSlot.trim();
+    final String lowerSlot = slotText.toLowerCase();
+
+    final bool isMorning = lowerSlot.contains('morn') || lowerSlot.contains('am');
+    final bool isEvening = lowerSlot.contains('even') || lowerSlot.contains('pm') || lowerSlot.contains('night');
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -202,41 +211,25 @@ class HistoryAppointmentCard extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 6),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          decoration: BoxDecoration(
-            color: colorScheme.primaryContainer.withValues(alpha: 0.45),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Icon(
-                Icons.schedule_rounded,
-                size: 13,
-                color: colorScheme.primary,
-              ),
-              const SizedBox(width: 4),
-              Text(
-                appointment.appointmentSlot,
-                style: textTheme.labelMedium?.copyWith(
-                  color: colorScheme.primary,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
-          ),
+        StatusChip(
+          status: appointment.appointmentSlot,
+          isSmall: true,
+          customColor: isMorning
+              ? AppTheme.warning(context)
+              : (isEvening ? AppTheme.info(context) : colorScheme.primary),
+          icon: isMorning
+              ? Icons.wb_sunny_rounded
+              : (isEvening ? Icons.nightlight_round : Icons.schedule_rounded),
         ),
       ],
     );
   }
 
-  // TOKEN CHIP
   Widget _buildTokenChip(
-    BuildContext context,
-    TextTheme textTheme,
-    ColorScheme colorScheme,
-  ) {
+      BuildContext context,
+      TextTheme textTheme,
+      ColorScheme colorScheme,
+      ) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
@@ -253,44 +246,6 @@ class HistoryAppointmentCard extends StatelessWidget {
     );
   }
 
-  // STATUS BADGE (Dynamic Color Handling)
-  Widget _buildStatusChip(
-    BuildContext context,
-    TextTheme textTheme,
-    ColorScheme colorScheme,
-  ) {
-    final String status = appointment.status.toUpperCase();
-
-    Color containerColor = colorScheme.secondaryContainer.withValues(
-      alpha: 0.45,
-    );
-    Color textColor = colorScheme.onSecondaryContainer;
-
-    if (status.contains('CANCEL')) {
-      containerColor = colorScheme.errorContainer.withValues(alpha: 0.45);
-      textColor = colorScheme.onErrorContainer;
-    } else if (status.contains('COMPLET') || status.contains('CONFIRM')) {
-      containerColor = colorScheme.tertiaryContainer.withValues(alpha: 0.45);
-      textColor = colorScheme.onTertiaryContainer;
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: containerColor,
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Text(
-        appointment.status,
-        style: textTheme.labelMedium?.copyWith(
-          color: textColor,
-          fontWeight: FontWeight.w700,
-        ),
-      ),
-    );
-  }
-
-  // VIEW DETAILS BUTTON
   Widget _buildViewDetailsButton(BuildContext context) {
     return OutlinedButton(
       onPressed: onViewDetails,

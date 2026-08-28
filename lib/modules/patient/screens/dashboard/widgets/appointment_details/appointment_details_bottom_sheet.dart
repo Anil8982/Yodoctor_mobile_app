@@ -16,6 +16,11 @@ void showAppointmentDetailsBottomSheet(
     isScrollControlled: true,
     backgroundColor: AppTheme.transparent,
     isDismissible: true,
+    sheetAnimationStyle: const AnimationStyle(
+      duration: Duration(milliseconds: 600),
+      reverseDuration: Duration(milliseconds: 500),
+    ),
+
     builder: (_) => AppointmentDetailsBottomSheet(appointment: appointment),
   );
 }
@@ -75,7 +80,10 @@ class AppointmentDetailsBottomSheet extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      DoctorProfileCard(appointment: appointment),
+                      Hero(
+                        tag: 'appointment-${appointment.id}',
+                        child: DoctorProfileCard(appointment: appointment),
+                      ),
                       const SizedBox(height: 24),
                       InfoSection(appointment: appointment),
                       const SizedBox(height: 28),

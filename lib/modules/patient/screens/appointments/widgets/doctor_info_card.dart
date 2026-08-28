@@ -19,9 +19,6 @@ class DoctorInfoCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.primaryContainer.transparency(0.25),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: colorScheme.primaryContainer.transparency(0.5),
-        ),
       ),
       child: Row(
         children: [
@@ -33,12 +30,12 @@ class DoctorInfoCard extends StatelessWidget {
                 : null,
             child: doctor.profileImage.isEmpty
                 ? Text(
-                    doctor.doctorName.replaceAll('Dr. ', '')[0],
-                    style: textTheme.titleLarge?.copyWith(
-                      color: colorScheme.onPrimary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  )
+              doctor.doctorName.replaceAll('Dr. ', '')[0],
+              style: textTheme.titleLarge?.copyWith(
+                color: colorScheme.onPrimary,
+                fontWeight: FontWeight.bold,
+              ),
+            )
                 : null,
           ),
           const SizedBox(width: 16),

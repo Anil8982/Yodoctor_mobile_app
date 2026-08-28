@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
 import 'package:yodoctor/core/utils/responsive.dart';
 import 'package:yodoctor/modules/doctor/models/certificate/doctor_certificate_request_model.dart';
+import 'package:yodoctor/modules/widgets/status_chip.dart';
 
 class CertificateListCards extends StatelessWidget {
   const CertificateListCards({
@@ -36,18 +38,18 @@ class CertificateListCards extends StatelessWidget {
 
   // 📱 MOBILE CARD LAYOUT
   Widget _buildMobileCard(
-      BuildContext context,
-      DoctorCertificateRequestModel cert,
-      ) {
+    BuildContext context,
+    DoctorCertificateRequestModel cert,
+  ) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    final formattedDate = DateFormat('dd MMM yyyy').format(
-      isIssuedTab ? cert.issuedAt ?? cert.createdAt : cert.createdAt,
-    );
-    final expiryDate = DateFormat('dd MMM yyyy').format(
-      cert.expiryDate ?? DateTime.now(),
-    );
+    final formattedDate = DateFormat(
+      'dd MMM yyyy',
+    ).format(isIssuedTab ? cert.issuedAt ?? cert.createdAt : cert.createdAt);
+    final expiryDate = DateFormat(
+      'dd MMM yyyy',
+    ).format(cert.expiryDate ?? DateTime.now());
 
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.md),
@@ -70,7 +72,6 @@ class CertificateListCards extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header: Avatar + User Info + Status Chip
           Row(
             children: [
               CircleAvatar(
@@ -112,7 +113,11 @@ class CertificateListCards extends StatelessWidget {
               ),
               if (!isIssuedTab) ...[
                 const SizedBox(width: AppSpacing.xs),
-                _buildStatusChip(context, cert.status),
+                StatusChip(
+                  status: cert.status.isNotEmpty
+                      ? cert.status[0].toUpperCase() + cert.status.substring(1)
+                      : '',
+                ),
               ],
             ],
           ),
@@ -150,18 +155,18 @@ class CertificateListCards extends StatelessWidget {
 
   // 💻 DESKTOP CARD LAYOUT
   Widget _buildDesktopCard(
-      BuildContext context,
-      DoctorCertificateRequestModel cert,
-      ) {
+    BuildContext context,
+    DoctorCertificateRequestModel cert,
+  ) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    final formattedDate = DateFormat('dd MMM yyyy').format(
-      isIssuedTab ? cert.issuedAt ?? cert.createdAt : cert.createdAt,
-    );
-    final expiryDate = DateFormat('dd MMM yyyy').format(
-      cert.expiryDate ?? DateTime.now(),
-    );
+    final formattedDate = DateFormat(
+      'dd MMM yyyy',
+    ).format(isIssuedTab ? cert.issuedAt ?? cert.createdAt : cert.createdAt);
+    final expiryDate = DateFormat(
+      'dd MMM yyyy',
+    ).format(cert.expiryDate ?? DateTime.now());
 
     return Container(
       width: double.infinity,
@@ -264,13 +269,13 @@ class CertificateListCards extends StatelessWidget {
                 const SizedBox(height: 6),
                 isIssuedTab
                     ? Text(
-                  expiryDate,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.error,
-                  ),
-                )
-                    : _buildStatusChip(context, cert.status),
+                        expiryDate,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.error(context),
+                        ),
+                      )
+                    : StatusChip(status: cert.status, isSmall: true),
               ],
             ),
           ),
@@ -318,11 +323,11 @@ class CertificateListCards extends StatelessWidget {
 
   // Helper Widget: Action Button
   Widget _buildActionButton(
-      BuildContext context,
-      ThemeData theme,
-      DoctorCertificateRequestModel certificate, {
-        double? width,
-      }) {
+    BuildContext context,
+    ThemeData theme,
+    DoctorCertificateRequestModel certificate, {
+    double? width,
+  }) {
     final colorScheme = theme.colorScheme;
 
     return SizedBox(
@@ -368,72 +373,17 @@ class CertificateListCards extends StatelessWidget {
   // Helper Widget: Certificate Type Chip
   Widget _buildTypeChip(BuildContext context, String type) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
-    final bg = isDark ? const Color(0xFF26292E) : const Color(0xFFF1F3F5);
-    final fg = isDark ? const Color(0xFFD0D4DC) : const Color(0xFF495057);
-
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: bg,
+        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
         type,
         style: theme.textTheme.labelSmall?.copyWith(
-          color: fg,
+          color: theme.colorScheme.onSurfaceVariant,
           fontWeight: FontWeight.w700,
-        ),
-      ),
-    );
-  }
-
-  // Helper Widget: Soft Custom Status Chip (No Material Harsh/Nag Colors)
-  Widget _buildStatusChip(BuildContext context, String status) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final normalizedStatus = status.trim().toUpperCase();
-
-    Color bg;
-    Color fg;
-
-    switch (normalizedStatus) {
-      case 'VERIFICATION':
-      case 'PENDING':
-      case 'TEMPORARILY UNFIT':
-        bg = isDark ? const Color(0xFF332712) : const Color(0xFFFFF8E1);
-        fg = isDark ? const Color(0xFFFFD54F) : const Color(0xFFE65100);
-        break;
-      case 'ISSUED':
-      case 'APPROVED':
-      case 'FIT':
-        bg = isDark ? const Color(0xFF132E23) : const Color(0xFFE8F5E9);
-        fg = isDark ? const Color(0xFF81C784) : const Color(0xFF2E7D32);
-        break;
-      case 'REJECTED':
-      case 'CANCELLED':
-      case 'UNFIT':
-        bg = isDark ? const Color(0xFF331619) : const Color(0xFFFFEBEE);
-        fg = isDark ? const Color(0xFFE57373) : const Color(0xFFC62828);
-        break;
-      default:
-        bg = isDark ? const Color(0xFF26292E) : const Color(0xFFF1F3F5);
-        fg = isDark ? const Color(0xFFA0AAB8) : const Color(0xFF6C757D);
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Text(
-        status,
-        style: theme.textTheme.labelSmall?.copyWith(
-          color: fg,
-          fontWeight: FontWeight.w800,
-          fontSize: 10,
         ),
       ),
     );
@@ -441,21 +391,20 @@ class CertificateListCards extends StatelessWidget {
 
   // Helper Widget: Compact Date Badge
   Widget _buildDateBadge(
-      BuildContext context, {
-        required IconData icon,
-        required String label,
-        bool isError = false,
-      }) {
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    bool isError = false,
+  }) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     final bg = isError
-        ? (isDark ? const Color(0xFF331619) : const Color(0xFFFFEBEE))
-        : (isDark ? const Color(0xFF26292E) : const Color(0xFFF1F3F5));
+        ? AppTheme.error(context).withValues(alpha: 0.15)
+        : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3);
 
     final fg = isError
-        ? (isDark ? const Color(0xFFE57373) : const Color(0xFFC62828))
-        : (isDark ? const Color(0xFFA0AAB8) : const Color(0xFF6C757D));
+        ? AppTheme.error(context)
+        : theme.colorScheme.onSurfaceVariant;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
