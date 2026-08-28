@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/doctor/models/subscription/subscription_model.dart';
+import 'package:yodoctor/modules/widgets/status_chip.dart';
 
 class BillingHistorySection extends StatelessWidget {
   final List<BillingInvoice> history;
@@ -141,7 +142,6 @@ class BillingHistorySection extends StatelessWidget {
 
   Widget _buildModernInvoiceCard(BuildContext context, BillingInvoice invoice) {
     final colorScheme = Theme.of(context).colorScheme;
-    final isPaid = invoice.status.toLowerCase() == 'paid';
     final isMobile = MediaQuery.of(context).size.width < 600;
 
     return Material(
@@ -179,7 +179,7 @@ class BillingHistorySection extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        _buildStatusBadge(context, isPaid, invoice.status),
+                        StatusChip(status: invoice.status.toUpperCase()),
                         _buildAmountText(context, invoice.amount),
                       ],
                     ),
@@ -197,11 +197,7 @@ class BillingHistorySection extends StatelessWidget {
                     Expanded(
                       flex: 2,
                       child: Center(
-                        child: _buildStatusBadge(
-                          context,
-                          isPaid,
-                          invoice.status,
-                        ),
+                        child: StatusChip(status: invoice.status.toUpperCase()),
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -293,43 +289,6 @@ class BillingHistorySection extends StatelessWidget {
     );
   }
 
-  Widget _buildStatusBadge(BuildContext context, bool isPaid, String status) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    final badgeColor = _getStatusColor(status, colorScheme);
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: badgeColor.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: badgeColor.withValues(alpha: 0.25)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 6,
-            height: 6,
-            decoration: BoxDecoration(
-              color: badgeColor,
-              shape: BoxShape.circle,
-            ),
-          ),
-          const SizedBox(width: 8),
-          Text(
-            status.toUpperCase(),
-            style: textTheme.labelSmall?.copyWith(
-              color: badgeColor,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 0.5,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildAmountText(BuildContext context, double amount) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
@@ -341,23 +300,5 @@ class BillingHistorySection extends StatelessWidget {
         color: colorScheme.onSurface,
       ),
     );
-  }
-
-  // 🎯 Dynamic status color based on payment status
-  Color _getStatusColor(String status, ColorScheme colorScheme) {
-    switch (status.toLowerCase()) {
-      case 'paid':
-        return AppTheme.green;
-      case 'pending':
-        return AppTheme.orange;
-      case 'failed':
-        return colorScheme.error;
-      case 'refunded':
-        return Colors.blue;
-      case 'cancelled':
-        return AppTheme.grey;
-      default:
-        return colorScheme.onSurfaceVariant;
-    }
   }
 }

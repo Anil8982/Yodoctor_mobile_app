@@ -158,7 +158,9 @@ class _MySubscriptionScreenState extends ConsumerState<MySubscriptionScreen> {
             icon: Icons.verified_rounded,
             label: 'Status',
             value: plan.isActive ? 'Active' : 'Inactive',
-            valueColor: plan.isActive ? AppTheme.green : AppTheme.red,
+            valueColor: plan.isActive
+                ? AppTheme.active(context)
+                : AppTheme.error(context),
             colorScheme: colorScheme,
             theme: theme,
           ),

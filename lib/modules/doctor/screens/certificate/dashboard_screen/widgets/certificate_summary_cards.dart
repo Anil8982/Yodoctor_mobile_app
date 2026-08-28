@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
 import 'package:yodoctor/modules/doctor/controllers/doctor_certificate_controller.dart';
 
@@ -23,58 +24,58 @@ class CertificateSummaryCards extends StatelessWidget {
       child: Row(
         children: isIssuedTab
             ? [
-          _buildCard(
-            context,
-            'Total Issued',
-            '${notifier.issuedCount}',
-            colorScheme.primary,
-            colorScheme.primaryContainer,
-          ),
-          const SizedBox(width: AppSpacing.md),
-          _buildCard(
-            context,
-            'This Month',
-            '${notifier.issuedCount}',
-            colorScheme.secondary,
-            colorScheme.secondaryContainer,
-          ),
-          const SizedBox(width: AppSpacing.md),
-          _buildCard(
-            context,
-            'Expiring Soon',
-            '1',
-            colorScheme.error,
-            colorScheme.errorContainer,
-          ),
-        ]
+                _buildCard(
+                  context,
+                  'Total Issued',
+                  '${notifier.issuedCount}',
+                  AppTheme.info(context),
+                  AppTheme.info(context),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                _buildCard(
+                  context,
+                  'This Month',
+                  '${notifier.issuedCount}',
+                  AppTheme.success(context),
+                  AppTheme.success(context),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                _buildCard(
+                  context,
+                  'Expiring Soon',
+                  '1',
+                  AppTheme.error(context),
+                  AppTheme.error(context),
+                ),
+              ]
             : [
-          _buildCard(
-            context,
-            'Pending Requests',
-            '${notifier.pendingCount}',
-            colorScheme.tertiary,
-            colorScheme.tertiaryContainer,
-          ),
-          const SizedBox(width: AppSpacing.md),
-          _buildCard(
-            context,
-            'Total Requests',
-            '${notifier.totalCount}',
-            colorScheme.primary,
-            colorScheme.primaryContainer,
-          ),
-        ],
+                _buildCard(
+                  context,
+                  'Pending Requests',
+                  '${notifier.pendingCount}',
+                  AppTheme.pending(context),
+                  AppTheme.pending(context),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                _buildCard(
+                  context,
+                  'Total Requests',
+                  '${notifier.totalCount}',
+                  AppTheme.info(context),
+                  AppTheme.info(context),
+                ),
+              ],
       ),
     );
   }
 
   Widget _buildCard(
-      BuildContext context,
-      String title,
-      String count,
-      Color textColor,
-      Color containerColor,
-      ) {
+    BuildContext context,
+    String title,
+    String count,
+    Color textColor,
+    Color containerColor,
+  ) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -105,7 +106,7 @@ class CertificateSummaryCards extends StatelessWidget {
               vertical: AppSpacing.xxs,
             ),
             decoration: BoxDecoration(
-              color: containerColor.withValues(alpha: 0.4),
+              color: containerColor.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
