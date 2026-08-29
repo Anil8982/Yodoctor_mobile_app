@@ -34,10 +34,7 @@ class AppSearchSelectField extends StatelessWidget {
     this.enabled = true,
   });
 
-  void _openSearchPicker(
-      BuildContext context,
-      FormFieldState<String> state,
-      ) {
+  void _openSearchPicker(BuildContext context, FormFieldState<String> state) {
     if (!enabled) return;
 
     final colorScheme = Theme.of(context).colorScheme;
@@ -58,8 +55,10 @@ class AppSearchSelectField extends StatelessWidget {
         return StatefulBuilder(
           builder: (context, setModalState) {
             final filteredItems = items
-                .where((item) =>
-                item.toLowerCase().contains(searchQuery.toLowerCase()))
+                .where(
+                  (item) =>
+                      item.toLowerCase().contains(searchQuery.toLowerCase()),
+                )
                 .toList();
 
             return Padding(
@@ -110,7 +109,7 @@ class AppSearchSelectField extends StatelessWidget {
                         size: 20,
                       ),
                       filled: true,
-                      fillColor: colorScheme.surfaceContainerLow,
+                      fillColor: colorScheme.surfaceContainer,
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16,
                         vertical: 12,
@@ -127,54 +126,52 @@ class AppSearchSelectField extends StatelessWidget {
                   Flexible(
                     child: filteredItems.isEmpty
                         ? Padding(
-                      padding: const EdgeInsets.all(24.0),
-                      child: Center(
-                        child: Text(
-                          'No matching results found',
-                          style: textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ),
-                    )
-                        : ListView.separated(
-                      shrinkWrap: true,
-                      itemCount: filteredItems.length,
-                      separatorBuilder: (_, _) => const Divider(
-                        height: 1,
-                        thickness: 0.5,
-                      ),
-                      itemBuilder: (context, index) {
-                        final item = filteredItems[index];
-                        final isSelected = item == value;
-
-                        return ListTile(
-                          contentPadding: EdgeInsets.zero,
-                          title: Text(
-                            item,
-                            style: textTheme.bodyMedium?.copyWith(
-                              fontWeight: isSelected
-                                  ? FontWeight.bold
-                                  : FontWeight.normal,
-                              color: isSelected
-                                  ? colorScheme.primary
-                                  : colorScheme.onSurface,
+                            padding: const EdgeInsets.all(24.0),
+                            child: Center(
+                              child: Text(
+                                'No matching results found',
+                                style: textTheme.bodyMedium?.copyWith(
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                              ),
                             ),
-                          ),
-                          trailing: isSelected
-                              ? Icon(
-                            Icons.check_circle_rounded,
-                            color: colorScheme.primary,
                           )
-                              : null,
-                          onTap: () {
-                            state.didChange(item);
-                            onChanged(item);
-                            Navigator.pop(context);
-                          },
-                        );
-                      },
-                    ),
+                        : ListView.separated(
+                            shrinkWrap: true,
+                            itemCount: filteredItems.length,
+                            separatorBuilder: (_, _) =>
+                                const Divider(height: 1, thickness: 0.5),
+                            itemBuilder: (context, index) {
+                              final item = filteredItems[index];
+                              final isSelected = item == value;
+
+                              return ListTile(
+                                contentPadding: EdgeInsets.zero,
+                                title: Text(
+                                  item,
+                                  style: textTheme.bodyMedium?.copyWith(
+                                    fontWeight: isSelected
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                    color: isSelected
+                                        ? colorScheme.primary
+                                        : colorScheme.onSurface,
+                                  ),
+                                ),
+                                trailing: isSelected
+                                    ? Icon(
+                                        Icons.check_circle_rounded,
+                                        color: colorScheme.primary,
+                                      )
+                                    : null,
+                                onTap: () {
+                                  state.didChange(item);
+                                  onChanged(item);
+                                  Navigator.pop(context);
+                                },
+                              );
+                            },
+                          ),
                   ),
                 ],
               ),
@@ -195,8 +192,9 @@ class AppSearchSelectField extends StatelessWidget {
       autovalidateMode: autovalidateMode,
       validator: validator,
       builder: (state) {
-        final activeError =
-        isInvalid ? (errorText ?? 'Selection required') : state.errorText;
+        final activeError = isInvalid
+            ? (errorText ?? 'Selection required')
+            : state.errorText;
         final hasError = activeError != null && activeError.isNotEmpty;
 
         return AppFieldWrapper(

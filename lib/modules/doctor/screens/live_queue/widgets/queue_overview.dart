@@ -172,7 +172,7 @@ class _QueueOverviewState extends ConsumerState<QueueOverview> {
           child: _buildCounterCard(
             'Total',
             total.toString(),
-            colorScheme.surfaceContainerLow,
+            colorScheme.surfaceContainer,
             AppTheme.info(context),
             theme,
           ),
@@ -182,7 +182,7 @@ class _QueueOverviewState extends ConsumerState<QueueOverview> {
           child: _buildCounterCard(
             'Waiting',
             waiting.toString(),
-            colorScheme.surfaceContainerLow,
+            colorScheme.surfaceContainer,
             AppTheme.pending(context),
             theme,
           ),
@@ -192,7 +192,7 @@ class _QueueOverviewState extends ConsumerState<QueueOverview> {
           child: _buildCounterCard(
             'Done',
             done.toString(),
-            colorScheme.surfaceContainerLow,
+            colorScheme.surfaceContainer,
             AppTheme.success(context).withValues(),
             theme,
           ),

@@ -28,7 +28,7 @@ class QueueTracker extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerLow,
+        color: colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
           color: colorScheme.outlineVariant.withValues(alpha: 0.5),
@@ -52,17 +52,17 @@ class QueueTracker extends ConsumerWidget {
             isLive: current != null,
             action: (current != null && !hasWaitingPatient)
                 ? SizedBox(
-              width: double.infinity,
-              child: FilledButton.tonalIcon(
-                onPressed: () => notifier.nextToken(slot),
-                style: FilledButton.styleFrom(
-                  backgroundColor: colorScheme.secondary,
-                  foregroundColor: colorScheme.onSecondary,
-                ),
-                icon: const Icon(Icons.stop_circle_rounded, size: 18),
-                label: const Text("Finish Consultation"),
-              ),
-            )
+                    width: double.infinity,
+                    child: FilledButton.tonalIcon(
+                      onPressed: () => notifier.nextToken(slot),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: colorScheme.secondary,
+                        foregroundColor: colorScheme.onSecondary,
+                      ),
+                      icon: const Icon(Icons.stop_circle_rounded, size: 18),
+                      label: const Text("Finish Consultation"),
+                    ),
+                  )
                 : null,
           ),
 
@@ -209,10 +209,10 @@ class QueueTracker extends ConsumerWidget {
             duration: const Duration(milliseconds: 300),
             child: action != null
                 ? Padding(
-              key: const ValueKey<bool>(true),
-              padding: const EdgeInsets.only(top: AppSpacing.md),
-              child: action,
-            )
+                    key: const ValueKey<bool>(true),
+                    padding: const EdgeInsets.only(top: AppSpacing.md),
+                    child: action,
+                  )
                 : const SizedBox.shrink(key: ValueKey<bool>(false)),
           ),
         ],

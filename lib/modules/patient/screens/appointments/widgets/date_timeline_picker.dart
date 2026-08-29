@@ -20,7 +20,15 @@ class DateTimelinePicker extends StatelessWidget {
     final textTheme = theme.textTheme;
 
     final DateTime today = DateTime.now();
-    const List<String> weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const List<String> weekdays = [
+      'Mon',
+      'Tue',
+      'Wed',
+      'Thu',
+      'Fri',
+      'Sat',
+      'Sun',
+    ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -42,7 +50,9 @@ class DateTimelinePicker extends StatelessWidget {
                 return Padding(
                   padding: const EdgeInsets.only(right: 10),
                   child: InkWell(
-                    onTap: onDateSelected != null ? () => onDateSelected!(date) : null,
+                    onTap: onDateSelected != null
+                        ? () => onDateSelected!(date)
+                        : null,
                     borderRadius: BorderRadius.circular(16),
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
@@ -51,8 +61,12 @@ class DateTimelinePicker extends StatelessWidget {
                       decoration: BoxDecoration(
                         // Dim background color if interactions are disabled
                         color: onDateSelected == null && !isSelected
-                            ? colorScheme.surfaceContainerHighest.transparency(0.2)
-                            : (isSelected ? colorScheme.primary : colorScheme.surfaceContainerLow),
+                            ? colorScheme.surfaceContainerHighest.transparency(
+                                0.2,
+                              )
+                            : (isSelected
+                                  ? colorScheme.primary
+                                  : colorScheme.surfaceContainer),
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Column(
@@ -63,8 +77,12 @@ class DateTimelinePicker extends StatelessWidget {
                             style: textTheme.labelMedium?.copyWith(
                               color: isSelected
                                   ? colorScheme.onPrimary
-                                  : colorScheme.onSurfaceVariant.withValues(alpha: onDateSelected == null ? 0.4 : 0.8),
-                              fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                                  : colorScheme.onSurfaceVariant.withValues(
+                                      alpha: onDateSelected == null ? 0.4 : 0.8,
+                                    ),
+                              fontWeight: isSelected
+                                  ? FontWeight.bold
+                                  : FontWeight.w600,
                             ),
                           ),
                           const SizedBox(height: 6),
@@ -73,7 +91,9 @@ class DateTimelinePicker extends StatelessWidget {
                             style: textTheme.titleMedium?.copyWith(
                               color: isSelected
                                   ? colorScheme.onPrimary
-                                  : colorScheme.onSurface.withValues(alpha: onDateSelected == null ? 0.4 : 1.0),
+                                  : colorScheme.onSurface.withValues(
+                                      alpha: onDateSelected == null ? 0.4 : 1.0,
+                                    ),
                               fontWeight: FontWeight.w900,
                             ),
                           ),
@@ -87,7 +107,9 @@ class DateTimelinePicker extends StatelessWidget {
                 onPressed: onCustomDatePick, // Disabled automatically when null
                 style: IconButton.styleFrom(
                   padding: const EdgeInsets.all(16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                 ),
                 icon: const Icon(Icons.calendar_month_rounded),
               ),

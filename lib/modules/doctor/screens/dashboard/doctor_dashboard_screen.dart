@@ -53,7 +53,7 @@ class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
 
     if (dashboardAsync.hasError && !hasData) {
       return Scaffold(
-        backgroundColor: colorScheme.surfaceContainerLow,
+        backgroundColor: colorScheme.surfaceContainer,
         body: Center(
           child: Text(
             'Error: ${dashboardAsync.error}',
@@ -77,7 +77,7 @@ class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
         : true;
 
     return Container(
-      color: colorScheme.surfaceContainerLow,
+      color: colorScheme.surfaceContainer,
       child: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [

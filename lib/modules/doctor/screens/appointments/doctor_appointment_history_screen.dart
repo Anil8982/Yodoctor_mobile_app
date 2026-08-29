@@ -50,7 +50,7 @@ class _DoctorAppointmentHistoryScreenState
     final filteredAppointments = historyNotifier.getFilteredHistory();
 
     return Container(
-      color: colorScheme.surfaceContainerLow,
+      color: colorScheme.surfaceContainer,
       child: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
@@ -213,9 +213,7 @@ class _DoctorAppointmentHistoryScreenState
         ? status[0].toUpperCase() + status.substring(1)
         : 'Pending';
 
-    return StatusChip(
-      status: resolvedStatus,
-    );
+    return StatusChip(status: resolvedStatus);
   }
 
   Widget _buildInfoChip(IconData icon, String label) {
@@ -226,7 +224,7 @@ class _DoctorAppointmentHistoryScreenState
         vertical: AppSpacing.xs,
       ),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerLow,
+        color: colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(99),
       ),
       child: Row(

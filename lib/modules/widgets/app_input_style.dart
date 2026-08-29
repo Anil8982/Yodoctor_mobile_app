@@ -38,7 +38,7 @@ class AppInputStyle {
       filled: true,
 
       fillColor: enabled
-          ? colorScheme.surfaceContainerLow
+          ? colorScheme.surfaceContainer
           : colorScheme.surfaceContainerHighest.transparency(0.5),
 
       counterText: '',
@@ -58,9 +58,7 @@ class AppInputStyle {
       enabledBorder: OutlineInputBorder(
         borderRadius: borderRadius,
         borderSide: BorderSide(
-          color: hasError
-              ? colorScheme.error
-              : colorScheme.outlineVariant,
+          color: hasError ? colorScheme.error : colorScheme.outlineVariant,
           width: hasError ? 1.4 : 1.2,
         ),
       ),

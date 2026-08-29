@@ -130,7 +130,7 @@ class _YoTextFieldState extends State<YoTextField> {
               color: colorScheme.onSurfaceVariant.transparency(0.65),
             ),
             filled: true,
-            fillColor: colorScheme.surfaceContainerLow,
+            fillColor: colorScheme.surfaceContainer,
             prefixIcon: Icon(
               widget.prefixIcon,
               color: colorScheme.primary,
@@ -249,7 +249,7 @@ class YoLogoBar extends StatelessWidget {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: colorScheme.surfaceContainerLow,
+                    color: colorScheme.surfaceContainer,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: colorScheme.outlineVariant),
                   ),

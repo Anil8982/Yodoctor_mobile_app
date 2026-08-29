@@ -276,7 +276,7 @@ class SubscriptionPricingCard extends ConsumerWidget {
 
     final cardBg = isSelected
         ? (isDarkMode ? const Color(0xFF141927) : activeColor.pastel(0.97))
-        : colorScheme.surfaceContainerLow;
+        : colorScheme.surfaceContainer;
 
     final String rawDiscountText = plan.discountPercentage;
     String? displayDiscountText;

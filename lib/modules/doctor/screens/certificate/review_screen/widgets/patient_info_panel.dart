@@ -62,7 +62,9 @@ class PatientInfoPanel extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      certificate.fullName.isNotEmpty ? certificate.fullName : 'Patient Name',
+                      certificate.fullName.isNotEmpty
+                          ? certificate.fullName
+                          : 'Patient Name',
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w900,
                         color: colorScheme.onSurface,
@@ -73,7 +75,9 @@ class PatientInfoPanel extends StatelessWidget {
                     Text(
                       'ID: ${certificate.id}',
                       style: theme.textTheme.labelSmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                        color: colorScheme.onSurfaceVariant.withValues(
+                          alpha: 0.7,
+                        ),
                         fontFamily: 'Courier',
                         fontWeight: FontWeight.w700,
                         fontSize: 11,
@@ -85,7 +89,8 @@ class PatientInfoPanel extends StatelessWidget {
               if (isReadOnly) ...[
                 StatusChip(
                   status: certificate.status.isNotEmpty
-                      ? certificate.status[0].toUpperCase() + certificate.status.substring(1)
+                      ? certificate.status[0].toUpperCase() +
+                            certificate.status.substring(1)
                       : 'Pending',
                 ),
               ],
@@ -112,7 +117,9 @@ class PatientInfoPanel extends StatelessWidget {
                 context,
                 Icons.calendar_today_rounded,
                 'DOB',
-                certificate.formattedDob.isNotEmpty ? certificate.formattedDob : 'N/A',
+                certificate.formattedDob.isNotEmpty
+                    ? certificate.formattedDob
+                    : 'N/A',
               ),
               _buildInfoRow(
                 context,
@@ -124,7 +131,9 @@ class PatientInfoPanel extends StatelessWidget {
                 context,
                 Icons.assignment_rounded,
                 'CERTIFICATE',
-                certificate.certificateType.isNotEmpty ? certificate.certificateType : 'N/A',
+                certificate.certificateType.isNotEmpty
+                    ? certificate.certificateType
+                    : 'N/A',
               ),
               _buildInfoRow(
                 context,
@@ -143,13 +152,17 @@ class PatientInfoPanel extends StatelessWidget {
           const SizedBox(height: 24),
 
           // Clinical complaints
-          _buildSectionLabel(context, 'CLINICAL COMPLAINTS', Icons.medical_information_rounded),
+          _buildSectionLabel(
+            context,
+            'CLINICAL COMPLAINTS',
+            Icons.medical_information_rounded,
+          ),
           const SizedBox(height: 8),
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             decoration: BoxDecoration(
-              color: colorScheme.surfaceContainerLow,
+              color: colorScheme.surfaceContainer,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: colorScheme.outlineVariant.withValues(alpha: 0.15),
@@ -170,14 +183,18 @@ class PatientInfoPanel extends StatelessWidget {
           const SizedBox(height: 24),
 
           // Documents section
-          _buildSectionLabel(context, 'UPLOADED DOCUMENTS (${documents.length})', Icons.folder_rounded),
+          _buildSectionLabel(
+            context,
+            'UPLOADED DOCUMENTS (${documents.length})',
+            Icons.folder_rounded,
+          ),
           const SizedBox(height: 8),
 
           if (documents.isEmpty)
             Container(
               padding: const EdgeInsets.all(AppSpacing.lg),
               decoration: BoxDecoration(
-                color: colorScheme.surfaceContainerLow,
+                color: colorScheme.surfaceContainer,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: colorScheme.outlineVariant.withValues(alpha: 0.2),
@@ -195,7 +212,9 @@ class PatientInfoPanel extends StatelessWidget {
                   Text(
                     'No documents uploaded',
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+                      color: colorScheme.onSurfaceVariant.withValues(
+                        alpha: 0.6,
+                      ),
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -220,20 +239,26 @@ class PatientInfoPanel extends StatelessWidget {
           const SizedBox(height: 24),
 
           // Current Medications
-          _buildSectionLabel(context, 'CURRENT MEDICATIONS', Icons.medication_rounded),
+          _buildSectionLabel(
+            context,
+            'CURRENT MEDICATIONS',
+            Icons.medication_rounded,
+          ),
           const SizedBox(height: 8),
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             decoration: BoxDecoration(
-              color: colorScheme.surfaceContainerLow,
+              color: colorScheme.surfaceContainer,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: colorScheme.outlineVariant.withValues(alpha: 0.15),
               ),
             ),
             child: Text(
-              certificate.medications.trim().isEmpty ? "N/A" : certificate.medications,
+              certificate.medications.trim().isEmpty
+                  ? "N/A"
+                  : certificate.medications,
               style: theme.textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.w600,
               ),
@@ -249,7 +274,7 @@ class PatientInfoPanel extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             decoration: BoxDecoration(
-              color: colorScheme.surfaceContainerLow,
+              color: colorScheme.surfaceContainer,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: colorScheme.outlineVariant.withValues(alpha: 0.15),
@@ -273,11 +298,19 @@ class PatientInfoPanel extends StatelessWidget {
             const SizedBox(height: 24),
 
             // Certificate ID
-            if (certificate.certificateId != null && certificate.certificateId!.isNotEmpty) ...[
-              _buildSectionLabel(context, 'CERTIFICATE ID', Icons.assignment_rounded),
+            if (certificate.certificateId != null &&
+                certificate.certificateId!.isNotEmpty) ...[
+              _buildSectionLabel(
+                context,
+                'CERTIFICATE ID',
+                Icons.assignment_rounded,
+              ),
               const SizedBox(height: 6),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: colorScheme.primaryContainer.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(10),
@@ -305,7 +338,7 @@ class PatientInfoPanel extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               decoration: BoxDecoration(
-                color: colorScheme.surfaceContainerLow,
+                color: colorScheme.surfaceContainer,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: colorScheme.outlineVariant.withValues(alpha: 0.15),
@@ -324,12 +357,18 @@ class PatientInfoPanel extends StatelessWidget {
             const SizedBox(height: 16),
 
             // Fitness Status
-            _buildSectionLabel(context, 'FITNESS STATUS', Icons.health_and_safety_rounded),
+            _buildSectionLabel(
+              context,
+              'FITNESS STATUS',
+              Icons.health_and_safety_rounded,
+            ),
             const SizedBox(height: 6),
             Align(
               alignment: Alignment.centerLeft,
               child: StatusChip(
-                status: certificate.fitnessStatus?.isNotEmpty == true ? certificate.fitnessStatus! : 'fit',
+                status: certificate.fitnessStatus?.isNotEmpty == true
+                    ? certificate.fitnessStatus!
+                    : 'fit',
                 isSmall: true,
               ),
             ),
@@ -364,11 +403,11 @@ class PatientInfoPanel extends StatelessWidget {
   }
 
   Widget _buildInfoRow(
-      BuildContext context,
-      IconData icon,
-      String label,
-      String value,
-      ) {
+    BuildContext context,
+    IconData icon,
+    String label,
+    String value,
+  ) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 

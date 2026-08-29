@@ -48,7 +48,9 @@ class SessionSelectionSection extends StatelessWidget {
               subLabel: morningTime,
               icon: Icons.light_mode_rounded,
               isSelected: selectedSession == 'Morning',
-              onTap: onSessionChanged != null ? () => onSessionChanged!('Morning') : null,
+              onTap: onSessionChanged != null
+                  ? () => onSessionChanged!('Morning')
+                  : null,
               colorScheme: colorScheme,
               textTheme: textTheme,
             ),
@@ -62,7 +64,9 @@ class SessionSelectionSection extends StatelessWidget {
               subLabel: eveningTime,
               icon: Icons.dark_mode_rounded,
               isSelected: selectedSession == 'Evening',
-              onTap: onSessionChanged != null ? () => onSessionChanged!('Evening') : null,
+              onTap: onSessionChanged != null
+                  ? () => onSessionChanged!('Evening')
+                  : null,
               colorScheme: colorScheme,
               textTheme: textTheme,
             ),
@@ -91,7 +95,9 @@ class SessionSelectionSection extends StatelessWidget {
         decoration: BoxDecoration(
           color: isDisabled && !isSelected
               ? colorScheme.surfaceContainerHighest.transparency(0.2)
-              : (isSelected ? colorScheme.primary : colorScheme.surfaceContainerLow),
+              : (isSelected
+                    ? colorScheme.primary
+                    : colorScheme.surfaceContainer),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Column(
@@ -101,7 +107,9 @@ class SessionSelectionSection extends StatelessWidget {
               icon,
               color: isSelected
                   ? colorScheme.onPrimary
-                  : colorScheme.primary.withValues(alpha: isDisabled ? 0.4 : 1.0),
+                  : colorScheme.primary.withValues(
+                      alpha: isDisabled ? 0.4 : 1.0,
+                    ),
               size: 24,
             ),
             const SizedBox(height: 14),
@@ -111,7 +119,9 @@ class SessionSelectionSection extends StatelessWidget {
                 fontWeight: FontWeight.w800,
                 color: isSelected
                     ? colorScheme.onPrimary
-                    : colorScheme.onSurface.withValues(alpha: isDisabled ? 0.4 : 1.0),
+                    : colorScheme.onSurface.withValues(
+                        alpha: isDisabled ? 0.4 : 1.0,
+                      ),
               ),
             ),
             const SizedBox(height: 2),
@@ -120,7 +130,9 @@ class SessionSelectionSection extends StatelessWidget {
               style: textTheme.bodySmall?.copyWith(
                 color: isSelected
                     ? colorScheme.onPrimary.transparency(0.8)
-                    : colorScheme.onSurfaceVariant.withValues(alpha: isDisabled ? 0.4 : 0.8),
+                    : colorScheme.onSurfaceVariant.withValues(
+                        alpha: isDisabled ? 0.4 : 0.8,
+                      ),
                 fontSize: 11,
               ),
             ),

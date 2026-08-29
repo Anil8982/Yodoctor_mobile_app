@@ -82,7 +82,7 @@ class PaymentSuccessScreen extends ConsumerWidget {
                     width: double.infinity,
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: colorScheme.surfaceContainerLow,
+                      color: colorScheme.surfaceContainer,
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
                         color: colorScheme.outlineVariant.transparency(0.3),

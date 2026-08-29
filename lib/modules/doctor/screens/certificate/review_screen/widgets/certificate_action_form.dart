@@ -362,7 +362,7 @@ class CertificateActionForm extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           decoration: BoxDecoration(
-            color: colorScheme.surfaceContainerLow,
+            color: colorScheme.surfaceContainer,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: colorScheme.outlineVariant.withValues(alpha: 0.15),

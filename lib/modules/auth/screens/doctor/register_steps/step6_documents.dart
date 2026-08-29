@@ -103,7 +103,8 @@ class _Step6DocumentsState extends ConsumerState<Step6Documents> {
         widget.data.certificateFile == null ||
         widget.data.idProofFile == null) {
       AppSnackBar.show(
-        message: 'Please upload all required documents (Profile, Certificate & ID Proof)',
+        message:
+            'Please upload all required documents (Profile, Certificate & ID Proof)',
         type: AppSnackBarType.warning,
       );
       return;
@@ -156,7 +157,8 @@ class _Step6DocumentsState extends ConsumerState<Step6Documents> {
           field: 'certificate',
           label: 'Medical Registration Certificate *',
           icon: Icons.verified_outlined,
-          description: 'Official degree or state council certificate (PDF, Image)',
+          description:
+              'Official degree or state council certificate (PDF, Image)',
         ),
         const SizedBox(height: 14),
         _buildDocumentTile(
@@ -176,7 +178,7 @@ class _Step6DocumentsState extends ConsumerState<Step6Documents> {
         const SizedBox(height: 24),
         const InfoBox(
           text:
-          'All documents are encrypted and stored securely. Access is restricted to official verification admins only.',
+              'All documents are encrypted and stored securely. Access is restricted to official verification admins only.',
         ),
         const SizedBox(height: 28),
 
@@ -204,7 +206,7 @@ class _Step6DocumentsState extends ConsumerState<Step6Documents> {
       decoration: BoxDecoration(
         color: isUploaded
             ? colorScheme.primary.transparency(0.06)
-            : colorScheme.surfaceContainerLow,
+            : colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isUploaded
@@ -218,16 +220,12 @@ class _Step6DocumentsState extends ConsumerState<Step6Documents> {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: isUploaded
-                  ? colorScheme.primary
-                  : colorScheme.surface,
+              color: isUploaded ? colorScheme.primary : colorScheme.surface,
               shape: BoxShape.circle,
             ),
             child: Icon(
               isUploaded ? Icons.check_rounded : icon,
-              color: isUploaded
-                  ? colorScheme.onPrimary
-                  : colorScheme.primary,
+              color: isUploaded ? colorScheme.onPrimary : colorScheme.primary,
               size: 20,
             ),
           ),
@@ -252,7 +250,9 @@ class _Step6DocumentsState extends ConsumerState<Step6Documents> {
                     color: isUploaded
                         ? colorScheme.primary
                         : colorScheme.onSurfaceVariant,
-                    fontWeight: isUploaded ? FontWeight.w600 : FontWeight.normal,
+                    fontWeight: isUploaded
+                        ? FontWeight.w600
+                        : FontWeight.normal,
                   ),
                 ),
               ],
@@ -273,7 +273,10 @@ class _Step6DocumentsState extends ConsumerState<Step6Documents> {
             TextButton(
               onPressed: () => _pickFile(field),
               style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),

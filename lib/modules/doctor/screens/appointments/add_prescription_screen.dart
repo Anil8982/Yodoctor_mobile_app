@@ -177,7 +177,7 @@ class _AddPrescriptionScreenState extends ConsumerState<AddPrescriptionScreen> {
                           color: colorScheme.onSurfaceVariant.transparency(0.5),
                         ),
                         filled: true,
-                        fillColor: colorScheme.surfaceContainerLow,
+                        fillColor: colorScheme.surfaceContainer,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide(
@@ -232,7 +232,7 @@ class _AddPrescriptionScreenState extends ConsumerState<AddPrescriptionScreen> {
                           color: colorScheme.onSurfaceVariant.transparency(0.5),
                         ),
                         filled: true,
-                        fillColor: colorScheme.surfaceContainerLow,
+                        fillColor: colorScheme.surfaceContainer,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide(

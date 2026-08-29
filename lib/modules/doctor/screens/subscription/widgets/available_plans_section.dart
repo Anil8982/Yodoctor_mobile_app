@@ -735,7 +735,7 @@ class AvailablePlansSection extends ConsumerWidget {
       decoration: BoxDecoration(
         color: isHighlighted
             ? colorScheme.primaryContainer.transparency(0.3)
-            : colorScheme.surfaceContainerLow.transparency(0.5),
+            : colorScheme.surfaceContainer.transparency(0.5),
         borderRadius: BorderRadius.circular(12),
         border: isHighlighted
             ? Border.all(color: colorScheme.primary.transparency(0.2))

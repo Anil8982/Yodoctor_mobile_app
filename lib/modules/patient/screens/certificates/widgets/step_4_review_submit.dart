@@ -188,7 +188,7 @@ class Step4ReviewSubmit extends ConsumerWidget {
         Container(
           width: double.infinity,
           decoration: BoxDecoration(
-            color: colorScheme.surfaceContainerLow,
+            color: colorScheme.surfaceContainer,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: colorScheme.outlineVariant.withValues(alpha: 0.3),
@@ -239,9 +239,9 @@ class Step4ReviewSubmit extends ConsumerWidget {
   }
 
   Widget _buildDocumentReviewRow(
-      BuildContext context,
-      CertificateFormState formState,
-      ) {
+    BuildContext context,
+    CertificateFormState formState,
+  ) {
     final docs = [
       'Profile Photo',
       'Government ID Proof',
