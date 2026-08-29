@@ -155,6 +155,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 ),
                 sliver: SliverList(
                   delegate: SliverChildListDelegate([
+
                     TokenCard(token: data.todayToken),
                     const SizedBox(height: AppSpacing.xl),
 

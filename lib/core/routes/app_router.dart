@@ -9,6 +9,9 @@ import 'package:yodoctor/modules/admin/admin_scaffold_shell.dart';
 import 'package:yodoctor/modules/admin/screens/doctors_management/doctor_management_screen.dart';
 import 'package:yodoctor/modules/admin/screens/enquiries/enquiry_screen.dart';
 import 'package:yodoctor/modules/admin/screens/home_care_bookings/home_care_bookings_screen.dart';
+import 'package:yodoctor/modules/app_config/controllers/app_config_controller.dart';
+import 'package:yodoctor/modules/app_config/screens/force_update_screen.dart';
+import 'package:yodoctor/modules/app_config/screens/maintenance_screen.dart';
 import 'package:yodoctor/modules/auth/controllers/doctor_status_controller.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/doctor_login_screen.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/doctor_register_screen.dart';
@@ -105,6 +108,16 @@ final routerProvider = Provider<GoRouter>((ref) {
     refreshRouter();
   });
 
+  ref.listen(appConfigProvider, (_, _) {
+    AppLogger.debug(
+      'Router: appConfigProvider changed, refreshing',
+      tag: LogTags.app,
+      subTag: 'Router',
+    );
+
+    refreshRouter();
+  });
+
   // Cleanup notifier when provider is disposed
   ref.onDispose(refreshListenable.dispose);
 
@@ -130,11 +143,66 @@ final routerProvider = Provider<GoRouter>((ref) {
     refreshListenable: refreshListenable,
 
     redirect: (context, state) {
+      // final storage = ref.read(storageProvider);
+      // final token = storage.getToken();
+      // final role = storage.getRole();
+      // final isLoggedIn = token != null && token.isNotEmpty;
+      // final matchedPath = state.matchedLocation;
+      // final authType = storage.getAuthType();
+      // final subState = ref.read(subscriptionStatusProvider);
+
+      final matchedPath = state.matchedLocation;
+
+      // ============================================================
+      // APP CONFIG GATE
+      // ============================================================
+
+      final appConfigState = ref.read(appConfigProvider);
+
+      // App config is still loading.
+      if (appConfigState.status == AppConfigStatus.loading) {
+        if (matchedPath != AppRoutes.splash) {
+          return AppRoutes.splash;
+        }
+
+        return null;
+      }
+
+      // App config failed to load.
+      if (appConfigState.status == AppConfigStatus.error) {
+        if (matchedPath != AppRoutes.splash) {
+          return AppRoutes.splash;
+        }
+
+        return null;
+      }
+
+      // App is under maintenance.
+      if (appConfigState.status == AppConfigStatus.maintenance) {
+        if (matchedPath != AppRoutes.maintenance) {
+          return AppRoutes.maintenance;
+        }
+
+        return null;
+      }
+
+      // Force update required.
+      if (appConfigState.status == AppConfigStatus.forceUpdate) {
+        if (matchedPath != AppRoutes.forceUpdate) {
+          return AppRoutes.forceUpdate;
+        }
+
+        return null;
+      }
+
+      // ============================================================
+      // APP CONFIG READY
+      // ============================================================
+
       final storage = ref.read(storageProvider);
       final token = storage.getToken();
       final role = storage.getRole();
       final isLoggedIn = token != null && token.isNotEmpty;
-      final matchedPath = state.matchedLocation;
       final authType = storage.getAuthType();
       final subState = ref.read(subscriptionStatusProvider);
 
@@ -257,6 +325,32 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.splash,
         builder: (context, state) => const SplashScreen(),
+      ),
+
+      GoRoute(
+        path: AppRoutes.maintenance,
+        builder: (context, state) {
+          final appConfigState = ref.watch(appConfigProvider);
+
+          return MaintenanceScreen(
+            message: appConfigState.config?.status.maintenanceMsg,
+          );
+        },
+      ),
+
+      GoRoute(
+        path: AppRoutes.forceUpdate,
+        builder: (context, state) {
+          final appConfigState = ref.watch(appConfigProvider);
+          final config = appConfigState.config;
+
+          final storeUrl = config?.appLinks.androidPlayStoreUrl ?? '';
+
+          return ForceUpdateScreen(
+            message: config?.versioning.forceUpdateMsg ?? 'A new version of the app is available. Please update to continue.',
+            storeUrl: storeUrl,
+          );
+        },
       ),
 
       // ---- Auth Screens ----

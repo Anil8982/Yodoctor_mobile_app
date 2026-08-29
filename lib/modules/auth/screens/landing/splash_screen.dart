@@ -4,6 +4,7 @@ import 'package:yodoctor/core/constants/app_assets.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
 import 'package:yodoctor/core/providers/storage_provider.dart';
+import 'package:yodoctor/modules/app_config/controllers/app_config_controller.dart';
 import 'package:yodoctor/modules/auth/controllers/doctor_status_controller.dart';
 import 'package:yodoctor/modules/doctor/controllers/subscription_status_controller.dart';
 
@@ -52,6 +53,28 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   }
 
   Future<void> _initialize() async {
+
+    await ref.read(appConfigProvider.notifier).checkAppConfig();
+
+    final appConfigState = ref.read(appConfigProvider);
+
+    if (appConfigState.status != AppConfigStatus.ready) {
+      AppLogger.info(
+        'Splash: App configuration is not ready. '
+            'Status: ${appConfigState.status}',
+        tag: LogTags.app,
+        subTag: 'Splash',
+      );
+      return;
+    }
+
+    AppLogger.success(
+      'Splash: App configuration is ready. Proceeding to main screen.',
+      tag: LogTags.app,
+      subTag: 'Splash',
+    );
+
+
     final storage = ref.read(storageProvider);
     final token = storage.getToken();
     final role = storage.getRole();

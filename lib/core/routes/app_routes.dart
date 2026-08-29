@@ -6,6 +6,11 @@ class AppRoutes {
   static const String landing = root;
   static const String splash = '/splash';
 
+
+// App Config
+  static const String maintenance = '/maintenance';
+  static const String forceUpdate = '/force-update';
+
   // Auth
   static const String patientLogin = '/auth/patient/login';
   static const String patientRegister = '/auth/patient/register';
