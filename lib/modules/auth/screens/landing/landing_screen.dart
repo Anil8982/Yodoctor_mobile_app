@@ -1,19 +1,24 @@
 import 'package:chroma_kit/chroma_kit.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/constants/app_assets.dart';
+import 'package:yodoctor/core/constants/log_tags.dart';
+import 'package:yodoctor/core/debug/app_logger.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:yodoctor/modules/app_config/controllers/app_config_controller.dart';
 import 'package:yodoctor/modules/auth/screens/landing/widgets/yo_role_btn.dart';
 
-class LandingScreen extends StatefulWidget {
+class LandingScreen extends ConsumerStatefulWidget {
   const LandingScreen({super.key});
 
   @override
-  State<LandingScreen> createState() => _LandingScreenState();
+  ConsumerState<LandingScreen> createState() => _LandingScreenState();
 }
 
-class _LandingScreenState extends State<LandingScreen> {
+class _LandingScreenState extends ConsumerState<LandingScreen> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -117,7 +122,7 @@ class _LandingScreenState extends State<LandingScreen> {
                                     const SizedBox(height: 15),
                                     Row(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      MainAxisAlignment.center,
                                       children: [
                                         Icon(
                                           Icons.security_rounded,
@@ -290,6 +295,12 @@ class _LandingScreenState extends State<LandingScreen> {
                             ),
                           ),
                         ),
+
+                        const SizedBox(height: 8),
+
+                        // Legal links section
+                        _buildLegalLinks(context),
+
                         const SizedBox(height: 16),
                       ],
                     ),
@@ -303,14 +314,102 @@ class _LandingScreenState extends State<LandingScreen> {
     );
   }
 
+  Widget _buildLegalLinks(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final appConfig = ref.watch(appConfigProvider).config;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Text.rich(
+        TextSpan(
+          children: [
+            TextSpan(
+              text: 'By continuing, you agree to our ',
+              style: textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+                fontSize: 11,
+              ),
+            ),
+            TextSpan(
+              text: 'Privacy Policy',
+              style: textTheme.bodySmall?.copyWith(
+                color: colorScheme.primary,
+                fontWeight: FontWeight.w600,
+                fontSize: 11,
+                decoration: TextDecoration.underline,
+                decorationColor: colorScheme.primary.transparency(0.5),
+              ),
+              recognizer: TapGestureRecognizer()
+                ..onTap = () {
+                  final url = appConfig?.legalAndSupport.privacyPolicyUrl ?? '';
+                  AppLogger.info(
+                    'Privacy Policy URL: $url',
+                    tag: LogTags.app,
+                    subTag: 'Landing',
+                  );
+                  if (url.isNotEmpty) {
+                    context.push(
+                      AppRoutes.webViewPage(
+                        title: 'Privacy Policy',
+                        url: url,
+                      ),
+                    );
+                  }
+                },
+            ),
+            TextSpan(
+              text: ' and ',
+              style: textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+                fontSize: 11,
+              ),
+            ),
+            TextSpan(
+              text: 'Terms of Service',
+              style: textTheme.bodySmall?.copyWith(
+                color: colorScheme.primary,
+                fontWeight: FontWeight.w600,
+                fontSize: 11,
+                decoration: TextDecoration.underline,
+                decorationColor: colorScheme.primary.transparency(0.5),
+              ),
+              recognizer: TapGestureRecognizer()
+                ..onTap = () {
+                  final url = appConfig?.legalAndSupport.termsServiceUrl ?? '';
+
+
+                  AppLogger.info(
+                    'Terms of Service URL: $url',
+                    tag: LogTags.app,
+                    subTag: 'Landing',
+                  );
+
+                  if (url.isNotEmpty) {
+                    context.push(
+                      AppRoutes.webViewPage(
+                        title: 'Terms of Service',
+                        url: url,
+                      ),
+                    );
+                  }
+                },
+            ),
+          ],
+        ),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
   Widget _buildFeatureItem(
-    BuildContext context, {
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required Color iconColor,
-    required Color bgColor,
-  }) {
+      BuildContext context, {
+        required IconData icon,
+        required String title,
+        required String subtitle,
+        required Color iconColor,
+        required Color bgColor,
+      }) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 

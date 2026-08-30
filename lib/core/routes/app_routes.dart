@@ -7,7 +7,12 @@ class AppRoutes {
   static const String splash = '/splash';
 
 
-// App Config
+  static const webView = '/webview';
+  static String webViewPage({required String title, required String url}) =>
+      '/webview?title=${Uri.encodeComponent(title)}'
+          '&url=${Uri.encodeComponent(url)}';
+
+  // App Config
   static const String maintenance = '/maintenance';
   static const String forceUpdate = '/force-update';
 

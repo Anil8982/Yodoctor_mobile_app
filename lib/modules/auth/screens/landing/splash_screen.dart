@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/constants/app_assets.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
 import 'package:yodoctor/core/providers/storage_provider.dart';
+import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/modules/app_config/controllers/app_config_controller.dart';
 import 'package:yodoctor/modules/auth/controllers/doctor_status_controller.dart';
 import 'package:yodoctor/modules/doctor/controllers/subscription_status_controller.dart';
@@ -24,6 +26,12 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   @override
   void initState() {
     super.initState();
+
+    AppLogger.info(
+      'Splash: Screen initialized',
+      tag: LogTags.app,
+      subTag: 'Splash',
+    );
 
     // Setup fade + scale animation
     _animationController = AnimationController(
@@ -53,18 +61,34 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   }
 
   Future<void> _initialize() async {
+    AppLogger.info(
+      'Splash: Starting initialization...',
+      tag: LogTags.app,
+      subTag: 'Splash',
+    );
 
     await ref.read(appConfigProvider.notifier).checkAppConfig();
 
+    // Wait for state to propagate
+    await Future<void>.delayed(Duration.zero);
+
     final appConfigState = ref.read(appConfigProvider);
 
+    AppLogger.info(
+      'Splash: AppConfig status after check → ${appConfigState.status}',
+      tag: LogTags.app,
+      subTag: 'Splash',
+    );
+
     if (appConfigState.status != AppConfigStatus.ready) {
-      AppLogger.info(
+      AppLogger.warning(
         'Splash: App configuration is not ready. '
             'Status: ${appConfigState.status}',
         tag: LogTags.app,
         subTag: 'Splash',
       );
+      // Router redirect handle करेल (maintenance/forceUpdate/error)
+      _goToApp();
       return;
     }
 
@@ -73,7 +97,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       tag: LogTags.app,
       subTag: 'Splash',
     );
-
 
     final storage = ref.read(storageProvider);
     final token = storage.getToken();
@@ -86,10 +109,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     );
 
     // Only doctors need verification flow trigger
-    // Patients and unauthenticated users rely on GoRouter redirect
     if (token != null && token.isNotEmpty && role == 'doctor') {
       AppLogger.info(
-        'Splash: Triggering doctor verification',
+        'Splash: Triggering doctor verification flow',
         tag: LogTags.app,
         subTag: 'Splash',
       );
@@ -97,27 +119,166 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       // 1. First fetch verification status
       await ref.read(doctorStatusProvider.notifier).initialize();
 
+      final doctorStateAfterInit = ref.read(doctorStatusProvider);
+      AppLogger.info(
+        'Splash: Doctor status after initialize → '
+            'status=${doctorStateAfterInit.status}, '
+            'isResolved=${doctorStateAfterInit.isResolved}',
+        tag: LogTags.app,
+        subTag: 'Splash',
+      );
+
       // 2. Sequential Check: If approved, then check active subscription
-      final doctorState = ref.read(doctorStatusProvider);
-      if (doctorState.status == 'APPROVED') {
+      if (doctorStateAfterInit.status == 'APPROVED') {
         AppLogger.info(
           'Splash: Doctor is APPROVED, checking active subscription status',
           tag: LogTags.app,
           subTag: 'Splash',
         );
         await ref.read(subscriptionStatusProvider.notifier).checkActiveSubscription();
+
+        final subStateAfterCheck = ref.read(subscriptionStatusProvider);
+        AppLogger.info(
+          'Splash: Subscription status after check → '
+              'isResolved=${subStateAfterCheck.isResolved}, '
+              'hasSubscription=${subStateAfterCheck.hasSubscription}',
+          tag: LogTags.app,
+          subTag: 'Splash',
+        );
       }
     }
 
-    // Navigation handled automatically by GoRouter redirect:
-    // - No token → /landing
-    // - Patient → /dashboard
-    // - Doctor APPROVED → /doctor/dashboard
-    // - Doctor PENDING/REJECTED → /waitingApproval
+    _goToApp();
+  }
+
+  void _goToApp() {
+    if (!mounted) {
+      AppLogger.warning(
+        'Splash: _goToApp() called but widget not mounted',
+        tag: LogTags.app,
+        subTag: 'Splash',
+      );
+      return;
+    }
+
+    AppLogger.info(
+      'Splash: Initialization complete. Navigating to app...',
+      tag: LogTags.app,
+      subTag: 'Splash',
+    );
+
+    final storage = ref.read(storageProvider);
+    final token = storage.getToken();
+    final role = storage.getRole();
+
+    AppLogger.info(
+      'Splash: Navigation params → token=${token != null ? 'YES' : 'NO'}, role=$role',
+      tag: LogTags.app,
+      subTag: 'Splash',
+    );
+
+    // Unauthenticated → Landing
+    if (token == null || token.isEmpty) {
+      AppLogger.debug(
+        'Splash: No token → Navigating to Landing',
+        tag: LogTags.app,
+        subTag: 'Splash',
+      );
+      context.go(AppRoutes.landing);
+      AppLogger.success(
+        'Splash: Navigation to Landing completed',
+        tag: LogTags.app,
+        subTag: 'Splash',
+      );
+      return;
+    }
+
+    AppLogger.debug(
+      'Splash: Role-based navigation → $role',
+      tag: LogTags.app,
+      subTag: 'Splash',
+    );
+
+    // Authenticated → Role-based navigation
+    switch (role) {
+      case 'patient':
+        AppLogger.debug(
+          'Splash: Patient → Navigating to Dashboard',
+          tag: LogTags.app,
+          subTag: 'Splash',
+        );
+        context.go(AppRoutes.dashboard);
+        AppLogger.success(
+          'Splash: Navigation to Patient Dashboard completed',
+          tag: LogTags.app,
+          subTag: 'Splash',
+        );
+        break;
+
+      case 'admin':
+        AppLogger.debug(
+          'Splash: Admin → Navigating to Admin Dashboard',
+          tag: LogTags.app,
+          subTag: 'Splash',
+        );
+        context.go(AppRoutes.adminDashboard);
+        AppLogger.success(
+          'Splash: Navigation to Admin Dashboard completed',
+          tag: LogTags.app,
+          subTag: 'Splash',
+        );
+        break;
+
+      case 'doctor':
+        AppLogger.debug(
+          'Splash: Doctor → Attempting Doctor Dashboard (router will redirect if needed)',
+          tag: LogTags.app,
+          subTag: 'Splash',
+        );
+
+        final doctorState = ref.read(doctorStatusProvider);
+        final subState = ref.read(subscriptionStatusProvider);
+
+        AppLogger.info(
+          'Splash: Doctor navigation check → '
+              'status=${doctorState.status}, '
+              'isResolved=${doctorState.isResolved}, '
+              'subResolved=${subState.isResolved}, '
+              'hasSub=${subState.hasSubscription}',
+          tag: LogTags.app,
+          subTag: 'Splash',
+        );
+
+        context.go(AppRoutes.doctorDashboard);
+        AppLogger.success(
+          'Splash: Navigation to Doctor Dashboard completed',
+          tag: LogTags.app,
+          subTag: 'Splash',
+        );
+        break;
+
+      default:
+        AppLogger.warning(
+          'Splash: Unknown role → Navigating to Landing',
+          tag: LogTags.app,
+          subTag: 'Splash',
+        );
+        context.go(AppRoutes.landing);
+        AppLogger.success(
+          'Splash: Navigation to Landing completed (default)',
+          tag: LogTags.app,
+          subTag: 'Splash',
+        );
+    }
   }
 
   @override
   void dispose() {
+    AppLogger.info(
+      'Splash: Screen disposed',
+      tag: LogTags.app,
+      subTag: 'Splash',
+    );
     _animationController.dispose();
     super.dispose();
   }

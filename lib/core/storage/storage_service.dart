@@ -133,8 +133,11 @@
 //   }
 // }
 
+import 'dart:convert';
+
 import 'package:hive/hive.dart';
 import 'package:yodoctor/core/enums/auth_type.dart';
+import 'package:yodoctor/modules/app_config/models/app_config_model.dart';
 
 import 'hive_boxes.dart';
 import 'hive_keys.dart';
@@ -146,6 +149,7 @@ class StorageService {
   Box get _box => Hive.box(HiveBoxes.appStorage);
 
   final SecureStorageService _secureStorage = SecureStorageService();
+  Box get _appConfigBox => Hive.box(HiveBoxes.appConfig);
 
   String? _cachedToken;
   String? _cachedRegistrationToken;
@@ -243,6 +247,32 @@ class StorageService {
   }
   Future<void> clearActiveSubscription() async {
     await _box.delete(HiveKeys.activeSubscription);
+  }
+
+  // App Config
+  Future<void> saveAppConfig(AppConfigModel config) async {
+    await _appConfigBox.put(
+      HiveKeys.appConfig,
+      jsonEncode(config.toJson()),
+    );
+  }
+
+  AppConfigModel? getAppConfig() {
+    final value = _appConfigBox.get(HiveKeys.appConfig);
+
+    if (value == null) return null;
+
+    try {
+      final json = jsonDecode(value as String) as Map<String, dynamic>;
+
+      return AppConfigModel.fromJson(json);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> clearAppConfig() async {
+    await _appConfigBox.delete(HiveKeys.appConfig);
   }
 
   // Clear All

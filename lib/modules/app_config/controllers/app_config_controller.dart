@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:yodoctor/core/storage/storage_service.dart';
 import 'package:yodoctor/core/utils/app_version_utils.dart';
 
 import '../models/app_config_model.dart';
@@ -27,9 +28,14 @@ final firestoreProvider = Provider<FirebaseFirestore>((ref) {
   return FirebaseFirestore.instance;
 });
 
+final storageServiceProvider = Provider<StorageService>((ref) {
+  return StorageService();
+});
+
 final appConfigRepositoryProvider = Provider<AppConfigRepository>((ref) {
   return FirebaseAppConfigRepository(
     firestore: ref.watch(firestoreProvider),
+    storageService: ref.watch(storageServiceProvider),
   );
 });
 
@@ -45,7 +51,6 @@ class AppConfigNotifier extends Notifier<AppConfigState> {
 
   @override
   AppConfigState build() {
-    Future.microtask(checkAppConfig);
     return const AppConfigState();
   }
 
@@ -64,6 +69,7 @@ class AppConfigNotifier extends Notifier<AppConfigState> {
     try {
       final repository = ref.read(appConfigRepositoryProvider);
       final config = await repository.getAppConfig();
+
 
       AppLogger.success(
         'App configuration loaded successfully.',

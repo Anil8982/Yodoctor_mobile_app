@@ -12,6 +12,7 @@ import 'package:yodoctor/modules/admin/screens/home_care_bookings/home_care_book
 import 'package:yodoctor/modules/app_config/controllers/app_config_controller.dart';
 import 'package:yodoctor/modules/app_config/screens/force_update_screen.dart';
 import 'package:yodoctor/modules/app_config/screens/maintenance_screen.dart';
+import 'package:yodoctor/modules/app_config/screens/webview/webview_screen.dart';
 import 'package:yodoctor/modules/auth/controllers/doctor_status_controller.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/doctor_login_screen.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/doctor_register_screen.dart';
@@ -130,6 +131,15 @@ final routerProvider = Provider<GoRouter>((ref) {
         path == AppRoutes.doctorRegister;
   }
 
+  // Helper: detect public screens (accessible without auth)
+  bool isPublicScreen(String path) {
+    return path == AppRoutes.webView ||
+        path == AppRoutes.documentViewer ||
+        path == AppRoutes.maintenance ||
+        path == AppRoutes.forceUpdate ||
+        path == AppRoutes.splash;
+  }
+
   // Helper: detect doctor protected routes
   bool isDoctorProtectedRoute(String path) {
     return path == '/doctor' || path.startsWith('/doctor/');
@@ -153,10 +163,7 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       final matchedPath = state.matchedLocation;
 
-      // ============================================================
       // APP CONFIG GATE
-      // ============================================================
-
       final appConfigState = ref.read(appConfigProvider);
 
       // App config is still loading.
@@ -195,10 +202,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         return null;
       }
 
-      // ============================================================
       // APP CONFIG READY
-      // ============================================================
-
       final storage = ref.read(storageProvider);
       final token = storage.getToken();
       final role = storage.getRole();
@@ -222,6 +226,11 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       // ---- Unauthenticated ----
       if (!isLoggedIn) {
+        // Allow public screens (webview, document viewer, etc.)
+        if (isPublicScreen(matchedPath)) {
+          return null; // Allow access
+        }
+
         // Redirect everything except auth screens to landing
         if (!isAuthScreen(matchedPath) && matchedPath != AppRoutes.landing) {
           AppLogger.debug(
@@ -347,7 +356,9 @@ final routerProvider = Provider<GoRouter>((ref) {
           final storeUrl = config?.appLinks.androidPlayStoreUrl ?? '';
 
           return ForceUpdateScreen(
-            message: config?.versioning.forceUpdateMsg ?? 'A new version of the app is available. Please update to continue.',
+            message:
+                config?.versioning.forceUpdateMsg ??
+                'A new version of the app is available. Please update to continue.',
             storeUrl: storeUrl,
           );
         },
@@ -452,9 +463,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               ? state.extra as PatientDoctorModel
               : null;
 
-          return ApplyCertificateScreen(
-            initialDoctor: doctor,
-          );
+          return ApplyCertificateScreen(initialDoctor: doctor);
         },
       ),
       GoRoute(
@@ -509,7 +518,6 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
 
       // ---- Doctor Shared Routes (non-shell) ----
-
       GoRoute(
         parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.doctorProfile,
@@ -621,8 +629,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.paymentProcessing,
         builder: (context, state) {
-          return PaymentProcessingScreen(
-          );
+          return PaymentProcessingScreen();
         },
       ),
       GoRoute(
@@ -633,7 +640,6 @@ final routerProvider = Provider<GoRouter>((ref) {
           return InvoiceDetailScreen(invoice: invoice);
         },
       ),
-
 
       // ---- Shared ----
       GoRoute(
@@ -646,6 +652,24 @@ final routerProvider = Provider<GoRouter>((ref) {
             fileName: extra['fileName'],
             isImage: extra['isImage'] ?? false,
             isPdf: extra['isPdf'] ?? false,
+          );
+        },
+      ),
+
+      GoRoute(
+        path: AppRoutes.webView,
+        builder: (context, state) {
+          final title = state.uri.queryParameters['title'] ?? '';
+          final url = state.uri.queryParameters['url'] ?? '';
+
+          final extra = state.extra as Map<String, dynamic>?;
+
+          return WebViewScreen(
+            title: title,
+            url: url,
+            floatingIcon: extra?['floatingIcon'] as IconData?,
+            onFloatingPressed: extra?['onFloatingPressed'] as VoidCallback?,
+            floatingLabel: extra?['floatingLabel'] as String?,
           );
         },
       ),
@@ -727,7 +751,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: AppRoutes.doctorAppointments,
                 builder: (context, state) =>
-                const DoctorAppointmentHistoryScreen(),
+                    const DoctorAppointmentHistoryScreen(),
               ),
             ],
           ),
