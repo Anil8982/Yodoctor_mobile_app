@@ -1,97 +1,156 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/utils/dummy_data.dart';
+import 'package:yodoctor/core/constants/log_tags.dart';
+import 'package:yodoctor/core/debug/app_logger.dart';
+import '../models/search/doctor_search_model.dart';
+import '../models/search/search_params.dart';
+import '../repositories/patient_search_repository.dart';
 
-// 🎯 Unified immutable state structure holding raw data list, filtered results, and criteria keys
 class DoctorListingState {
-  final List<DoctorProfile> allDoctors;
-  final List<DoctorProfile> filteredDoctors;
-  final String selectedSpecialty;
-  final String activeQuery;
+  final bool isLoading;
+  final String? error;
+  final List<DoctorSearchModel> doctors;
+  final int page;
+  final bool hasMore;
+  final String currentSearch;
+  final String currentCity;
 
   DoctorListingState({
-    this.allDoctors = const [],
-    this.filteredDoctors = const [],
-    this.selectedSpecialty = 'All',
-    this.activeQuery = '',
+    this.isLoading = false,
+    this.error,
+    this.doctors = const [],
+    this.page = 1,
+    this.hasMore = true,
+    this.currentSearch = "",
+    this.currentCity = "",
   });
 
   DoctorListingState copyWith({
-    List<DoctorProfile>? allDoctors,
-    List<DoctorProfile>? filteredDoctors,
-    String? selectedSpecialty,
-    String? activeQuery,
+    bool? isLoading,
+    String? error,
+    bool clearError = false,
+    List<DoctorSearchModel>? doctors,
+    int? page,
+    bool? hasMore,
+    String? currentSearch,
+    String? currentCity,
   }) {
     return DoctorListingState(
-      allDoctors: allDoctors ?? this.allDoctors,
-      filteredDoctors: filteredDoctors ?? this.filteredDoctors,
-      selectedSpecialty: selectedSpecialty ?? this.selectedSpecialty,
-      activeQuery: activeQuery ?? this.activeQuery,
+      isLoading: isLoading ?? this.isLoading,
+      error: clearError ? null : (error ?? this.error),
+      doctors: doctors ?? this.doctors,
+      page: page ?? this.page,
+      hasMore: hasMore ?? this.hasMore,
+      currentSearch: currentSearch ?? this.currentSearch,
+      currentCity: currentCity ?? this.currentCity,
     );
   }
 }
 
-// 🎯 FIX: Extended manual AsyncNotifier base class to resolve inheritance bounds and undefined state errors
-class DoctorListingNotifier extends AsyncNotifier<DoctorListingState> {
+final doctorListingControllerProvider =
+NotifierProvider<DoctorListingController, DoctorListingState>(
+  DoctorListingController.new,
+);
+
+class DoctorListingController extends Notifier<DoctorListingState> {
+  static const String _subTag = 'DoctorListingController';
 
   @override
-  Future<DoctorListingState> build() async {
-    // Automatically triggers initial listing fetch query on setup initialization
-    final results = await DummyData.searchDoctors(query: '');
-    return DoctorListingState(
-      allDoctors: results,
-      filteredDoctors: results,
+  DoctorListingState build() {
+    return DoctorListingState();
+  }
+
+  /// Execute search with params
+  Future<void> searchDoctors(SearchParams params) async {
+    state = DoctorListingState(
+      currentSearch: params.search,
+      currentCity: params.city,
     );
+    await _loadDoctors(page: 1);
   }
 
-  // Fetch or query repository dataset based on dynamic user search inputs
-  Future<void> loadDoctors({String query = ''}) async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final results = await DummyData.searchDoctors(query: query);
+  /// Clear all filters - Show all doctors
+  Future<void> clearAllFilters() async {
+    // Reset to empty search and city
+    state = DoctorListingState(
+      currentSearch: "",
+      currentCity: "",
+    );
+    await _loadDoctors(page: 1);
+  }
 
-      return DoctorListingState(
-        allDoctors: results,
-        activeQuery: query,
-        selectedSpecialty: 'All', // Reset filter category on fresh search operations
-        filteredDoctors: results,
+  /// Load more for infinite scroll
+  Future<void> loadMore() async {
+    if (state.isLoading || !state.hasMore) return;
+    await _loadDoctors(page: state.page + 1);
+  }
+
+  /// Refresh current search
+  Future<void> refresh() async {
+    await _loadDoctors(page: 1);
+  }
+
+  /// Retry on error
+  Future<void> retry() async {
+    await _loadDoctors(page: state.page);
+  }
+
+  /// Clear error state
+  void clearError() {
+    state = state.copyWith(clearError: true);
+  }
+
+  /// Reset state
+  void reset() {
+    state = DoctorListingState();
+  }
+
+  Future<void> _loadDoctors({required int page}) async {
+    if (state.isLoading) return;
+
+    state = state.copyWith(isLoading: true, clearError: true);
+
+    try {
+      final repository = ref.read(patientSearchRepositoryProvider);
+      final response = await repository.searchDoctors(
+        search: state.currentSearch,
+        city: state.currentCity,
+        page: page,
+        limit: 20,
       );
-    });
-  }
 
-  // Set selected specialty channel criteria seamlessly
-  void setSpecialty(String specialty) {
-    final currentState = state.value;
-    if (currentState == null || currentState.selectedSpecialty == specialty) return;
+      if (response.statusCode == 200) {
+        final rawList = response.data["data"]["doctors"] as List;
+        final doctors = rawList
+            .map((e) => DoctorSearchModel.fromJson(e))
+            .toList();
 
-    List<DoctorProfile> computedResults;
-    if (specialty == 'All') {
-      computedResults = List.from(currentState.allDoctors);
-    } else {
-      computedResults = currentState.allDoctors
-          .where((item) => item.specialty == specialty)
-          .toList();
+        final totalCount = response.data["data"]["count"] as int? ?? 0;
+        final hasMore = (page * 20) < totalCount;
+
+        state = state.copyWith(
+          doctors: page == 1 ? doctors : [...state.doctors, ...doctors],
+          page: page,
+          hasMore: hasMore,
+          isLoading: false,
+        );
+      } else {
+        state = state.copyWith(
+          error: response.data["message"] ?? "Failed to load doctors",
+          isLoading: false,
+        );
+      }
+    } catch (e, st) {
+      state = state.copyWith(
+        error: "Failed to load doctors",
+        isLoading: false,
+      );
+      AppLogger.exception(
+        e,
+        st,
+        message: 'Load doctors failed',
+        tag: LogTags.patient,
+        subTag: _subTag,
+      );
     }
-
-    state = AsyncValue.data(currentState.copyWith(
-      selectedSpecialty: specialty,
-      filteredDoctors: computedResults,
-    ));
-  }
-
-  // Dynamic utility mapping sync array options array cleanly
-  List<String> getSpecialtiesList() {
-    final currentState = state.value;
-    if (currentState == null) return ['All'];
-
-    final Set<String> values = {
-      'All',
-      ...currentState.allDoctors.map((item) => item.specialty),
-    };
-    return values.toList();
   }
 }
-
-// 🎯 FIX: Provider registration utilizing autoDispose modifier to safely track lifecycle bounds
-final doctorListingProvider = AsyncNotifierProvider.autoDispose<DoctorListingNotifier, DoctorListingState>(
-  DoctorListingNotifier.new,
-);

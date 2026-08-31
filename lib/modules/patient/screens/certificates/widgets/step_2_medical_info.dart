@@ -1,74 +1,119 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/core/utils/app_field_helper.dart';
 import 'package:yodoctor/modules/patient/controllers/certificate_request.dart';
+import 'package:yodoctor/modules/widgets/app_date_picker_field.dart';
+import 'package:yodoctor/modules/widgets/app_dropdown_field.dart';
+import 'package:yodoctor/modules/widgets/app_text_field.dart';
 import 'step_header_helper.dart';
-import 'custom_text_field.dart';
 
 class Step2MedicalInfo extends ConsumerWidget {
   final GlobalKey<FormState> formKey;
   final CertificateNotifier controller;
+  final AutovalidateMode? autovalidateMode;
 
-  const Step2MedicalInfo({super.key, required this.formKey, required this.controller});
+  const Step2MedicalInfo({
+    super.key,
+    required this.formKey,
+    required this.controller,
+    this.autovalidateMode,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     // Watch current form state reactively from provider
     final formState = ref.watch(certificateProvider);
 
     return Form(
       key: formKey,
+      autovalidateMode: autovalidateMode ?? AutovalidateMode.onUserInteraction,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const StepHeader(title: 'Medical Details', desc: 'Provide baseline biometrics to appear on your medical clearance.'),
+          const StepHeader(
+            title: 'Medical Details',
+            desc:
+            'Provide baseline biometrics to appear on your medical clearance.',
+          ),
           const SizedBox(height: 20),
-          CustomCertificateTextField(
+          AppTextField(
             controller: controller.fullNameController,
-            labelText: 'Full Name *',
-            prefixIcon: Icons.badge_rounded,
-            validator: (value) => value == null || value.trim().isEmpty ? 'Please enter name' : null,
+            label: 'Full Name',
+            isRequired: true,
+            hint: 'Enter full name',
+            icon: Icons.badge_rounded,
+            textCapitalization: TextCapitalization.words,
+            inputFormatters: [
+              SingleSpaceFormatter(),
+            ],
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return 'Please enter name';
+              }
+
+              final cleanedValue = value.trim().replaceAll(RegExp(r'\s+'), ' ');
+
+              if (cleanedValue.length < 2) {
+                return 'Name should have at least 2 characters';
+              }
+
+              if (!RegExp(r'^[A-Za-z]+(?: [A-Za-z]+)*$').hasMatch(cleanedValue)) {
+                return 'Only alphabets are allowed';
+              }
+
+              return null;
+            },
+          ),
+          const SizedBox(height: 20),
+          AppDatePickerField(
+            label: 'Date of Birth',
+            isRequired: true,
+            hint: 'Select Date',
+            icon: Icons.calendar_today_rounded,
+            value: formState.dateOfBirth,
+            firstDate: DateTime(1900),
+            lastDate: DateTime.now(),
+            onChanged: (date) {
+              if (date != null) {
+                controller.selectDateOfBirth(date);
+              }
+            },
+            validator: (value) {
+              if (formState.dateOfBirth == null) {
+                return 'Required';
+              }
+              return null;
+            },
           ),
           const SizedBox(height: 20),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                child: CustomCertificateTextField(
-                  controller: controller.dobController,
-                  labelText: 'Date of Birth *',
-                  prefixIcon: Icons.calendar_today_rounded,
-                  onTap: () async {
-                    FocusScope.of(context).requestFocus(FocusNode());
-                    final DateTime? picked = await showDatePicker(
-                      context: context,
-                      initialDate: DateTime(2002, 6, 14),
-                      firstDate: DateTime(1900),
-                      lastDate: DateTime.now(),
-                    );
-                    if (picked != null) {
-                      controller.dobController.text =
-                      '${picked.day.toString().padLeft(2, '0')}-${picked.month.toString().padLeft(2, '0')}-${picked.year}';
-                    }
-                  },
-                  validator: (value) => value == null || value.trim().isEmpty ? 'Required' : null,
+                child: AppDropdownField<String>(
+                  label: 'Gender',
+                  isRequired: true,
+                  hint: 'Select Gender',
+                  icon: Icons.people_outline_rounded,
+                  value: formState.gender,
+                  items: const ['Male', 'Female', 'Other'],
+                  onChanged: (value) =>
+                  value != null ? controller.setGender(value) : null,
+                  validator: (value) =>
+                  value == null || value.trim().isEmpty ? 'Required' : null,
                 ),
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: DropdownButtonFormField<String>(
-                  initialValue: formState.gender,
-                  decoration: InputDecoration(
-                    labelText: 'Gender *',
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide(color: colorScheme.outlineVariant.withValues(alpha: 0.35)),
-                    ),
-                  ),
-                  validator: (value) => value == null ? 'Required' : null,
-                  items: const ['Male', 'Female', 'Other'].map((g) => DropdownMenuItem<String>(value: g, child: Text(g))).toList(),
-                  onChanged: (value) => value != null ? controller.setGender(value) : null,
+                child: AppDropdownField<String>(
+                  label: 'Blood Group',
+                  hint: 'Select Blood Group',
+                  icon: Icons.bloodtype_outlined,
+                  value: formState.bloodGroup,
+                  items: const ['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'],
+                  onChanged: (value) =>
+                  value != null ? controller.setBloodGroup(value) : null,
                 ),
               ),
             ],
@@ -78,51 +123,77 @@ class Step2MedicalInfo extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                child: DropdownButtonFormField<String>(
-                  initialValue: formState.bloodGroup,
-                  decoration: InputDecoration(
-                    labelText: 'Blood Group *',
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide(color: colorScheme.outlineVariant.withValues(alpha: 0.35)),
-                    ),
-                  ),
-                  items: const ['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'].map((bg) => DropdownMenuItem<String>(value: bg, child: Text(bg))).toList(),
-                  onChanged: (value) => value != null ? controller.setBloodGroup(value) : null,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: CustomCertificateTextField(
+                child: AppTextField(
                   controller: controller.heightController,
-                  labelText: 'Height',
-                  suffixText: 'CM',
-                  keyboardType: TextInputType.number,
+                  label: 'Height',
+                  hint: 'e.g. 175',
+                  maxLength: 3,
+                  icon: Icons.height_rounded,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d?$')),
+                  ],
+                  validator: (value) {
+                    if (value != null && value.trim().isNotEmpty) {
+                      final height = double.tryParse(value.trim());
+                      if (height == null) {
+                        return 'Enter a valid number';
+                      }
+                      if (height <= 0 || height > 300) {
+                        return 'Enter a valid height (1 - 300 cm)';
+                      }
+                    }
+                    return null;
+                  },
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: AppTextField(
+                  controller: controller.weightController,
+                  label: 'Weight',
+                  hint: 'e.g. 70',
+                  maxLength: 3,
+                  icon: Icons.scale_rounded,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d?$')),
+                  ],
+                  validator: (value) {
+                    if (value != null && value.trim().isNotEmpty) {
+                      final weight = double.tryParse(value.trim());
+                      if (weight == null) {
+                        return 'Enter a valid number';
+                      }
+                      if (weight <= 0 || weight > 500) {
+                        return 'Enter a valid weight (1 - 500 kg)';
+                      }
+                    }
+                    return null;
+                  },
                 ),
               ),
             ],
           ),
           const SizedBox(height: 20),
-          CustomCertificateTextField(
-            controller: controller.weightController,
-            labelText: 'Weight',
-            suffixText: 'KG',
-            prefixIcon: Icons.scale_rounded,
-            keyboardType: TextInputType.number,
-          ),
-          const SizedBox(height: 20),
-          CustomCertificateTextField(
+          AppTextField(
             controller: controller.medicalConditionsController,
-            labelText: 'Known Medical Conditions',
-            hintText: 'e.g., Diabetes, Hypertension, Asthma',
+            label: 'Known Medical Conditions',
+            hint: 'e.g., Diabetes, Hypertension, Asthma',
+            icon: Icons.medical_information_outlined,
             maxLines: 2,
+            minLines: 1,
+            maxLength: 2000,
           ),
           const SizedBox(height: 20),
-          CustomCertificateTextField(
+          AppTextField(
             controller: controller.medicationsController,
-            labelText: 'Current Medications',
-            hintText: 'e.g., Metformin 500mg, Daily Multivitamins',
+            label: 'Current Medications',
+            hint: 'e.g., Metformin 500mg, Daily Multivitamins',
+            icon: Icons.medication_outlined,
             maxLines: 2,
+            minLines: 1,
+            maxLength: 3000,
           ),
         ],
       ),

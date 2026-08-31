@@ -1,0 +1,109 @@
+import 'package:dio/dio.dart';
+import 'package:go_router/go_router.dart';
+import 'package:yodoctor/core/constants/log_tags.dart';
+import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:yodoctor/core/routes/app_router.dart';
+import 'package:yodoctor/core/routes/app_routes.dart';
+import 'package:yodoctor/core/storage/storage_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/core/providers/app_role_provider.dart';
+import 'package:yodoctor/modules/auth/controllers/doctor_status_controller.dart';
+
+class AuthInterceptor extends Interceptor {
+  AuthInterceptor(this._storage, this._ref);
+
+  final StorageService _storage;
+  final Ref _ref;
+  static const String _subTag = 'AuthInterceptor';
+
+  static bool _isLoggingOut = false;
+
+  @override
+  void onRequest(
+      RequestOptions options,
+      RequestInterceptorHandler handler,
+      ) {
+    final path = options.path.toLowerCase();
+
+    final isRegistrationApi =
+        path.contains('/doctor/register') ||
+            path.contains('/doctor/registration');
+
+    final token = isRegistrationApi
+        ? _storage.getRegistrationToken()
+        : _storage.getToken();
+
+    AppLogger.info(
+      'Intercepting outgoing HTTP request: [${options.method}] -> ${options.uri}',
+      tag: LogTags.api,
+      subTag: _subTag,
+    );
+
+    if (token != null && token.isNotEmpty) {
+      options.headers['Authorization'] = 'Bearer $token';
+
+      AppLogger.success(
+        'Security context attached safely (${isRegistrationApi ? "Temporary Registration Token" : "Active Session Token"})',
+        tag: LogTags.api,
+        subTag: _subTag,
+      );
+    }
+
+    handler.next(options);
+  }
+
+  @override
+  void onError(
+      DioException err,
+      ErrorInterceptorHandler handler,
+      ) async {
+    // final isTokenExpired = err.response?.statusCode == 401 ||
+    //     err.response?.data?['message'] == 'Token expired';
+
+    final dynamic data = err.response?.data;
+    bool isTokenExpired = err.response?.statusCode == 401;
+
+    if (data is Map<String, dynamic>) {
+      if (data['message'] == 'Token expired') {
+        isTokenExpired = true;
+      }
+    }
+
+    if (isTokenExpired) {
+      if (!_isLoggingOut) {
+        _isLoggingOut = true;
+
+        AppLogger.warning(
+          'Session expired or invalid token detected. Triggering force logout...',
+          tag: LogTags.api,
+          subTag: _subTag,
+        );
+
+        await _storage.clearAll();
+
+        // Clear runtime Riverpod authentication state
+        _ref.read(doctorStatusProvider.notifier).reset();
+        _ref.read(appRoleProvider.notifier).clearRole();
+
+        final context = AppRouter.rootNavigatorKey.currentContext;
+        if (context != null && context.mounted) {
+          context.go(AppRoutes.landing);
+        }
+
+        Future.delayed(const Duration(seconds: 3), () {
+          _isLoggingOut = false;
+        });
+      }
+
+      return handler.resolve(
+        Response(
+          requestOptions: err.requestOptions,
+          statusCode: 401,
+          data: {'success': false, 'message': 'Session Interrupted'},
+        ),
+      );
+    }
+
+    handler.next(err);
+  }
+}

@@ -1,11 +1,20 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
-import 'package:yodoctor/modules/auth/models/doctor_register_model.dart';
-import 'shared_widgets.dart';
 
-class Step5Consultation extends StatefulWidget {
+import 'package:yodoctor/modules/auth/controllers/doctor_register_controller.dart';
+import 'package:yodoctor/modules/auth/models/doctor_register_model.dart';
+import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
+import 'package:yodoctor/modules/widgets/app_text_field.dart';
+import 'package:yodoctor/modules/auth/screens/doctor/widgets/section_label.dart';
+import 'package:yodoctor/modules/auth/screens/doctor/widgets/step_card.dart';
+import 'package:yodoctor/modules/auth/screens/doctor/widgets/step_title.dart';
+
+import '../widgets/nav_buttons.dart';
+
+class Step5Consultation extends ConsumerStatefulWidget {
   final DoctorFormData data;
   final VoidCallback onNext;
   final VoidCallback onBack;
@@ -18,25 +27,31 @@ class Step5Consultation extends StatefulWidget {
   });
 
   @override
-  State<Step5Consultation> createState() => _Step5ConsultationState();
+  ConsumerState<Step5Consultation> createState() => _Step5ConsultationState();
 }
 
-class _Step5ConsultationState extends State<Step5Consultation> {
+class _Step5ConsultationState extends ConsumerState<Step5Consultation> {
+  final _formKey = GlobalKey<FormState>();
   final _feeCtrl = TextEditingController();
+  bool _submittedOnce = false;
+
   final _days = const [
-    {'label': 'M', 'value': 'M'},
-    {'label': 'T', 'value': 'T'},
-    {'label': 'W', 'value': 'W'},
-    {'label': 'T', 'value': 'T2'},
-    {'label': 'F', 'value': 'F'},
-    {'label': 'S', 'value': 'S'},
-    {'label': 'Su', 'value': 'SU'},
+    {"label": "M", "value": "Mon"},
+    {"label": "T", "value": "Tue"},
+    {"label": "W", "value": "Wed"},
+    {"label": "T", "value": "Thu"},
+    {"label": "F", "value": "Fri"},
+    {"label": "S", "value": "Sat"},
+    {"label": "Su", "value": "Sun"},
   ];
 
   @override
   void initState() {
     super.initState();
     _feeCtrl.text = widget.data.fee;
+    if (widget.data.duration.isEmpty) {
+      widget.data.duration = '15 mins';
+    }
   }
 
   @override
@@ -51,7 +66,9 @@ class _Step5ConsultationState extends State<Step5Consultation> {
       initialTime: TimeOfDay.now(),
       builder: (ctx, child) => Theme(
         data: Theme.of(ctx).copyWith(
-          colorScheme: Theme.of(ctx).colorScheme.copyWith(primary: AppTheme.yoBlue),
+          colorScheme: Theme.of(ctx).colorScheme.copyWith(
+            primary: Theme.of(context).colorScheme.primary,
+          ),
         ),
         child: child!,
       ),
@@ -78,227 +95,395 @@ class _Step5ConsultationState extends State<Step5Consultation> {
     });
   }
 
+  Future<void> _handleNext() async {
+    setState(() => _submittedOnce = true);
+
+    if (!_formKey.currentState!.validate()) {
+      AppSnackBar.show(
+        message: 'Please resolve the highlighted errors',
+        type: AppSnackBarType.warning,
+      );
+      return;
+    }
+
+    if (widget.data.selectedDays.isEmpty) {
+      AppSnackBar.show(
+        message: 'Please select at least one available day',
+        type: AppSnackBarType.warning,
+      );
+      return;
+    }
+
+    widget.data.fee = _feeCtrl.text.trim();
+
+    widget.data.morningEnabled =
+        widget.data.morningStart.isNotEmpty &&
+        widget.data.morningEnd.isNotEmpty;
+
+    widget.data.eveningEnabled =
+        widget.data.eveningStart.isNotEmpty &&
+        widget.data.eveningEnd.isNotEmpty;
+
+    if (!widget.data.morningEnabled && !widget.data.eveningEnabled) {
+      AppSnackBar.show(
+        message: 'Please configure at least one slot timing',
+        type: AppSnackBarType.warning,
+      );
+      return;
+    }
+
+    final success = await ref
+        .read(doctorRegisterControllerProvider.notifier)
+        .saveStep5(widget.data);
+
+    if (!mounted) return;
+
+    if (success) {
+      AppSnackBar.show(
+        message: 'Consultation settings saved successfully!',
+        type: AppSnackBarType.success,
+      );
+      widget.onNext();
+    } else {
+      final errorMsg = ref.read(doctorRegisterControllerProvider).errorMessage;
+      AppSnackBar.show(
+        message: errorMsg ?? "Step 5 registration failed. Try again.",
+        type: AppSnackBarType.error,
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final registerState = ref.watch(doctorRegisterControllerProvider);
+
+    return Form(
+      key: _formKey,
+      autovalidateMode: _submittedOnce
+          ? AutovalidateMode.onUserInteraction
+          : AutovalidateMode.disabled,
+      child: StepCard(
+        children: [
+          StepTitle(
+            icon: Icons.schedule_outlined,
+            title: 'Consultation Settings',
+            subtitle:
+                'Configure consultation fees, slot timings, and availability',
+            color: colorScheme.primary,
+          ),
+          const SizedBox(height: 24),
+
+          // Consultation Fee
+          AppTextField(
+            label: 'Consultation Fee (₹)',
+            isRequired: true,
+            hint: 'Enter consultation fee amount',
+            icon: Icons.currency_rupee_rounded,
+            controller: _feeCtrl,
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            validator: (v) {
+              if (v == null || v.trim().isEmpty) return 'Fee is required';
+              final fee = int.tryParse(v);
+              if (fee == null || fee < 0) return 'Enter a valid fee amount';
+              return null;
+            },
+          ),
+          const SizedBox(height: 24),
+
+          // Average Consultation Duration
+          const SectionLabel(
+            label: 'Average Consultation Duration',
+            isRequired: true,
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: ['10 mins', '15 mins', '20 mins', '30 mins'].map((
+              duration,
+            ) {
+              final selected = widget.data.duration == duration;
+              return GestureDetector(
+                onTap: () => setState(() => widget.data.duration = duration),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 12,
+                  ),
+                  decoration: BoxDecoration(
+                    color: selected
+                        ? colorScheme.primaryContainer.transparency(0.85)
+                        : colorScheme.surfaceContainerLow,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: selected
+                          ? colorScheme.primary
+                          : colorScheme.outlineVariant.transparency(0.5),
+                      width: 1.5,
+                    ),
+                  ),
+                  child: Text(
+                    duration,
+                    style: textTheme.labelLarge?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: selected
+                          ? colorScheme.primary
+                          : colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+          const SizedBox(height: 24),
+
+          // Available Days of Week
+          const SectionLabel(label: 'Available Days of Week', isRequired: true),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: _days.map((day) {
+              final selected = widget.data.selectedDays.contains(day['value']);
+              return GestureDetector(
+                onTap: () => setState(
+                  () => selected
+                      ? widget.data.selectedDays.remove(day['value'])
+                      : widget.data.selectedDays.add(day['value']!),
+                ),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  width: 42,
+                  height: 42,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: selected
+                        ? colorScheme.primaryContainer.transparency(0.85)
+                        : colorScheme.surfaceContainerLow,
+                    border: Border.all(
+                      color: selected
+                          ? colorScheme.primary
+                          : colorScheme.outlineVariant.transparency(0.5),
+                      width: 1.5,
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      day['label']!,
+                      style: textTheme.labelMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: selected
+                            ? colorScheme.primary
+                            : colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+          const SizedBox(height: 24),
+
+          // Morning Slot Block
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: colorScheme.primary.transparency(0.06),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: colorScheme.primary.transparency(0.2)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.wb_sunny_rounded,
+                      color: AppTheme.amber,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Morning Slot Timing',
+                      style: textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _TimePickerTile(
+                        label: 'Start',
+                        time: widget.data.morningStart.isEmpty
+                            ? '--:--'
+                            : widget.data.morningStart,
+                        onTap: () => _pickTime('morningStart'),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _TimePickerTile(
+                        label: 'End',
+                        time: widget.data.morningEnd.isEmpty
+                            ? '--:--'
+                            : widget.data.morningEnd,
+                        onTap: () => _pickTime('morningEnd'),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Evening Slot Block
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: colorScheme.surfaceContainerLow,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: colorScheme.outlineVariant.transparency(0.5),
+                width: 1.2,
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.nightlight_round,
+                      color: colorScheme.primary,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Evening Slot Timing',
+                      style: textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                    const Spacer(),
+                    Text(
+                      'Optional',
+                      style: textTheme.labelSmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _TimePickerTile(
+                        label: 'Start',
+                        time: widget.data.eveningStart.isEmpty
+                            ? '--:--'
+                            : widget.data.eveningStart,
+                        onTap: () => _pickTime('eveningStart'),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _TimePickerTile(
+                        label: 'End',
+                        time: widget.data.eveningEnd.isEmpty
+                            ? '--:--'
+                            : widget.data.eveningEnd,
+                        onTap: () => _pickTime('eveningEnd'),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 28),
+
+          // Action Navigation
+          NavButtons(
+            onBack: widget.onBack,
+            onNext: registerState.isLoading ? null : _handleNext,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TimePickerTile extends StatelessWidget {
+  final String label;
+  final String time;
+  final VoidCallback onTap;
+
+  const _TimePickerTile({
+    required this.label,
+    required this.time,
+    required this.onTap,
+  });
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    return StepCard(
-      children: [
-         StepTitle(
-          icon: Icons.schedule_rounded,
-          title: 'Consultation Settings',
-          color: AppTheme.yoBlue,
-        ),
-        const SizedBox(height: 24),
-        const SectionLabel(label: 'Consultation Fee (₹)'),
-        const SizedBox(height: 10),
-        TextFormField(
-          controller: _feeCtrl,
-          keyboardType: TextInputType.number,
-          inputFormatters:  [FilteringTextInputFormatter.digitsOnly],
-          style: textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface),
-          decoration: InputDecoration(
-            hintText: 'e.g. 500',
-            hintStyle: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
-            prefixIcon: Padding(
-              padding: const EdgeInsets.only(left: 16, right: 4, top: 2),
-              child: Text(
-                '₹',
-                style: textTheme.titleLarge?.copyWith(
-                  color: AppTheme.yoBlue,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
-            filled: true,
-            fillColor: colorScheme.surfaceContainerLow,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
-              borderSide: BorderSide.none,
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
-              borderSide: BorderSide(color: colorScheme.outlineVariant, width: 1.2),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
-              borderSide:  BorderSide(color: AppTheme.yoBlue, width: 2),
-            ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: colorScheme.outlineVariant.transparency(0.5),
+            width: 1.2,
           ),
-          onChanged: (v) => widget.data.fee = v,
         ),
-        const SizedBox(height: 24),
-        const SectionLabel(label: 'Average Consultation Duration'),
-        const SizedBox(height: 12),
-        Wrap(
-          spacing: 10,
-          runSpacing: 10,
-          children: ['10 mins', '15 mins', '20 mins', '30 mins'].map((duration) {
-            final selected = widget.data.duration == duration;
-            return GestureDetector(
-              onTap: () => setState(() => widget.data.duration = duration),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                decoration: BoxDecoration(
-                  color: selected ? AppTheme.yoBlue : colorScheme.surface,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: selected ? AppTheme.yoBlue : colorScheme.outlineVariant,
-                    width: 1.5,
-                  ),
-                ),
-                child: Text(
-                  duration,
-                  style: textTheme.labelLarge?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: selected ? colorScheme.onPrimary : colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ),
-            );
-          }).toList(),
-        ),
-        const SizedBox(height: 24),
-        const SectionLabel(label: 'Available Days of Week'),
-        const SizedBox(height: 12),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: _days.map((day) {
-            final selected = widget.data.selectedDays.contains(day['value']);
-            return GestureDetector(
-              onTap: () => setState(
-                () => selected
-                    ? widget.data.selectedDays.remove(day['value'])
-                    : widget.data.selectedDays.add(day['value']!),
-              ),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: selected ? AppTheme.yoBlue : colorScheme.surface,
-                  border: Border.all(
-                    color: selected ? AppTheme.yoBlue : colorScheme.outlineVariant,
-                    width: 1.5,
-                  ),
-                ),
-                child: Center(
-                  child: Text(
-                    day['label']!,
-                    style: textTheme.labelMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: selected ? colorScheme.onPrimary : colorScheme.onSurfaceVariant,
+        child: Row(
+          children: [
+            Icon(
+              Icons.access_time_rounded,
+              color: colorScheme.primary,
+              size: 18,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: textTheme.labelSmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
                     ),
                   ),
-                ),
-              ),
-            );
-          }).toList(),
-        ),
-        const SizedBox(height: 24),
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: AppTheme.yoBlueLight,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppTheme.yoBlue.transparency(0.2)),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                   Icon(Icons.wb_sunny_rounded, color: AppTheme.warning, size: 20),
-                  const SizedBox(width: 8),
+                  const SizedBox(height: 2),
                   Text(
-                    'Morning Slot Timing',
-                    style: textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: colorScheme.onSurface,
+                    time,
+                    style: textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: time == '--:--'
+                          ? colorScheme.onSurfaceVariant.transparency(0.6)
+                          : colorScheme.onSurface,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 14),
-              Row(
-                children: [
-                  TimePickerTile(
-                    label: 'Start',
-                    time: widget.data.morningStart,
-                    onTap: () => _pickTime('morningStart'),
-                  ),
-                  const SizedBox(width: 12),
-                  TimePickerTile(
-                    label: 'End',
-                    time: widget.data.morningEnd,
-                    onTap: () => _pickTime('morningEnd'),
-                  ),
-                ],
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
-        const SizedBox(height: 14),
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: colorScheme.outlineVariant, width: 1.5),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                   Icon(Icons.nightlight_round, color: AppTheme.yoBlue, size: 20),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Evening Slot Timing',
-                    style: textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: colorScheme.onSurface,
-                    ),
-                  ),
-                  const Spacer(),
-                  Text(
-                    'Optional',
-                    style: textTheme.labelSmall?.copyWith(color: colorScheme.onSurfaceVariant),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 14),
-              Row(
-                children: [
-                  TimePickerTile(
-                    label: 'Start',
-                    time: widget.data.eveningStart.isEmpty ? '--:--' : widget.data.eveningStart,
-                    onTap: () => _pickTime('eveningStart'),
-                  ),
-                  const SizedBox(width: 12),
-                  TimePickerTile(
-                    label: 'End',
-                    time: widget.data.eveningEnd.isEmpty ? '--:--' : widget.data.eveningEnd,
-                    onTap: () => _pickTime('eveningEnd'),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 28),
-        NavButtons(
-          onBack: widget.onBack,
-          onNext: () {
-            widget.data.fee = _feeCtrl.text;
-            widget.onNext();
-          },
-        ),
-      ],
+      ),
     );
   }
 }

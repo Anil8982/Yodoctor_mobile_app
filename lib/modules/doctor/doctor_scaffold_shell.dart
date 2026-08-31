@@ -1,86 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 
-import 'screens/appointments/doctor_appointment_history_screen.dart';
-import 'screens/dashboard/doctor_dashboard_screen.dart';
-import 'screens/certificate/doctor_certificate_dashboard_screen.dart';
-import 'screens/reviews/doctor_reviews_screen.dart';
+import '../doctor/controllers/doctor_dashboard_controller.dart';
 import 'widgets/doctor_bottom_nav.dart';
+import 'widgets/doctor_drawer.dart';
 
-class DoctorScaffoldShell extends StatefulWidget {
-  const DoctorScaffoldShell({
-    super.key,
-    required this.navigationShell,
-  });
+class DoctorScaffoldShell extends ConsumerWidget {
+  const DoctorScaffoldShell({super.key, required this.navigationShell});
 
   final StatefulNavigationShell navigationShell;
 
   @override
-  State<DoctorScaffoldShell> createState() => _DoctorScaffoldShellState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final dashboard = ref.watch(doctorDashboardProvider);
 
-class _DoctorScaffoldShellState extends State<DoctorScaffoldShell> {
-  late final PersistentTabController _controller;
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      drawer: dashboard.when(
+        data: (data) => DoctorDrawer(doctor: data.doctor),
+        loading: () => const Drawer(),
+        error: (_, _) => const Drawer(),
+      ),
 
-  @override
-  void initState() {
-    super.initState();
-    _controller = PersistentTabController(initialIndex: widget.navigationShell.currentIndex);
-  }
+      body: navigationShell,
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  List<Widget> _buildScreens() {
-    return [
-      DoctorDashboardScreen(
-        onOpenAppointments: () {
-          setState(() {
-            _controller.index = 1;
-            widget.navigationShell.goBranch(1);
-          });
+      bottomNavigationBar: DoctorBottomNav(
+        currentIndex: navigationShell.currentIndex,
+        onTap: (index) {
+          navigationShell.goBranch(
+            index,
+            initialLocation: index == navigationShell.currentIndex,
+          );
         },
       ),
-      const DoctorAppointmentHistoryScreen(),
-      const DoctorCertificateDashboardScreen(),
-      const DoctorReviewsScreen(),
-    ];
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (_controller.index != widget.navigationShell.currentIndex) {
-      _controller.index = widget.navigationShell.currentIndex;
-    }
-
-    return PersistentTabView(
-      context,
-      controller: _controller,
-      screens: _buildScreens(),
-      items: DoctorBottomNav.navBarItems(context),
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      handleAndroidBackButtonPress: true,
-      resizeToAvoidBottomInset: true,
-      stateManagement: true,
-      hideNavigationBarWhenKeyboardAppears: true,
-      padding: const EdgeInsets.only(top: 8),
-      navBarHeight: kBottomNavigationBarHeight + 10,
-      decoration: NavBarDecoration(
-        borderRadius: BorderRadius.zero,
-        border: Border(
-          top: BorderSide(
-            color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.35),
-          ),
-        ),
-      ),
-      navBarStyle: NavBarStyle.style6,
-      onItemSelected: (index) {
-        widget.navigationShell.goBranch(index);
-      },
     );
   }
 }

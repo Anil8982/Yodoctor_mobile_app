@@ -52,7 +52,7 @@ final List<MedicalService> medicalServicesList = [
   const MedicalService(
     title: 'Apply for Medical Certificate',
     subtitle: 'Consult from home',
-    route: AppRoutes.applyCertificate,
+    route: AppRoutes.doctorSelection,
     icon: Icons.description_rounded,
     baseColor: Color(0xFFEC407A),
   ),

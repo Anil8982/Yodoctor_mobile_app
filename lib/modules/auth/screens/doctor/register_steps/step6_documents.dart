@@ -1,127 +1,287 @@
-﻿import 'package:flutter/material.dart';
-import 'package:yodoctor/core/theme/app_theme.dart';
-import 'package:yodoctor/modules/auth/models/doctor_register_model.dart';
-import 'shared_widgets.dart';
+﻿import 'dart:io';
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-//  STEP 6 â€” DOCUMENTS
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-class Step6Documents extends StatefulWidget {
+import 'package:chroma_kit/chroma_kit.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'package:yodoctor/modules/auth/controllers/doctor_register_controller.dart';
+import 'package:yodoctor/modules/auth/models/doctor_register_model.dart';
+import 'package:yodoctor/modules/auth/screens/doctor/widgets/info_box.dart';
+import 'package:yodoctor/modules/auth/screens/doctor/widgets/step_card.dart';
+import 'package:yodoctor/modules/auth/screens/doctor/widgets/step_title.dart';
+import 'package:yodoctor/modules/widgets/app_snack_bar.dart'; // 👈 AppSnackBar Import
+
+import '../widgets/nav_buttons.dart';
+
+class Step6Documents extends ConsumerStatefulWidget {
   final DoctorFormData data;
-  final VoidCallback onNext, onBack;
+  final VoidCallback onNext;
+  final VoidCallback onBack;
+
   const Step6Documents({
     super.key,
     required this.data,
     required this.onNext,
     required this.onBack,
   });
+
   @override
-  State<Step6Documents> createState() => _Step6DocumentsState();
+  ConsumerState<Step6Documents> createState() => _Step6DocumentsState();
 }
 
-class _Step6DocumentsState extends State<Step6Documents> {
-  void _simulateUpload(String field) => setState(() {
+class _Step6DocumentsState extends ConsumerState<Step6Documents> {
+  Future<void> _pickFile(String field) async {
+    final result = await FilePicker.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png'],
+    );
+
+    if (result == null || result.files.single.path == null) return;
+
+    final file = File(result.files.single.path!);
+
+    setState(() {
+      switch (field) {
+        case "profile":
+          widget.data.profileFile = file;
+          break;
+        case "certificate":
+          widget.data.certificateFile = file;
+          break;
+        case "idProof":
+          widget.data.idProofFile = file;
+          break;
+        case "clinicProof":
+          widget.data.clinicProofFile = file;
+          break;
+      }
+    });
+  }
+
+  void _removeFile(String field) {
+    setState(() {
+      switch (field) {
+        case "profile":
+          widget.data.profileFile = null;
+          break;
+        case "certificate":
+          widget.data.certificateFile = null;
+          break;
+        case "idProof":
+          widget.data.idProofFile = null;
+          break;
+        case "clinicProof":
+          widget.data.clinicProofFile = null;
+          break;
+      }
+    });
+  }
+
+  String? _getFileName(String field) {
+    File? file;
     switch (field) {
-      case 'profile':
-        widget.data.profileFile = 'profile_photo.jpg';
+      case "profile":
+        file = widget.data.profileFile;
         break;
-      case 'certificate':
-        widget.data.certificateFile = 'medical_certificate.pdf';
+      case "certificate":
+        file = widget.data.certificateFile;
         break;
-      case 'idProof':
-        widget.data.idProofFile = 'government_id.pdf';
+      case "idProof":
+        file = widget.data.idProofFile;
         break;
-      case 'clinicProof':
-        widget.data.clinicProofFile = 'clinic_proof.pdf';
+      case "clinicProof":
+        file = widget.data.clinicProofFile;
         break;
     }
-  });
+    if (file == null) return null;
+    return file.path.split(Platform.pathSeparator).last;
+  }
 
-  String? _getFile(String field) {
-    switch (field) {
-      case 'profile':
-        return widget.data.profileFile;
-      case 'certificate':
-        return widget.data.certificateFile;
-      case 'idProof':
-        return widget.data.idProofFile;
-      case 'clinicProof':
-        return widget.data.clinicProofFile;
-      default:
-        return null;
+  Future<void> _handleNext() async {
+    if (widget.data.profileFile == null ||
+        widget.data.certificateFile == null ||
+        widget.data.idProofFile == null) {
+      AppSnackBar.show(
+        message: 'Please upload all required documents (Profile, Certificate & ID Proof)',
+        type: AppSnackBarType.warning,
+      );
+      return;
+    }
+
+    final success = await ref
+        .read(doctorRegisterControllerProvider.notifier)
+        .saveStep6(widget.data);
+
+    if (!mounted) return;
+
+    if (success) {
+      AppSnackBar.show(
+        message: 'Documents uploaded successfully!',
+        type: AppSnackBarType.success,
+      );
+      widget.onNext();
+    } else {
+      final errorMsg = ref.read(doctorRegisterControllerProvider).errorMessage;
+      AppSnackBar.show(
+        message: errorMsg ?? "Step 6 document upload failed. Try again.",
+        type: AppSnackBarType.error,
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final registerState = ref.watch(doctorRegisterControllerProvider);
+
     return StepCard(
       children: [
-         StepTitle(
-          icon: Icons.folder_rounded,
+        StepTitle(
+          icon: Icons.folder_outlined,
           title: 'Upload Documents',
-          color: AppTheme.yoBlue,
+          subtitle: 'Upload required medical credentials and identity proofs',
+          color: colorScheme.primary,
         ),
         const SizedBox(height: 24),
-        UploadBox(
-          icon: Icons.camera_alt_rounded,
-          label: 'Profile Picture *',
+
+        _buildDocumentTile(
           field: 'profile',
-          uploadedFile: _getFile('profile'),
-          onTap: () => _simulateUpload('profile'),
+          label: 'Profile Picture *',
+          icon: Icons.camera_alt_outlined,
+          description: 'Clear photo showing face clearly (JPG, PNG)',
         ),
         const SizedBox(height: 14),
-        UploadBox(
-          icon: Icons.description_rounded,
-          label: 'Medical Registration Certificate *',
+        _buildDocumentTile(
           field: 'certificate',
-          uploadedFile: _getFile('certificate'),
-          onTap: () => _simulateUpload('certificate'),
+          label: 'Medical Registration Certificate *',
+          icon: Icons.verified_outlined,
+          description: 'Official degree or state council certificate (PDF, Image)',
         ),
         const SizedBox(height: 14),
-        UploadBox(
-          icon: Icons.badge_rounded,
-          label: 'Government ID Proof *',
+        _buildDocumentTile(
           field: 'idProof',
-          uploadedFile: _getFile('idProof'),
-          onTap: () => _simulateUpload('idProof'),
+          label: 'Government ID Proof *',
+          icon: Icons.badge_outlined,
+          description: 'Aadhaar Card, PAN Card, or Passport (PDF, Image)',
         ),
         const SizedBox(height: 14),
-        UploadBox(
-          icon: Icons.business_rounded,
-          label: 'Clinic Establishment Proof (Optional)',
+        _buildDocumentTile(
           field: 'clinicProof',
-          uploadedFile: _getFile('clinicProof'),
-          onTap: () => _simulateUpload('clinicProof'),
+          label: 'Clinic Establishment Proof (Optional)',
+          icon: Icons.business_outlined,
+          description: 'Electricity bill, registration, or lease deed',
         ),
-        const SizedBox(height: 20),
+
+        const SizedBox(height: 24),
         const InfoBox(
           text:
-              'All documents are encrypted and stored securely. Access is restricted to admin verification only.',
+          'All documents are encrypted and stored securely. Access is restricted to official verification admins only.',
         ),
         const SizedBox(height: 28),
+
         NavButtons(
           onBack: widget.onBack,
-          onNext: () {
-            if (widget.data.profileFile == null ||
-                widget.data.certificateFile == null ||
-                widget.data.idProofFile == null) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Text('Please upload all required documents'),
-                  backgroundColor: AppTheme.error,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              );
-              return;
-            }
-            widget.onNext();
-          },
+          onNext: registerState.isLoading ? null : _handleNext,
         ),
       ],
     );
   }
-}
 
+  Widget _buildDocumentTile({
+    required String field,
+    required String label,
+    required IconData icon,
+    required String description,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final fileName = _getFileName(field);
+    final isUploaded = fileName != null;
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: isUploaded
+            ? colorScheme.primary.transparency(0.06)
+            : colorScheme.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isUploaded
+              ? colorScheme.primary
+              : colorScheme.outlineVariant.transparency(0.5),
+          width: isUploaded ? 1.5 : 1.2,
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: isUploaded
+                  ? colorScheme.primary
+                  : colorScheme.surface,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              isUploaded ? Icons.check_rounded : icon,
+              color: isUploaded
+                  ? colorScheme.onPrimary
+                  : colorScheme.primary,
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: colorScheme.onSurface,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  isUploaded ? fileName : description,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: textTheme.bodySmall?.copyWith(
+                    color: isUploaded
+                        ? colorScheme.primary
+                        : colorScheme.onSurfaceVariant,
+                    fontWeight: isUploaded ? FontWeight.w600 : FontWeight.normal,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          if (isUploaded)
+            IconButton(
+              icon: Icon(
+                Icons.cancel_rounded,
+                color: colorScheme.error.transparency(0.8),
+                size: 22,
+              ),
+              onPressed: () => _removeFile(field),
+              tooltip: 'Remove document',
+            )
+          else
+            TextButton(
+              onPressed: () => _pickFile(field),
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: const Text('Upload'),
+            ),
+        ],
+      ),
+    );
+  }
+}

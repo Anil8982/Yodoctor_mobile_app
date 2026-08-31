@@ -1,5 +1,6 @@
+import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
-import 'package:yodoctor/core/models/patient/family_member.dart';
+import '../../../models/family/family_member_model.dart';
 
 class PatientSelectionSection extends StatelessWidget {
   const PatientSelectionSection({
@@ -13,18 +14,23 @@ class PatientSelectionSection extends StatelessWidget {
   });
 
   final bool isSelf;
-  final List<FamilyMember> familyMembers;
-  final FamilyMember? selectedFamilyMember;
-  final ValueChanged<bool> onProfileTypeChanged;
-  final ValueChanged<FamilyMember?> onMemberChanged;
-  final VoidCallback onAddFamilyPressed;
+  final List<FamilyMemberModel> familyMembers;
+  final FamilyMemberModel? selectedFamilyMember;
+  final ValueChanged<bool>? onProfileTypeChanged;
+  final ValueChanged<FamilyMemberModel?>? onMemberChanged;
+  final VoidCallback? onAddFamilyPressed;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
-
+    final currentSelectedFamilyMember =
+    familyMembers.any((member) => member.id == selectedFamilyMember?.id)
+        ? familyMembers.firstWhere(
+          (member) => member.id == selectedFamilyMember?.id,
+    )
+        : null;
     return Column(
       children: [
         Row(
@@ -34,7 +40,9 @@ class PatientSelectionSection extends StatelessWidget {
                 label: 'For Self',
                 icon: Icons.person_rounded,
                 isSelected: isSelf,
-                onTap: () => onProfileTypeChanged(true),
+                onTap: onProfileTypeChanged != null
+                    ? () => onProfileTypeChanged!(true)
+                    : null,
                 colorScheme: colorScheme,
                 textTheme: textTheme,
               ),
@@ -45,7 +53,9 @@ class PatientSelectionSection extends StatelessWidget {
                 label: 'Family Member',
                 icon: Icons.group_rounded,
                 isSelected: !isSelf,
-                onTap: () => onProfileTypeChanged(false),
+                onTap: onProfileTypeChanged != null
+                    ? () => onProfileTypeChanged!(false)
+                    : null,
                 colorScheme: colorScheme,
                 textTheme: textTheme,
               ),
@@ -54,45 +64,62 @@ class PatientSelectionSection extends StatelessWidget {
         ),
         if (!isSelf) ...[
           const SizedBox(height: 14),
-          Row(
-            children: [
-              Expanded(
-                child: DropdownButtonFormField<FamilyMember>(
-                  initialValue: selectedFamilyMember,
-                  hint: const Text('Choose Member'),
-                  decoration: InputDecoration(
-                    fillColor: colorScheme.surfaceContainerLow,
-                    filled: true,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide(color: colorScheme.outlineVariant),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide(color: colorScheme.outlineVariant.withValues(alpha: 0.6)),
-                    ),
-                  ),
-                  items: familyMembers.map((member) {
-                    return DropdownMenuItem<FamilyMember>(
-                      value: member,
-                      child: Text(member.name, style: textTheme.bodyLarge),
-                    );
-                  }).toList(),
-                  onChanged: onMemberChanged,
-                ),
-              ),
-              const SizedBox(width: 12),
-              IconButton.filledTonal(
+
+          if (familyMembers.isEmpty)
+            Center(
+              child: FilledButton.icon(
                 onPressed: onAddFamilyPressed,
-                style: IconButton.styleFrom(
-                  padding: const EdgeInsets.all(14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                ),
-                icon: const Icon(Icons.person_add_alt_1_rounded),
+                icon: const Icon(Icons.person_add),
+                label: const Text("Add Family Member"),
               ),
-            ],
-          ),
+            )
+          else
+            Row(
+              children: [
+                Expanded(
+                  child: DropdownButtonFormField<FamilyMemberModel>(
+                    initialValue: currentSelectedFamilyMember,
+                    hint: const Text("Choose Member"),
+                    decoration: InputDecoration(
+                      fillColor: onMemberChanged == null
+                          ? colorScheme.surfaceContainerHighest.transparency(
+                        0.3,
+                      )
+                          : colorScheme.surfaceContainerLow,
+                      filled: true,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide.none,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                    items: familyMembers.map((member) {
+                      return DropdownMenuItem<FamilyMemberModel>(
+                        value: member,
+                        child: Text(member.fullName),
+                      );
+                    }).toList(),
+                    onChanged: onMemberChanged,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                IconButton.filledTonal(
+                  onPressed: onAddFamilyPressed,
+                  icon: const Icon(Icons.person_add_alt_1_rounded),
+                ),
+              ],
+            ),
         ],
       ],
     );
@@ -102,7 +129,7 @@ class PatientSelectionSection extends StatelessWidget {
     required String label,
     required IconData icon,
     required bool isSelected,
-    required VoidCallback onTap,
+    required VoidCallback? onTap,
     required ColorScheme colorScheme,
     required TextTheme textTheme,
   }) {
@@ -113,12 +140,12 @@ class PatientSelectionSection extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
         decoration: BoxDecoration(
-          color: isSelected ? colorScheme.primaryContainer : colorScheme.surfaceContainerLow,
+          color: onTap == null
+              ? colorScheme.surfaceContainerHighest.transparency(0.2)
+              : (isSelected
+              ? colorScheme.primary
+              : colorScheme.surfaceContainerLow),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: isSelected ? colorScheme.primary : colorScheme.outlineVariant.withValues(alpha: 0),
-            width: 1.5,
-          ),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -126,7 +153,11 @@ class PatientSelectionSection extends StatelessWidget {
             Icon(
               icon,
               size: 18,
-              color: isSelected ? colorScheme.primary : colorScheme.onSurfaceVariant,
+              color: isSelected && onTap != null
+                  ? colorScheme.onPrimary
+                  : colorScheme.onSurfaceVariant.transparency(
+                onTap == null ? 0.4 : 1.0,
+              ),
             ),
             const SizedBox(width: 8),
             Flexible(
@@ -135,7 +166,11 @@ class PatientSelectionSection extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: textTheme.labelLarge?.copyWith(
                   fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
-                  color: isSelected ? colorScheme.primary : colorScheme.onSurfaceVariant,
+                  color: isSelected && onTap != null
+                      ? colorScheme.onPrimary
+                      : colorScheme.onSurfaceVariant.transparency(
+                    onTap == null ? 0.4 : 1.0,
+                  ),
                 ),
               ),
             ),

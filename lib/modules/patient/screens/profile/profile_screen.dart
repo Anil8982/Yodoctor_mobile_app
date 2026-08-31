@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:yodoctor/modules/patient/controllers/profile_controller.dart';
-import '../../../../core/theme/app_theme.dart';
+import 'package:yodoctor/core/constants/log_tags.dart';
+import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:yodoctor/modules/widgets/app_header.dart';
+import '../../controllers/profile_controller.dart';
 import '../../../../core/utils/app_spacing.dart';
 import 'widgets/profile_header.dart';
 import 'widgets/profile_info_card.dart';
@@ -15,33 +17,41 @@ class ProfileScreen extends ConsumerStatefulWidget {
 }
 
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
+  final _formKey = GlobalKey<FormState>();
   bool isEditing = false;
+  String? _selectedImagePath;
+  bool _removeProfileImage = false;
+  static const String _subTag = 'ProfileScreen';
 
-  void toggleEdit() => setState(() => isEditing = !isEditing);
+  void toggleEdit() {
+    setState(() => isEditing = !isEditing);
+    AppLogger.info(
+      'Toggle edit mode: $isEditing',
+      tag: LogTags.ui,
+      subTag: _subTag,
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    AppLogger.info(
+      'ProfileScreen Initialized',
+      tag: LogTags.ui,
+      subTag: _subTag,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-
-    // Watch profile state and read notifier channel directly from Riverpod
-    final profileState = ref.watch(profileProvider);
-    final notifier = ref.read(profileProvider.notifier);
+    final profileState = ref.watch(profileControllerProvider);
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppBar(
-        scrolledUnderElevation: 0,
-        flexibleSpace: DecoratedBox(
-          decoration: BoxDecoration(gradient: AppTheme.patientGradient),
-        ),
-        title: Text(
-          'Profile Settings',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: colorScheme.onPrimary,
-          ),
-        ),
+      appBar: AppHeader(
+        title: 'Profile Settings',
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 12.0),
@@ -61,43 +71,96 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
             ),
           ),
         ],
-        iconTheme: IconThemeData(color: colorScheme.onPrimary),
       ),
-      body: Builder(
-        builder: (context) {
-          // Check async validation states from immutable wrapper safely
-          if (profileState.user == null) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          return Column(
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(AppSpacing.md),
-                  physics: const BouncingScrollPhysics(),
-                  child: Column(
-                    children: [
-                      ProfileHeader(user: profileState.user!, isEditing: isEditing),
-                      const SizedBox(height: 32),
-                      ProfileInfoCard(controller: notifier, isEditing: isEditing),
-                      const SizedBox(height: 24),
-                    ],
+      body: SafeArea(
+        child: profileState.user == null && profileState.isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : Column(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(AppSpacing.md),
+                      physics: const BouncingScrollPhysics(),
+                      child: Column(
+                        children: [
+                          if (profileState.user != null) ...[
+                            ProfileHeader(
+                              user: profileState.user!,
+                              isEditing: isEditing,
+                              selectedImagePath: _selectedImagePath,
+                              removeProfileImage: _removeProfileImage,
+                              onImageSelected: (path) {
+                                setState(() {
+                                  _selectedImagePath = path;
+                                  _removeProfileImage = false;
+                                });
+                              },
+                              onRemoveImage: () {
+                                setState(() {
+                                  _selectedImagePath = null;
+                                  _removeProfileImage = true;
+                                });
+                              },
+                            ),
+                            const SizedBox(height: 32),
+                            Form(
+                              key: _formKey,
+                              child: ProfileInfoCard(
+                                controller: ref.read(
+                                  profileControllerProvider.notifier,
+                                ),
+                                isEditing: isEditing,
+                              ),
+                            ),
+                          ] else if (profileState.errorMessage != null) ...[
+                            Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Text(
+                                  profileState.errorMessage!,
+                                  style: TextStyle(color: colorScheme.error),
+                                ),
+                              ),
+                            ),
+                          ],
+                          const SizedBox(height: 24),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
+                  if (isEditing)
+                    ProfileActionBar(
+                      formKey: _formKey,
+
+                      selectedImagePath: _selectedImagePath,
+
+                      removeProfileImage: _removeProfileImage,
+
+                      onDiscardImageChanges: () {
+                        setState(() {
+                          _selectedImagePath = null;
+                          _removeProfileImage = false;
+                        });
+                      },
+
+                      onComplete: () {
+                        if (!mounted) return;
+
+                        setState(() {
+                          _selectedImagePath = null;
+                          _removeProfileImage = false;
+                          isEditing = false;
+                        });
+                      },
+                    ),
+                ],
               ),
-              if (isEditing)
-                ProfileActionBar(
-                  controller: notifier,
-                  onComplete: () => setState(() => isEditing = false),
-                ),
-            ],
-          );
-        },
       ),
     );
   }

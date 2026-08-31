@@ -1,65 +1,44 @@
 import 'package:flutter/material.dart';
-import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
+import 'package:yodoctor/modules/widgets/app_bottom_nav.dart';
 
-class PatientBottomNav {
-  const PatientBottomNav._();
+class PatientBottomNav extends StatelessWidget {
+  const PatientBottomNav({
+    super.key,
+    required this.currentIndex,
+    required this.onTap,
+  });
 
-  static List<PersistentBottomNavBarItem> navBarItems(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+  final int currentIndex;
+  final ValueChanged<int> onTap;
 
-    return [
-      PersistentBottomNavBarItem(
-        icon: const Icon(Icons.home_rounded),
-        title: "Home",
-        activeColorPrimary: colorScheme.primary,
-        inactiveColorPrimary: colorScheme.onSurfaceVariant,
-      ),
-      PersistentBottomNavBarItem(
-        icon: const Icon(Icons.wallet_membership_rounded),
-        title: "Certificates",
-        activeColorPrimary: colorScheme.primary,
-        inactiveColorPrimary: colorScheme.onSurfaceVariant,
-      ),
-      PersistentBottomNavBarItem(
-        icon: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: colorScheme.primary,
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: colorScheme.primary.withValues(alpha: 0.35),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              )
-            ],
-          ),
-          child: Icon(Icons.qr_code_scanner_rounded, color: colorScheme.onPrimary, size: 26),
+  @override
+  Widget build(BuildContext context) {
+    return AppBottomNav(
+      currentIndex: currentIndex,
+      onTap: onTap,
+      centerWidgetGapIndex: 2,
+      items: const [
+        NavItemData(
+          icon: Icons.home_outlined,
+          activeIcon: Icons.home_rounded,
+          label: "Home",
         ),
-        title: "Scan",
-        activeColorPrimary: colorScheme.primary,
-        inactiveColorPrimary: colorScheme.onSurfaceVariant,
-      ),
-      // PersistentBottomNavBarItem(
-      //   icon: const Icon(Icons.people_rounded),
-      //   title: "Family",
-      //   activeColorPrimary: colorScheme.primary,
-      //   inactiveColorPrimary: colorScheme.onSurfaceVariant,
-      // ),
-
-      PersistentBottomNavBarItem(
-        icon: const Icon(Icons.medical_services_rounded),
-        title: "Services",
-        activeColorPrimary: colorScheme.primary,
-        inactiveColorPrimary: colorScheme.onSurfaceVariant,
-      ),
-
-      PersistentBottomNavBarItem(
-        icon: const Icon(Icons.history_rounded),
-        title: "History",
-        activeColorPrimary: colorScheme.primary,
-        inactiveColorPrimary: colorScheme.onSurfaceVariant,
-      ),
-    ];
+        NavItemData(
+          icon: Icons.wallet_membership_outlined,
+          activeIcon: Icons.wallet_membership_rounded,
+          label: "Certificates",
+        ),
+        NavItemData(
+          icon: Icons.medical_services_outlined,
+          activeIcon: Icons.medical_services_rounded,
+          label: "Services",
+        ),
+        NavItemData(
+          icon: Icons.history_outlined,
+          activeIcon: Icons.history_rounded,
+          label: "History",
+        ),
+      ],
+    );
   }
 }

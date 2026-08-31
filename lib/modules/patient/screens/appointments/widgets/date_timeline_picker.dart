@@ -5,13 +5,13 @@ class DateTimelinePicker extends StatelessWidget {
   const DateTimelinePicker({
     super.key,
     required this.selectedDate,
-    required this.onDateSelected,
-    required this.onCustomDatePick,
+    required this.onDateSelected, // Can accept null during loading
+    required this.onCustomDatePick, // Can accept null during loading
   });
 
   final DateTime selectedDate;
-  final ValueChanged<DateTime> onDateSelected;
-  final VoidCallback onCustomDatePick;
+  final ValueChanged<DateTime>? onDateSelected; // Made nullable
+  final VoidCallback? onCustomDatePick; // Made nullable
 
   @override
   Widget build(BuildContext context) {
@@ -42,18 +42,18 @@ class DateTimelinePicker extends StatelessWidget {
                 return Padding(
                   padding: const EdgeInsets.only(right: 10),
                   child: InkWell(
-                    onTap: () => onDateSelected(date),
+                    onTap: onDateSelected != null ? () => onDateSelected!(date) : null,
                     borderRadius: BorderRadius.circular(16),
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
                       width: 70,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
-                        color: isSelected ? colorScheme.primary : colorScheme.surfaceContainerLow,
+                        // Dim background color if interactions are disabled
+                        color: onDateSelected == null && !isSelected
+                            ? colorScheme.surfaceContainerHighest.transparency(0.2)
+                            : (isSelected ? colorScheme.primary : colorScheme.surfaceContainerLow),
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: isSelected ? colorScheme.primary : colorScheme.outlineVariant.transparency(0.3),
-                        ),
                       ),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
@@ -61,7 +61,9 @@ class DateTimelinePicker extends StatelessWidget {
                           Text(
                             dayLabel,
                             style: textTheme.labelMedium?.copyWith(
-                              color: isSelected ? colorScheme.onPrimary : colorScheme.outline,
+                              color: isSelected
+                                  ? colorScheme.onPrimary
+                                  : colorScheme.onSurfaceVariant.withValues(alpha: onDateSelected == null ? 0.4 : 0.8),
                               fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
                             ),
                           ),
@@ -69,7 +71,9 @@ class DateTimelinePicker extends StatelessWidget {
                           Text(
                             date.day.toString(),
                             style: textTheme.titleMedium?.copyWith(
-                              color: isSelected ? colorScheme.onPrimary : colorScheme.onSurface,
+                              color: isSelected
+                                  ? colorScheme.onPrimary
+                                  : colorScheme.onSurface.withValues(alpha: onDateSelected == null ? 0.4 : 1.0),
                               fontWeight: FontWeight.w900,
                             ),
                           ),
@@ -80,7 +84,7 @@ class DateTimelinePicker extends StatelessWidget {
                 );
               }),
               IconButton.filledTonal(
-                onPressed: onCustomDatePick,
+                onPressed: onCustomDatePick, // Disabled automatically when null
                 style: IconButton.styleFrom(
                   padding: const EdgeInsets.all(16),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),

@@ -6,11 +6,13 @@ class AppointmentBottomBar extends StatelessWidget {
     required this.consultationFee,
     required this.canConfirm,
     required this.onConfirmPressed,
+    this.isLoading = false,
   });
 
   final double consultationFee;
   final bool canConfirm;
-  final VoidCallback onConfirmPressed;
+  final VoidCallback? onConfirmPressed;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
@@ -22,12 +24,6 @@ class AppointmentBottomBar extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        border: Border(
-          top: BorderSide(
-            color: colorScheme.outlineVariant.withValues(alpha: 0.4),
-            width: 1,
-          ),
-        ),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -38,7 +34,7 @@ class AppointmentBottomBar extends StatelessWidget {
               Text(
                 'Consultation Fee',
                 style: textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.outline,
+                  color: colorScheme.onSurfaceVariant,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -55,14 +51,23 @@ class AppointmentBottomBar extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: FilledButton(
-              onPressed: canConfirm ? onConfirmPressed : null,
+              onPressed: (canConfirm && !isLoading) ? onConfirmPressed : null,
               style: FilledButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),
-              child: const Text(
+              child: isLoading
+                  ? SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.5,
+                  color: colorScheme.onPrimary,
+                ),
+              )
+                  : const Text(
                 'Confirm Appointment',
                 style: TextStyle(
                   fontWeight: FontWeight.w900,
@@ -75,7 +80,7 @@ class AppointmentBottomBar extends StatelessWidget {
           Text(
             'Payable at clinic during visit',
             style: textTheme.bodySmall?.copyWith(
-              color: colorScheme.outline,
+              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
               fontStyle: FontStyle.italic,
             ),
           ),

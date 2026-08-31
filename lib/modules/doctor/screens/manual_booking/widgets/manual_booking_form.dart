@@ -1,25 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
+import 'package:yodoctor/modules/widgets/app_field_wrapper.dart';
+import 'package:yodoctor/modules/widgets/app_text_field.dart';
 
 class ManualBookingForm extends StatelessWidget {
   const ManualBookingForm({
     super.key,
     required this.formKey,
+    required this.autovalidateMode,
     required this.patientNameController,
     required this.mobileController,
     required this.ageController,
     required this.selectedShift,
     required this.onShiftChanged,
     required this.onSubmit,
+    required this.loading,
   });
 
   final GlobalKey<FormState> formKey;
+  final AutovalidateMode autovalidateMode;
   final TextEditingController patientNameController;
   final TextEditingController mobileController;
   final TextEditingController ageController;
   final String selectedShift;
   final ValueChanged<String?> onShiftChanged;
   final VoidCallback onSubmit;
+  final bool loading;
 
   @override
   Widget build(BuildContext context) {
@@ -27,51 +35,57 @@ class ManualBookingForm extends StatelessWidget {
 
     return Form(
       key: formKey,
+      autovalidateMode: autovalidateMode,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildInputField(
-            context,
-            controller: patientNameController,
+          AppTextField(
             label: 'PATIENT NAME',
+            isRequired: true,
             hint: 'Enter full name',
-            icon: Icons.person_rounded,
-            requiredField: true,
-            validator: (value) {
-              if (value == null || value.trim().isEmpty) return 'Patient name is required';
+            icon: Icons.person_outline_rounded,
+            controller: patientNameController,
+            textCapitalization: TextCapitalization.words,
+            validator: (v) {
+              if (v == null || v.trim().isEmpty) return 'Full name required';
+              if (v.trim().length < 3) return 'Enter a valid name';
               return null;
             },
           ),
           const SizedBox(height: AppSpacing.xl),
-          _buildInputField(
-            context,
-            controller: mobileController,
+          AppTextField(
             label: 'MOBILE NUMBER',
+            isRequired: true,
             hint: 'Enter 10-digit mobile number',
             icon: Icons.phone_android_rounded,
-            maxLength: 10,
+            controller: mobileController,
             keyboardType: TextInputType.phone,
-            requiredField: true,
-            validator: (value) {
-              final normalized = value?.trim() ?? '';
-              if (normalized.isEmpty) return 'Mobile number is required';
-              if (!RegExp(r'^[0-9]{10}$').hasMatch(normalized)) return 'Enter a valid 10-digit number';
+            maxLength: 10,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            validator: (v) {
+              if (v == null || v.trim().isEmpty) return 'Mobile required';
+              final indianPhoneRegExp = RegExp(r'^[6-9]\d{9}$');
+              if (!indianPhoneRegExp.hasMatch(v.trim())) {
+                return 'Enter a valid 10-digit mobile number';
+              }
               return null;
             },
           ),
           const SizedBox(height: AppSpacing.xl),
-          _buildInputField(
-            context,
-            controller: ageController,
+          AppTextField(
+            isOptional: true,
             label: 'AGE',
             hint: 'Enter patient age (Years)',
             icon: Icons.cake_rounded,
+            controller: ageController,
             keyboardType: TextInputType.number,
-            validator: (value) {
-              final normalized = value?.trim() ?? '';
+            validator: (v) {
+              final normalized = v?.trim() ?? '';
               if (normalized.isEmpty) return null;
               final age = int.tryParse(normalized);
-              if (age == null || age < 1 || age > 120) return 'Enter age between 1 and 120';
+              if (age == null || age < 1 || age > 120) {
+                return 'Enter age between 1 and 120';
+              }
               return null;
             },
           ),
@@ -82,81 +96,35 @@ class ManualBookingForm extends StatelessWidget {
             width: double.infinity,
             height: 54,
             child: FilledButton(
-              onPressed: onSubmit,
+              onPressed: loading ? null : onSubmit,
               style: FilledButton.styleFrom(
                 backgroundColor: colorScheme.primary,
                 foregroundColor: colorScheme.onPrimary,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
                 elevation: 0,
               ),
-              child: const Text(
-                'Confirm Booking',
-                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
-              ),
+              child: loading
+                  ? SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: AppTheme.white,
+                      ),
+                    )
+                  : const Text(
+                      "Confirm Booking",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w900,
+                        fontSize: 16,
+                      ),
+                    ),
             ),
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildInputField(
-      BuildContext context, {
-        required TextEditingController controller,
-        required String label,
-        required String hint,
-        required IconData icon,
-        bool requiredField = false,
-        TextInputType? keyboardType,
-        String? Function(String?)? validator,
-        int? maxLength,
-      }) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildFieldLabel(context, label, requiredField),
-        const SizedBox(height: 8),
-        TextFormField(
-          controller: controller,
-          keyboardType: keyboardType,
-          validator: validator,
-          maxLength: maxLength,
-          style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700, color: colorScheme.onSurface),
-          decoration: InputDecoration(
-            hintText: hint,
-            hintStyle: theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant.withValues(alpha: 0.45)),
-            prefixIcon: Icon(icon, size: 20, color: colorScheme.primary),
-            filled: true,
-            fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
-            contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 16),
-            counterText: '',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
-              borderSide: BorderSide.none,
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
-              borderSide: BorderSide.none,
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
-              borderSide: BorderSide(color: colorScheme.primary, width: 1.5),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
-              borderSide: BorderSide(color: colorScheme.error.withValues(alpha: 0.5), width: 1),
-            ),
-            focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
-              borderSide: BorderSide(color: colorScheme.error, width: 1.5),
-            ),
-            errorStyle: theme.textTheme.labelSmall?.copyWith(color: colorScheme.error, fontWeight: FontWeight.w700),
-          ),
-        ),
-      ],
     );
   }
 
@@ -165,92 +133,70 @@ class ManualBookingForm extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final shifts = ['Morning Shift', 'Evening Shift'];
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildFieldLabel(context, 'SELECT SHIFT', true),
-        const SizedBox(height: 10),
-        Row(
-          children: shifts.map((shift) {
-            final isSelected = selectedShift == shift;
-            final isMorning = shift == 'Morning Shift';
+    return AppFieldWrapper(
+      label: 'SELECT SHIFT',
+      isRequired: true,
+      hasError: false,
+      child: Row(
+        children: shifts.map((shift) {
+          final isSelected = selectedShift == shift;
+          final isMorning = shift == 'Morning Shift';
 
-            return Expanded(
-              child: Padding(
-                padding: EdgeInsets.only(
-                  right: isMorning ? 6 : 0,
-                  left: isMorning ? 0 : 6,
-                ),
-                child: InkWell(
-                  onTap: () => onShiftChanged(shift),
-                  borderRadius: BorderRadius.circular(14),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 180),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    decoration: BoxDecoration(
-                      color: isSelected ? colorScheme.primaryContainer.withValues(alpha: 0.6) : colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(
-                        color: isSelected ? colorScheme.primary : Colors.transparent,
-                        width: isSelected ? 1.5 : 0,
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          isMorning ? Icons.wb_sunny_rounded : Icons.nights_stay_rounded,
-                          size: 16,
-                          color: isSelected ? colorScheme.primary : colorScheme.onSurfaceVariant,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          isMorning ? 'Morning' : 'Evening',
-                          style: theme.textTheme.labelLarge?.copyWith(
-                            fontWeight: FontWeight.w900,
-                            color: isSelected ? colorScheme.primary : colorScheme.onSurfaceVariant,
+          return Expanded(
+            child: Padding(
+              padding: EdgeInsets.only(
+                right: isMorning ? 6 : 0,
+                left: isMorning ? 0 : 6,
+              ),
+              child: InkWell(
+                onTap: () => onShiftChanged(shift),
+                borderRadius: BorderRadius.circular(14),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 180),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? colorScheme.primaryContainer.withValues(alpha: 0.6)
+                        : colorScheme.surfaceContainerHighest.withValues(
+                            alpha: 0.3,
                           ),
-                        ),
-                      ],
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: isSelected
+                          ? colorScheme.primary
+                          : AppTheme.transparent,
+                      width: isSelected ? 1.5 : 0,
                     ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        isMorning
+                            ? Icons.wb_sunny_rounded
+                            : Icons.nights_stay_rounded,
+                        size: 16,
+                        color: isSelected
+                            ? colorScheme.primary
+                            : colorScheme.onSurfaceVariant,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        isMorning ? 'Morning' : 'Evening',
+                        style: theme.textTheme.labelLarge?.copyWith(
+                          fontWeight: FontWeight.w900,
+                          color: isSelected
+                              ? colorScheme.primary
+                              : colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-            );
-          }).toList(),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildFieldLabel(BuildContext context, String label, bool requiredField) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return RichText(
-      text: TextSpan(
-        text: label,
-        style: Theme.of(context).textTheme.labelMedium?.copyWith(
-          color: colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
-          fontWeight: FontWeight.w900,
-          letterSpacing: 0.8,
-          fontSize: 11,
-        ),
-        children: [
-          if (requiredField)
-            TextSpan(
-              text: ' *',
-              style: TextStyle(color: colorScheme.error, fontWeight: FontWeight.w900),
-            )
-          else
-            TextSpan(
-              text: ' (Optional)',
-              style: TextStyle(
-                color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
-                fontWeight: FontWeight.w700,
-                fontSize: 10,
-              ),
             ),
-        ],
+          );
+        }).toList(),
       ),
     );
   }

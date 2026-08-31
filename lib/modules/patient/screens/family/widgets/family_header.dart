@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../core/utils/app_spacing.dart';
-import '../../../../../core/widgets/gradient_background.dart';
 
 class FamilyHeader extends StatelessWidget {
-  const FamilyHeader({
-    super.key,
-    required this.membersCount,
-  });
+  const FamilyHeader({super.key, required this.membersCount});
 
   final int membersCount;
 
@@ -15,37 +11,41 @@ class FamilyHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final TextTheme textTheme = Theme.of(context).textTheme;
-    final double topPadding = MediaQuery.of(context).padding.top;
 
-    return GradientBackground(
-      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(32)),
-      padding: EdgeInsets.fromLTRB(
-        AppSpacing.xl,
-        topPadding + 70,
-        AppSpacing.xl,
-        AppSpacing.xl,
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.xl),
+      decoration: BoxDecoration(
+        color: colorScheme.primary,
+        borderRadius: const BorderRadius.all(
+          Radius.circular(24),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           Text(
-            'Family Members',
-            style: textTheme.headlineMedium?.copyWith(
+            'Family Health Network',
+            style: textTheme.titleLarge?.copyWith(
               color: colorScheme.onPrimary,
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w900,
+              letterSpacing: -0.3,
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 6),
           Text(
-            'Manage health profiles for your loved ones.',
-            style: textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onPrimary.withValues(alpha: 0.9),
+            'Monitor and manage medical data for your linked family profiles.',
+            style: textTheme.bodySmall?.copyWith(
+              color: colorScheme.onPrimary.withValues(alpha: 0.85),
+              height: 1.3,
             ),
           ),
           const SizedBox(height: 14),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 8,
+            ),
             decoration: BoxDecoration(
               color: colorScheme.onPrimary.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(12),
@@ -63,7 +63,7 @@ class FamilyHeader extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  '$membersCount members linked',
+                  '$membersCount profiles active',
                   style: textTheme.bodySmall?.copyWith(
                     color: colorScheme.onPrimary,
                     fontWeight: FontWeight.w700,

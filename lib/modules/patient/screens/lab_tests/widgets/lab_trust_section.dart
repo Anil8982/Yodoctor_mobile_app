@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 
 class LabTrustSection extends StatelessWidget {
   const LabTrustSection({super.key});
@@ -22,7 +23,7 @@ class LabTrustSection extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
         itemCount: items.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        separatorBuilder: (_, _) => const SizedBox(width: 8),
         itemBuilder: (context, index) {
           final item = items[index];
           return Container(
@@ -34,7 +35,7 @@ class LabTrustSection extends StatelessWidget {
             ),
             child: Row(
               children: [
-                Icon(item['icon'] as IconData, color: Colors.orange, size: 20),
+                Icon(item['icon'] as IconData, color: AppTheme.warning(context), size: 20),
                 const SizedBox(width: 8),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -44,12 +45,13 @@ class LabTrustSection extends StatelessWidget {
                       item['title'] as String,
                       style: theme.textTheme.labelMedium?.copyWith(
                         fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurface,
                       ),
                     ),
                     Text(
                       item['desc'] as String,
                       style: theme.textTheme.labelSmall?.copyWith(
-                        color: colorScheme.outline,
+                        color: colorScheme.onSurfaceVariant,
                         fontSize: 9,
                       ),
                     ),

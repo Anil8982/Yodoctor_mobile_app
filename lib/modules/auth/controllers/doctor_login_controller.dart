@@ -1,0 +1,203 @@
+import 'dart:async';
+import 'package:dio/dio.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/core/constants/log_tags.dart';
+import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:yodoctor/core/providers/app_role_provider.dart';
+import 'package:yodoctor/core/providers/storage_provider.dart';
+import 'package:yodoctor/core/session/app_session_controller.dart';
+import 'package:yodoctor/modules/auth/repositories/doctor_auth_repository.dart';
+
+final doctorLoginControllerProvider =
+    AsyncNotifierProvider<DoctorLoginController, Map<String, dynamic>?>(
+      DoctorLoginController.new,
+    );
+
+class DoctorLoginController extends AsyncNotifier<Map<String, dynamic>?> {
+  static const String _subTag = 'DoctorLoginController';
+
+  @override
+  FutureOr<Map<String, dynamic>?> build() => null;
+
+  Future<Map<String, dynamic>?> login({
+    required String identifier,
+    required String password,
+  }) async {
+    AppLogger.info(
+      'Initiating doctor email credential verification sequence',
+      tag: LogTags.auth,
+      subTag: _subTag,
+    );
+    state = const AsyncLoading();
+
+    try {
+      final repository = ref.read(doctorAuthRepositoryProvider);
+      final response = await repository.login(
+        identifier: identifier,
+        password: password,
+      );
+      final statusCode = response.statusCode ?? 0;
+
+      if (statusCode >= 200 && statusCode < 300) {
+        final data = response.data;
+        final redirect = data["redirect"];
+        final token = data["data"]?["token"];
+
+        if (token != null) {
+          final status = data["status"];
+
+          AppLogger.info(
+            'Login API Response Status: $status',
+            tag: LogTags.auth,
+            subTag: _subTag,
+          );
+
+          if (redirect == "resume") {
+            await repository.saveRegistrationToken(token);
+
+            AppLogger.success(
+              'Temporary Registration Token captured',
+              tag: LogTags.auth,
+              subTag: _subTag,
+            );
+          } else {
+            await repository.saveSessionToken(token);
+            await repository.saveUserRole('doctor');
+            await repository.saveStatus(status);
+
+            final storage = ref.read(storageProvider);
+            await storage.saveActiveSubscription(false);
+
+            ref.read(appRoleProvider.notifier).setRole(AppRole.doctor);
+
+            if (status == "APPROVED") {
+              AppLogger.success(
+                'JWT Master active session token and role cached',
+                tag: LogTags.auth,
+                subTag: _subTag,
+              );
+            } else {
+              AppLogger.warning(
+                'Login allowed but account status is: $status',
+                tag: LogTags.auth,
+                subTag: _subTag,
+              );
+            }
+          }
+        }
+
+        final redirectPayload = {
+          "redirect": data["redirect"],
+          "status": data["status"],
+          "nextStep": data["nextStep"],
+          "message": data["message"],
+        };
+
+        state = AsyncData(redirectPayload);
+        return redirectPayload;
+      } else {
+        final msg = response.data?["message"] ?? "Authentication Rejected";
+        state = AsyncError(msg, StackTrace.current);
+        return null;
+      }
+    } catch (e, st) {
+      String message = 'Something went wrong';
+
+      if (e is DioException) {
+        final statusCode = e.response?.statusCode;
+
+        if (statusCode == 401) {
+          message = e.response?.data?['message'] ?? 'Invalid email or password';
+        } else if (statusCode == 404) {
+          message = 'Account not found';
+        } else if (statusCode == 500) {
+          message = 'Server error. Please try again later';
+        } else {
+          message = e.response?.data?['message'] ?? 'Request failed';
+        }
+      }
+
+      state = AsyncError(message, st);
+
+      AppLogger.exception(
+        e,
+        st,
+        message: 'Fatal crash within session gate login wire',
+        tag: LogTags.auth,
+        subTag: _subTag,
+      );
+
+      return null;
+    }
+  }
+
+  Future<void> logout() async {
+    state = const AsyncLoading();
+
+    try {
+      await ref.read(appSessionProvider).logout(AppRole.doctor);
+
+      state = const AsyncData(null);
+
+      AppLogger.success(
+        'Doctor logout completed successfully',
+        tag: LogTags.auth,
+        subTag: _subTag,
+      );
+    } catch (e, st) {
+      state = AsyncError(e, st);
+
+      AppLogger.exception(
+        e,
+        st,
+        message: 'Doctor logout failed',
+        tag: LogTags.auth,
+        subTag: _subTag,
+      );
+    }
+  }
+
+  // Future<void> logout() async {
+  //   state = const AsyncLoading();
+  //   try {
+  //     final repository = ref.read(doctorAuthRepositoryProvider);
+  //     await repository.clearAuthSession();
+  //
+  //     // 1. Reset runtime verification and status notifiers
+  //     ref.read(doctorStatusProvider.notifier).reset();
+  //     ref.read(subscriptionStatusProvider.notifier).reset();
+  //
+  //     // 2. Invalidate all Doctor modules and controllers to clear old session data
+  //     ref.invalidate(doctorSubscriptionProvider);
+  //     ref.invalidate(incomingAppointmentProvider);
+  //     ref.invalidate(appointmentHistoryProvider);
+  //     ref.invalidate(doctorCertificateProvider);
+  //     ref.invalidate(doctorCertificateReviewProvider);
+  //     ref.invalidate(doctorDashboardProvider);
+  //     ref.invalidate(doctorQrProvider);
+  //     ref.invalidate(doctorProfileProvider);
+  //     ref.invalidate(manualBookingProvider);
+  //
+  //     // 3. Clear application role state
+  //     ref.read(appRoleProvider.notifier).clearRole();
+  //
+  //     state = const AsyncData(null);
+  //     AppLogger.success(
+  //       'Doctor control profile session tokens and controllers terminated successfully',
+  //       tag: LogTags.auth,
+  //       subTag: _subTag,
+  //     );
+  //   } catch (e, st) {
+  //     state = AsyncError(e, st);
+  //     AppLogger.exception(
+  //       e,
+  //       st,
+  //       message: 'Session clear failure sequence intercept',
+  //       tag: LogTags.auth,
+  //       subTag: _subTag,
+  //     );
+  //   }
+  // }
+}
+
+

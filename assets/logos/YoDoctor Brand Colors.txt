@@ -1,0 +1,25 @@
+YoDoctor Brand Colors
+
+Primary Blue:
+#1976D2
+
+Healthcare Green:
+#34C759
+
+Background Color:
+#EEF7FF
+
+Recommended Usage:
+- Background: #EEF7FF
+- Stethoscope Icon: #1976D2
+- "Yo" Text: #1976D2
+- "Doctor" Text: #34C759
+- Tagline: #1976D2
+- Circular Rings/Borders: #1976D2 with 20-40% opacity variations
+
+Design Style:
+- Clean Healthcare Branding
+- Modern Medical-Tech Appearance
+- Minimal & Professional
+- High Contrast
+- App Store & Play Store Ready

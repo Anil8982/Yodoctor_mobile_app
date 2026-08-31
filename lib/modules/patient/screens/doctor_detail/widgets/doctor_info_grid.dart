@@ -1,11 +1,11 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
-import '../../../../../core/models/patient/doctor_profile.dart';
+import '../../../models/search/doctor_detail_model.dart';
 
 class DoctorInfoGrid extends StatelessWidget {
   const DoctorInfoGrid({super.key, required this.doctor});
 
-  final DoctorProfile doctor;
+  final DoctorDetailModel doctor;
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +16,7 @@ class DoctorInfoGrid extends StatelessWidget {
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: colorScheme.outlineVariant.transparency(0.35),
+          color: colorScheme.outlineVariant.transparency(.35),
           width: 1.2,
         ),
       ),
@@ -27,68 +27,101 @@ class DoctorInfoGrid extends StatelessWidget {
               Expanded(
                 child: _CompactItem(
                   icon: Icons.local_hospital_rounded,
-                  label: 'Clinic Name',
-                  value: doctor.hospital,
+                  label: "Clinic Name",
+                  value: doctor.clinicName,
                 ),
               ),
-              Container(width: 1, height: 45, color: colorScheme.outlineVariant.transparency(0.25)), // उभा डिव्हायडर
+              Container(
+                width: 1,
+                height: 45,
+                color: colorScheme.outlineVariant.transparency(.25),
+              ),
               Expanded(
                 child: _CompactItem(
                   icon: Icons.location_city_rounded,
-                  label: 'City',
-                  value: doctor.location,
+                  label: "City",
+                  value: doctor.city,
                 ),
               ),
             ],
           ),
-          Divider(height: 1, thickness: 1, color: colorScheme.outlineVariant.transparency(0.25)), // आडवा डिव्हायडर
+
+          Divider(
+            height: 1,
+            thickness: 1,
+            color: colorScheme.outlineVariant.transparency(.25),
+          ),
 
           Row(
             children: [
               Expanded(
                 child: _CompactItem(
                   icon: Icons.map_rounded,
-                  label: 'Address',
-                  value: 'Ashoka Garden',
+                  label: "Address",
+                  value: doctor.address,
                 ),
               ),
-              Container(width: 1, height: 45, color: colorScheme.outlineVariant.transparency(0.25)),
+              Container(
+                width: 1,
+                height: 45,
+                color: colorScheme.outlineVariant.transparency(.25),
+              ),
               Expanded(
                 child: _CompactItem(
                   icon: Icons.badge_rounded,
-                  label: 'License No',
-                  value: 'MPM123456',
+                  label: "License No",
+                  value: doctor.licenseNumber,
                 ),
               ),
             ],
           ),
-          Divider(height: 1, thickness: 1, color: colorScheme.outlineVariant.transparency(0.25)),
+
+          Divider(
+            height: 1,
+            thickness: 1,
+            color: colorScheme.outlineVariant.transparency(.25),
+          ),
 
           Row(
             children: [
               Expanded(
                 child: _CompactItem(
-                  icon: Icons.payments_rounded,
-                  label: 'Consultation Fee',
-                  value: '₹${doctor.consultationFee.toStringAsFixed(0)}',
+                  icon: Icons.wb_sunny_rounded,
+                  label: "Morning",
+                  value: doctor.sessionTimings.morning.isEmpty
+                      ? "Not Available"
+                      : doctor.sessionTimings.morning,
                 ),
               ),
-              Container(width: 1, height: 45, color: colorScheme.outlineVariant.transparency(0.25)),
+              Container(
+                width: 1,
+                height: 45,
+                color: colorScheme.outlineVariant.transparency(.25),
+              ),
               Expanded(
                 child: _CompactItem(
-                  icon: Icons.access_time_filled_rounded,
-                  label: 'Timings',
-                  value: doctor.availableSlot.isNotEmpty ? doctor.availableSlot : '15 mins',
+                  icon: Icons.nights_stay_rounded,
+                  label: "Evening",
+                  value: doctor.sessionTimings.evening.isEmpty
+                      ? "Not Available"
+                      : doctor.sessionTimings.evening,
                 ),
               ),
             ],
           ),
-          Divider(height: 1, thickness: 1, color: colorScheme.outlineVariant.transparency(0.25)),
+
+          Divider(
+            height: 1,
+            thickness: 1,
+            color: colorScheme.outlineVariant.transparency(.25),
+          ),
 
           _CompactItem(
             icon: Icons.calendar_month_rounded,
-            label: 'Available Days',
-            value: 'Mon, Tue, Wed, Thu, Fri, Sat, Sun',
+            label: "Available Days",
+            value: doctor.availableDays.isEmpty
+                ? "Not Available"
+                : doctor.availableDays.join(", "),
             isFullWidth: true,
           ),
         ],

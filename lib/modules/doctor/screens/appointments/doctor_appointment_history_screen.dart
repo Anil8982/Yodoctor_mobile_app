@@ -1,12 +1,11 @@
-import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:yodoctor/modules/doctor/models/appointment/appointment_history_item.dart';
+import 'package:yodoctor/modules/widgets/status_chip.dart';
 
 import '../../../../core/utils/app_spacing.dart';
-import '../../../../core/utils/dummy_data.dart';
 import '../../../../core/utils/responsive.dart';
-import '../../widgets/doctor_drawer.dart';
 import '../../widgets/doctor_sliver_app_bar.dart';
 
 import '../../controllers/appointment_history_controller.dart';
@@ -18,11 +17,12 @@ class DoctorAppointmentHistoryScreen extends ConsumerStatefulWidget {
   const DoctorAppointmentHistoryScreen({super.key});
 
   @override
-  ConsumerState<DoctorAppointmentHistoryScreen> createState() => _DoctorAppointmentHistoryScreenState();
+  ConsumerState<DoctorAppointmentHistoryScreen> createState() =>
+      _DoctorAppointmentHistoryScreenState();
 }
 
-class _DoctorAppointmentHistoryScreenState extends ConsumerState<DoctorAppointmentHistoryScreen> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+class _DoctorAppointmentHistoryScreenState
+    extends ConsumerState<DoctorAppointmentHistoryScreen> {
   final TextEditingController _searchController = TextEditingController();
 
   @override
@@ -32,26 +32,32 @@ class _DoctorAppointmentHistoryScreenState extends ConsumerState<DoctorAppointme
   }
 
   @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(appointmentHistoryProvider.notifier).loadHistory();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final double horizontalPadding = Responsive.horizontalPadding(context);
-
     final historyState = ref.watch(appointmentHistoryProvider);
     final historyNotifier = ref.read(appointmentHistoryProvider.notifier);
     final filteredAppointments = historyNotifier.getFilteredHistory();
 
-    return Scaffold(
-      key: _scaffoldKey,
-      backgroundColor: colorScheme.surfaceContainer,
-      extendBodyBehindAppBar: true,
-      drawer: const DoctorDrawer(doctor: DummyData.currentDoctorProfile),
-      body: NestedScrollView(
+    return Container(
+      color: colorScheme.surfaceContainerLow,
+      child: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
             DoctorSliverAppBar(
+              titleText: 'Appointment History',
               expandedHeight: 140.0,
-              scaffoldKey: _scaffoldKey,
+
               background: FlexibleSpaceBar(
                 title: Text(
                   'Appointment History',
@@ -91,7 +97,9 @@ class _DoctorAppointmentHistoryScreenState extends ConsumerState<DoctorAppointme
                           HistoryToolbar(
                             selectedFilter: historyState.selectedFilter,
                             searchController: _searchController,
-                            onFilterChanged: historyNotifier.setFilter,
+                            onFilterChanged: (filter) {
+                              historyNotifier.setFilter(filter);
+                            },
                             onSearchChanged: historyNotifier.setSearchQuery,
                           ),
                           const SizedBox(height: AppSpacing.lg),
@@ -130,6 +138,16 @@ class _DoctorAppointmentHistoryScreenState extends ConsumerState<DoctorAppointme
 
   Widget _buildPatientIdentity(AppointmentHistoryItem appointment) {
     final colorScheme = Theme.of(context).colorScheme;
+
+    // Safely resolve patient name
+    final parsedName = _patientName(appointment.patientLabel);
+    final displayName = parsedName.isNotEmpty ? parsedName : 'Unknown Patient';
+
+    // Safe initial - prevents RangeError on empty string
+    final initial = displayName.isNotEmpty
+        ? displayName.substring(0, 1).toUpperCase()
+        : '?';
+
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -137,8 +155,11 @@ class _DoctorAppointmentHistoryScreenState extends ConsumerState<DoctorAppointme
           radius: 22,
           backgroundColor: colorScheme.primaryContainer,
           child: Text(
-            _patientName(appointment.patientLabel).substring(0, 1).toUpperCase(),
-            style: TextStyle(color: colorScheme.primary, fontWeight: FontWeight.w900),
+            initial,
+            style: TextStyle(
+              color: colorScheme.primary,
+              fontWeight: FontWeight.w900,
+            ),
           ),
         ),
         const SizedBox(width: AppSpacing.sm),
@@ -146,7 +167,7 @@ class _DoctorAppointmentHistoryScreenState extends ConsumerState<DoctorAppointme
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              _patientName(appointment.patientLabel),
+              displayName,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurface,
                 fontWeight: FontWeight.w800,
@@ -168,7 +189,10 @@ class _DoctorAppointmentHistoryScreenState extends ConsumerState<DoctorAppointme
   Widget _buildTokenChip(String token) {
     final colorScheme = Theme.of(context).colorScheme;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.xs,
+      ),
       decoration: BoxDecoration(
         color: colorScheme.primaryContainer.withValues(alpha: 0.55),
         borderRadius: BorderRadius.circular(99),
@@ -185,44 +209,22 @@ class _DoctorAppointmentHistoryScreenState extends ConsumerState<DoctorAppointme
   }
 
   Widget _buildStatusChip(String status) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final statusUpper = status.toUpperCase();
-    final completed = statusUpper == 'COMPLETED';
-    final cancelled = statusUpper == 'CANCELLED';
+    final resolvedStatus = status.isNotEmpty
+        ? status[0].toUpperCase() + status.substring(1)
+        : 'Pending';
 
-    final foreground = completed
-        ? colorScheme.secondary
-        : cancelled
-        ? colorScheme.error
-        : Colors.orange;
-
-    final background = completed
-        ? colorScheme.secondaryContainer
-        : cancelled
-        ? colorScheme.errorContainer
-        : Colors.orange.transparency(0.15);
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
-      decoration: BoxDecoration(
-        color: background,
-        borderRadius: BorderRadius.circular(99),
-        border: Border.all(color: foreground.withValues(alpha: 0.2)),
-      ),
-      child: Text(
-        status,
-        style: Theme.of(context).textTheme.labelMedium?.copyWith(
-          color: foreground,
-          fontWeight: FontWeight.w800,
-        ),
-      ),
+    return StatusChip(
+      status: resolvedStatus,
     );
   }
 
   Widget _buildInfoChip(IconData icon, String label) {
     final colorScheme = Theme.of(context).colorScheme;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.xs,
+      ),
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(99),
@@ -238,61 +240,11 @@ class _DoctorAppointmentHistoryScreenState extends ConsumerState<DoctorAppointme
     );
   }
 
-  // void _openPrescription(AppointmentHistoryItem appointment) {
-  //   showModalBottomSheet<void>(
-  //     context: context,
-  //     showDragHandle: true,
-  //     builder: (context) {
-  //       final theme = Theme.of(context);
-  //       final colorScheme = theme.colorScheme;
-  //
-  //       return Padding(
-  //         padding: const EdgeInsets.fromLTRB(AppSpacing.xl, 0, AppSpacing.xl, AppSpacing.xxl),
-  //         child: Column(
-  //           mainAxisSize: MainAxisSize.min,
-  //           children: [
-  //             Icon(Icons.receipt_long_rounded, size: 44, color: colorScheme.primary),
-  //             const SizedBox(height: AppSpacing.md),
-  //             Text(
-  //               'Prescription',
-  //               style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900),
-  //             ),
-  //             const SizedBox(height: AppSpacing.xs),
-  //             Text(
-  //               'Create a prescription for ${_patientName(appointment.patientLabel)}.',
-  //               textAlign: TextAlign.center,
-  //               style: theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
-  //             ),
-  //             const SizedBox(height: AppSpacing.xl),
-  //             SizedBox(
-  //               width: double.infinity,
-  //               child: FilledButton.icon(
-  //                 onPressed: () {
-  //                   Navigator.pop(context);
-  //                   _showMessage('Prescription editor coming soon');
-  //                 },
-  //                 icon: const Icon(Icons.add_rounded),
-  //                 label: const Text('Create Prescription'),
-  //               ),
-  //             ),
-  //           ],
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
-
   void _openPrescription(AppointmentHistoryItem appointment) {
     context.push(
       '/doctor/add-prescription/${appointment.id}?name=${Uri.encodeComponent(appointment.patientLabel)}&token=${Uri.encodeComponent(appointment.tokenNumber)}',
     );
   }
-  //
-  // void _showMessage(String message) {
-  //   ScaffoldMessenger.of(context).showSnackBar(
-  //     SnackBar(content: Text(message)),
-  //   );
-  // }
 
   String _patientName(String label) {
     return label.replaceAll(RegExp(r'\s*\([^)]*\)'), '').trim();
@@ -319,12 +271,16 @@ class _EmptyHistory extends StatelessWidget {
           const SizedBox(height: AppSpacing.md),
           Text(
             'No appointments found',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900),
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900),
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
             'Try another date filter or patient name.',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
           ),
         ],
       ),
