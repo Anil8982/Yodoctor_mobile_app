@@ -110,7 +110,7 @@ class _DoctorLoginScreenState extends ConsumerState<DoctorLoginScreen>
     final loginState = ref.watch(doctorLoginControllerProvider);
 
     return Scaffold(
-      backgroundColor: colorScheme.surfaceContainerLow,
+      backgroundColor: colorScheme.surfaceContainer,
       body: GestureDetector(
         behavior: HitTestBehavior.translucent,
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),

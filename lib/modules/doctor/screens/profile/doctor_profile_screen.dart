@@ -39,7 +39,7 @@ class _DoctorProfileScreenState extends ConsumerState<DoctorProfileScreen> {
     }
 
     return Scaffold(
-      backgroundColor: colorScheme.surfaceContainerLow,
+      backgroundColor: colorScheme.surfaceContainer,
       body: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [

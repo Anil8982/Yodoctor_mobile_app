@@ -55,12 +55,13 @@ class _DoctorCertificateDashboardScreenState
     final notifier = ref.read(doctorCertificateProvider.notifier);
     final filteredCerts = notifier.filteredCertificates;
 
-    final isLoading = certificateState.loading &&
+    final isLoading =
+        certificateState.loading &&
         certificateState.pendingCertificates.isEmpty &&
         certificateState.issuedCertificates.isEmpty;
 
     return Container(
-      color: colorScheme.surfaceContainerLow,
+      color: colorScheme.surfaceContainer,
 
       child: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) {
@@ -154,7 +155,7 @@ class _DoctorCertificateDashboardScreenState
                                   CertificateListCards(
                                     certificates: filteredCerts,
                                     isIssuedTab:
-                                    certificateState.activeTabIndex == 1,
+                                        certificateState.activeTabIndex == 1,
                                   ),
                               ],
                             ],

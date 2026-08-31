@@ -145,7 +145,7 @@ class _Step7DeclarationState extends ConsumerState<Step7Declaration> {
                   decoration: BoxDecoration(
                     color: checked
                         ? colorScheme.primary.transparency(0.06)
-                        : colorScheme.surfaceContainerLow,
+                        : colorScheme.surfaceContainer,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color: checked

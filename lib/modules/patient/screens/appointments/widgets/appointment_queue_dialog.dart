@@ -6,9 +6,9 @@ import 'package:yodoctor/modules/widgets/app_dialog.dart';
 
 class AppointmentQueueDialog {
   static void show(
-      BuildContext context, {
-        required AppointmentQueueInfo queueInfo,
-      }) {
+    BuildContext context, {
+    required AppointmentQueueInfo queueInfo,
+  }) {
     final theme = Theme.of(context);
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = theme.textTheme;
@@ -46,7 +46,7 @@ class AppointmentQueueDialog {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 16),
               decoration: BoxDecoration(
-                color: colorScheme.surfaceContainerLow,
+                color: colorScheme.surfaceContainer,
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Column(

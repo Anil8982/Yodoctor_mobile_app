@@ -290,7 +290,7 @@ class SubscriptionVerificationPage extends ConsumerWidget {
           itemBuilder: (context, index) {
             final feature = features[index];
             return Card(
-              color: colorScheme.surfaceContainerLow,
+              color: colorScheme.surfaceContainer,
               child: Padding(
                 padding: const EdgeInsets.all(12),
                 child: Column(
@@ -378,7 +378,7 @@ class SubscriptionVerificationPage extends ConsumerWidget {
                 child: Card(
                   color: isSelected
                       ? colorScheme.primaryContainer
-                      : colorScheme.surfaceContainerLow,
+                      : colorScheme.surfaceContainer,
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(

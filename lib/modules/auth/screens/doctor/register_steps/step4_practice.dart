@@ -72,7 +72,7 @@ class _Step4PracticeState extends ConsumerState<Step4Practice> {
 
   bool get _hospRequired =>
       widget.data.practiceType == 'Hospital Attached' ||
-          widget.data.practiceType == 'Government Hospital';
+      widget.data.practiceType == 'Government Hospital';
 
   Future<void> _handleNext() async {
     setState(() => _submittedOnce = true);
@@ -142,7 +142,7 @@ class _Step4PracticeState extends ConsumerState<Step4Practice> {
                 decoration: BoxDecoration(
                   color: selected
                       ? colorScheme.primary.transparency(0.08)
-                      : colorScheme.surfaceContainerLow,
+                      : colorScheme.surfaceContainer,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
                     color: selected
@@ -167,17 +167,17 @@ class _Step4PracticeState extends ConsumerState<Step4Practice> {
                       ),
                       child: selected
                           ? Center(
-                        child: SizedBox(
-                          width: 10,
-                          height: 10,
-                          child: DecoratedBox(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: colorScheme.primary,
-                            ),
-                          ),
-                        ),
-                      )
+                              child: SizedBox(
+                                width: 10,
+                                height: 10,
+                                child: DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: colorScheme.primary,
+                                  ),
+                                ),
+                              ),
+                            )
                           : null,
                     ),
                     const SizedBox(width: 14),
@@ -229,8 +229,8 @@ class _Step4PracticeState extends ConsumerState<Step4Practice> {
             textCapitalization: TextCapitalization.words,
             validator: _hospRequired
                 ? (v) => (v == null || v.trim().isEmpty)
-                ? 'Hospital name required'
-                : null
+                      ? 'Hospital name required'
+                      : null
                 : null,
           ),
           const SizedBox(height: 28),

@@ -26,10 +26,10 @@ class PatientSelectionSection extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
     final currentSelectedFamilyMember =
-    familyMembers.any((member) => member.id == selectedFamilyMember?.id)
+        familyMembers.any((member) => member.id == selectedFamilyMember?.id)
         ? familyMembers.firstWhere(
-          (member) => member.id == selectedFamilyMember?.id,
-    )
+            (member) => member.id == selectedFamilyMember?.id,
+          )
         : null;
     return Column(
       children: [
@@ -83,9 +83,9 @@ class PatientSelectionSection extends StatelessWidget {
                     decoration: InputDecoration(
                       fillColor: onMemberChanged == null
                           ? colorScheme.surfaceContainerHighest.transparency(
-                        0.3,
-                      )
-                          : colorScheme.surfaceContainerLow,
+                              0.3,
+                            )
+                          : colorScheme.surfaceContainer,
                       filled: true,
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16,
@@ -143,8 +143,8 @@ class PatientSelectionSection extends StatelessWidget {
           color: onTap == null
               ? colorScheme.surfaceContainerHighest.transparency(0.2)
               : (isSelected
-              ? colorScheme.primary
-              : colorScheme.surfaceContainerLow),
+                    ? colorScheme.primary
+                    : colorScheme.surfaceContainer),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Row(
@@ -156,8 +156,8 @@ class PatientSelectionSection extends StatelessWidget {
               color: isSelected && onTap != null
                   ? colorScheme.onPrimary
                   : colorScheme.onSurfaceVariant.transparency(
-                onTap == null ? 0.4 : 1.0,
-              ),
+                      onTap == null ? 0.4 : 1.0,
+                    ),
             ),
             const SizedBox(width: 8),
             Flexible(
@@ -169,8 +169,8 @@ class PatientSelectionSection extends StatelessWidget {
                   color: isSelected && onTap != null
                       ? colorScheme.onPrimary
                       : colorScheme.onSurfaceVariant.transparency(
-                    onTap == null ? 0.4 : 1.0,
-                  ),
+                          onTap == null ? 0.4 : 1.0,
+                        ),
                 ),
               ),
             ),

@@ -40,7 +40,7 @@ class _ManualBookingScreenState extends ConsumerState<ManualBookingScreen> {
     final notifier = ref.read(manualBookingProvider.notifier);
 
     return Container(
-      color: colorScheme.surfaceContainerLow,
+      color: colorScheme.surfaceContainer,
       child: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
@@ -94,8 +94,7 @@ class _ManualBookingScreenState extends ConsumerState<ManualBookingScreen> {
                                 autovalidateMode: _submittedOnce
                                     ? AutovalidateMode.onUserInteraction
                                     : AutovalidateMode.disabled,
-                                patientNameController:
-                                _patientNameController,
+                                patientNameController: _patientNameController,
                                 mobileController: _mobileController,
                                 ageController: _ageController,
                                 selectedShift: state.selectedShift,
@@ -114,8 +113,8 @@ class _ManualBookingScreenState extends ConsumerState<ManualBookingScreen> {
                                   }
 
                                   final success = await notifier.submit(
-                                    patientName:
-                                    _patientNameController.text.trim(),
+                                    patientName: _patientNameController.text
+                                        .trim(),
                                     mobile: _mobileController.text.trim(),
                                     age: _ageController.text.trim(),
                                   );
@@ -131,7 +130,7 @@ class _ManualBookingScreenState extends ConsumerState<ManualBookingScreen> {
                                     _ageController.clear();
                                     AppSnackBar.show(
                                       message:
-                                      'Patient booked successfully! 🚀',
+                                          'Patient booked successfully! 🚀',
                                       type: AppSnackBarType.success,
                                     );
                                   } else {
@@ -140,7 +139,7 @@ class _ManualBookingScreenState extends ConsumerState<ManualBookingScreen> {
                                     );
                                     AppSnackBar.show(
                                       message:
-                                      currentState.errorMessage ??
+                                          currentState.errorMessage ??
                                           "Registration failed. Try again.",
                                       type: AppSnackBarType.error,
                                     );

@@ -23,7 +23,7 @@ class QueuePatientList extends ConsumerWidget {
         width: double.infinity,
         padding: const EdgeInsets.all(AppSpacing.xl),
         decoration: BoxDecoration(
-          color: colorScheme.surfaceContainerLow,
+          color: colorScheme.surfaceContainer,
           borderRadius: BorderRadius.circular(30),
           border: Border.all(
             color: colorScheme.outlineVariant.withValues(alpha: 0.3),

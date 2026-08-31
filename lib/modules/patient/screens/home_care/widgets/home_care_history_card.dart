@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/patient/models/home_care/home_care_history_model.dart';
+import 'package:yodoctor/modules/widgets/status_chip.dart';
 
 class HomeCareHistoryCard extends StatelessWidget {
   final HomeCareBookingModel booking;
@@ -323,47 +324,8 @@ class HomeCareHistoryCard extends StatelessWidget {
   }
 
   Widget _getStatusBadge(BuildContext context, String status) {
-    final colorScheme = Theme.of(context).colorScheme;
     final normalizedStatus = status.trim().toUpperCase();
 
-    Color backgroundColor;
-    Color foregroundColor;
-
-    switch (normalizedStatus) {
-      case 'CANCELLED':
-        backgroundColor = colorScheme.errorContainer;
-        foregroundColor = colorScheme.onErrorContainer;
-        break;
-      case 'COMPLETED':
-        backgroundColor = colorScheme.secondaryContainer;
-        foregroundColor = colorScheme.onSecondaryContainer;
-        break;
-      default:
-        backgroundColor = colorScheme.primaryContainer;
-        foregroundColor = colorScheme.onPrimaryContainer;
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.circle, size: 6, color: foregroundColor),
-          const SizedBox(width: 6),
-          Text(
-            status,
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: foregroundColor,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ],
-      ),
-    );
+    return StatusChip(status: normalizedStatus);
   }
 }

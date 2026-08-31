@@ -217,7 +217,7 @@ class _Step5ConsultationState extends ConsumerState<Step5Consultation> {
                   decoration: BoxDecoration(
                     color: selected
                         ? colorScheme.primaryContainer.transparency(0.85)
-                        : colorScheme.surfaceContainerLow,
+                        : colorScheme.surfaceContainer,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: selected
@@ -262,7 +262,7 @@ class _Step5ConsultationState extends ConsumerState<Step5Consultation> {
                     shape: BoxShape.circle,
                     color: selected
                         ? colorScheme.primaryContainer.transparency(0.85)
-                        : colorScheme.surfaceContainerLow,
+                        : colorScheme.surfaceContainer,
                     border: Border.all(
                       color: selected
                           ? colorScheme.primary
@@ -348,7 +348,7 @@ class _Step5ConsultationState extends ConsumerState<Step5Consultation> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: colorScheme.surfaceContainerLow,
+              color: colorScheme.surfaceContainer,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: colorScheme.outlineVariant.transparency(0.5),

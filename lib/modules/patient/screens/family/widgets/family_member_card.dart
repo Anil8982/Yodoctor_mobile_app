@@ -243,15 +243,16 @@ class FamilyMemberCard extends StatelessWidget {
                         onPressed: onDelete == null
                             ? null
                             : () {
-                          Navigator.pop(modalContext);
-                          onDelete?.call();
-                        },
+                                Navigator.pop(modalContext);
+                                onDelete?.call();
+                              },
                         icon: const Icon(Icons.delete_outline_rounded),
                         label: const Text('Remove'),
                         style: FilledButton.styleFrom(
                           backgroundColor: colorScheme.errorContainer,
                           foregroundColor: colorScheme.onErrorContainer,
-                          disabledBackgroundColor: colorScheme.surfaceContainerHighest,
+                          disabledBackgroundColor:
+                              colorScheme.surfaceContainerHighest,
                           disabledForegroundColor: colorScheme.onSurfaceVariant,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
@@ -266,9 +267,9 @@ class FamilyMemberCard extends StatelessWidget {
                         onPressed: onEdit == null
                             ? null
                             : () {
-                          Navigator.pop(modalContext);
-                          onEdit?.call();
-                        },
+                                Navigator.pop(modalContext);
+                                onEdit?.call();
+                              },
                         icon: const Icon(Icons.edit_rounded),
                         label: const Text('Update'),
                         style: FilledButton.styleFrom(
@@ -290,13 +291,13 @@ class FamilyMemberCard extends StatelessWidget {
   }
 
   Widget _buildInfoBox(
-      BuildContext context,
-      IconData icon,
-      String label,
-      String value,
-      double width, {
-        bool isError = false,
-      }) {
+    BuildContext context,
+    IconData icon,
+    String label,
+    String value,
+    double width, {
+    bool isError = false,
+  }) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
@@ -304,7 +305,7 @@ class FamilyMemberCard extends StatelessWidget {
       width: width,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerLow,
+        color: colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: colorScheme.outlineVariant.withValues(alpha: 0.3),

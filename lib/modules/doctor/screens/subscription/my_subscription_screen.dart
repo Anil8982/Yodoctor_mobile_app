@@ -158,7 +158,9 @@ class _MySubscriptionScreenState extends ConsumerState<MySubscriptionScreen> {
             icon: Icons.verified_rounded,
             label: 'Status',
             value: plan.isActive ? 'Active' : 'Inactive',
-            valueColor: plan.isActive ? AppTheme.green : AppTheme.red,
+            valueColor: plan.isActive
+                ? AppTheme.active(context)
+                : AppTheme.error(context),
             colorScheme: colorScheme,
             theme: theme,
           ),
@@ -178,7 +180,7 @@ class _MySubscriptionScreenState extends ConsumerState<MySubscriptionScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerLow,
+        color: colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: colorScheme.outlineVariant.transparency(0.3)),
       ),
@@ -232,7 +234,7 @@ class _MySubscriptionScreenState extends ConsumerState<MySubscriptionScreen> {
       width: double.infinity,
       padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerLow,
+        color: colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: colorScheme.outlineVariant.transparency(0.3)),
       ),

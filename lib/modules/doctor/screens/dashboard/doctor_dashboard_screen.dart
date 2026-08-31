@@ -53,7 +53,7 @@ class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
 
     if (dashboardAsync.hasError && !hasData) {
       return Scaffold(
-        backgroundColor: colorScheme.surfaceContainerLow,
+        backgroundColor: colorScheme.surfaceContainer,
         body: Center(
           child: Text(
             'Error: ${dashboardAsync.error}',
@@ -77,7 +77,7 @@ class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
         : true;
 
     return Container(
-      color: colorScheme.surfaceContainerLow,
+      color: colorScheme.surfaceContainer,
       child: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
@@ -171,7 +171,7 @@ class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
                 title: 'Pending Requests',
                 subtitle: '${data.pendingRequests} awaiting approval',
                 badgeCount: data.pendingRequests,
-                badgeColor: AppTheme.orange.shade800,
+                badgeColor: AppTheme.pending(context),
                 onTap: () {
                   context.push(
                     AppRoutes.doctorLiveQueue,
@@ -235,7 +235,7 @@ class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
                     count: data.todayQueue.toString(),
                     label: 'Patients',
                     icon: Icons.people_outline_rounded,
-                    accentColor: colorScheme.primary,
+                    accentColor: AppTheme.info(context),
                   ),
                   Container(
                     height: 32,
@@ -247,7 +247,7 @@ class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
                     count: data.pendingRequests.toString(),
                     label: 'Pending',
                     icon: Icons.hourglass_empty_rounded,
-                    accentColor: colorScheme.tertiary,
+                    accentColor: AppTheme.pending(context),
                   ),
                   Container(
                     height: 32,

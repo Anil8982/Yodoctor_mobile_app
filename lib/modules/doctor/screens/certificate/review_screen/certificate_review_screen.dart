@@ -48,7 +48,7 @@ class _CertificateReviewScreenState
     final isSubmitting = reviewState.submitting;
 
     return Scaffold(
-      backgroundColor: colorScheme.surfaceContainerLow,
+      backgroundColor: colorScheme.surfaceContainer,
       appBar: AppHeader(
         title: isReadOnly ? 'Certificate Details' : 'Review Request',
       ),

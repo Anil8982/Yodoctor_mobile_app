@@ -67,25 +67,45 @@ class MySubscriptionShimmer extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerLow,
+        color: colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const ShimmerBox(width: 120, height: 14, borderRadius: BorderRadius.all(Radius.circular(7))),
+          const ShimmerBox(
+            width: 120,
+            height: 14,
+            borderRadius: BorderRadius.all(Radius.circular(7)),
+          ),
           const SizedBox(height: 12),
-          const ShimmerBox(width: 80, height: 12, borderRadius: BorderRadius.all(Radius.circular(6))),
+          const ShimmerBox(
+            width: 80,
+            height: 12,
+            borderRadius: BorderRadius.all(Radius.circular(6)),
+          ),
           const SizedBox(height: 20),
-          const ShimmerBox(width: 60, height: 24, borderRadius: BorderRadius.all(Radius.circular(12))),
+          const ShimmerBox(
+            width: 60,
+            height: 24,
+            borderRadius: BorderRadius.all(Radius.circular(12)),
+          ),
           const SizedBox(height: 16),
           const ShimmerChip(width: 70, height: 28),
           const SizedBox(height: 16),
           Row(
             children: [
-              const ShimmerBox(width: 100, height: 12, borderRadius: BorderRadius.all(Radius.circular(6))),
+              const ShimmerBox(
+                width: 100,
+                height: 12,
+                borderRadius: BorderRadius.all(Radius.circular(6)),
+              ),
               const SizedBox(width: 8),
-              const ShimmerBox(width: 80, height: 12, borderRadius: BorderRadius.all(Radius.circular(6))),
+              const ShimmerBox(
+                width: 80,
+                height: 12,
+                borderRadius: BorderRadius.all(Radius.circular(6)),
+              ),
             ],
           ),
         ],
@@ -97,7 +117,7 @@ class MySubscriptionShimmer extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerLow,
+        color: colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -105,9 +125,17 @@ class MySubscriptionShimmer extends StatelessWidget {
         children: [
           const ShimmerCircle(size: 20),
           const SizedBox(height: 12),
-          const ShimmerBox(width: 60, height: 14, borderRadius: BorderRadius.all(Radius.circular(7))),
+          const ShimmerBox(
+            width: 60,
+            height: 14,
+            borderRadius: BorderRadius.all(Radius.circular(7)),
+          ),
           const SizedBox(height: 4),
-          const ShimmerBox(width: 80, height: 10, borderRadius: BorderRadius.all(Radius.circular(5))),
+          const ShimmerBox(
+            width: 80,
+            height: 10,
+            borderRadius: BorderRadius.all(Radius.circular(5)),
+          ),
         ],
       ),
     );
@@ -118,7 +146,7 @@ class MySubscriptionShimmer extends StatelessWidget {
       width: double.infinity,
       height: 50,
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerLow,
+        color: colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(14),
       ),
     );
@@ -129,32 +157,58 @@ class MySubscriptionShimmer extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerLow,
+        color: colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const ShimmerBox(width: 130, height: 16, borderRadius: BorderRadius.all(Radius.circular(8))),
+          const ShimmerBox(
+            width: 130,
+            height: 16,
+            borderRadius: BorderRadius.all(Radius.circular(8)),
+          ),
           const SizedBox(height: 16),
           ...List.generate(2, (index) {
             return Padding(
               padding: EdgeInsets.only(top: index > 0 ? 12 : 0),
               child: Row(
                 children: [
-                  const ShimmerBox(width: 44, height: 44, borderRadius: BorderRadius.all(Radius.circular(12))),
+                  const ShimmerBox(
+                    width: 44,
+                    height: 44,
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                  ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const ShimmerBox(width: 100, height: 12, borderRadius: BorderRadius.all(Radius.circular(6))),
+                        const ShimmerBox(
+                          width: 100,
+                          height: 12,
+                          borderRadius: BorderRadius.all(Radius.circular(6)),
+                        ),
                         const SizedBox(height: 6),
                         Row(
                           children: [
-                            const Expanded(child: ShimmerBox(height: 10, borderRadius: BorderRadius.all(Radius.circular(5)))),
+                            const Expanded(
+                              child: ShimmerBox(
+                                height: 10,
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(5),
+                                ),
+                              ),
+                            ),
                             const SizedBox(width: 8),
-                            const Expanded(child: ShimmerBox(height: 10, borderRadius: BorderRadius.all(Radius.circular(5)))),
+                            const Expanded(
+                              child: ShimmerBox(
+                                height: 10,
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(5),
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ],
@@ -163,7 +217,11 @@ class MySubscriptionShimmer extends StatelessWidget {
                   const SizedBox(width: 12),
                   const ShimmerChip(width: 60, height: 24),
                   const SizedBox(width: 12),
-                  const ShimmerBox(width: 50, height: 14, borderRadius: BorderRadius.all(Radius.circular(7))),
+                  const ShimmerBox(
+                    width: 50,
+                    height: 14,
+                    borderRadius: BorderRadius.all(Radius.circular(7)),
+                  ),
                 ],
               ),
             );

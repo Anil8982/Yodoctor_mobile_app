@@ -157,7 +157,9 @@ class _DoctorHeaderCardState extends State<DoctorHeaderCard> {
             mainAxisSize: MainAxisSize.min,
             children: [
               StatusChip(
-                status: widget.doctor.isAvailable == 1 ? 'Available' : 'Not Available',
+                status: widget.doctor.isAvailable == 1
+                    ? 'Available'
+                    : 'Not Available',
                 isSmall: true,
                 customColor: widget.doctor.isAvailable == 1
                     ? AppTheme.success(context)
@@ -191,51 +193,51 @@ class _DoctorHeaderCardState extends State<DoctorHeaderCard> {
               ),
             ],
           ),
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 14),
-            child: Divider(height: 1, thickness: 0.8),
-          ),
-          InkWell(
-            onTap: () {},
-            borderRadius: BorderRadius.circular(12),
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              decoration: BoxDecoration(
-                color: colorScheme.primary.transparency(0.06),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: colorScheme.primary.transparency(0.15),
-                  width: 1,
-                ),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.confirmation_num_rounded,
-                    size: 18,
-                    color: colorScheme.primary,
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      'Apply Medical Certificate / Voucher',
-                      style: textTheme.labelMedium?.copyWith(
-                        color: colorScheme.primary,
-                        fontWeight: FontWeight.w800,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
-                  Icon(
-                    Icons.arrow_forward_rounded,
-                    size: 14,
-                    color: colorScheme.primary,
-                  ),
-                ],
-              ),
-            ),
-          ),
+          // const Padding(
+          //   padding: EdgeInsets.symmetric(vertical: 14),
+          //   child: Divider(height: 1, thickness: 0.8),
+          // ),
+          // InkWell(
+          //   onTap: () {},
+          //   borderRadius: BorderRadius.circular(12),
+          //   child: Container(
+          //     width: double.infinity,
+          //     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          //     decoration: BoxDecoration(
+          //       color: colorScheme.primary.transparency(0.06),
+          //       borderRadius: BorderRadius.circular(12),
+          //       border: Border.all(
+          //         color: colorScheme.primary.transparency(0.15),
+          //         width: 1,
+          //       ),
+          //     ),
+          //     child: Row(
+          //       children: [
+          //         Icon(
+          //           Icons.confirmation_num_rounded,
+          //           size: 18,
+          //           color: colorScheme.primary,
+          //         ),
+          //         const SizedBox(width: 10),
+          //         Expanded(
+          //           child: Text(
+          //             'Apply Medical Certificate / Voucher',
+          //             style: textTheme.labelMedium?.copyWith(
+          //               color: colorScheme.primary,
+          //               fontWeight: FontWeight.w800,
+          //               fontSize: 12,
+          //             ),
+          //           ),
+          //         ),
+          //         Icon(
+          //           Icons.arrow_forward_rounded,
+          //           size: 14,
+          //           color: colorScheme.primary,
+          //         ),
+          //       ],
+          //     ),
+          //   ),
+          // ),
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 14),
             child: Divider(height: 1, thickness: 0.8),

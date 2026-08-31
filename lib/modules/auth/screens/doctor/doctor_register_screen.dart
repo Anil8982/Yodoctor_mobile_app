@@ -130,7 +130,7 @@ class _DoctorRegisterScreenState extends ConsumerState<DoctorRegisterScreen>
     final registerState = ref.watch(doctorRegisterControllerProvider);
 
     return Scaffold(
-      backgroundColor: colorScheme.surfaceContainerLow,
+      backgroundColor: colorScheme.surfaceContainer,
       body: FadeTransition(
         opacity: _fadeAnim,
         child: Stack(

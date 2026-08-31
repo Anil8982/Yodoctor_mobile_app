@@ -63,9 +63,11 @@ class StatusChip extends StatelessWidget {
     final _StatusConfig config = _resolveStatusConfig(context, status);
 
     // Dynamic padding & sizing for isSmall flag
-    final EdgeInsetsGeometry resolvedPadding = padding ?? (isSmall
-        ? const EdgeInsets.symmetric(horizontal: 8, vertical: 4)
-        : const EdgeInsets.symmetric(horizontal: 10, vertical: 6));
+    final EdgeInsetsGeometry resolvedPadding =
+        padding ??
+        (isSmall
+            ? const EdgeInsets.symmetric(horizontal: 8, vertical: 4)
+            : const EdgeInsets.symmetric(horizontal: 10, vertical: 6));
 
     final double resolvedFontSize = fontSize ?? (isSmall ? 10 : 11);
     final double resolvedIconSize = resolvedFontSize + 2;
@@ -75,10 +77,7 @@ class StatusChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: config.backgroundColor,
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(
-          color: config.borderColor,
-          width: 1,
-        ),
+        border: Border.all(color: config.borderColor, width: 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -106,13 +105,18 @@ class StatusChip extends StatelessWidget {
     );
   }
 
-  _StatusConfig _resolveStatusConfig(BuildContext context, dynamic inputStatus) {
+  _StatusConfig _resolveStatusConfig(
+    BuildContext context,
+    dynamic inputStatus,
+  ) {
     String rawString = '';
     Status? matchedEnum;
 
     if (customColor != null) {
       matchedEnum = Status.custom;
-      rawString = inputStatus is Status ? _formatEnumName(inputStatus.name) : inputStatus.toString().trim();
+      rawString = inputStatus is Status
+          ? _formatEnumName(inputStatus.name)
+          : inputStatus.toString().trim();
     } else if (inputStatus is Status) {
       matchedEnum = inputStatus;
       rawString = _formatEnumName(inputStatus.name);
@@ -178,10 +182,10 @@ class StatusChip extends StatelessWidget {
           resolvedIcon = matchedEnum == Status.missed
               ? Icons.event_busy_rounded
               : (matchedEnum == Status.error
-              ? Icons.error_rounded
-              : (matchedEnum == Status.unfit
-              ? Icons.cancel_outlined
-              : Icons.cancel_rounded));
+                    ? Icons.error_rounded
+                    : (matchedEnum == Status.unfit
+                          ? Icons.cancel_outlined
+                          : Icons.cancel_rounded));
           break;
 
         case Status.inactive:
@@ -198,10 +202,10 @@ class StatusChip extends StatelessWidget {
           resolvedIcon = matchedEnum == Status.rescheduled
               ? Icons.update_rounded
               : (matchedEnum == Status.consulting
-              ? Icons.medical_services_rounded
-              : (matchedEnum == Status.temporarilyUnfit
-              ? Icons.hourglass_empty_rounded
-              : Icons.schedule_rounded));
+                    ? Icons.medical_services_rounded
+                    : (matchedEnum == Status.temporarilyUnfit
+                          ? Icons.hourglass_empty_rounded
+                          : Icons.schedule_rounded));
           break;
 
         case Status.processing:
@@ -239,7 +243,9 @@ class StatusChip extends StatelessWidget {
   Status? _matchStringToEnum(String value) {
     final upper = value.toUpperCase();
 
-    if (upper.contains('CANCEL') || upper.contains('REJECT')) return Status.cancelled;
+    if (upper.contains('CANCEL') || upper.contains('REJECT')) {
+      return Status.cancelled;
+    }
     if (upper.contains('COMPLET')) return Status.completed;
     if (upper.contains('CONFIRM')) return Status.confirmed;
     if (upper.contains('ACCEPT')) return Status.accepted;
@@ -249,11 +255,17 @@ class StatusChip extends StatelessWidget {
     if (upper.contains('WARN')) return Status.warning;
     if (upper.contains('ERR') || upper.contains('FAIL')) return Status.error;
     if (upper.contains('PROCESS')) return Status.processing;
-    if (upper.contains('SCHEDULE') || upper.contains('RESCHEDULE')) return Status.rescheduled;
+    if (upper.contains('SCHEDULE') || upper.contains('RESCHEDULE')) {
+      return Status.rescheduled;
+    }
     if (upper.contains('BOOK')) return Status.booked;
     if (upper.contains('CHECK')) return Status.checkedIn;
     if (upper.contains('CONSULT')) return Status.consulting;
     if (upper.contains('MISSED')) return Status.missed;
+
+    //payment mappings
+    if (upper.contains('PAID')) return Status.success;
+    if (upper.contains('REFUNDED')) return Status.info;
 
     // Certificate mappings
     if (upper.contains('VERIF')) return Status.verification;
@@ -261,7 +273,9 @@ class StatusChip extends StatelessWidget {
     if (upper.contains('APPROV')) return Status.approved;
     if (upper == 'FIT') return Status.fit;
     if (upper == 'UNFIT') return Status.unfit;
-    if (upper.contains('TEMP') || upper.contains('TEMPORARILY')) return Status.temporarilyUnfit;
+    if (upper.contains('TEMP') || upper.contains('TEMPORARILY')) {
+      return Status.temporarilyUnfit;
+    }
 
     for (var status in Status.values) {
       if (status.name.toUpperCase() == upper) {

@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/modules/patient/controllers/home_care_history_controller.dart';
+import 'package:yodoctor/modules/widgets/status_chip.dart';
 
 class HomeCareBookingDetails extends ConsumerWidget {
   const HomeCareBookingDetails({super.key});
@@ -41,12 +42,7 @@ class HomeCareBookingDetails extends ConsumerWidget {
                           builder: (context, constraints) {
                             return Row(
                               children: [
-                                Expanded(
-                                  child: _buildStatusBadge(
-                                    context,
-                                    booking.status,
-                                  ),
-                                ),
+                                _buildStatusBadge(context, booking.status),
                                 const SizedBox(width: 8),
                                 Flexible(
                                   child: Align(
@@ -365,51 +361,9 @@ class HomeCareBookingDetails extends ConsumerWidget {
   }
 
   Widget _buildStatusBadge(BuildContext context, String status) {
-    final colorScheme = Theme.of(context).colorScheme;
     final normalizedStatus = status.trim().toUpperCase();
 
-    Color backgroundColor;
-    Color foregroundColor;
-
-    switch (normalizedStatus) {
-      case 'CANCELLED':
-        backgroundColor = colorScheme.errorContainer;
-        foregroundColor = colorScheme.onErrorContainer;
-        break;
-      case 'COMPLETED':
-        backgroundColor = colorScheme.secondaryContainer;
-        foregroundColor = colorScheme.onSecondaryContainer;
-        break;
-      default:
-        backgroundColor = colorScheme.primaryContainer;
-        foregroundColor = colorScheme.onPrimaryContainer;
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.circle, size: 8, color: foregroundColor),
-          const SizedBox(width: 8),
-          Flexible(
-            child: Text(
-              status,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                color: foregroundColor,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+    return StatusChip(status: normalizedStatus);
   }
 
   Widget _buildEmergencyChip(BuildContext context, bool isEmergency) {
