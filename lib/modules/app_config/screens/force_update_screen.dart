@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 
 class ForceUpdateScreen extends StatelessWidget {
   final String message;
@@ -19,16 +20,14 @@ class ForceUpdateScreen extends StatelessWidget {
     }
 
     if (await canLaunchUrl(uri)) {
-      await launchUrl(
-        uri,
-        mode: LaunchMode.externalApplication,
-      );
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Scaffold(
       body: SafeArea(
@@ -38,12 +37,7 @@ class ForceUpdateScreen extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.system_update_rounded,
-                  size: 80,
-                  color: theme.colorScheme.primary,
-                ),
-
+                _buildIllustration(context, colorScheme),
                 const SizedBox(height: 24),
 
                 Text(
@@ -64,17 +58,51 @@ class ForceUpdateScreen extends StatelessWidget {
 
                 const SizedBox(height: 32),
 
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton(
-                    onPressed: _updateApp,
-                    child: const Text("Update Now"),
+                OutlinedButton.icon(
+                  onPressed: _updateApp,
+                  icon: const Icon(Icons.system_update_rounded),
+                  label: const Text('Update Now'),
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(color: AppTheme.green, width: 1.5),
                   ),
                 ),
               ],
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildIllustration(BuildContext context, ColorScheme colorScheme) {
+    return Container(
+      height: 280,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: AppTheme.transparent,
+        borderRadius: BorderRadius.circular(120),
+      ),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(15),
+            child: Image.asset(
+              'assets/images/update-pana.png',
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) {
+                return ColoredBox(
+                  color: colorScheme.primaryContainer,
+                  child: Icon(
+                    Icons.system_update_rounded,
+                    size: 40,
+                    color: colorScheme.primary,
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
