@@ -36,6 +36,7 @@ dependencies:
   firebase_core: ^4.11.0
   firebase_auth: ^6.5.4
   google_sign_in: ^7.2.0
+  cloud_firestore: ^6.9.0
 
   # Local Storage
   hive: ^2.2.3
@@ -67,6 +68,9 @@ dependencies:
   flutter_dotenv: ^6.0.1
   path: ^1.9.0
 
+  package_info_plus: ^9.0.1
+  webview_flutter: ^4.14.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -81,6 +85,7 @@ flutter:
   assets:
     - assets/logos/
     - assets/icons/
+    - assets/images/
     - .env
 
 flutter_launcher_icons:

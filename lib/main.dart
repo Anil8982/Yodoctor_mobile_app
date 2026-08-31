@@ -5,6 +5,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'core/providers/storage_provider.dart';
+import 'core/storage/hive_boxes.dart';
 import 'core/storage/storage_service.dart';
 import 'firebase_options.dart';
 import 'core/providers/app_role_provider.dart';
@@ -20,7 +21,9 @@ Future<void> main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   await Hive.initFlutter();
-  await Hive.openBox('app_storage');
+
+  await Hive.openBox(HiveBoxes.appStorage);
+  await Hive.openBox(HiveBoxes.appConfig);
 
   final storage = StorageService();
   await storage.initialize();

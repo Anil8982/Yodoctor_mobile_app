@@ -6,6 +6,7 @@ class Assets {
   Assets._();
 
   static const $AssetsIconsGen icons = $AssetsIconsGen();
+  static const $AssetsImagesGen images = $AssetsImagesGen();
   static const $AssetsLogosGen logos = $AssetsLogosGen();
 }
 
@@ -47,6 +48,17 @@ class $AssetsIconsGen {
   final AssetGenImage patient = const AssetGenImage('assets/icons/patient.png');
   final AssetGenImage protection = const AssetGenImage(
     'assets/icons/protection.png',
+  );
+}
+
+class $AssetsImagesGen {
+  const $AssetsImagesGen();
+
+  final AssetGenImage maintenancePana = const AssetGenImage(
+    'assets/images/maintenance-pana.png',
+  );
+  final AssetGenImage updatePana = const AssetGenImage(
+    'assets/images/update-pana.png',
   );
 }
 

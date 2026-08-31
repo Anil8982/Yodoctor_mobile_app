@@ -6,6 +6,16 @@ class AppRoutes {
   static const String landing = root;
   static const String splash = '/splash';
 
+
+  static const webView = '/webview';
+  static String webViewPage({required String title, required String url}) =>
+      '/webview?title=${Uri.encodeComponent(title)}'
+          '&url=${Uri.encodeComponent(url)}';
+
+  // App Config
+  static const String maintenance = '/maintenance';
+  static const String forceUpdate = '/force-update';
+
   // Auth
   static const String patientLogin = '/auth/patient/login';
   static const String patientRegister = '/auth/patient/register';

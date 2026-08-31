@@ -9,6 +9,10 @@ import 'package:yodoctor/modules/admin/admin_scaffold_shell.dart';
 import 'package:yodoctor/modules/admin/screens/doctors_management/doctor_management_screen.dart';
 import 'package:yodoctor/modules/admin/screens/enquiries/enquiry_screen.dart';
 import 'package:yodoctor/modules/admin/screens/home_care_bookings/home_care_bookings_screen.dart';
+import 'package:yodoctor/modules/app_config/controllers/app_config_controller.dart';
+import 'package:yodoctor/modules/app_config/screens/force_update_screen.dart';
+import 'package:yodoctor/modules/app_config/screens/maintenance_screen.dart';
+import 'package:yodoctor/modules/app_config/screens/webview/webview_screen.dart';
 import 'package:yodoctor/modules/auth/controllers/doctor_status_controller.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/doctor_login_screen.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/doctor_register_screen.dart';
@@ -105,6 +109,16 @@ final routerProvider = Provider<GoRouter>((ref) {
     refreshRouter();
   });
 
+  ref.listen(appConfigProvider, (_, _) {
+    AppLogger.debug(
+      'Router: appConfigProvider changed, refreshing',
+      tag: LogTags.app,
+      subTag: 'Router',
+    );
+
+    refreshRouter();
+  });
+
   // Cleanup notifier when provider is disposed
   ref.onDispose(refreshListenable.dispose);
 
@@ -115,6 +129,15 @@ final routerProvider = Provider<GoRouter>((ref) {
         path == AppRoutes.patientRegister ||
         path == AppRoutes.doctorLogin ||
         path == AppRoutes.doctorRegister;
+  }
+
+  // Helper: detect public screens (accessible without auth)
+  bool isPublicScreen(String path) {
+    return path == AppRoutes.webView ||
+        path == AppRoutes.documentViewer ||
+        path == AppRoutes.maintenance ||
+        path == AppRoutes.forceUpdate ||
+        path == AppRoutes.splash;
   }
 
   // Helper: detect doctor protected routes
@@ -130,11 +153,60 @@ final routerProvider = Provider<GoRouter>((ref) {
     refreshListenable: refreshListenable,
 
     redirect: (context, state) {
+      // final storage = ref.read(storageProvider);
+      // final token = storage.getToken();
+      // final role = storage.getRole();
+      // final isLoggedIn = token != null && token.isNotEmpty;
+      // final matchedPath = state.matchedLocation;
+      // final authType = storage.getAuthType();
+      // final subState = ref.read(subscriptionStatusProvider);
+
+      final matchedPath = state.matchedLocation;
+
+      // APP CONFIG GATE
+      final appConfigState = ref.read(appConfigProvider);
+
+      // App config is still loading.
+      if (appConfigState.status == AppConfigStatus.loading) {
+        if (matchedPath != AppRoutes.splash) {
+          return AppRoutes.splash;
+        }
+
+        return null;
+      }
+
+      // App config failed to load.
+      if (appConfigState.status == AppConfigStatus.error) {
+        if (matchedPath != AppRoutes.splash) {
+          return AppRoutes.splash;
+        }
+
+        return null;
+      }
+
+      // App is under maintenance.
+      if (appConfigState.status == AppConfigStatus.maintenance) {
+        if (matchedPath != AppRoutes.maintenance) {
+          return AppRoutes.maintenance;
+        }
+
+        return null;
+      }
+
+      // Force update required.
+      if (appConfigState.status == AppConfigStatus.forceUpdate) {
+        if (matchedPath != AppRoutes.forceUpdate) {
+          return AppRoutes.forceUpdate;
+        }
+
+        return null;
+      }
+
+      // APP CONFIG READY
       final storage = ref.read(storageProvider);
       final token = storage.getToken();
       final role = storage.getRole();
       final isLoggedIn = token != null && token.isNotEmpty;
-      final matchedPath = state.matchedLocation;
       final authType = storage.getAuthType();
       final subState = ref.read(subscriptionStatusProvider);
 
@@ -154,6 +226,11 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       // ---- Unauthenticated ----
       if (!isLoggedIn) {
+        // Allow public screens (webview, document viewer, etc.)
+        if (isPublicScreen(matchedPath)) {
+          return null; // Allow access
+        }
+
         // Redirect everything except auth screens to landing
         if (!isAuthScreen(matchedPath) && matchedPath != AppRoutes.landing) {
           AppLogger.debug(
@@ -259,6 +336,34 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const SplashScreen(),
       ),
 
+      GoRoute(
+        path: AppRoutes.maintenance,
+        builder: (context, state) {
+          final appConfigState = ref.watch(appConfigProvider);
+
+          return MaintenanceScreen(
+            message: appConfigState.config?.status.maintenanceMsg,
+          );
+        },
+      ),
+
+      GoRoute(
+        path: AppRoutes.forceUpdate,
+        builder: (context, state) {
+          final appConfigState = ref.watch(appConfigProvider);
+          final config = appConfigState.config;
+
+          final storeUrl = config?.appLinks.androidPlayStoreUrl ?? '';
+
+          return ForceUpdateScreen(
+            message:
+                config?.versioning.forceUpdateMsg ??
+                'A new version of the app is available. Please update to continue.',
+            storeUrl: storeUrl,
+          );
+        },
+      ),
+
       // ---- Auth Screens ----
       GoRoute(
         parentNavigatorKey: AppRouter.rootNavigatorKey,
@@ -358,9 +463,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               ? state.extra as PatientDoctorModel
               : null;
 
-          return ApplyCertificateScreen(
-            initialDoctor: doctor,
-          );
+          return ApplyCertificateScreen(initialDoctor: doctor);
         },
       ),
       GoRoute(
@@ -415,7 +518,6 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
 
       // ---- Doctor Shared Routes (non-shell) ----
-
       GoRoute(
         parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.doctorProfile,
@@ -527,8 +629,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.paymentProcessing,
         builder: (context, state) {
-          return PaymentProcessingScreen(
-          );
+          return PaymentProcessingScreen();
         },
       ),
       GoRoute(
@@ -539,7 +640,6 @@ final routerProvider = Provider<GoRouter>((ref) {
           return InvoiceDetailScreen(invoice: invoice);
         },
       ),
-
 
       // ---- Shared ----
       GoRoute(
@@ -552,6 +652,24 @@ final routerProvider = Provider<GoRouter>((ref) {
             fileName: extra['fileName'],
             isImage: extra['isImage'] ?? false,
             isPdf: extra['isPdf'] ?? false,
+          );
+        },
+      ),
+
+      GoRoute(
+        path: AppRoutes.webView,
+        builder: (context, state) {
+          final title = state.uri.queryParameters['title'] ?? '';
+          final url = state.uri.queryParameters['url'] ?? '';
+
+          final extra = state.extra as Map<String, dynamic>?;
+
+          return WebViewScreen(
+            title: title,
+            url: url,
+            floatingIcon: extra?['floatingIcon'] as IconData?,
+            onFloatingPressed: extra?['onFloatingPressed'] as VoidCallback?,
+            floatingLabel: extra?['floatingLabel'] as String?,
           );
         },
       ),
@@ -633,7 +751,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: AppRoutes.doctorAppointments,
                 builder: (context, state) =>
-                const DoctorAppointmentHistoryScreen(),
+                    const DoctorAppointmentHistoryScreen(),
               ),
             ],
           ),

@@ -7,6 +7,7 @@ class HiveKeys {
   static const String appRole = 'app_role';
   static const String authType = 'auth_type';
 
+  static const String appConfig = 'app_config';
 
   // Future use
   static const String patientProfile = 'patient_profile';
