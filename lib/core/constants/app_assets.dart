@@ -21,6 +21,9 @@ abstract final class AppAssets {
   static const protectionIcon = 'assets/icons/protection.png';
   static const healthcareIcon = 'assets/icons/healthcare.png';
 
+  static const maintenance = 'assets/images/maintenance-pana.png';
+  static const update = 'assets/images/update-pana.png';
+
 
 
 
