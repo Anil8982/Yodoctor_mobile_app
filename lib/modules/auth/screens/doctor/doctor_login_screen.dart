@@ -116,146 +116,165 @@ class _DoctorLoginScreenState extends ConsumerState<DoctorLoginScreen>
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
         child: FadeTransition(
           opacity: _fadeAnimation,
-          child: Stack(
-            children: [
-              TopBackground(color: AppTheme.primary),
-              BottomLeftCircle(color: AppTheme.primary),
-              BottomRightCircle(color: AppTheme.primary),
-
-              SafeArea(
-                child: Column(
-                  children: [
-                    Hero(
-                      tag: 'docAppBar',
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 16,
-                        ),
-                        child: Row(
+          child: Container(
+            color: colorScheme.surface,
+            child: SafeArea(
+              top: false,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: constraints.maxHeight,
+                      ),
+                      child: IntrinsicHeight(
+                        child: Stack(
                           children: [
-                            GestureDetector(
-                              onTap: () => Navigator.pop(context),
-                              child: Container(
-                                width: 40,
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  color: colorScheme.onPrimary.transparency(
-                                    0.25,
+                            TopBackground(color: AppTheme.primary),
+                            BottomLeftCircle(color: AppTheme.primary),
+                            BottomRightCircle(color: AppTheme.primary),
+
+                            SafeArea(
+                              child: Column(
+                                children: [
+                                  Hero(
+                                    tag: 'docAppBar',
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 24,
+                                        vertical: 16,
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          GestureDetector(
+                                            onTap: () => Navigator.pop(context),
+                                            child: Container(
+                                              width: 40,
+                                              height: 40,
+                                              decoration: BoxDecoration(
+                                                color: colorScheme.onPrimary
+                                                    .transparency(0.25),
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                              ),
+                                              child: Icon(
+                                                Icons.arrow_back_rounded,
+                                                color: colorScheme.onPrimary,
+                                              ),
+                                            ),
+                                          ),
+                                          const Spacer(),
+                                          Text(
+                                            'Doctor Portal',
+                                            style: textTheme.titleMedium
+                                                ?.copyWith(
+                                                  color: colorScheme.onPrimary,
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                          ),
+                                          const Spacer(),
+                                          const SizedBox(width: 40),
+                                        ],
+                                      ),
+                                    ),
                                   ),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Icon(
-                                  Icons.arrow_back_rounded,
-                                  color: colorScheme.onPrimary,
-                                ),
+
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                      left: 24,
+                                      right: 24,
+                                      top: 10,
+                                      bottom: 0,
+                                    ),
+                                    child: Stack(
+                                      clipBehavior: Clip.none,
+                                      alignment: Alignment.topCenter,
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                            top: 80,
+                                          ),
+                                          child: _buildLoginCard(
+                                            loginState.isLoading,
+                                          ),
+                                        ),
+
+                                        Positioned(
+                                          top: 0,
+                                          child: Hero(
+                                            tag: 'AppLogo',
+                                            child: DoctorAvatar(
+                                              color: AppTheme.primary,
+                                              icon: Image.asset(
+                                                AppAssets.logoV(context),
+                                                width: 90,
+                                                height: 90,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 24),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        "Don't have an account?",
+                                        style: textTheme.bodyMedium?.copyWith(
+                                          color: colorScheme.onSurfaceVariant,
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed: () => context.push(
+                                          AppRoutes.doctorRegister,
+                                        ),
+                                        style: TextButton.styleFrom(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 6,
+                                          ),
+                                          minimumSize: Size.zero,
+                                          tapTargetSize:
+                                              MaterialTapTargetSize.shrinkWrap,
+                                        ),
+                                        child: Text(
+                                          "Register Here",
+                                          style: TextStyle(
+                                            color: AppTheme.primary,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 15,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const Spacer(),
+
+                                  const SizedBox(height: 10),
+                                ],
                               ),
                             ),
-                            const Spacer(),
-                            Text(
-                              'Doctor Portal',
-                              style: textTheme.titleMedium?.copyWith(
-                                color: colorScheme.onPrimary,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            const Spacer(),
-                            const SizedBox(width: 40),
                           ],
                         ),
                       ),
                     ),
-
-                    Expanded(
-                      child: Stack(
-                        clipBehavior: Clip.none,
-                        alignment: Alignment.topCenter,
-                        children: [
-                          Positioned.fill(
-                            top: 90,
-                            left: 24,
-                            right: 24,
-                            bottom: 0,
-                            child: _buildMainScrollableLoginCard(
-                              loginState.isLoading,
-                            ),
-                          ),
-
-                          Positioned(
-                            top: 10,
-                            child: Hero(
-                              tag: 'AppLogo',
-                              child: DoctorAvatar(
-                                color: AppTheme.primary,
-                                icon: Image.asset(
-                                  AppAssets.logoV(context),
-                                  width: 90,
-                                  height: 90,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                  );
+                },
               ),
-            ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildMainScrollableLoginCard(bool isLoading) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-
-    return CustomScrollView(
-      physics: const BouncingScrollPhysics(),
-      slivers: [
-        SliverList(
-          delegate: SliverChildListDelegate([
-            _buildLoginCard(isLoading),
-            const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "Don't have an account?",
-                  style: textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                TextButton(
-                  onPressed: () => context.push(AppRoutes.doctorRegister),
-                  style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 6),
-                    minimumSize: Size.zero,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  ),
-                  child: Text(
-                    "Register Here",
-                    style: TextStyle(
-                      color: AppTheme.primary,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ]),
-        ),
-      ],
-    );
-  }
-
   Widget _buildLoginCard(bool isLoading) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
