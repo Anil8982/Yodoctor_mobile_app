@@ -16,6 +16,7 @@ class ServiceCard extends StatelessWidget {
     final textTheme = theme.textTheme;
 
     return Material(
+      clipBehavior: Clip.antiAlias,
       color: AppTheme.transparent,
       borderRadius: BorderRadius.circular(24),
       child: InkWell(
