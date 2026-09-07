@@ -144,13 +144,13 @@ class _LabTestsScreenState extends ConsumerState<LabTestsScreen> {
                         onSearch: (value) {},
                       ),
                       const SizedBox(height: 5),
-                      LabCategoriesList(
-                        categories: labState.categories,
-                        selectedCategoryId: selectedCategory,
-                        onCategorySelected: (catId) {
-                          notifier.selectCategory(catId);
-                        },
-                      ),
+                      // LabCategoriesList(
+                      //   categories: labState.categories,
+                      //   selectedCategoryId: selectedCategory,
+                      //   onCategorySelected: (catId) {
+                      //     notifier.selectCategory(catId);
+                      //   },
+                      // ),
                       const SizedBox(height: 6),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),

@@ -33,7 +33,11 @@ class LabHeroSection extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.verified_user_rounded, size: 14, color: colorScheme.primary),
+                Icon(
+                  Icons.verified_user_rounded,
+                  size: 14,
+                  color: colorScheme.primary,
+                ),
                 const SizedBox(width: 6),
                 Text(
                   'Trusted by 50,000+ Families',
@@ -61,31 +65,31 @@ class LabHeroSection extends StatelessWidget {
               color: colorScheme.onSurfaceVariant,
             ),
           ),
-          const SizedBox(height: 20),
-          TextField(
-            controller: controller,
-            onChanged: onSearch,
-            style: theme.textTheme.bodyMedium,
-            decoration: InputDecoration(
-              hintText: 'Search tests, packages, checkups...',
-              prefixIcon: Icon(Icons.search_rounded, color: colorScheme.outline),
-              filled: true,
-              fillColor: theme.cardColor,
-              contentPadding: const EdgeInsets.symmetric(vertical: 16),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(20),
-                borderSide: BorderSide(color: colorScheme.outlineVariant),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(20),
-                borderSide: BorderSide(color: colorScheme.outlineVariant.withValues(alpha: 0.5)),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(20),
-                borderSide: BorderSide(color: colorScheme.primary, width: 1.5),
-              ),
-            ),
-          ),
+          // const SizedBox(height: 20),
+          // TextField(
+          //   controller: controller,
+          //   onChanged: onSearch,
+          //   style: theme.textTheme.bodyMedium,
+          //   decoration: InputDecoration(
+          //     hintText: 'Search tests, packages, checkups...',
+          //     prefixIcon: Icon(Icons.search_rounded, color: colorScheme.outline),
+          //     filled: true,
+          //     fillColor: theme.cardColor,
+          //     contentPadding: const EdgeInsets.symmetric(vertical: 16),
+          //     border: OutlineInputBorder(
+          //       borderRadius: BorderRadius.circular(20),
+          //       borderSide: BorderSide(color: colorScheme.outlineVariant),
+          //     ),
+          //     enabledBorder: OutlineInputBorder(
+          //       borderRadius: BorderRadius.circular(20),
+          //       borderSide: BorderSide(color: colorScheme.outlineVariant.withValues(alpha: 0.5)),
+          //     ),
+          //     focusedBorder: OutlineInputBorder(
+          //       borderRadius: BorderRadius.circular(20),
+          //       borderSide: BorderSide(color: colorScheme.primary, width: 1.5),
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );

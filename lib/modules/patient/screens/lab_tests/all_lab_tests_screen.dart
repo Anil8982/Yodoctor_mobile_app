@@ -63,13 +63,13 @@ class AllLabTestsScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const SizedBox(height: 8),
-          LabCategoriesList(
-            categories: labState.categories,
-            selectedCategoryId: selectedCategory,
-            onCategorySelected: (catId) {
-              notifier.selectCategory(catId);
-            },
-          ),
+          // LabCategoriesList(
+          //   categories: labState.categories,
+          //   selectedCategoryId: selectedCategory,
+          //   onCategorySelected: (catId) {
+          //     notifier.selectCategory(catId);
+          //   },
+          // ),
           const SizedBox(height: 12),
           Expanded(
             child: filteredPackages.isEmpty
@@ -101,8 +101,7 @@ class AllLabTestsScreen extends ConsumerWidget {
                         },
                         onViewDetails: () {
                           context.push(
-                            AppRoutes.labTestDetails,
-                            extra: package,
+                            '${AppRoutes.labTestDetails}/${package.id}',
                           );
                         },
                       );
