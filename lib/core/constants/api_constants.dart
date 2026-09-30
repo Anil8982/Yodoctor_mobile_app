@@ -14,6 +14,7 @@ class ApiConstants {
   }
 
   static const login = '/auth/login';
+  static const verifyLoginOtp = '/auth/verify-login-otp';
   static const googleLogin = '/auth/google-login';
   static const forgotPassword = '/auth/forgot-password';
   static const verifyReset = '/auth/verify-reset';

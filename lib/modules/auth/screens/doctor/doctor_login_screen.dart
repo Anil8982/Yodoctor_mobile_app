@@ -8,6 +8,7 @@ import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
 
 import 'package:yodoctor/modules/auth/widgets/auth_widgets.dart';
+import 'package:yodoctor/modules/auth/widgets/otp_bottom_sheet.dart';
 import 'package:yodoctor/modules/auth/widgets/top_bottom_curve_widgets.dart';
 import 'package:yodoctor/modules/auth/widgets/yo_login_text_field.dart';
 import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
@@ -57,25 +58,7 @@ class _DoctorLoginScreenState extends ConsumerState<DoctorLoginScreen>
     super.dispose();
   }
 
-  Future<void> _handleLogin() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    final notifier = ref.read(doctorLoginControllerProvider.notifier);
-
-    final result = await notifier.login(
-      identifier: _emailController.text.trim(),
-      password: _passwordController.text.trim(),
-    );
-
-    if (!mounted) return;
-
-    if (result == null) {
-      final loginState = ref.read(doctorLoginControllerProvider);
-      final errorMsg = loginState.error?.toString() ?? "Login Failed";
-      AppSnackBar.show(message: errorMsg, type: AppSnackBarType.error);
-      return;
-    }
-
+  void _processLoginRedirect(Map<String, dynamic> result) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
 
@@ -99,6 +82,72 @@ class _DoctorLoginScreenState extends ConsumerState<DoctorLoginScreen>
           );
       }
     });
+  }
+
+  Future<void> _handleLogin() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+    final notifier = ref.read(doctorLoginControllerProvider.notifier);
+
+    final result = await notifier.login(
+      identifier: email,
+      password: password,
+    );
+
+    if (!mounted) return;
+
+    if (result == null) {
+      final loginState = ref.read(doctorLoginControllerProvider);
+      final errorMsg = loginState.error?.toString() ?? "Login Failed";
+      AppSnackBar.show(message: errorMsg, type: AppSnackBarType.error);
+      return;
+    }
+
+    if (result["redirect"] == "otp" || result["requiresOtp"] == true) {
+      OtpBottomSheet.show(
+        context: context,
+        verificationId: result["verificationId"],
+        channel: result["channel"],
+        mobile: result["mobile"],
+        maskedDestination: result["maskedDestination"],
+        primaryColor: AppTheme.primary,
+        onVerify: (otp) async {
+          final verifyResult = await notifier.verifyOtp(
+            otp: otp,
+            verificationId: result["verificationId"],
+            channel: result["channel"],
+            mobile: result["mobile"],
+          );
+          if (verifyResult != null) {
+            _processLoginRedirect(verifyResult);
+            return true;
+          } else {
+            final state = ref.read(doctorLoginControllerProvider);
+            final errorMsg =
+                state.error?.toString() ?? "Invalid or expired OTP";
+            return errorMsg;
+          }
+        },
+        onResend: () async {
+          final resendResult = await notifier.resendOtp(
+            identifier: email,
+            password: password,
+          );
+          if (resendResult != null && resendResult["success"] == true) {
+            return true;
+          } else {
+            final errorMsg =
+                resendResult?["message"] ?? "Failed to resend OTP";
+            return errorMsg;
+          }
+        },
+      );
+      return;
+    }
+
+    _processLoginRedirect(result);
   }
 
   @override

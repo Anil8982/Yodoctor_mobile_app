@@ -15,21 +15,27 @@ class $AssetsLogosGen {
 
   final String yoDoctorBrandColors = 'assets/logos/YoDoctor Brand Colors.txt';
   final AssetGenImage appLogo = const AssetGenImage(
-      'assets/logos/app_logo.png');
+    'assets/logos/app_logo.png',
+  );
   final AssetGenImage appLogoBg = const AssetGenImage(
-      'assets/logos/app_logo_bg.png');
+    'assets/logos/app_logo_bg.png',
+  );
   final AssetGenImage appLogoFg = const AssetGenImage(
-      'assets/logos/app_logo_fg.png');
+    'assets/logos/app_logo_fg.png',
+  );
   final AssetGenImage badge = const AssetGenImage('assets/logos/badge.png');
   final AssetGenImage google = const AssetGenImage('assets/logos/google.png');
   final AssetGenImage logo = const AssetGenImage('assets/logos/logo.png');
   final AssetGenImage yoDark = const AssetGenImage('assets/logos/yo_dark.png');
   final AssetGenImage yoDarkV = const AssetGenImage(
-      'assets/logos/yo_dark_v.png');
+    'assets/logos/yo_dark_v.png',
+  );
   final AssetGenImage yoLight = const AssetGenImage(
-      'assets/logos/yo_light.png');
+    'assets/logos/yo_light.png',
+  );
   final AssetGenImage yoLightV = const AssetGenImage(
-      'assets/logos/yo_light_v.png');
+    'assets/logos/yo_light_v.png',
+  );
 }
 
 class $AssetsIconsGen {
@@ -37,26 +43,29 @@ class $AssetsIconsGen {
 
   final AssetGenImage doctor = const AssetGenImage('assets/icons/doctor.png');
   final AssetGenImage healthcare = const AssetGenImage(
-      'assets/icons/healthcare.png');
+    'assets/icons/healthcare.png',
+  );
   final AssetGenImage patient = const AssetGenImage('assets/icons/patient.png');
   final AssetGenImage protection = const AssetGenImage(
-      'assets/icons/protection.png');
+    'assets/icons/protection.png',
+  );
 }
 
 class $AssetsImagesGen {
   const $AssetsImagesGen();
 
   final AssetGenImage maintenancePana = const AssetGenImage(
-      'assets/images/maintenance-pana.png');
+    'assets/images/maintenance-pana.png',
+  );
   final AssetGenImage updatePana = const AssetGenImage(
-      'assets/images/update-pana.png');
+    'assets/images/update-pana.png',
+  );
 }
 
 class AssetGenImage {
   const AssetGenImage(this._assetName, {this.size, this.flavors = const {}});
 
   final String _assetName;
-
 
   final Size? size;
   final Set<String> flavors;
@@ -114,15 +123,8 @@ class AssetGenImage {
     );
   }
 
-  ImageProvider provider({
-    AssetBundle? bundle,
-    String? package,
-  }) {
-    return AssetImage(
-      _assetName,
-      bundle: bundle,
-      package: package,
-    );
+  ImageProvider provider({AssetBundle? bundle, String? package}) {
+    return AssetImage(_assetName, bundle: bundle, package: package);
   }
 
   Widget custom({
@@ -139,4 +141,3 @@ class AssetGenImage {
 
   String get keyName => _assetName;
 }
-
