@@ -54,11 +54,22 @@ class AuthInterceptor extends Interceptor {
 
   @override
   void onError(
-      DioException err,
-      ErrorInterceptorHandler handler,
-      ) async {
-    // final isTokenExpired = err.response?.statusCode == 401 ||
-    //     err.response?.data?['message'] == 'Token expired';
+    DioException err,
+    ErrorInterceptorHandler handler,
+  ) async {
+    final path = err.requestOptions.path.toLowerCase();
+    final isPublicAuthEndpoint = path.contains('/auth/login') ||
+        path.contains('/auth/verify-login-otp') ||
+        path.contains('/auth/google-login') ||
+        path.contains('/auth/forgot-password') ||
+        path.contains('/auth/verify-reset') ||
+        path.contains('/auth/reset-password') ||
+        path.contains('/patient/register') ||
+        path.contains('/doctor/register');
+
+    if (isPublicAuthEndpoint) {
+      return handler.next(err);
+    }
 
     final dynamic data = err.response?.data;
     bool isTokenExpired = err.response?.statusCode == 401;

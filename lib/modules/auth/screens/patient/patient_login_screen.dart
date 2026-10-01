@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,6 +11,7 @@ import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/core/providers/app_role_provider.dart';
 import 'package:yodoctor/modules/auth/screens/patient/patient_register_screen.dart';
 import 'package:yodoctor/modules/auth/widgets/auth_widgets.dart';
+import 'package:yodoctor/modules/auth/widgets/otp_bottom_sheet.dart';
 import 'package:yodoctor/modules/auth/widgets/top_bottom_curve_widgets.dart';
 import 'package:yodoctor/modules/auth/controllers/patient_auth_controller.dart';
 import 'package:yodoctor/modules/auth/widgets/yo_login_text_field.dart';
@@ -61,6 +63,17 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
     super.dispose();
   }
 
+  void _navigateAfterLogin(String email) {
+    if (email == "admin@gmail.com" ||
+        email.toLowerCase().contains("admin")) {
+      ref.read(appRoleProvider.notifier).setRole(AppRole.admin);
+      context.go(AppRoutes.adminDashboard);
+    } else {
+      ref.read(appRoleProvider.notifier).setRole(AppRole.patient);
+      context.go(AppRoutes.dashboard);
+    }
+  }
+
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -80,20 +93,57 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
         .signInWithEmail(
           email: email,
           password: password,
-          onSuccess: () {
-            if (email == "admin@gmail.com" ||
-                email.toLowerCase().contains("admin")) {
-              ref.read(appRoleProvider.notifier).setRole(AppRole.admin);
-              context.go(AppRoutes.adminDashboard);
-            } else {
-              ref.read(appRoleProvider.notifier).setRole(AppRole.patient);
-              context.go(AppRoutes.dashboard);
-            }
-          },
+          onSuccess: () => _navigateAfterLogin(email),
           onFailure: (errorMessage) {
             AppSnackBar.show(
               message: errorMessage,
               type: AppSnackBarType.error,
+            );
+          },
+          onOtpRequired: (otpInfo) {
+            OtpBottomSheet.show(
+              context: context,
+              verificationId: otpInfo.verificationId,
+              channel: otpInfo.channel,
+              mobile: otpInfo.mobile,
+              maskedDestination: otpInfo.maskedDestination,
+              primaryColor: AppTheme.secondary,
+              onVerify: (otp) async {
+                final completer = Completer<dynamic>();
+                await ref
+                    .read(patientAuthControllerProvider.notifier)
+                    .verifyOtp(
+                      otp: otp,
+                      email: email,
+                      verificationId: otpInfo.verificationId,
+                      channel: otpInfo.channel,
+                      mobile: otpInfo.mobile,
+                      onSuccess: () {
+                        completer.complete(true);
+                        _navigateAfterLogin(email);
+                      },
+                      onFailure: (error) {
+                        completer.complete(error);
+                      },
+                    );
+                return completer.future;
+              },
+              onResend: () async {
+                final completer = Completer<dynamic>();
+                await ref
+                    .read(patientAuthControllerProvider.notifier)
+                    .resendOtp(
+                      email: email,
+                      password: password,
+                      onSuccess: (message) {
+                        completer.complete(true);
+                      },
+                      onFailure: (error) {
+                        completer.complete(error);
+                      },
+                    );
+                return completer.future;
+              },
             );
           },
         );

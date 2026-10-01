@@ -45,11 +45,21 @@ class PatientAuthRepository implements AuthRepository {
         data: {
           'identifier': identifier.trim(),
           'password': password,
+          'portal': 'USER',
         },
       );
 
       final Map<String, dynamic> data = Map<String, dynamic>.from(response.data);
       final loginResponse = LoginResponse.fromJson(data);
+
+      if (loginResponse.requiresOtp) {
+        AppLogger.info(
+          'Login requires OTP verification. VerificationId: ${loginResponse.verificationId}, Channel: ${loginResponse.channel}',
+          tag: LogTags.auth,
+          subTag: _subTag,
+        );
+        return loginResponse;
+      }
 
       if (!loginResponse.success) {
         AppLogger.warning(
@@ -110,6 +120,94 @@ class PatientAuthRepository implements AuthRepository {
       return LoginResponse(
         success: false,
         message: 'Something went wrong.',
+      );
+    }
+  }
+
+  Future<LoginResponse> verifyLoginOtp({
+    required String otp,
+    String? verificationId,
+    String? channel,
+    String? mobile,
+  }) async {
+    try {
+      AppLogger.info(
+        'Submitting patient OTP verification request',
+        tag: LogTags.auth,
+        subTag: _subTag,
+      );
+
+      final Map<String, dynamic> payload = {
+        'otp': otp.trim(),
+        if (channel != null && channel.isNotEmpty)
+          'channel': channel.toUpperCase(),
+        if (verificationId != null && verificationId.isNotEmpty)
+          'verificationId': verificationId,
+        if (mobile != null && mobile.isNotEmpty)
+          'mobile': mobile,
+      };
+
+      final response = await _dio.post(
+        ApiConstants.verifyLoginOtp,
+        data: payload,
+      );
+
+      final Map<String, dynamic> data = Map<String, dynamic>.from(response.data);
+      final loginResponse = LoginResponse.fromJson(data);
+
+      if (!loginResponse.success) {
+        AppLogger.warning(
+          'OTP verification rejected by gateway branch: ${loginResponse.message}',
+          tag: LogTags.auth,
+          subTag: _subTag,
+        );
+        return loginResponse;
+      }
+
+      if (loginResponse.token?.isNotEmpty == true) {
+        await _storage.saveToken(loginResponse.token!);
+        await _storage.saveRole('patient');
+
+        AppLogger.success(
+          'Master JWT session key and patient role saved post OTP verification',
+          tag: LogTags.auth,
+          subTag: _subTag,
+        );
+      }
+
+      return loginResponse;
+    } on DioException catch (e, st) {
+      AppLogger.exception(
+        e,
+        st,
+        message: 'OTP verification API request failed',
+        tag: LogTags.auth,
+        subTag: _subTag,
+      );
+
+      String errorMessage = 'Invalid or expired OTP. Please try again.';
+      final responseData = e.response?.data;
+
+      if (responseData is Map<String, dynamic>) {
+        errorMessage = responseData['message']?.toString() ?? errorMessage;
+      }
+
+      return LoginResponse(
+        success: false,
+        message: errorMessage,
+      );
+    } catch (e, st) {
+      AppLogger.exception(
+        e,
+        st,
+        message: 'Unexpected error during OTP verification',
+        tag: LogTags.auth,
+        subTag: _subTag,
+      );
+
+      return LoginResponse(
+        success: false,
+        message: 'Something went wrong during OTP verification.',
       );
     }
   }

@@ -1,4 +1,6 @@
 class AppConstants {
+  static const int otpResendCooldownSeconds = 30;
+
   static const List<String> genderOptions = ['Male', 'Female', 'Other'];
 
   static const List<String> bloodGroupOptions = [

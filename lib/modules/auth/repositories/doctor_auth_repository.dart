@@ -39,6 +39,30 @@ class DoctorAuthRepository {
     }
   }
 
+  Future<Response> verifyLoginOtp({
+    required String otp,
+    String? verificationId,
+    String? channel,
+    String? mobile,
+  }) async {
+    final payload = {
+      "otp": otp.trim(),
+      if (channel != null && channel.isNotEmpty) "channel": channel.toUpperCase(),
+      if (verificationId != null && verificationId.isNotEmpty) "verificationId": verificationId,
+      if (mobile != null && mobile.isNotEmpty) "mobile": mobile,
+    };
+    AppLogger.info('Initiating doctor OTP verification request', tag: LogTags.auth, subTag: _subTag);
+
+    try {
+      final response = await _dio.post(ApiConstants.verifyLoginOtp, data: payload);
+      AppLogger.success('Doctor OTP verification completed. Status: ${response.statusCode}', tag: LogTags.auth, subTag: _subTag);
+      return response;
+    } catch (e, st) {
+      AppLogger.error('Doctor OTP verification transmission failure', tag: LogTags.auth, subTag: _subTag, error: e, stackTrace: st);
+      rethrow;
+    }
+  }
+
   Future<Response> registerStep1({
     required String fullName,
     required String email,

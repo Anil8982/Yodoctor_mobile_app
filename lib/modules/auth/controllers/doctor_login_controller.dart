@@ -43,6 +43,37 @@ class DoctorLoginController extends AsyncNotifier<Map<String, dynamic>?> {
         final redirect = data["redirect"];
         final token = data["data"]?["token"];
 
+        final bool requiresOtp = data["requiresOtp"] == true ||
+            data["otpRequired"] == true ||
+            data["isOtpRequired"] == true ||
+            data["data"]?["requiresOtp"] == true ||
+            data["data"]?["otpRequired"] == true ||
+            redirect == "otp" ||
+            data["status"] == "OTP_REQUIRED" ||
+            (token == null &&
+                (data["verificationId"] != null ||
+                    data["data"]?["verificationId"] != null));
+
+        if (requiresOtp) {
+          final otpPayload = {
+            "redirect": "otp",
+            "requiresOtp": true,
+            "verificationId":
+                data["verificationId"] ?? data["data"]?["verificationId"],
+            "channel": data["channel"] ?? data["data"]?["channel"],
+            "mobile": data["mobile"] ?? data["data"]?["mobile"],
+            "maskedDestination": data["maskedEmail"] ??
+                data["data"]?["maskedEmail"] ??
+                data["maskedMobile"] ??
+                data["data"]?["maskedMobile"] ??
+                data["maskedDestination"] ??
+                data["data"]?["maskedDestination"],
+            "message": data["message"],
+          };
+          state = AsyncData(otpPayload);
+          return otpPayload;
+        }
+
         if (token != null) {
           final status = data["status"];
 
@@ -128,6 +159,148 @@ class DoctorLoginController extends AsyncNotifier<Map<String, dynamic>?> {
       );
 
       return null;
+    }
+  }
+
+  Future<Map<String, dynamic>?> verifyOtp({
+    required String otp,
+    String? verificationId,
+    String? channel,
+    String? mobile,
+  }) async {
+    AppLogger.info(
+      'Initiating doctor OTP verification sequence',
+      tag: LogTags.auth,
+      subTag: _subTag,
+    );
+    state = const AsyncLoading();
+
+    try {
+      final repository = ref.read(doctorAuthRepositoryProvider);
+      final response = await repository.verifyLoginOtp(
+        otp: otp,
+        verificationId: verificationId,
+        channel: channel,
+        mobile: mobile,
+      );
+      final statusCode = response.statusCode ?? 0;
+
+      if (statusCode >= 200 && statusCode < 300) {
+        final data = response.data;
+        final redirect = data["redirect"];
+        final token = data["data"]?["token"];
+
+        if (token != null) {
+          final status = data["status"];
+
+          if (redirect == "resume") {
+            await repository.saveRegistrationToken(token);
+          } else {
+            await repository.saveSessionToken(token);
+            await repository.saveUserRole('doctor');
+            await repository.saveStatus(status);
+
+            final storage = ref.read(storageProvider);
+            await storage.saveActiveSubscription(false);
+
+            ref.read(appRoleProvider.notifier).setRole(AppRole.doctor);
+          }
+        }
+
+        final redirectPayload = {
+          "redirect": data["redirect"],
+          "status": data["status"],
+          "nextStep": data["nextStep"],
+          "message": data["message"],
+        };
+
+        state = AsyncData(redirectPayload);
+        return redirectPayload;
+      } else {
+        final msg = response.data?["message"] ?? "OTP Verification Failed";
+        state = AsyncError(msg, StackTrace.current);
+        return null;
+      }
+    } catch (e, st) {
+      String message = 'OTP verification failed';
+
+      if (e is DioException) {
+        final statusCode = e.response?.statusCode;
+        if (statusCode == 400 || statusCode == 401) {
+          message = e.response?.data?['message'] ?? 'Invalid or expired OTP';
+        } else if (statusCode == 404) {
+          message = 'Account or verification request not found';
+        } else if (statusCode == 500) {
+          message = 'Server error. Please try again later';
+        } else {
+          message = e.response?.data?['message'] ?? 'Verification failed';
+        }
+      }
+
+      state = AsyncError(message, st);
+
+      AppLogger.exception(
+        e,
+        st,
+        message: 'Fatal crash within doctor OTP verification wire',
+        tag: LogTags.auth,
+        subTag: _subTag,
+      );
+
+      return null;
+    }
+  }
+
+  Future<Map<String, dynamic>?> resendOtp({
+    required String identifier,
+    required String password,
+  }) async {
+    AppLogger.info(
+      'Initiating doctor OTP resend sequence',
+      tag: LogTags.auth,
+      subTag: _subTag,
+    );
+
+    try {
+      final repository = ref.read(doctorAuthRepositoryProvider);
+      final response = await repository.login(
+        identifier: identifier,
+        password: password,
+      );
+
+      final statusCode = response.statusCode ?? 0;
+      if (statusCode >= 200 && statusCode < 300) {
+        final data = response.data;
+        return {
+          "success": true,
+          "message": data["message"] ?? "OTP resent successfully",
+          "verificationId":
+              data["verificationId"] ?? data["data"]?["verificationId"],
+          "channel": data["channel"] ?? data["data"]?["channel"],
+          "mobile": data["mobile"] ?? data["data"]?["mobile"],
+        };
+      } else {
+        return {
+          "success": false,
+          "message": response.data?["message"] ?? "Failed to resend OTP",
+        };
+      }
+    } catch (e, st) {
+      AppLogger.exception(
+        e,
+        st,
+        message: 'Doctor OTP resend failed',
+        tag: LogTags.auth,
+        subTag: _subTag,
+      );
+      String message = 'Failed to resend OTP';
+      if (e is DioException) {
+        message = e.response?.data?['message'] ?? message;
+      }
+      return {
+        "success": false,
+        "message": message,
+      };
     }
   }
 
