@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:yodoctor/core/models/patient/lab_test_model.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
+
+import '../../../models/lab/lab_category_model.dart';
 
 class LabCategoriesList extends StatelessWidget {
-  final List<LabCategory> categories;
-  final String selectedCategoryId;
-  final ValueChanged<String> onCategorySelected;
+  final List<LabCategoryModel> categories;
+  final int selectedCategoryId;
+
+  final ValueChanged<int> onCategorySelected;
 
   const LabCategoriesList({
     super.key,
@@ -16,6 +19,31 @@ class LabCategoriesList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+
+    IconData getCategoryIcon(String name) {
+      switch (name.toLowerCase()) {
+        case "blood":
+          return Icons.bloodtype;
+
+        case "thyroid":
+          return Icons.monitor_heart;
+
+        case "diabetes":
+          return Icons.medical_services;
+
+        case "heart":
+          return Icons.favorite;
+
+        case "kidney":
+          return Icons.water_drop;
+
+        case "liver":
+          return Icons.health_and_safety;
+
+        default:
+          return Icons.science;
+      }
+    }
 
     return SizedBox(
       height: 54,
@@ -35,20 +63,26 @@ class LabCategoriesList extends StatelessWidget {
               label: Text(cat.name),
               showCheckmark: false,
               avatar: Icon(
-                cat.icon,
+                getCategoryIcon(cat.name),
                 size: 16,
-                color: isSelected ? colorScheme.onPrimary : colorScheme.onSurfaceVariant,
+                color: isSelected
+                    ? colorScheme.onPrimary
+                    : colorScheme.onSurfaceVariant,
               ),
               labelStyle: TextStyle(
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                color: isSelected ? colorScheme.onPrimary : colorScheme.onSurfaceVariant,
+                color: isSelected
+                    ? colorScheme.onPrimary
+                    : colorScheme.onSurfaceVariant,
               ),
               backgroundColor: Theme.of(context).cardColor,
               selectedColor: colorScheme.primary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
                 side: BorderSide(
-                  color: isSelected ? Colors.transparent : colorScheme.outlineVariant,
+                  color: isSelected
+                      ? AppTheme.transparent
+                      : colorScheme.outlineVariant,
                 ),
               ),
               onSelected: (_) => onCategorySelected(cat.id),

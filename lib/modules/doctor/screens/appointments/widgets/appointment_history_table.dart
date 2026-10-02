@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:yodoctor/core/models/appointment_history_item.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
+import 'package:yodoctor/modules/doctor/models/appointment/appointment_history_item.dart';
 
 class AppointmentHistoryTable extends StatelessWidget {
   const AppointmentHistoryTable({
@@ -29,7 +29,9 @@ class AppointmentHistoryTable extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.2)),
+        border: Border.all(
+          color: colorScheme.outlineVariant.withValues(alpha: 0.2),
+        ),
         boxShadow: [
           BoxShadow(
             color: colorScheme.shadow.withValues(alpha: 0.05),
@@ -61,20 +63,41 @@ class AppointmentHistoryTable extends StatelessWidget {
             DataColumn(label: Text('ACTION')),
           ],
           rows: appointments.map((appointment) {
-            final completed = appointment.status.toUpperCase() == 'COMPLETED';
+            final completed =
+                appointment.status.toUpperCase() == 'COMPLETED';
+
+            final canOpenPrescription =
+                completed && !appointment.isWalkIn;
+
             return DataRow(
               cells: [
                 DataCell(patientIdentityBuilder(appointment)),
                 const DataCell(Text('Consultation')),
                 DataCell(tokenChipBuilder(appointment.tokenNumber)),
-                DataCell(Text(DateFormat('dd MMM yyyy, 05:30 a').format(appointment.date))),
+                DataCell(
+                  Text(
+                    DateFormat(
+                      'dd MMM yyyy, hh:mm a',
+                    ).format(appointment.date),
+                  ),
+                ),
                 DataCell(statusChipBuilder(appointment.status)),
                 DataCell(
-                  completed
+                  canOpenPrescription
                       ? FilledButton.icon(
-                    onPressed: () => onPrescriptionTap(appointment),
-                    icon: const Icon(Icons.add_rounded, size: 17),
-                    label: const Text('Prescription'),
+                    onPressed: () =>
+                        onPrescriptionTap(appointment),
+                    icon: Icon(
+                      appointment.hasPrescription
+                          ? Icons.receipt_long_rounded
+                          : Icons.add_rounded,
+                      size: 17,
+                    ),
+                    label: Text(
+                      appointment.hasPrescription
+                          ? 'View Prescription'
+                          : 'Prescription',
+                    ),
                   )
                       : const SizedBox(width: 120),
                 ),

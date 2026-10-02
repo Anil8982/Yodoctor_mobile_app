@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-
-import '../../../../../core/utils/dummy_data.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:yodoctor/modules/widgets/status_chip.dart';
+import '../../../models/history/appointment_history_model.dart';
 
 class HistoryAppointmentCard extends StatelessWidget {
   const HistoryAppointmentCard({
@@ -9,8 +10,8 @@ class HistoryAppointmentCard extends StatelessWidget {
     required this.onViewDetails,
   });
 
-  final AppointmentHistoryItem appointment;
-  final VoidCallback onViewDetails;
+  final AppointmentHistoryModel appointment;
+  final VoidCallback? onViewDetails;
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +24,9 @@ class HistoryAppointmentCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.35)),
+        border: Border.all(
+          color: colorScheme.outlineVariant.withValues(alpha: 0.35),
+        ),
         boxShadow: <BoxShadow>[
           BoxShadow(
             color: colorScheme.shadow.withValues(alpha: 0.05),
@@ -38,21 +41,38 @@ class HistoryAppointmentCard extends StatelessWidget {
     );
   }
 
+  // WIDE LAYOUT (Desktop / Tablet)
   Widget _buildWideLayout(
-    BuildContext context,
-    TextTheme textTheme,
-    ColorScheme colorScheme,
-  ) {
+      BuildContext context,
+      TextTheme textTheme,
+      ColorScheme colorScheme,
+      ) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
-        Expanded(flex: 4, child: _buildDoctorInfo(context, textTheme, colorScheme)),
-        Expanded(flex: 3, child: _buildDateShiftInfo(context, textTheme, colorScheme)),
-        Expanded(flex: 2, child: _buildTokenChip(context, textTheme, colorScheme)),
-        Expanded(flex: 3, child: _buildStatusChip(context, textTheme, colorScheme)),
+        Expanded(
+          flex: 4,
+          child: _buildDoctorInfo(context, textTheme, colorScheme),
+        ),
+        Expanded(
+          flex: 3,
+          child: _buildDateShiftInfo(context, textTheme, colorScheme),
+        ),
+        Expanded(
+          flex: 2,
+          child: _buildTokenChip(context, textTheme, colorScheme),
+        ),
+        Expanded(
+          flex: 3,
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: StatusChip(status: appointment.status),
+          ),
+        ),
         Expanded(
           flex: 2,
           child: Align(
-            alignment: Alignment.center,
+            alignment: Alignment.centerRight,
             child: _buildViewDetailsButton(context),
           ),
         ),
@@ -60,29 +80,39 @@ class HistoryAppointmentCard extends StatelessWidget {
     );
   }
 
+  // COMPACT LAYOUT (Mobile)
   Widget _buildCompactLayout(
-    BuildContext context,
-    TextTheme textTheme,
-    ColorScheme colorScheme,
-  ) {
+      BuildContext context,
+      TextTheme textTheme,
+      ColorScheme colorScheme,
+      ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         _buildDoctorInfo(context, textTheme, colorScheme),
         const SizedBox(height: 14),
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            Expanded(child: _buildDateShiftInfo(context, textTheme, colorScheme)),
+            Expanded(
+              child: _buildDateShiftInfo(context, textTheme, colorScheme),
+            ),
             const SizedBox(width: 10),
-            Expanded(child: _buildTokenChip(context, textTheme, colorScheme)),
+            _buildTokenChip(context, textTheme, colorScheme),
           ],
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 14),
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            Expanded(child: _buildStatusChip(context, textTheme, colorScheme)),
+            StatusChip(status: appointment.status),
             const SizedBox(width: 10),
-            Expanded(child: _buildViewDetailsButton(context)),
+            Expanded(
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: _buildViewDetailsButton(context),
+              ),
+            ),
           ],
         ),
       ],
@@ -90,19 +120,25 @@ class HistoryAppointmentCard extends StatelessWidget {
   }
 
   Widget _buildDoctorInfo(
-    BuildContext context,
-    TextTheme textTheme,
-    ColorScheme colorScheme,
-  ) {
+      BuildContext context,
+      TextTheme textTheme,
+      ColorScheme colorScheme,
+      ) {
     return Row(
       children: <Widget>[
         CircleAvatar(
-          radius: 22,
+          radius: 24,
           backgroundColor: colorScheme.primaryContainer,
-          child: Icon(
-            Icons.person_rounded,
-            color: colorScheme.primary,
-          ),
+          backgroundImage:
+          appointment.profileImage != null &&
+              appointment.profileImage!.isNotEmpty
+              ? NetworkImage(appointment.profileImage!)
+              : null,
+          child:
+          appointment.profileImage == null ||
+              appointment.profileImage!.isEmpty
+              ? Icon(Icons.person_rounded, color: colorScheme.primary, size: 26)
+              : null,
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -111,17 +147,27 @@ class HistoryAppointmentCard extends StatelessWidget {
             children: <Widget>[
               Text(
                 appointment.doctorName,
-                style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
               ),
+              const SizedBox(height: 2),
               Text(
-                appointment.specialty,
+                appointment.specialization,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: textTheme.bodyMedium?.copyWith(
                   color: colorScheme.primary,
                   fontWeight: FontWeight.w700,
                 ),
               ),
+              const SizedBox(height: 2),
               Text(
-                'Patient: ${appointment.patientLabel}',
+                'Patient: ${appointment.patientName}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: textTheme.bodySmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),
@@ -134,14 +180,21 @@ class HistoryAppointmentCard extends StatelessWidget {
   }
 
   Widget _buildDateShiftInfo(
-    BuildContext context,
-    TextTheme textTheme,
-    ColorScheme colorScheme,
-  ) {
+      BuildContext context,
+      TextTheme textTheme,
+      ColorScheme colorScheme,
+      ) {
+    final String slotText = appointment.appointmentSlot.trim();
+    final String lowerSlot = slotText.toLowerCase();
+
+    final bool isMorning = lowerSlot.contains('morn') || lowerSlot.contains('am');
+    final bool isEvening = lowerSlot.contains('even') || lowerSlot.contains('pm') || lowerSlot.contains('night');
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Row(
+          mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Icon(
               Icons.calendar_today_rounded,
@@ -150,96 +203,44 @@ class HistoryAppointmentCard extends StatelessWidget {
             ),
             const SizedBox(width: 6),
             Text(
-              _formatDate(appointment.date),
-              style: textTheme.titleMedium?.copyWith(
+              appointment.appointmentDate,
+              style: textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.w700,
               ),
             ),
           ],
         ),
         const SizedBox(height: 6),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-          decoration: BoxDecoration(
-            color: colorScheme.primaryContainer.withValues(alpha: 0.45),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Icon(
-                Icons.wb_twilight_rounded,
-                size: 14,
-                color: colorScheme.primary,
-              ),
-              const SizedBox(width: 4),
-              Text(
-                appointment.shift,
-                style: textTheme.labelMedium?.copyWith(
-                  color: colorScheme.primary,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
-          ),
+        StatusChip(
+          status: appointment.appointmentSlot,
+          isSmall: true,
+          customColor: isMorning
+              ? AppTheme.warning(context)
+              : (isEvening ? AppTheme.info(context) : colorScheme.primary),
+          icon: isMorning
+              ? Icons.wb_sunny_rounded
+              : (isEvening ? Icons.nightlight_round : Icons.schedule_rounded),
         ),
       ],
     );
   }
 
   Widget _buildTokenChip(
-    BuildContext context,
-    TextTheme textTheme,
-    ColorScheme colorScheme,
-  ) {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-        decoration: BoxDecoration(
-          color: colorScheme.primaryContainer.withValues(alpha: 0.35),
-          borderRadius: BorderRadius.circular(14),
-        ),
-        child: Text(
-          appointment.tokenNumber,
-          style: textTheme.titleMedium?.copyWith(
-            color: colorScheme.primary,
-            fontWeight: FontWeight.w800,
-          ),
-        ),
+      BuildContext context,
+      TextTheme textTheme,
+      ColorScheme colorScheme,
+      ) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      decoration: BoxDecoration(
+        color: colorScheme.primaryContainer.withValues(alpha: 0.35),
+        borderRadius: BorderRadius.circular(12),
       ),
-    );
-  }
-
-  Widget _buildStatusChip(
-    BuildContext context,
-    TextTheme textTheme,
-    ColorScheme colorScheme,
-  ) {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-        decoration: BoxDecoration(
-          color: colorScheme.secondaryContainer.withValues(alpha: 0.45),
-          borderRadius: BorderRadius.circular(999),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            CircleAvatar(
-              radius: 3,
-              backgroundColor: colorScheme.secondary,
-            ),
-            const SizedBox(width: 6),
-            Text(
-              appointment.status,
-              style: textTheme.labelLarge?.copyWith(
-                color: colorScheme.onSecondaryContainer,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ],
+      child: Text(
+        'Token #${appointment.tokenNumber}',
+        style: textTheme.labelLarge?.copyWith(
+          color: colorScheme.primary,
+          fontWeight: FontWeight.w800,
         ),
       ),
     );
@@ -251,30 +252,12 @@ class HistoryAppointmentCard extends StatelessWidget {
       style: OutlinedButton.styleFrom(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        visualDensity: VisualDensity.compact,
       ),
       child: const Text(
         'View Details',
         style: TextStyle(fontWeight: FontWeight.w700),
       ),
     );
-  }
-
-  String _formatDate(DateTime date) {
-    const List<String> months = <String>[
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    final String day = date.day.toString().padLeft(2, '0');
-    return '$day ${months[date.month - 1]} ${date.year}';
   }
 }

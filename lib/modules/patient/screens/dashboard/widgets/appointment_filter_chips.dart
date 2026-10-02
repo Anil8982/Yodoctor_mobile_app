@@ -1,6 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 
-import '../../../../../core/widgets/app_chip.dart';
+import '../../../../widgets/app_chip.dart';
 
 class AppointmentFilterChips extends StatelessWidget {
   const AppointmentFilterChips({

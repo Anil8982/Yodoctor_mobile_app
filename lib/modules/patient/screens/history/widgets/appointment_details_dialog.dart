@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
-import '../../../../../core/utils/dummy_data.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:yodoctor/modules/widgets/app_text_field.dart';
+import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
+import '../../../models/history/appointment_history_model.dart';
 
 Future<void> showAppointmentDetailsDialog({
   required BuildContext context,
-  required AppointmentHistoryItem appointment,
+  required AppointmentHistoryModel appointment,
   required int initialRating,
   required String initialFeedback,
   required Future<void> Function(int rating, String feedback) onSubmitRating,
@@ -12,7 +15,7 @@ Future<void> showAppointmentDetailsDialog({
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
-    backgroundColor: Theme.of(context).colorScheme.surface.withValues(alpha: 0),
+    backgroundColor: AppTheme.transparent,
     builder: (context) => _AppointmentDetailsSheet(
       appointment: appointment,
       initialRating: initialRating,
@@ -32,14 +35,15 @@ class _AppointmentDetailsSheet extends StatefulWidget {
     required this.onDownloadPrescription,
   });
 
-  final AppointmentHistoryItem appointment;
+  final AppointmentHistoryModel appointment;
   final int initialRating;
   final String initialFeedback;
   final Future<void> Function(int rating, String feedback) onSubmitRating;
   final VoidCallback onDownloadPrescription;
 
   @override
-  State<_AppointmentDetailsSheet> createState() => _AppointmentDetailsSheetState();
+  State<_AppointmentDetailsSheet> createState() =>
+      _AppointmentDetailsSheetState();
 }
 
 class _AppointmentDetailsSheetState extends State<_AppointmentDetailsSheet> {
@@ -69,127 +73,183 @@ class _AppointmentDetailsSheetState extends State<_AppointmentDetailsSheet> {
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-      ),
-      padding: EdgeInsets.fromLTRB(24, 12, 24, MediaQuery.of(context).viewInsets.bottom + 90),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: colorScheme.outlineVariant.withValues(alpha: 0.4),
-              borderRadius: BorderRadius.circular(10),
-            ),
+        boxShadow: [
+          BoxShadow(
+            color: colorScheme.shadow.withValues(alpha: 0.1),
+            blurRadius: 20,
+            offset: const Offset(0, -4),
           ),
-          const SizedBox(height: 24),
-
-          // Doctor Header
-          Row(
+        ],
+      ),
+      child: SafeArea(
+        top: false,
+        child: SingleChildScrollView(
+          padding: EdgeInsets.fromLTRB(
+            24,
+            12,
+            24,
+            MediaQuery.of(context).viewInsets.bottom + 24,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              // Drag Handle
+              Center(
+                child: Container(
+                  width: 36,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // Doctor Info Card Header
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: colorScheme.surfaceContainerHighest.withValues(
+                    alpha: 0.3,
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: colorScheme.outlineVariant.withValues(alpha: 0.3),
+                  ),
+                ),
+                child: Row(
                   children: [
-                    Text(
-                      widget.appointment.doctorName,
-                      style: textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w900),
+                    Container(
+                      height: 52,
+                      width: 52,
+                      decoration: BoxDecoration(
+                        color: colorScheme.primaryContainer.withValues(
+                          alpha: 0.6,
+                        ),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Icon(
+                        Icons.medical_services_rounded,
+                        color: colorScheme.primary,
+                        size: 26,
+                      ),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${_formatDate(widget.appointment.date)}  •  Token ${widget.appointment.tokenNumber}',
-                      style: textTheme.bodyMedium?.copyWith(color: colorScheme.outline, fontWeight: FontWeight.w600),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.appointment.doctorName,
+                            style: textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.calendar_today_rounded,
+                                size: 13,
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                widget.appointment.appointmentDate,
+                                style: textTheme.bodySmall?.copyWith(
+                                  color: colorScheme.onSurfaceVariant,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 6),
+                                child: Text("•"),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: colorScheme.primary.withValues(
+                                    alpha: 0.1,
+                                  ),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Text(
+                                  'Token ${widget.appointment.tokenNumber}',
+                                  style: textTheme.labelSmall?.copyWith(
+                                    color: colorScheme.primary,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
               ),
-              IconButton.filledTonal(
-                onPressed: widget.onDownloadPrescription,
-                icon: const Icon(Icons.file_download_outlined),
-                tooltip: 'Download',
-              ),
-            ],
-          ),
 
-          const SizedBox(height: 32),
-          Text("Rate your experience", style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)),
-          const SizedBox(height: 16),
+              const SizedBox(height: 20),
 
-          // Minimal Stars
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(5, (index) {
-              final ratingValue = index + 1;
-              final isSelected = ratingValue <= _selectedRating;
-              return IconButton(
-                onPressed: () => setState(() => _selectedRating = ratingValue),
-                icon: Icon(
-                  isSelected ? Icons.star_rounded : Icons.star_outline_rounded,
-                  color: isSelected ? colorScheme.secondary : colorScheme.outlineVariant,
-                  size: 36,
-                ),
-              );
-            }),
-          ),
-
-          const SizedBox(height: 24),
-          TextField(
-            controller: _feedbackController,
-            maxLines: 3,
-            decoration: InputDecoration(
-              hintText: 'Share your thoughts (optional)',
-              filled: true,
-              fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.2),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(20),
-                borderSide: BorderSide.none,
-              ),
-              contentPadding: const EdgeInsets.all(20),
-            ),
-          ),
-
-          const SizedBox(height: 32),
-
-          // Primary Action
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                width: double.infinity,
-                child: FilledButton(
-                  onPressed: _selectedRating == 0 || _isSubmitting
-                      ? null
-                      : () async {
-                    final nav = Navigator.of(context);
-                    setState(() => _isSubmitting = true);
-                    await widget.onSubmitRating(_selectedRating, _feedbackController.text.trim());
-                    if (mounted) nav.pop();
-                  },
-                  style: FilledButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 18),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-                    elevation: 0,
-                  ),
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 200),
-                    child: _isSubmitting
-                        ? SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2.5,
-                        color: colorScheme.onPrimary,
+              // View Prescription Banner Button
+              Material(
+                color: AppTheme.transparent,
+                child: InkWell(
+                  onTap: widget.onDownloadPrescription,
+                  borderRadius: BorderRadius.circular(16),
+                  child: Ink(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
+                    decoration: BoxDecoration(
+                      color: colorScheme.secondaryContainer.withValues(
+                        alpha: 0.4,
                       ),
-                    )
-                        : const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: colorScheme.secondary.withValues(alpha: 0.2),
+                      ),
+                    ),
+                    child: Row(
                       children: [
-                        Icon(Icons.check_circle_outline_rounded, size: 20),
-                        SizedBox(width: 10),
-                        Text(
-                          'Save Feedback',
-                          style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+                        Icon(
+                          Icons.description_outlined,
+                          color: colorScheme.secondary,
+                          size: 22,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "View Prescription",
+                                style: textTheme.bodyMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: colorScheme.onSurface,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                "Tap to view consultation files",
+                                style: textTheme.bodySmall?.copyWith(
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Icon(
+                          Icons.arrow_forward_ios_rounded,
+                          size: 16,
+                          color: colorScheme.secondary,
                         ),
                       ],
                     ),
@@ -197,35 +257,155 @@ class _AppointmentDetailsSheetState extends State<_AppointmentDetailsSheet> {
                 ),
               ),
 
+              const SizedBox(height: 24),
+              const Divider(height: 1),
+              const SizedBox(height: 20),
+
+              // Rating Title
+              Center(
+                child: Text(
+                  "Rate your experience",
+                  style: textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
               const SizedBox(height: 12),
+
+              // Stars
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(5, (index) {
+                  final ratingValue = index + 1;
+                  final isSelected = ratingValue <= _selectedRating;
+                  return IconButton(
+                    onPressed: () =>
+                        setState(() => _selectedRating = ratingValue),
+                    icon: Icon(
+                      isSelected
+                          ? Icons.star_rounded
+                          : Icons.star_outline_rounded,
+                      color: isSelected
+                          ? const Color(0xFFFFB300)
+                          : colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+                      size: 34,
+                    ),
+                  );
+                }),
+              ),
+
+              const SizedBox(height: 16),
+
+              // Feedback Text Field
+              AppTextField(
+                controller: _feedbackController,
+                label: "Share your thoughts",
+                hint: 'Share your thoughts',
+                icon: Icons.rate_review_outlined,
+                maxLines: 5,
+                minLines: 1,
+                maxLength: 500,
+              ),
+              const SizedBox(height: 24),
+
+              // Actions
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton(
+                  onPressed: _selectedRating == 0 || _isSubmitting
+                      ? null
+                      : () async {
+                          final nav = Navigator.of(context);
+                          setState(() => _isSubmitting = true);
+                          try {
+                            await widget.onSubmitRating(
+                              _selectedRating,
+                              _feedbackController.text.trim(),
+                            );
+                            if (mounted) {
+                              nav.pop();
+                              AppSnackBar.show(
+                                message: "Review submitted successfully!",
+                                type: AppSnackBarType.success,
+                              );
+                            }
+                          } catch (e) {
+                            if (mounted) {
+                              setState(() => _isSubmitting = false);
+                              AppSnackBar.show(
+                                message: e.toString().replaceFirst(
+                                  "Exception: ",
+                                  "",
+                                ),
+                                type: AppSnackBarType.error,
+                              );
+                            }
+                          }
+                        },
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 200),
+                    child: _isSubmitting
+                        ? SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.5,
+                              color: colorScheme.onPrimary,
+                            ),
+                          )
+                        : const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.check_circle_outline_rounded,
+                                size: 20,
+                              ),
+                              SizedBox(width: 8),
+                              Text(
+                                'Save Feedback',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                ),
+                              ),
+                            ],
+                          ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 8),
 
               SizedBox(
                 width: double.infinity,
                 child: TextButton(
                   onPressed: () => Navigator.pop(context),
                   style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
                   ),
                   child: Text(
                     'Maybe Later',
                     style: TextStyle(
-                      color: colorScheme.outline,
+                      color: colorScheme.onSurfaceVariant,
                       fontWeight: FontWeight.bold,
-                      letterSpacing: 0.5,
                     ),
                   ),
                 ),
               ),
             ],
-          )
-        ],
+          ),
+        ),
       ),
     );
-  }
-
-  String _formatDate(DateTime date) {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return '${date.day} ${months[date.month - 1]} ${date.year}';
   }
 }
