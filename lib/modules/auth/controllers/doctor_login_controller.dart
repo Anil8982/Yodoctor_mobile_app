@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
 import 'package:yodoctor/core/providers/app_role_provider.dart';
+import 'package:yodoctor/core/providers/otp_cooldown_provider.dart';
 import 'package:yodoctor/core/providers/storage_provider.dart';
 import 'package:yodoctor/core/session/app_session_controller.dart';
 import 'package:yodoctor/modules/auth/repositories/doctor_auth_repository.dart';
@@ -16,6 +17,8 @@ final doctorLoginControllerProvider =
 class DoctorLoginController extends AsyncNotifier<Map<String, dynamic>?> {
   static const String _subTag = 'DoctorLoginController';
 
+  Map<String, dynamic>? _pendingOtpPayload;
+
   @override
   FutureOr<Map<String, dynamic>?> build() => null;
 
@@ -23,6 +26,17 @@ class DoctorLoginController extends AsyncNotifier<Map<String, dynamic>?> {
     required String identifier,
     required String password,
   }) async {
+    // 🛡️ Cooldown Guard: Prevent new network OTP triggers during active cooldown
+    final remaining = ref.read(otpCooldownProvider.notifier).remainingSeconds;
+    if (remaining > 0 && _pendingOtpPayload != null) {
+      AppLogger.info(
+        'Active doctor OTP cooldown running (${remaining}s remaining). Returning cached pending OTP state.',
+        tag: LogTags.auth,
+        subTag: _subTag,
+      );
+      return _pendingOtpPayload;
+    }
+
     AppLogger.info(
       'Initiating doctor email credential verification sequence',
       tag: LogTags.auth,
@@ -70,6 +84,8 @@ class DoctorLoginController extends AsyncNotifier<Map<String, dynamic>?> {
                 data["data"]?["maskedDestination"],
             "message": data["message"],
           };
+          _pendingOtpPayload = otpPayload;
+          ref.read(otpCooldownProvider.notifier).startCooldown();
           state = AsyncData(otpPayload);
           return otpPayload;
         }
@@ -116,6 +132,9 @@ class DoctorLoginController extends AsyncNotifier<Map<String, dynamic>?> {
             }
           }
         }
+
+        _pendingOtpPayload = null;
+        ref.read(otpCooldownProvider.notifier).reset();
 
         final redirectPayload = {
           "redirect": data["redirect"],
@@ -207,6 +226,9 @@ class DoctorLoginController extends AsyncNotifier<Map<String, dynamic>?> {
           }
         }
 
+        _pendingOtpPayload = null;
+        ref.read(otpCooldownProvider.notifier).reset();
+
         final redirectPayload = {
           "redirect": data["redirect"],
           "status": data["status"],
@@ -271,13 +293,29 @@ class DoctorLoginController extends AsyncNotifier<Map<String, dynamic>?> {
       final statusCode = response.statusCode ?? 0;
       if (statusCode >= 200 && statusCode < 300) {
         final data = response.data;
+        _pendingOtpPayload = {
+          "redirect": "otp",
+          "requiresOtp": true,
+          "verificationId": data["verificationId"] ??
+              data["data"]?["verificationId"] ??
+              _pendingOtpPayload?["verificationId"],
+          "channel": data["channel"] ??
+              data["data"]?["channel"] ??
+              _pendingOtpPayload?["channel"],
+          "mobile": data["mobile"] ??
+              data["data"]?["mobile"] ??
+              _pendingOtpPayload?["mobile"],
+          "maskedDestination": _pendingOtpPayload?["maskedDestination"],
+          "message": data["message"] ?? "OTP resent successfully",
+        };
+        ref.read(otpCooldownProvider.notifier).startCooldown();
+
         return {
           "success": true,
           "message": data["message"] ?? "OTP resent successfully",
-          "verificationId":
-              data["verificationId"] ?? data["data"]?["verificationId"],
-          "channel": data["channel"] ?? data["data"]?["channel"],
-          "mobile": data["mobile"] ?? data["data"]?["mobile"],
+          "verificationId": _pendingOtpPayload!["verificationId"],
+          "channel": _pendingOtpPayload!["channel"],
+          "mobile": _pendingOtpPayload!["mobile"],
         };
       } else {
         return {
@@ -308,6 +346,8 @@ class DoctorLoginController extends AsyncNotifier<Map<String, dynamic>?> {
     state = const AsyncLoading();
 
     try {
+      _pendingOtpPayload = null;
+      ref.read(otpCooldownProvider.notifier).reset();
       await ref.read(appSessionProvider).logout(AppRole.doctor);
 
       state = const AsyncData(null);
@@ -329,48 +369,4 @@ class DoctorLoginController extends AsyncNotifier<Map<String, dynamic>?> {
       );
     }
   }
-
-  // Future<void> logout() async {
-  //   state = const AsyncLoading();
-  //   try {
-  //     final repository = ref.read(doctorAuthRepositoryProvider);
-  //     await repository.clearAuthSession();
-  //
-  //     // 1. Reset runtime verification and status notifiers
-  //     ref.read(doctorStatusProvider.notifier).reset();
-  //     ref.read(subscriptionStatusProvider.notifier).reset();
-  //
-  //     // 2. Invalidate all Doctor modules and controllers to clear old session data
-  //     ref.invalidate(doctorSubscriptionProvider);
-  //     ref.invalidate(incomingAppointmentProvider);
-  //     ref.invalidate(appointmentHistoryProvider);
-  //     ref.invalidate(doctorCertificateProvider);
-  //     ref.invalidate(doctorCertificateReviewProvider);
-  //     ref.invalidate(doctorDashboardProvider);
-  //     ref.invalidate(doctorQrProvider);
-  //     ref.invalidate(doctorProfileProvider);
-  //     ref.invalidate(manualBookingProvider);
-  //
-  //     // 3. Clear application role state
-  //     ref.read(appRoleProvider.notifier).clearRole();
-  //
-  //     state = const AsyncData(null);
-  //     AppLogger.success(
-  //       'Doctor control profile session tokens and controllers terminated successfully',
-  //       tag: LogTags.auth,
-  //       subTag: _subTag,
-  //     );
-  //   } catch (e, st) {
-  //     state = AsyncError(e, st);
-  //     AppLogger.exception(
-  //       e,
-  //       st,
-  //       message: 'Session clear failure sequence intercept',
-  //       tag: LogTags.auth,
-  //       subTag: _subTag,
-  //     );
-  //   }
-  // }
 }
-
-

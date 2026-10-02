@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,7 +8,6 @@ import 'package:yodoctor/core/debug/app_logger.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/core/providers/app_role_provider.dart';
-import 'package:yodoctor/modules/auth/screens/patient/patient_register_screen.dart';
 import 'package:yodoctor/modules/auth/widgets/auth_widgets.dart';
 import 'package:yodoctor/modules/auth/widgets/otp_bottom_sheet.dart';
 import 'package:yodoctor/modules/auth/widgets/top_bottom_curve_widgets.dart';
@@ -63,17 +61,6 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
     super.dispose();
   }
 
-  void _navigateAfterLogin(String email) {
-    if (email == "admin@gmail.com" ||
-        email.toLowerCase().contains("admin")) {
-      ref.read(appRoleProvider.notifier).setRole(AppRole.admin);
-      context.go(AppRoutes.adminDashboard);
-    } else {
-      ref.read(appRoleProvider.notifier).setRole(AppRole.patient);
-      context.go(AppRoutes.dashboard);
-    }
-  }
-
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -81,6 +68,7 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
 
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
+    final notifier = ref.read(patientAuthControllerProvider.notifier);
 
     AppLogger.info(
       'Form validated. Submitting payload to AsyncNotifier.',
@@ -88,65 +76,73 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
       subTag: _subTag,
     );
 
-    ref
-        .read(patientAuthControllerProvider.notifier)
-        .signInWithEmail(
-          email: email,
-          password: password,
-          onSuccess: () => _navigateAfterLogin(email),
-          onFailure: (errorMessage) {
-            AppSnackBar.show(
-              message: errorMessage,
-              type: AppSnackBarType.error,
-            );
-          },
-          onOtpRequired: (otpInfo) {
-            OtpBottomSheet.show(
-              context: context,
-              verificationId: otpInfo.verificationId,
-              channel: otpInfo.channel,
-              mobile: otpInfo.mobile,
-              maskedDestination: otpInfo.maskedDestination,
-              primaryColor: AppTheme.secondary,
-              onVerify: (otp) async {
-                final completer = Completer<dynamic>();
-                await ref
-                    .read(patientAuthControllerProvider.notifier)
-                    .verifyOtp(
-                      otp: otp,
-                      email: email,
-                      verificationId: otpInfo.verificationId,
-                      channel: otpInfo.channel,
-                      mobile: otpInfo.mobile,
-                      onSuccess: () {
-                        completer.complete(true);
-                        _navigateAfterLogin(email);
-                      },
-                      onFailure: (error) {
-                        completer.complete(error);
-                      },
-                    );
-                return completer.future;
-              },
-              onResend: () async {
-                final completer = Completer<dynamic>();
-                await ref
-                    .read(patientAuthControllerProvider.notifier)
-                    .resendOtp(
-                      email: email,
-                      password: password,
-                      onSuccess: (message) {
-                        completer.complete(true);
-                      },
-                      onFailure: (error) {
-                        completer.complete(error);
-                      },
-                    );
-                return completer.future;
-              },
-            );
-          },
-        );
+    final result = await notifier.signInWithEmail(
+      email: email,
+      password: password,
+    );
+
+    if (!mounted) return;
+
+    if (result == null) {
+      final authState = ref.read(patientAuthControllerProvider);
+      final errorMsg = authState.error?.toString() ?? 'Login failed';
+      AppSnackBar.show(
+        message: errorMsg,
+        type: AppSnackBarType.error,
+      );
+      return;
+    }
+
+    if (result['redirect'] == 'otp' || result['requiresOtp'] == true) {
+      OtpBottomSheet.show(
+        context: context,
+        verificationId: result['verificationId'],
+        channel: result['channel'],
+        mobile: result['mobile'],
+        maskedDestination: result['maskedDestination'],
+        primaryColor: AppTheme.secondary,
+        onVerify: (otp) async {
+          final verifyResult = await notifier.verifyOtp(
+            otp: otp,
+            email: email,
+            verificationId: result['verificationId'],
+            channel: result['channel'],
+            mobile: result['mobile'],
+          );
+
+          if (verifyResult != null && verifyResult['success'] == true) {
+            ref.read(appRoleProvider.notifier).setRole(AppRole.patient);
+            if (mounted) {
+              context.go(AppRoutes.dashboard);
+            }
+            return true;
+          } else {
+            final authState = ref.read(patientAuthControllerProvider);
+            final errorMsg =
+                authState.error?.toString() ?? 'Invalid or expired OTP';
+            return errorMsg;
+          }
+        },
+        onResend: () async {
+          final resendResult = await notifier.resendOtp(
+            email: email,
+            password: password,
+          );
+
+          if (resendResult != null && resendResult['success'] == true) {
+            return true;
+          } else {
+            final errorMsg =
+                resendResult?['message'] ?? 'Failed to resend OTP';
+            return errorMsg;
+          }
+        },
+      );
+      return;
+    }
+
+    ref.read(appRoleProvider.notifier).setRole(AppRole.patient);
+    context.go(AppRoutes.dashboard);
   }
 
   @override
@@ -198,7 +194,13 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
                                     child: Row(
                                       children: [
                                         GestureDetector(
-                                          onTap: () => Navigator.pop(context),
+                                          onTap: () {
+                                            if (context.canPop()) {
+                                              context.pop();
+                                            } else {
+                                              context.go(AppRoutes.landing);
+                                            }
+                                          },
                                           child: Container(
                                             width: 40,
                                             height: 40,
@@ -283,12 +285,8 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
                                         onPressed: isProcessing
                                             ? null
                                             : () {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (_) =>
-                                                        const PatientRegisterScreen(),
-                                                  ),
+                                                context.push(
+                                                  AppRoutes.patientRegister,
                                                 );
                                               },
                                         style: TextButton.styleFrom(
@@ -478,36 +476,44 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
                 context: context,
                 icon: Image.asset(AppAssets.google, height: 20),
                 label: 'Continue with Google',
-                isLoading: isProcessing, // 🎯 स्पिनर मॅनेजमेंट पॅरामीटर
+                isLoading: isProcessing,
                 onTap: isProcessing
                     ? null
-                    : () {
-                        FocusManager.instance.primaryFocus
-                            ?.unfocus(); // Close keyboard
+                    : () async {
+                        FocusManager.instance.primaryFocus?.unfocus();
                         AppLogger.info(
                           'Google button click event received',
                           tag: LogTags.ui,
                           subTag: _subTag,
                         );
-                        ref
+
+                        final user = await ref
                             .read(patientAuthControllerProvider.notifier)
-                            .signInWithGoogle(
-                              onSuccess: (user) {
-                                AppLogger.highlight(
-                                  'OAuth authorization resolved for user: ${user.name}',
-                                );
-                                ref
-                                    .read(appRoleProvider.notifier)
-                                    .setRole(AppRole.patient);
-                                context.go(AppRoutes.dashboard);
-                              },
-                              onCanceled: () {
-                                AppSnackBar.show(
-                                  message: 'Google Sign-In was canceled.',
-                                  type: AppSnackBarType.error,
-                                );
-                              },
+                            .signInWithGoogle();
+
+                        if (!mounted) return;
+
+                        if (user != null) {
+                          AppLogger.highlight(
+                            'OAuth authorization resolved for user: ${user.name}',
+                          );
+                          ref
+                              .read(appRoleProvider.notifier)
+                              .setRole(AppRole.patient);
+                          context.go(AppRoutes.dashboard);
+                        } else {
+                          final authState =
+                              ref.read(patientAuthControllerProvider);
+                          if (authState.hasError) {
+                            final errorMsg =
+                                authState.error?.toString() ??
+                                'Google Sign-In failed';
+                            AppSnackBar.show(
+                              message: errorMsg,
+                              type: AppSnackBarType.error,
                             );
+                          }
+                        }
                       },
               ),
             ],
@@ -522,7 +528,7 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
     required Widget icon,
     required String label,
     required VoidCallback? onTap,
-    bool isLoading = false, // Added local spinner check
+    bool isLoading = false,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;

@@ -2,14 +2,15 @@ import 'dart:async';
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:yodoctor/core/constants/app_constants.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/core/providers/otp_cooldown_provider.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/auth/widgets/auth_widgets.dart';
 
 typedef OtpVerifyCallback = Future<dynamic> Function(String otp);
 typedef OtpResendCallback = Future<dynamic> Function();
 
-class OtpBottomSheet extends StatefulWidget {
+class OtpBottomSheet extends ConsumerStatefulWidget {
   final String? verificationId;
   final String? channel;
   final String? mobile;
@@ -57,20 +58,20 @@ class OtpBottomSheet extends StatefulWidget {
   }
 
   @override
-  State<OtpBottomSheet> createState() => _OtpBottomSheetState();
+  ConsumerState<OtpBottomSheet> createState() => _OtpBottomSheetState();
 }
 
-class _OtpBottomSheetState extends State<OtpBottomSheet>
+class _OtpBottomSheetState extends ConsumerState<OtpBottomSheet>
     with SingleTickerProviderStateMixin {
   final TextEditingController _otpController = TextEditingController();
-  final FocusNode _focusNode = FocusNode();
+  final FocusNode _otpFocusNode = FocusNode();
 
   late final AnimationController _shakeController;
   late final Animation<double> _shakeAnimation;
 
   Timer? _timer;
   Timer? _successMessageTimer;
-  int _secondsRemaining = AppConstants.otpResendCooldownSeconds;
+  int _secondsRemaining = 0;
   bool _isVerifying = false;
   bool _isResending = false;
   String? _errorMessage;
@@ -95,12 +96,25 @@ class _OtpBottomSheetState extends State<OtpBottomSheet>
       CurvedAnimation(parent: _shakeController, curve: Curves.easeInOut),
     );
 
+    // Sync remaining seconds from controller timestamp
+    _syncRemainingSeconds();
     _startCooldownTimer();
+
     _otpController.addListener(_onOtpChanged);
-    _focusNode.addListener(_onFocusChanged);
+    _otpFocusNode.addListener(_onFocusChanged);
+
+    // Reliable auto-request focus and ensure cooldown is active
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        _focusNode.requestFocus();
+        _otpFocusNode.requestFocus();
+        final currentExpiry = ref.read(otpCooldownProvider);
+        if (currentExpiry == null || currentExpiry.isBefore(DateTime.now())) {
+          ref.read(otpCooldownProvider.notifier).startCooldown();
+          setState(() {
+            _syncRemainingSeconds();
+            _startCooldownTimer();
+          });
+        }
       }
     });
   }
@@ -136,29 +150,37 @@ class _OtpBottomSheetState extends State<OtpBottomSheet>
     _shakeController.dispose();
     _otpController.removeListener(_onOtpChanged);
     _otpController.dispose();
-    _focusNode.removeListener(_onFocusChanged);
-    _focusNode.dispose();
+    _otpFocusNode.removeListener(_onFocusChanged);
+    _otpFocusNode.dispose();
     super.dispose();
+  }
+
+  void _syncRemainingSeconds() {
+    final expiry = ref.read(otpCooldownProvider);
+    if (expiry != null) {
+      final diff = expiry.difference(DateTime.now()).inSeconds;
+      _secondsRemaining = diff > 0 ? diff : 0;
+    } else {
+      _secondsRemaining = 0;
+    }
   }
 
   void _startCooldownTimer() {
     _timer?.cancel();
-    setState(() {
-      _secondsRemaining = AppConstants.otpResendCooldownSeconds;
-    });
+    _syncRemainingSeconds();
+    if (_secondsRemaining <= 0) return;
 
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (!mounted) {
         timer.cancel();
         return;
       }
-      if (_secondsRemaining > 0) {
-        setState(() {
-          _secondsRemaining--;
-        });
-      } else {
-        timer.cancel();
-      }
+      setState(() {
+        _syncRemainingSeconds();
+        if (_secondsRemaining <= 0) {
+          timer.cancel();
+        }
+      });
     });
   }
 
@@ -203,6 +225,7 @@ class _OtpBottomSheetState extends State<OtpBottomSheet>
   }
 
   Future<void> _handleResend() async {
+    _syncRemainingSeconds();
     if (_secondsRemaining > 0 || _isResending || _isVerifying) return;
 
     setState(() {
@@ -221,6 +244,7 @@ class _OtpBottomSheetState extends State<OtpBottomSheet>
 
       if (result == true || result == null) {
         _otpController.clear();
+        ref.read(otpCooldownProvider.notifier).startCooldown();
         _startCooldownTimer();
         setState(() {
           _resendSuccessMessage = 'New OTP sent successfully.';
@@ -233,7 +257,7 @@ class _OtpBottomSheetState extends State<OtpBottomSheet>
             });
           }
         });
-        _focusNode.requestFocus();
+        _otpFocusNode.requestFocus();
       } else if (result is String && result.isNotEmpty) {
         setState(() {
           _errorMessage = result;
@@ -286,113 +310,126 @@ class _OtpBottomSheetState extends State<OtpBottomSheet>
           child: child,
         );
       },
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          // Invisible input taking user touch and keyboard events
-          Opacity(
-            opacity: 0.0,
-            child: TextField(
-              controller: _otpController,
-              focusNode: _focusNode,
-              keyboardType: TextInputType.number,
-              maxLength: 6,
-              enableSuggestions: false,
-              autocorrect: false,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              decoration: const InputDecoration(
-                counterText: '',
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.zero,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
+          if (!_otpFocusNode.hasFocus) {
+            _otpFocusNode.requestFocus();
+          }
+        },
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            // Invisible input taking user touch and keyboard events
+            Opacity(
+              opacity: 0.0,
+              child: TextField(
+                controller: _otpController,
+                focusNode: _otpFocusNode,
+                keyboardType: TextInputType.number,
+                maxLength: 6,
+                enableSuggestions: false,
+                autocorrect: false,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                decoration: const InputDecoration(
+                  counterText: '',
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.zero,
+                ),
               ),
             ),
-          ),
 
-          // Visible 6 Styled Digit Boxes
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: List.generate(6, (index) {
-              final isFilled = index < currentText.length;
-              final isFocused =
-                  _focusNode.hasFocus && index == currentText.length;
-              final digit = isFilled ? currentText[index] : '';
+            // Visible 6 Styled Digit Boxes
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: List.generate(6, (index) {
+                final isFilled = index < currentText.length;
+                final isFocused =
+                    _otpFocusNode.hasFocus && index == currentText.length;
+                final digit = isFilled ? currentText[index] : '';
 
-              Color borderColor;
-              double borderWidth;
-              Color boxBgColor;
+                Color borderColor;
+                double borderWidth;
+                Color boxBgColor;
 
-              if (hasError) {
-                borderColor = colorScheme.error;
-                borderWidth = 1.5;
-                boxBgColor = colorScheme.error.transparency(0.04);
-              } else if (isFocused) {
-                borderColor = widget.primaryColor;
-                borderWidth = 2.0;
-                boxBgColor = colorScheme.surface;
-              } else if (isFilled) {
-                borderColor = widget.primaryColor.transparency(0.45);
-                borderWidth = 1.5;
-                boxBgColor = colorScheme.surface;
-              } else {
-                borderColor = colorScheme.outlineVariant.transparency(0.8);
-                borderWidth = 1.2;
-                boxBgColor = colorScheme.surfaceContainerLow;
-              }
+                if (hasError) {
+                  borderColor = colorScheme.error;
+                  borderWidth = 1.5;
+                  boxBgColor = colorScheme.error.transparency(0.04);
+                } else if (isFocused) {
+                  borderColor = widget.primaryColor;
+                  borderWidth = 2.0;
+                  boxBgColor = colorScheme.surface;
+                } else if (isFilled) {
+                  borderColor = widget.primaryColor.transparency(0.45);
+                  borderWidth = 1.5;
+                  boxBgColor = colorScheme.surface;
+                } else {
+                  borderColor = colorScheme.outlineVariant.transparency(0.8);
+                  borderWidth = 1.2;
+                  boxBgColor = colorScheme.surfaceContainerLow;
+                }
 
-              return GestureDetector(
-                onTap: () => _focusNode.requestFocus(),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 180),
-                  width: 48,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    color: boxBgColor,
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(
-                      color: borderColor,
-                      width: borderWidth,
+                return GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () {
+                    if (!_otpFocusNode.hasFocus) {
+                      _otpFocusNode.requestFocus();
+                    }
+                  },
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 180),
+                    width: 48,
+                    height: 56,
+                    decoration: BoxDecoration(
+                      color: boxBgColor,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: borderColor,
+                        width: borderWidth,
+                      ),
+                      boxShadow: isFocused
+                          ? [
+                              BoxShadow(
+                                color: widget.primaryColor.transparency(0.18),
+                                blurRadius: 10,
+                                offset: const Offset(0, 2),
+                              ),
+                            ]
+                          : (isFilled
+                              ? [
+                                  BoxShadow(
+                                    color: AppTheme.black.transparency(0.03),
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ]
+                              : null),
                     ),
-                    boxShadow: isFocused
-                        ? [
-                            BoxShadow(
-                              color: widget.primaryColor.transparency(0.18),
-                              blurRadius: 10,
-                              offset: const Offset(0, 2),
+                    alignment: Alignment.center,
+                    child: isFocused && digit.isEmpty
+                        ? Container(
+                            width: 2,
+                            height: 22,
+                            decoration: BoxDecoration(
+                              color: widget.primaryColor,
+                              borderRadius: BorderRadius.circular(1),
                             ),
-                          ]
-                        : (isFilled
-                            ? [
-                                BoxShadow(
-                                  color: AppTheme.black.transparency(0.03),
-                                  blurRadius: 4,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ]
-                            : null),
+                          )
+                        : Text(
+                            digit,
+                            style: textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 22,
+                              color: colorScheme.onSurface,
+                            ),
+                          ),
                   ),
-                  alignment: Alignment.center,
-                  child: isFocused && digit.isEmpty
-                      ? Container(
-                          width: 2,
-                          height: 22,
-                          decoration: BoxDecoration(
-                            color: widget.primaryColor,
-                            borderRadius: BorderRadius.circular(1),
-                          ),
-                        )
-                      : Text(
-                          digit,
-                          style: textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 22,
-                            color: colorScheme.onSurface,
-                          ),
-                        ),
-                ),
-              );
-            }),
-          ),
-        ],
+                );
+              }),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -502,7 +539,7 @@ class _OtpBottomSheetState extends State<OtpBottomSheet>
 
                 const SizedBox(height: 24),
 
-                // 6-digit OTP input boxes
+                // 6-digit OTP input boxes with reliable focus gesture handling
                 _buildOtpDigitBoxes(context),
 
                 const SizedBox(height: 8),

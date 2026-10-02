@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:yodoctor/core/providers/otp_cooldown_provider.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/auth/models/login_response.dart';
 import 'package:yodoctor/modules/auth/widgets/otp_bottom_sheet.dart';
@@ -61,16 +63,18 @@ void main() {
     testWidgets('renders title, supporting text, and buttons correctly',
         (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          theme: AppTheme.patientTheme,
-          home: Scaffold(
-            body: OtpBottomSheet(
-              verificationId: 'ver_test',
-              channel: 'EMAIL',
-              maskedDestination: 'user***@domain.com',
-              primaryColor: AppTheme.secondary,
-              onVerify: (otp) async => true,
-              onResend: () async => true,
+        ProviderScope(
+          child: MaterialApp(
+            theme: AppTheme.patientTheme,
+            home: Scaffold(
+              body: OtpBottomSheet(
+                verificationId: 'ver_test',
+                channel: 'EMAIL',
+                maskedDestination: 'user***@domain.com',
+                primaryColor: AppTheme.secondary,
+                onVerify: (otp) async => true,
+                onResend: () async => true,
+              ),
             ),
           ),
         ),
@@ -95,18 +99,20 @@ void main() {
       String? submittedOtp;
 
       await tester.pumpWidget(
-        MaterialApp(
-          theme: AppTheme.doctorTheme,
-          home: Scaffold(
-            body: OtpBottomSheet(
-              channel: 'SMS',
-              mobile: '+919876543210',
-              primaryColor: AppTheme.primary,
-              onVerify: (otp) async {
-                submittedOtp = otp;
-                return true;
-              },
-              onResend: () async => true,
+        ProviderScope(
+          child: MaterialApp(
+            theme: AppTheme.doctorTheme,
+            home: Scaffold(
+              body: OtpBottomSheet(
+                channel: 'SMS',
+                mobile: '+919876543210',
+                primaryColor: AppTheme.primary,
+                onVerify: (otp) async {
+                  submittedOtp = otp;
+                  return true;
+                },
+                onResend: () async => true,
+              ),
             ),
           ),
         ),
@@ -126,15 +132,17 @@ void main() {
     testWidgets('displays inline error message when verification fails',
         (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          theme: AppTheme.patientTheme,
-          home: Scaffold(
-            body: OtpBottomSheet(
-              channel: 'EMAIL',
-              maskedDestination: 'test@example.com',
-              primaryColor: AppTheme.secondary,
-              onVerify: (otp) async => 'Invalid OTP entered',
-              onResend: () async => true,
+        ProviderScope(
+          child: MaterialApp(
+            theme: AppTheme.patientTheme,
+            home: Scaffold(
+              body: OtpBottomSheet(
+                channel: 'EMAIL',
+                maskedDestination: 'test@example.com',
+                primaryColor: AppTheme.secondary,
+                onVerify: (otp) async => 'Invalid OTP entered',
+                onResend: () async => true,
+              ),
             ),
           ),
         ),
@@ -154,6 +162,36 @@ void main() {
       await tester.pump();
 
       expect(find.text('Invalid OTP entered'), findsNothing);
+    });
+
+    testWidgets('preserves persistent cooldown across sheet dismiss and reopen',
+        (WidgetTester tester) async {
+      final container = ProviderContainer();
+      container.read(otpCooldownProvider.notifier).startCooldown(18);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp(
+            theme: AppTheme.patientTheme,
+            home: Scaffold(
+              body: OtpBottomSheet(
+                channel: 'EMAIL',
+                maskedDestination: 'test@example.com',
+                primaryColor: AppTheme.secondary,
+                onVerify: (otp) async => true,
+                onResend: () async => true,
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pump();
+
+      // Expect to find active countdown reflecting controller timestamp and disabled action
+      expect(find.textContaining('Resend OTP in'), findsOneWidget);
+      expect(find.text('Resend OTP'), findsNothing);
     });
   });
 
@@ -182,6 +220,22 @@ void main() {
       expect(payload['otp'], '654321');
       expect(payload['channel'], 'SMS');
       expect(payload['mobile'], '+919876543210');
+    });
+  });
+
+  group('OTP Cooldown Controller Tests', () {
+    test('startCooldown sets active cooldown remaining seconds', () {
+      final container = ProviderContainer();
+      final notifier = container.read(otpCooldownProvider.notifier);
+
+      expect(notifier.remainingSeconds, 0);
+
+      notifier.startCooldown(25);
+      expect(notifier.remainingSeconds, greaterThan(0));
+      expect(notifier.remainingSeconds, lessThanOrEqualTo(25));
+
+      notifier.reset();
+      expect(notifier.remainingSeconds, 0);
     });
   });
 }

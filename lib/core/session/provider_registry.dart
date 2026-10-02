@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:yodoctor/core/profile_image/profile_image_controller.dart';
 import 'package:yodoctor/core/providers/app_role_provider.dart';
+import 'package:yodoctor/core/providers/otp_cooldown_provider.dart';
 
 import 'package:yodoctor/modules/auth/controllers/doctor_login_controller.dart';
 import 'package:yodoctor/modules/auth/controllers/doctor_register_controller.dart';
@@ -48,6 +49,7 @@ class ProviderRegistry {
     ref.invalidate(doctorRegisterControllerProvider); // Doctor Registration
     ref.invalidate(patientAuthControllerProvider); // Patient Login
     ref.invalidate(patientRegisterControllerProvider); // Patient Registration
+    ref.invalidate(otpCooldownProvider); // OTP Cooldown
 
     ref.invalidate(profileImageController); // Profile Image
 

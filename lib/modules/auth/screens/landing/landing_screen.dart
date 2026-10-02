@@ -25,290 +25,449 @@ class _LandingScreenState extends ConsumerState<LandingScreen> {
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      body: Container(
-        color: colorScheme.surface,
-        child: SafeArea(
-          top: false,
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                  child: IntrinsicHeight(
-                    child: Column(
-                      children: [
-                        Container(
-                          height: 240,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                colorScheme.secondary,
-                                colorScheme.primary
-                                    .blendWith(colorScheme.secondary, 0.5)
-                                    .transparency(0.5),
-                                colorScheme.primary,
-                              ],
+      backgroundColor: colorScheme.surface,
+      body: SafeArea(
+        top: false,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final isCompact = constraints.maxHeight < 740;
+
+            return SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: IntrinsicHeight(
+                  child: Column(
+                    children: [
+                      // 1. Premium Glossy & Glassmorphic Curved Header
+                      Container(
+                        height: isCompact ? 180 : 230,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            stops: const [0.0, 0.45, 1.0],
+                            colors: [
+                              colorScheme.secondary.blendWith(Colors.white, 0.15),
+                              colorScheme.secondary.blendWith(colorScheme.primary.transparency(0.8)),
+                              colorScheme.primary.transparency(0.8),
+                            ],
+                          ),
+                          borderRadius: const BorderRadius.only(
+                            bottomLeft: Radius.circular(56),
+                            bottomRight: Radius.circular(56),
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: colorScheme.primary.withValues(alpha: 0.28),
+                              blurRadius: 24,
+                              offset: const Offset(0, 10),
                             ),
-                            borderRadius: BorderRadius.only(
-                              bottomLeft: Radius.circular(70),
-                              bottomRight: Radius.circular(70),
+                            BoxShadow(
+                              color: colorScheme.secondary.withValues(alpha: 0.18),
+                              blurRadius: 14,
+                              offset: const Offset(0, 4),
                             ),
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: const BorderRadius.only(
+                            bottomLeft: Radius.circular(56),
+                            bottomRight: Radius.circular(56),
                           ),
                           child: Stack(
+                            clipBehavior: Clip.none,
                             children: [
+                              // 🔮 Gloss Top Reflection Highlight Arc
                               Positioned(
+                                top: -60,
                                 left: -40,
-                                bottom: 20,
+                                child: Container(
+                                  width: 220,
+                                  height: 180,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    gradient: RadialGradient(
+                                      colors: [
+                                        Colors.white.withValues(alpha: 0.28),
+                                        Colors.white.withValues(alpha: 0.0),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+
+                              // 🔮 Right Subtle Cyan/Mint Ambient Glow
+                              Positioned(
+                                top: 10,
+                                right: -30,
+                                child: Container(
+                                  width: 170,
+                                  height: 170,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    gradient: RadialGradient(
+                                      colors: [
+                                        colorScheme.primaryContainer.withValues(alpha: 0.25),
+                                        Colors.transparent,
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+
+                              // 🔮 Bottom-Left Accent Glow
+                              Positioned(
+                                bottom: -35,
+                                left: 15,
                                 child: Container(
                                   width: 120,
                                   height: 120,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
-                                    color: AppTheme.white.transparency(0.15),
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                top: -30,
-                                right: -30,
-                                child: Container(
-                                  width: 160,
-                                  height: 160,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: AppTheme.white.transparency(0.1),
-                                  ),
-                                ),
-                              ),
-                              Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    const SizedBox(height: 16),
-                                    Hero(
-                                      tag: 'AppLogo',
-                                      child: Container(
-                                        width: 130,
-                                        height: 130,
-                                        decoration: BoxDecoration(
-                                          color: colorScheme.surfaceContainer,
-                                          shape: BoxShape.circle,
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: AppTheme.black.withValues(
-                                                alpha: 0.12,
-                                              ),
-                                              blurRadius: 12,
-                                              offset: Offset(0, 4),
-                                            ),
-                                          ],
-                                        ),
-                                        padding: const EdgeInsets.all(4),
-                                        child: ClipRRect(
-                                          borderRadius: BorderRadius.circular(
-                                            55,
-                                          ),
-                                          child: Image.asset(
-                                            AppAssets.logoV(context),
-                                            fit: BoxFit.contain,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 15),
-                                    Row(
-                                      mainAxisAlignment:
-                                      MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          Icons.security_rounded,
-                                          color: colorScheme.surfaceContainer,
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Text(
-                                          'Your health, connected.',
-                                          style: textTheme.bodyLarge?.copyWith(
-                                            color: colorScheme.onPrimary,
-                                            fontWeight: FontWeight.w600,
-                                            letterSpacing: 0.5,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Icon(
-                                          Icons.favorite_rounded,
-                                          color: AppTheme.white.transparency(
-                                            0.8,
-                                          ),
-                                          size: 18,
-                                        ),
+                                    gradient: RadialGradient(
+                                      colors: [
+                                        Colors.white.withValues(alpha: 0.16),
+                                        Colors.transparent,
                                       ],
                                     ),
-                                    const SizedBox(height: 8),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        const SizedBox(height: 24),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 24),
-                          child: Column(
-                            children: [
-                              Text.rich(
-                                TextSpan(
-                                  children: [
-                                    TextSpan(
-                                      text: 'Healthcare simplified\n',
-                                      style: textTheme.headlineMedium?.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                        color: colorScheme.onSurface,
-                                        letterSpacing: 0.5,
-                                      ),
-                                    ),
-                                    TextSpan(
-                                      text: 'for everyone',
-                                      style: textTheme.headlineMedium?.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                        color: colorScheme.primary,
-                                        letterSpacing: 0.5,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 16),
-                              SizedBox(
-                                width: double.infinity,
-                                child: Image.asset(
-                                  AppAssets.protectionIcon,
-                                  height: 50,
-                                  color: colorScheme.secondary.transparency(
-                                    0.9,
                                   ),
-                                  fit: BoxFit.contain,
+                                ),
+                              ),
+
+                              // 💎 Center Content with Glossy Logo Frame & Glass Pill
+                              Align(
+                                alignment: Alignment.bottomCenter,
+                                child: Padding(
+                                  padding: EdgeInsets.only(bottom: isCompact ? 12 : 16),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      // Glossy Halo Around App Logo
+                                      Hero(
+                                        tag: 'AppLogo',
+                                        child: Container(
+                                          padding: const EdgeInsets.all(4),
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            gradient: LinearGradient(
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
+                                              colors: [
+                                                Colors.white.withValues(alpha: 0.85),
+                                                Colors.white.withValues(alpha: 0.25),
+                                              ],
+                                            ),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: AppTheme.black.withValues(alpha: 0.18),
+                                                blurRadius: 18,
+                                                offset: const Offset(0, 7),
+                                              ),
+                                              BoxShadow(
+                                                color: Colors.white.withValues(alpha: 0.35),
+                                                blurRadius: 10,
+                                                offset: const Offset(-2, -2),
+                                              ),
+                                            ],
+                                          ),
+                                          child: Container(
+                                            width: isCompact ? 84 : 108,
+                                            height: isCompact ? 84 : 108,
+                                            decoration: const BoxDecoration(
+                                              color: Colors.white,
+                                              shape: BoxShape.circle,
+                                            ),
+                                            padding: const EdgeInsets.all(3),
+                                            child: ClipRRect(
+                                              borderRadius: BorderRadius.circular(50),
+                                              child: Image.asset(
+                                                AppAssets.logoLightV,
+                                                fit: BoxFit.contain,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+
+                                      SizedBox(height: isCompact ? 8 : 12),
+
+                                      // Frosted Glass "Connected" Pill
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(24),
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 14,
+                                            vertical: 5,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white.withValues(alpha: 0.18),
+                                            borderRadius: BorderRadius.circular(24),
+                                            border: Border.all(
+                                              color: Colors.white.withValues(alpha: 0.38),
+                                              width: 1.1,
+                                            ),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: AppTheme.black.withValues(alpha: 0.06),
+                                                blurRadius: 10,
+                                                offset: const Offset(0, 3),
+                                              ),
+                                            ],
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Container(
+                                                padding: const EdgeInsets.all(2),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.white.withValues(alpha: 0.25),
+                                                  shape: BoxShape.circle,
+                                                ),
+                                                child: Icon(
+                                                  Icons.verified_rounded,
+                                                  color: Colors.white,
+                                                  size: isCompact ? 13 : 15,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 7),
+                                              Text(
+                                                'Your health, connected.',
+                                                style: (isCompact
+                                                    ? textTheme.labelMedium
+                                                    : textTheme.bodyMedium)
+                                                    ?.copyWith(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.w700,
+                                                  letterSpacing: 0.35,
+                                                  shadows: [
+                                                    Shadow(
+                                                      color: Colors.black.withValues(alpha: 0.2),
+                                                      blurRadius: 4,
+                                                      offset: const Offset(0, 1),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ],
                           ),
                         ),
+                      ),
 
-                        const SizedBox(height: 16),
+                      const Spacer(),
 
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 26),
-                          child: Text(
-                            'Choose your role to get started with your personalized health journey.',
+                      // 2. Main Title & Pill Section (Vertically Centered)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text.rich(
+                              TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: 'Healthcare simplified\n',
+                                    style: (isCompact
+                                        ? textTheme.titleLarge
+                                        : textTheme.headlineMedium)
+                                        ?.copyWith(
+                                      fontWeight: FontWeight.w800,
+                                      color: colorScheme.onSurface,
+                                      letterSpacing: 0.2,
+                                      height: 1.15,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: 'for everyone',
+                                    style: (isCompact
+                                        ? textTheme.titleLarge
+                                        : textTheme.headlineMedium)
+                                        ?.copyWith(
+                                      fontWeight: FontWeight.w800,
+                                      color: colorScheme.primary,
+                                      letterSpacing: 0.2,
+                                      height: 1.15,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 10),
+
+                            // Trust Badge Pill
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: colorScheme.secondary.transparency(0.08),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: colorScheme.secondary.transparency(0.18),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Image.asset(
+                                    AppAssets.protectionIcon,
+                                    height: 14,
+                                    width: 14,
+                                    color: colorScheme.secondary,
+                                    fit: BoxFit.contain,
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    'Secure & Certified Platform',
+                                    style: textTheme.labelSmall?.copyWith(
+                                      color: colorScheme.secondary,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 10.5,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const Spacer(),
+
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Choose your role to get started',
                             textAlign: TextAlign.center,
                             style: textTheme.titleSmall?.copyWith(
                               color: colorScheme.onSurfaceVariant,
                               fontWeight: FontWeight.w600,
-                              letterSpacing: 1,
+                              letterSpacing: 0.3,
+                              fontSize: isCompact ? 12.5 : 14,
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 20),
+                          SizedBox(height: isCompact ? 10 : 12),
 
-                        const Spacer(flex: 1),
-
-                        YoRoleButton(
-                          isDoctor: true,
-                          onTap: () {
-                            context.push(AppRoutes.doctorLogin);
-                          },
-                        ),
-                        const SizedBox(height: 14),
-                        YoRoleButton(
-                          isDoctor: false,
-                          onTap: () {
-                            context.push(AppRoutes.patientLogin);
-                          },
-                        ),
-
-                        const Spacer(flex: 1),
-
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 20,
-                          ),
-                          child: IntrinsicHeight(
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: _buildFeatureItem(
-                                    context,
-                                    icon: Icons.verified_user_rounded,
-                                    title: 'Secure & Private',
-                                    subtitle: 'Your data is safe',
-                                    iconColor: colorScheme.secondary,
-                                    bgColor: colorScheme.secondary.transparency(
-                                      0.08,
+                          if (isCompact)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 10),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: YoRoleButton(
+                                      isDoctor: true,
+                                      isCompact: true,
+                                      onTap: () => context.push(AppRoutes.doctorLogin),
                                     ),
                                   ),
-                                ),
-                                VerticalDivider(
-                                  color: colorScheme.outlineVariant
-                                      .transparency(0.6),
-                                  thickness: 1,
-                                  indent: 6,
-                                  endIndent: 6,
-                                ),
-                                Expanded(
-                                  child: _buildFeatureItem(
-                                    context,
-                                    icon: Icons.access_time_filled_rounded,
-                                    title: 'Quick Access',
-                                    subtitle: 'Healthcare at your fingertips',
-                                    iconColor: colorScheme.primary,
-                                    bgColor: colorScheme.primary.transparency(
-                                      0.08,
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: YoRoleButton(
+                                      isDoctor: false,
+                                      isCompact: true,
+                                      onTap: () => context.push(AppRoutes.patientLogin),
                                     ),
                                   ),
-                                ),
-                                VerticalDivider(
-                                  color: colorScheme.outlineVariant
-                                      .transparency(0.6),
-                                  thickness: 1,
-                                  indent: 6,
-                                  endIndent: 6,
-                                ),
-                                Expanded(
-                                  child: _buildFeatureItem(
-                                    context,
-                                    icon: Icons.favorite_rounded,
-                                    title: 'Trusted Care',
-                                    subtitle: 'Quality doctors you can trust',
-                                    iconColor: colorScheme.tertiary,
-                                    bgColor: colorScheme.tertiary.transparency(
-                                      0.08,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                                ],
+                              ),
+                            )
+                          else ...[
+                            YoRoleButton(
+                              isDoctor: true,
+                              onTap: () => context.push(AppRoutes.doctorLogin),
                             ),
+                            const SizedBox(height: 12),
+                            YoRoleButton(
+                              isDoctor: false,
+                              onTap: () => context.push(AppRoutes.patientLogin),
+                            ),
+                          ],
+                        ],
+                      ),
+
+                      SizedBox(height: isCompact ? 10 : 16),
+
+                      // 4. Feature Highlights Footer
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: isCompact ? 8 : 14,
+                        ),
+                        child: IntrinsicHeight(
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: _buildFeatureItem(
+                                  context,
+                                  icon: Icons.verified_user_rounded,
+                                  title: 'Secure & Private',
+                                  subtitle: 'Your data is safe',
+                                  iconColor: colorScheme.secondary,
+                                  bgColor: colorScheme.secondary.transparency(0.08),
+                                  isCompact: isCompact,
+                                ),
+                              ),
+                              VerticalDivider(
+                                color: colorScheme.outlineVariant.transparency(0.5),
+                                thickness: 1,
+                                indent: 4,
+                                endIndent: 4,
+                              ),
+                              Expanded(
+                                child: _buildFeatureItem(
+                                  context,
+                                  icon: Icons.access_time_filled_rounded,
+                                  title: 'Quick Access',
+                                  subtitle: 'Instant consultations',
+                                  iconColor: colorScheme.primary,
+                                  bgColor: colorScheme.primary.transparency(0.08),
+                                  isCompact: isCompact,
+                                ),
+                              ),
+                              VerticalDivider(
+                                color: colorScheme.outlineVariant.transparency(0.5),
+                                thickness: 1,
+                                indent: 4,
+                                endIndent: 4,
+                              ),
+                              Expanded(
+                                child: _buildFeatureItem(
+                                  context,
+                                  icon: Icons.favorite_rounded,
+                                  title: 'Trusted Care',
+                                  subtitle: 'Certified doctors',
+                                  iconColor: colorScheme.tertiary,
+                                  bgColor: colorScheme.tertiary.transparency(0.08),
+                                  isCompact: isCompact,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
+                      ),
 
-                        const SizedBox(height: 8),
+                      // 5. Legal Links
+                      _buildLegalLinks(context),
 
-                        // Legal links section
-                        _buildLegalLinks(context),
-
-                        const SizedBox(height: 16),
-                      ],
-                    ),
+                      SizedBox(height: isCompact ? 8 : 14),
+                    ],
                   ),
                 ),
-              );
-            },
-          ),
+              ),
+            );
+          },
         ),
       ),
     );
@@ -377,14 +536,11 @@ class _LandingScreenState extends ConsumerState<LandingScreen> {
               recognizer: TapGestureRecognizer()
                 ..onTap = () {
                   final url = appConfig?.legalAndSupport.termsServiceUrl ?? '';
-
-
                   AppLogger.info(
                     'Terms of Service URL: $url',
                     tag: LogTags.app,
                     subTag: 'Landing',
                   );
-
                   if (url.isNotEmpty) {
                     context.push(
                       AppRoutes.webViewPage(
@@ -409,6 +565,7 @@ class _LandingScreenState extends ConsumerState<LandingScreen> {
         required String subtitle,
         required Color iconColor,
         required Color bgColor,
+        required bool isCompact,
       }) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
@@ -419,32 +576,31 @@ class _LandingScreenState extends ConsumerState<LandingScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 36,
-            height: 36,
+            width: 32,
+            height: 32,
             decoration: BoxDecoration(color: bgColor, shape: BoxShape.circle),
-            child: Icon(icon, color: iconColor, size: 18),
+            child: Icon(icon, color: iconColor, size: 16),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 4),
           Text(
             title,
-            maxLines: 2,
+            maxLines: 1,
             textAlign: TextAlign.center,
             overflow: TextOverflow.ellipsis,
             style: textTheme.labelSmall?.copyWith(
               fontWeight: FontWeight.w700,
               color: colorScheme.onSurface,
-              fontSize: 11,
+              fontSize: 10.5,
             ),
           ),
-          const SizedBox(height: 1),
           Text(
             subtitle,
-            maxLines: 3,
+            maxLines: 1,
             textAlign: TextAlign.center,
             overflow: TextOverflow.ellipsis,
             style: textTheme.bodySmall?.copyWith(
               color: colorScheme.onSurfaceVariant.transparency(0.7),
-              fontSize: 9,
+              fontSize: 8.5,
             ),
           ),
         ],

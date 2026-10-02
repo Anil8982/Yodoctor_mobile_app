@@ -1,11 +1,10 @@
 import 'dart:async';
-import 'dart:ui';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
 import 'package:yodoctor/core/enums/auth_type.dart';
+import 'package:yodoctor/core/providers/otp_cooldown_provider.dart';
 import 'package:yodoctor/core/providers/storage_provider.dart';
-import 'package:yodoctor/modules/auth/models/login_response.dart';
 import 'package:yodoctor/modules/auth/models/patient_user.dart';
 import 'package:yodoctor/core/providers/app_role_provider.dart';
 import 'package:yodoctor/modules/auth/repositories/patient_auth_repository.dart';
@@ -23,19 +22,29 @@ final patientAuthControllerProvider =
 class PatientAuthController extends AsyncNotifier<PatientUser?> {
   static const String _subTag = 'PatientAuthController';
 
+  Map<String, dynamic>? _pendingOtpPayload;
+
   @override
   FutureOr<PatientUser?> build() {
     return null;
   }
 
   /// Handles traditional Email & Password Sign-In flow
-  Future<void> signInWithEmail({
+  Future<Map<String, dynamic>?> signInWithEmail({
     required String email,
     required String password,
-    required VoidCallback onSuccess,
-    required Function(String error) onFailure,
-    Function(LoginResponse otpResponse)? onOtpRequired,
   }) async {
+    // 🛡️ Cooldown Guard: Prevent new network OTP triggers during active cooldown
+    final remaining = ref.read(otpCooldownProvider.notifier).remainingSeconds;
+    if (remaining > 0 && _pendingOtpPayload != null) {
+      AppLogger.info(
+        'Active OTP cooldown running (${remaining}s remaining). Returning cached pending OTP state.',
+        tag: LogTags.auth,
+        subTag: _subTag,
+      );
+      return _pendingOtpPayload;
+    }
+
     AppLogger.info(
       'Initiating patient email authentication stream',
       tag: LogTags.auth,
@@ -53,17 +62,25 @@ class PatientAuthController extends AsyncNotifier<PatientUser?> {
       );
 
       if (response.requiresOtp) {
+        _pendingOtpPayload = {
+          'redirect': 'otp',
+          'requiresOtp': true,
+          'verificationId': response.verificationId,
+          'channel': response.channel,
+          'mobile': response.mobile,
+          'maskedDestination': response.maskedDestination,
+          'message': response.message,
+        };
+        ref.read(otpCooldownProvider.notifier).startCooldown();
         state = const AsyncData(null);
-        if (onOtpRequired != null) {
-          onOtpRequired(response);
-        }
-        return;
+        return _pendingOtpPayload;
       }
 
       if (!response.success) {
-        onFailure(response.message);
-        state = AsyncError(response.message, StackTrace.current);
-        return;
+        final errorMsg =
+            response.message.isNotEmpty ? response.message : 'Login failed';
+        state = AsyncError(errorMsg, StackTrace.current);
+        return null;
       }
 
       final user = PatientUser(
@@ -78,6 +95,8 @@ class PatientAuthController extends AsyncNotifier<PatientUser?> {
         gender: '',
       );
 
+      _pendingOtpPayload = null;
+      ref.read(otpCooldownProvider.notifier).reset();
       state = AsyncData(user);
 
       await storage.saveAuthType(AuthType.email);
@@ -89,23 +108,27 @@ class PatientAuthController extends AsyncNotifier<PatientUser?> {
         subTag: _subTag,
       );
 
-      onSuccess();
+      return {
+        'redirect': 'dashboard',
+        'success': true,
+        'message': response.message,
+        'token': response.token,
+      };
     } catch (e, st) {
       AppLogger.exception(e, st, tag: LogTags.auth, subTag: _subTag);
-      state = AsyncError(e, st);
-      onFailure(e.toString());
+      final errorMsg = e.toString().replaceAll('Exception: ', '').trim();
+      state = AsyncError(errorMsg, st);
+      return null;
     }
   }
 
   /// Verifies OTP for patient login
-  Future<bool> verifyOtp({
+  Future<Map<String, dynamic>?> verifyOtp({
     required String otp,
     required String email,
     String? verificationId,
     String? channel,
     String? mobile,
-    required VoidCallback onSuccess,
-    required Function(String error) onFailure,
   }) async {
     AppLogger.info(
       'Initiating patient OTP verification',
@@ -126,9 +149,11 @@ class PatientAuthController extends AsyncNotifier<PatientUser?> {
       );
 
       if (!response.success) {
-        state = AsyncError(response.message, StackTrace.current);
-        onFailure(response.message);
-        return false;
+        final errorMsg = response.message.isNotEmpty
+            ? response.message
+            : 'Invalid or expired OTP';
+        state = AsyncError(errorMsg, StackTrace.current);
+        return null;
       }
 
       final user = PatientUser(
@@ -143,6 +168,8 @@ class PatientAuthController extends AsyncNotifier<PatientUser?> {
         gender: '',
       );
 
+      _pendingOtpPayload = null;
+      ref.read(otpCooldownProvider.notifier).reset();
       state = AsyncData(user);
 
       await storage.saveAuthType(AuthType.email);
@@ -154,22 +181,23 @@ class PatientAuthController extends AsyncNotifier<PatientUser?> {
         subTag: _subTag,
       );
 
-      onSuccess();
-      return true;
+      return {
+        'redirect': 'dashboard',
+        'success': true,
+        'message': response.message,
+      };
     } catch (e, st) {
       AppLogger.exception(e, st, tag: LogTags.auth, subTag: _subTag);
-      state = AsyncError(e, st);
-      onFailure(e.toString());
-      return false;
+      final errorMsg = e.toString().replaceAll('Exception: ', '').trim();
+      state = AsyncError(errorMsg, st);
+      return null;
     }
   }
 
   /// Resends OTP by re-triggering authentication
-  Future<LoginResponse?> resendOtp({
+  Future<Map<String, dynamic>?> resendOtp({
     required String email,
     required String password,
-    required Function(String message) onSuccess,
-    required Function(String error) onFailure,
   }) async {
     AppLogger.info(
       'Initiating patient OTP resend request',
@@ -186,28 +214,48 @@ class PatientAuthController extends AsyncNotifier<PatientUser?> {
       );
 
       if (!response.success && !response.requiresOtp) {
-        onFailure(response.message);
-        return null;
+        return {
+          'success': false,
+          'message': response.message.isNotEmpty
+              ? response.message
+              : 'Failed to resend OTP',
+        };
       }
 
-      onSuccess(
-        response.message.isNotEmpty
+      _pendingOtpPayload = {
+        'redirect': 'otp',
+        'requiresOtp': true,
+        'verificationId': response.verificationId ??
+            _pendingOtpPayload?['verificationId'],
+        'channel':
+            response.channel ?? _pendingOtpPayload?['channel'],
+        'mobile': response.mobile ?? _pendingOtpPayload?['mobile'],
+        'maskedDestination': response.maskedDestination ??
+            _pendingOtpPayload?['maskedDestination'],
+        'message': response.message,
+      };
+      ref.read(otpCooldownProvider.notifier).startCooldown();
+
+      return {
+        'success': true,
+        'message': response.message.isNotEmpty
             ? response.message
             : 'OTP resent successfully',
-      );
-      return response;
+        'verificationId': response.verificationId,
+        'channel': response.channel,
+        'mobile': response.mobile,
+      };
     } catch (e, st) {
       AppLogger.exception(e, st, tag: LogTags.auth, subTag: _subTag);
-      onFailure(e.toString());
-      return null;
+      return {
+        'success': false,
+        'message': e.toString().replaceAll('Exception: ', '').trim(),
+      };
     }
   }
 
   /// Handles OAuth2 Google Sign-In pipeline
-  Future<void> signInWithGoogle({
-    required Function(PatientUser user) onSuccess,
-    required VoidCallback onCanceled,
-  }) async {
+  Future<PatientUser?> signInWithGoogle() async {
     AppLogger.info(
       'Triggering Google Auth pipeline from UI context request',
       tag: LogTags.auth,
@@ -218,7 +266,7 @@ class PatientAuthController extends AsyncNotifier<PatientUser?> {
     final googleAuthService = ref.read(googleAuthServiceProvider);
     final storage = ref.read(storageProvider);
 
-    state = await AsyncValue.guard(() async {
+    try {
       final PatientUser? patient = await googleAuthService.signInWithGoogle();
 
       if (patient != null) {
@@ -239,8 +287,11 @@ class PatientAuthController extends AsyncNotifier<PatientUser?> {
         }
 
         await storage.saveAuthType(AuthType.google);
-
         ref.read(appRoleProvider.notifier).setRole(AppRole.patient);
+
+        _pendingOtpPayload = null;
+        ref.read(otpCooldownProvider.notifier).reset();
+        state = AsyncData(patient);
 
         AppLogger.success(
           'Google OAuth authenticated and backend JWT session established',
@@ -248,7 +299,6 @@ class PatientAuthController extends AsyncNotifier<PatientUser?> {
           subTag: _subTag,
         );
 
-        onSuccess(patient);
         return patient;
       } else {
         AppLogger.warning(
@@ -256,9 +306,14 @@ class PatientAuthController extends AsyncNotifier<PatientUser?> {
           tag: LogTags.auth,
           subTag: _subTag,
         );
-        onCanceled();
+        state = const AsyncData(null);
         return null;
       }
-    });
+    } catch (e, st) {
+      AppLogger.exception(e, st, tag: LogTags.auth, subTag: _subTag);
+      final errorMsg = e.toString().replaceAll('Exception: ', '').trim();
+      state = AsyncError(errorMsg, st);
+      return null;
+    }
   }
 }

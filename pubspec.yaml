@@ -2,7 +2,7 @@ name: yodoctor
 description: "A comprehensive medical application for patients and doctors."
 publish_to: 'none'
 
-version: 1.0.0+6
+version: 1.0.1+7
 
 environment:
   sdk: '>=3.11.1 <4.0.0'
@@ -27,37 +27,36 @@ dependencies:
   go_router: ^17.2.3
 
   # Network & API
+  cached_network_image: ^3.4.1
   dio: ^5.10.0
   http_parser: ^4.1.2
   mime: ^2.0.0
-  cached_network_image: ^3.4.1
 
   # Firebase
-  firebase_core: ^4.11.0
-  firebase_auth: ^6.5.4
-  google_sign_in: ^7.2.0
   cloud_firestore: ^6.9.0
+  firebase_auth: ^6.5.4
+  firebase_core: ^4.11.0
+  google_sign_in: ^7.2.0
 
   # Local Storage
+  flutter_secure_storage: ^10.3.1
   hive: ^2.2.3
   hive_flutter: ^1.1.0
-  flutter_secure_storage: ^10.3.1
-
 
   # Files & Media Handling
   file_picker: ^11.0.2
+  file_saver: ^0.4.0
   image_picker: ^1.2.3
   open_filex: ^4.7.0
   path_provider: ^2.1.6
-  file_saver: ^0.4.0
 
   # Scanner & QR Code
   mobile_scanner: ^7.4.0
   qr_flutter: ^4.1.0
 
   # Maps & Location
-  geolocator: ^14.0.2
   geocoding: ^5.0.0
+  geolocator: ^14.0.2
 
   # Payment & External Launchers
   razorpay_flutter: ^1.4.5
@@ -65,20 +64,19 @@ dependencies:
 
   # Utilities & Helpers
   flutter_dotenv: ^6.0.1
-  path: ^1.9.0
-
-  package_info_plus: ^9.0.1
-  webview_flutter: ^4.14.1
-  pin_code_fields: ^10.1.0
   intl: ^0.20.3
+  package_info_plus: ^9.0.1
+  path: ^1.9.0
+  pin_code_fields: ^10.1.0
+  webview_flutter: ^4.14.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  flutter_lints: ^6.0.0
   change_app_package_name: ^1.5.0
   flutter_launcher_icons: ^0.14.4
+  flutter_lints: ^6.0.0
 
 flutter:
   uses-material-design: true
