@@ -99,8 +99,6 @@ class ProfileActionBar extends ConsumerWidget {
                         profileImageController.notifier,
                       );
 
-                      bool imageSuccess = true;
-
                       if (removeProfileImage) {
                         await imageNotifier.delete();
                       } else if (selectedImagePath != null &&

@@ -49,7 +49,7 @@ class _DoctorReviewsScreenState extends ConsumerState<DoctorReviewsScreen> {
 
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: colorScheme.surfaceContainer,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppHeader(title: 'Patient Reviews'),
       body: SafeArea(
         child: Center(

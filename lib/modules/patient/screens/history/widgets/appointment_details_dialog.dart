@@ -286,7 +286,7 @@ class _AppointmentDetailsSheetState extends State<_AppointmentDetailsSheet> {
                           ? Icons.star_rounded
                           : Icons.star_outline_rounded,
                       color: isSelected
-                          ? const Color(0xFFFFB300)
+                          ? AppTheme.warning(context)
                           : colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
                       size: 34,
                     ),

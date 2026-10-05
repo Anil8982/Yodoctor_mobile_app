@@ -9,19 +9,28 @@ class PatientCertificateDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final state = ref.watch(certificateProvider);
 
     final certificate = state.selectedCertificate;
 
     if (state.isLoading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return Scaffold(
+        backgroundColor: theme.scaffoldBackgroundColor,
+        body: const Center(child: CircularProgressIndicator()),
+      );
     }
 
     if (certificate == null) {
-      return const Scaffold(body: Center(child: Text("Certificate not found")));
+      return Scaffold(
+        backgroundColor: theme.scaffoldBackgroundColor,
+        body: const Center(child: Text("Certificate not found")),
+      );
     }
 
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppHeader(title: 'Certificate Details'),
 
       body: SafeArea(

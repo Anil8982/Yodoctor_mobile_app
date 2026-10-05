@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/modules/widgets/app_header.dart';
 import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
+import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/theme/app_theme.dart';
 import '../../../../../core/utils/app_spacing.dart';
 import '../../../../../core/utils/responsive.dart';
 import 'widgets/certificate_action_form.dart';
@@ -48,7 +50,7 @@ class _CertificateReviewScreenState
     final isSubmitting = reviewState.submitting;
 
     return Scaffold(
-      backgroundColor: colorScheme.surfaceContainer,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppHeader(
         title: isReadOnly ? 'Certificate Details' : 'Review Request',
       ),
@@ -298,16 +300,16 @@ class _CertificateReviewScreenState
 
     // Status Theme Dynamic Colors
     final Color statusBg = isApproved
-        ? (isDark ? const Color(0xFF132E23) : const Color(0xFFE8F5E9))
+        ? (isDark ? AppColors.successContainerDark : AppColors.successContainerLight)
         : isRejected
-        ? (isDark ? const Color(0xFF331619) : const Color(0xFFFFEBEE))
-        : (isDark ? const Color(0xFF332712) : const Color(0xFFFFF8E1));
+        ? (isDark ? AppColors.errorContainerDark : AppColors.errorContainerLight)
+        : (isDark ? AppColors.warningContainerDark : AppColors.warningContainerLight);
 
     final Color statusFg = isApproved
-        ? (isDark ? const Color(0xFF81C784) : const Color(0xFF2E7D32))
+        ? AppTheme.success(context)
         : isRejected
-        ? (isDark ? const Color(0xFFE57373) : const Color(0xFFC62828))
-        : (isDark ? const Color(0xFFFFD54F) : const Color(0xFFE65100));
+        ? AppTheme.error(context)
+        : AppTheme.warning(context);
 
     final IconData statusIcon = isApproved
         ? Icons.check_circle_rounded
@@ -318,11 +320,11 @@ class _CertificateReviewScreenState
     // Fitness Status Dynamic Colors
     final isFit = state.fitnessStatus.toUpperCase() == 'FIT';
     final fitnessBg = isFit
-        ? (isDark ? const Color(0xFF132E23) : const Color(0xFFE8F5E9))
-        : (isDark ? const Color(0xFF331619) : const Color(0xFFFFEBEE));
+        ? (isDark ? AppColors.successContainerDark : AppColors.successContainerLight)
+        : (isDark ? AppColors.errorContainerDark : AppColors.errorContainerLight);
     final fitnessFg = isFit
-        ? (isDark ? const Color(0xFF81C784) : const Color(0xFF2E7D32))
-        : (isDark ? const Color(0xFFE57373) : const Color(0xFFC62828));
+        ? AppTheme.success(context)
+        : AppTheme.error(context);
 
     return Container(
       width: double.infinity,
@@ -379,9 +381,7 @@ class _CertificateReviewScreenState
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: isDark
-                    ? const Color(0xFF1E2124)
-                    : const Color(0xFFF8F9FA),
+                color: colorScheme.surfaceContainerLow,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
@@ -452,7 +452,7 @@ class _CertificateReviewScreenState
             width: double.infinity,
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF1E2124) : const Color(0xFFF8F9FA),
+              color: colorScheme.surfaceContainerLow,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(

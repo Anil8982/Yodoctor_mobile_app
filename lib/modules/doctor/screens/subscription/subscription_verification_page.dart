@@ -25,7 +25,7 @@ class SubscriptionVerificationPage extends ConsumerWidget {
         state.currentPlan != null && state.currentPlan!.isActive;
 
     return Scaffold(
-      backgroundColor: colorScheme.surface,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppHeader(
         title: 'Activate Your Account',
         showBackButton: false,

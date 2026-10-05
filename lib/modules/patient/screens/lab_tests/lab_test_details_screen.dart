@@ -70,6 +70,7 @@ class _LabTestDetailsScreenState extends ConsumerState<LabTestDetailsScreen> {
 
     if (test == null) {
       return Scaffold(
+        backgroundColor: theme.scaffoldBackgroundColor,
         appBar: const AppHeader(title: 'Test Details'),
         body: Center(
           child: Column(

@@ -57,7 +57,7 @@ class StepProgressIndicator extends StatelessWidget {
                         shape: BoxShape.circle,
                         color: isCompleted
                             ? colorScheme.primaryContainer
-                            : (isActive ? colorScheme.primary : theme.scaffoldBackgroundColor),
+                            : (isActive ? colorScheme.primary : colorScheme.surface),
                         border: Border.all(
                           color: isCompleted || isActive
                               ? colorScheme.primary

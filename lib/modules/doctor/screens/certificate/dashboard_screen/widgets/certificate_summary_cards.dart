@@ -16,7 +16,6 @@ class CertificateSummaryCards extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isIssuedTab = state.activeTabIndex == 1;
-    final colorScheme = Theme.of(context).colorScheme;
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,

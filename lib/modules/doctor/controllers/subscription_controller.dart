@@ -466,9 +466,14 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
 
     try {
       final repository = ref.read(subscriptionRepositoryProvider);
+
       final response = await repository.createSubscription(
         planId: state.selectedNewPlan!.id,
         billing: state.isYearly ? "yearly" : "monthly",
+
+        // New subscription flow must NOT be treated as an upgrade.
+        // Upgrade requests are handled separately by _upgradeExistingSubscription().
+        isUpgrade: false,
       );
 
       if ((response.statusCode ?? 0) >= 200 &&
@@ -483,6 +488,7 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
           _pendingRazorpaySubscriptionId = subId;
 
           final razorpayController = ref.read(razorpayControllerProvider);
+
           razorpayController.openSubscriptionCheckout(
             key: key,
             subscriptionId: subId,
@@ -491,6 +497,7 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
               data["prefill"] as Map<String, dynamic>? ?? {},
             ),
           );
+
           return true;
         }
 
@@ -512,6 +519,7 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
         isLoading: false,
         errorMessage: 'Payment initialization failed.',
       );
+
       AppLogger.exception(
         e,
         st,
@@ -519,6 +527,7 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
         tag: LogTags.doctor,
         subTag: _subTag,
       );
+
       return false;
     }
   }

@@ -65,7 +65,7 @@ class _MySubscriptionScreenState extends ConsumerState<MySubscriptionScreen> {
     });
 
     return Scaffold(
-      backgroundColor: colorScheme.surface,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppHeader(title: 'My Subscription'),
       body: state.errorMessage != null && !state.isInitialized
           ? _buildErrorView(context, state.errorMessage!, colorScheme, theme)

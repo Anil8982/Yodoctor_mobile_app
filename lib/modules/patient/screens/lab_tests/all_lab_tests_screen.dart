@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/modules/patient/controllers/lab_test_controller.dart';
 import 'package:yodoctor/modules/widgets/app_header.dart';
-import 'widgets/lab_categories_list.dart';
 import 'widgets/lab_package_card.dart';
 
 class AllLabTestsScreen extends ConsumerWidget {
@@ -18,8 +17,6 @@ class AllLabTestsScreen extends ConsumerWidget {
     final labState = ref.watch(labProvider);
 
     final notifier = ref.read(labProvider.notifier);
-
-    final selectedCategory = labState.selectedCategory;
 
     final filteredPackages = notifier.filteredPackages;
     // final popularTests = labState.popularTests;

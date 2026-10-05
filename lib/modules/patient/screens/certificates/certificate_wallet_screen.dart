@@ -265,11 +265,11 @@ class _CertificateWalletScreenState
     Color getStatusColor() {
       switch (cert.status.toUpperCase()) {
         case 'APPROVED':
-          return colorScheme.primary;
+          return AppTheme.success(context);
         case 'PENDING':
-          return AppTheme.orange;
+          return AppTheme.warning(context);
         case 'REJECTED':
-          return colorScheme.error;
+          return AppTheme.error(context);
         default:
           return colorScheme.outline;
       }

@@ -51,7 +51,7 @@ class DoctorProfileCard extends StatelessWidget {
         ],
       ),
       child: Material(
-        color: Colors.transparent,
+        color: AppTheme.transparent,
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(24),

@@ -1,5 +1,6 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 
 class ProfileDropdownField extends StatelessWidget {
   final String label;
@@ -65,7 +66,7 @@ class ProfileDropdownField extends StatelessWidget {
         }).toList(),
         decoration: InputDecoration(
           filled: true,
-          fillColor: Colors.transparent,
+          fillColor: AppTheme.transparent,
 
           labelText: label,
           labelStyle: TextStyle(

@@ -81,7 +81,7 @@ class QueuePatientList extends ConsumerWidget {
     ColorScheme colorScheme,
     LiveQueueNotifier notifier,
   ) {
-    final statusColor = _getStatusColor(status);
+    final statusColor = _getStatusColor(context, status);
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4),
@@ -126,14 +126,15 @@ class QueuePatientList extends ConsumerWidget {
     );
   }
 
-  Color _getStatusColor(String status) {
+  Color _getStatusColor(BuildContext context, String status) {
+    final colorScheme = Theme.of(context).colorScheme;
     return switch (status) {
-      "ACCEPTED" => AppTheme.green,
-      "IN_PROGRESS" => Colors.blue,
-      "COMPLETED" => Colors.teal,
-      "CANCELLED" => AppTheme.red,
-      "SKIPPED" => AppTheme.orange,
-      _ => AppTheme.grey,
+      "ACCEPTED" => AppTheme.success(context),
+      "IN_PROGRESS" => AppTheme.info(context),
+      "COMPLETED" => colorScheme.primary,
+      "CANCELLED" => AppTheme.error(context),
+      "SKIPPED" => AppTheme.warning(context),
+      _ => colorScheme.onSurfaceVariant,
     };
   }
 

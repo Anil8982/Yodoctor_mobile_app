@@ -126,9 +126,10 @@ class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: AppHeader(title: _isEditing ? 'Update Member' : 'Add New Member'),
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),

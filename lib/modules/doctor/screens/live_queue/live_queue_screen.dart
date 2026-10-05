@@ -26,7 +26,7 @@ class LiveQueueScreen extends ConsumerWidget {
     }
 
     return Scaffold(
-      backgroundColor: colorScheme.surface,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppHeader(
         title: "Today's Queue",
         actions: [

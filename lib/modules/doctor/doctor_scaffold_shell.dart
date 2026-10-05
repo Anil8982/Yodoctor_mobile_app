@@ -13,9 +13,11 @@ class DoctorScaffoldShell extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
     final dashboard = ref.watch(doctorDashboardProvider);
 
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       resizeToAvoidBottomInset: false,
       drawer: dashboard.when(
         data: (data) => DoctorDrawer(doctor: data.doctor),

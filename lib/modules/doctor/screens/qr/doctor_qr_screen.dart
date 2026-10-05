@@ -24,7 +24,7 @@ class DoctorQrScreen extends ConsumerWidget {
     ).padding.bottom; // 👈 Get System Bottom Inset
 
     return Scaffold(
-      backgroundColor: colorScheme.surfaceContainer,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: const AppHeader(title: 'My Digital QR'),
       body: Column(
         children: [
@@ -63,7 +63,7 @@ class DoctorQrScreen extends ConsumerWidget {
                             children: [
                               Card(
                                 elevation: 0,
-                                color: colorScheme.surface,
+                                color: colorScheme.surfaceContainer,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(28),
                                   side: BorderSide(

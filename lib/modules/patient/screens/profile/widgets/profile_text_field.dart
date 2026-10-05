@@ -35,7 +35,7 @@ class ProfileTextField extends StatelessWidget {
         validator: validator,
         decoration: InputDecoration(
           filled: true,
-          fillColor: Colors.transparent,
+          fillColor: AppTheme.transparent,
 
           labelText: label,
           hintText: controller.text.trim().isEmpty

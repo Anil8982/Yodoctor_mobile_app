@@ -78,7 +78,7 @@ class _AddPrescriptionScreenState extends ConsumerState<AddPrescriptionScreen> {
     final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      backgroundColor: colorScheme.surface,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppHeader(title: "Add Prescription"),
       body: SafeArea(
         child: Align(

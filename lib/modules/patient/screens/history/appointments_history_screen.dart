@@ -38,6 +38,7 @@ class _AppointmentsHistoryScreenState
     final historyState = ref.watch(appointmentHistoryControllerProvider);
     final notifier = ref.read(appointmentHistoryControllerProvider.notifier);
 
+    final colorScheme = theme.colorScheme;
     final double horizontal = Responsive.horizontalPadding(context);
     final bool isWideScreen = MediaQuery.sizeOf(context).width >= 980;
 

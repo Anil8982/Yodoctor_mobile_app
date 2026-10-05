@@ -66,7 +66,7 @@ class _DoctorProfileEditScreenState
 
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: colorScheme.surfaceContainer,
+      backgroundColor: theme.scaffoldBackgroundColor,
       extendBodyBehindAppBar: true,
       body: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) {

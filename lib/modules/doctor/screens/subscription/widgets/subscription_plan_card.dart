@@ -12,23 +12,25 @@ class SubscriptionPlanCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+    final colorScheme = theme.colorScheme;
     final bool hasActivePlan = plan != null && plan!.isActive;
 
     // Dynamic colors & content based on active/inactive state
     final List<Color> gradientColors = hasActivePlan
         ? [
-            const Color(0xFF1A52CD),
-            const Color(0xFF0EA791),
-          ] // Active Blue/Green
+            colorScheme.primary,
+            colorScheme.secondary,
+          ] // Active Primary/Secondary
         : [
-            const Color(0xFFE65100),
-            const Color(0xFFF57C00),
-          ]; // Inactive Amber/Orange
+            AppTheme.warning(context),
+            AppTheme.warning(context).pastel(0.8),
+          ]; // Inactive Warning
 
     final shadowColor = hasActivePlan
-        ? const Color(0xFF1A52CD)
-        : const Color(0xFFF57C00);
+        ? colorScheme.primary
+        : AppTheme.warning(context);
 
     return Container(
       width: double.infinity,
@@ -62,8 +64,8 @@ class SubscriptionPlanCard extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(28.0),
               child: hasActivePlan
-                  ? _buildActiveContent(textTheme, plan!)
-                  : _buildInactiveContent(textTheme, onUpgradePressed),
+                  ? _buildActiveContent(context, textTheme, plan!)
+                  : _buildInactiveContent(context, textTheme, onUpgradePressed),
             ),
           ],
         ),
@@ -72,7 +74,11 @@ class SubscriptionPlanCard extends StatelessWidget {
   }
 
   // 1. ACTIVE PLAN CONTENT
-  Widget _buildActiveContent(TextTheme textTheme, SubscriptionPlan plan) {
+  Widget _buildActiveContent(
+    BuildContext context,
+    TextTheme textTheme,
+    SubscriptionPlan plan,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -100,9 +106,9 @@ class SubscriptionPlanCard extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const CircleAvatar(
+                  CircleAvatar(
                     radius: 3,
-                    backgroundColor: Color(0xFF39FF14),
+                    backgroundColor: AppTheme.success(context),
                   ),
                   const SizedBox(width: 8),
                   Text(
@@ -214,6 +220,7 @@ class SubscriptionPlanCard extends StatelessWidget {
 
   // 2. INACTIVE PLAN CONTENT
   Widget _buildInactiveContent(
+    BuildContext context,
     TextTheme textTheme,
     VoidCallback? onUpgradePressed,
   ) {
@@ -246,9 +253,9 @@ class SubscriptionPlanCard extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const CircleAvatar(
+                  CircleAvatar(
                     radius: 3,
-                    backgroundColor: Color(0xFFFF5252), // Red dot for inactive
+                    backgroundColor: AppTheme.error(context),
                   ),
                   const SizedBox(width: 8),
                   Text(
@@ -288,7 +295,7 @@ class SubscriptionPlanCard extends StatelessWidget {
             onPressed: onUpgradePressed,
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.white,
-              foregroundColor: const Color(0xFFE65100),
+              foregroundColor: AppTheme.warning(context),
               elevation: 0,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(14),

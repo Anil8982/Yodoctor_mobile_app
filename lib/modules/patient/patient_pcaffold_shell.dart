@@ -20,9 +20,11 @@ class PatientScaffoldShell extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
     final bool isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
 
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       resizeToAvoidBottomInset: false,
       drawer: PatientDrawer(),
       body: navigationShell,

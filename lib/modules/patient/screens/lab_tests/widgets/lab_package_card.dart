@@ -71,7 +71,7 @@ class LabPackageCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
-                    package.categoryId == 'fullbody' ? 'Package' : 'Essential',
+                    package.type.toLowerCase() == 'package' ? 'Package' : 'Essential',
                     style: theme.textTheme.labelSmall?.copyWith(
                       fontSize: 8,
                       fontWeight: FontWeight.bold,

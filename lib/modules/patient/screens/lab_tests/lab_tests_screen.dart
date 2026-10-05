@@ -5,7 +5,6 @@ import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/modules/patient/controllers/lab_test_controller.dart';
 import 'package:yodoctor/modules/widgets/app_header.dart';
 import 'widgets/lab_hero_section.dart';
-import 'widgets/lab_categories_list.dart';
 import 'widgets/lab_package_card.dart';
 import 'widgets/lab_trust_section.dart';
 import 'widgets/lab_support_banner.dart';
@@ -43,8 +42,6 @@ class _LabTestsScreenState extends ConsumerState<LabTestsScreen> {
     final labState = ref.watch(labProvider);
 
     final notifier = ref.read(labProvider.notifier);
-
-    final selectedCategory = labState.selectedCategory;
 
     final popularTests = labState.popularTests;
     final cartItems = labState.cart;
