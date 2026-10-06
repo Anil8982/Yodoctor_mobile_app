@@ -157,6 +157,8 @@ class ApiConstants {
   static const readAllNotifications = '/notifications/read-all';
 
   // --- Doctor Subscription & Billing ---
+  static const String firstOfferOrder = '/razorpay/first-offer/order';
+  static const String firstOfferVerify = '/razorpay/first-offer/verify';
   static const createSubscription = '/razorpay/subscriptions/create';
   static const verifySubscription = '/razorpay/subscriptions/verify';
   static const activeSubscription = '/razorpay/subscriptions/active';

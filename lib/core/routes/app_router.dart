@@ -14,13 +14,12 @@ import 'package:yodoctor/modules/app_config/screens/force_update_screen.dart';
 import 'package:yodoctor/modules/app_config/screens/maintenance_screen.dart';
 import 'package:yodoctor/modules/app_config/screens/webview/webview_screen.dart';
 import 'package:yodoctor/modules/auth/controllers/doctor_status_controller.dart';
-import 'package:yodoctor/modules/auth/screens/doctor/doctor_login_screen.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/doctor_register_screen.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/verification_status_screen.dart';
 import 'package:yodoctor/modules/auth/screens/landing/landing_screen.dart';
 import 'package:yodoctor/modules/auth/screens/landing/splash_screen.dart';
-import 'package:yodoctor/modules/auth/screens/patient/patient_login_screen.dart';
 import 'package:yodoctor/modules/auth/screens/patient/patient_register_screen.dart';
+import 'package:yodoctor/modules/auth/screens/unified_login_screen.dart';
 import 'package:yodoctor/modules/doctor/controllers/subscription_status_controller.dart';
 import 'package:yodoctor/modules/doctor/doctor_scaffold_shell.dart';
 import 'package:yodoctor/modules/doctor/models/subscription/subscription_model.dart';
@@ -370,10 +369,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.landing,
         builder: (context, state) => LandingScreen(),
       ),
+
       GoRoute(
         parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.patientLogin,
-        builder: (context, state) => PatientLoginScreen(),
+        builder: (context, state) => const UnifiedLoginScreen(role: UserRole.patient),
       ),
       GoRoute(
         parentNavigatorKey: AppRouter.rootNavigatorKey,
@@ -383,7 +383,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.doctorLogin,
-        builder: (context, state) => DoctorLoginScreen(),
+        builder: (context, state) => const UnifiedLoginScreen(role: UserRole.doctor),
       ),
       GoRoute(
         parentNavigatorKey: AppRouter.rootNavigatorKey,

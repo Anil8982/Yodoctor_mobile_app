@@ -166,6 +166,7 @@ class _OtpBottomSheetState extends ConsumerState<OtpBottomSheet>
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _timer?.cancel();
     _successMessageTimer?.cancel();
     _shakeController.dispose();
