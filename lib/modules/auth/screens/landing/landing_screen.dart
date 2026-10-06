@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/constants/app_assets.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:yodoctor/core/providers/app_role_provider.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/app_config/controllers/app_config_controller.dart';
@@ -369,7 +370,10 @@ class _LandingScreenState extends ConsumerState<LandingScreen> {
                                     child: YoRoleButton(
                                       isDoctor: true,
                                       isCompact: true,
-                                      onTap: () => context.push(AppRoutes.doctorLogin),
+                                      onTap: () {
+                                        ref.read(appRoleProvider.notifier).setRole(AppRole.doctor);
+                                        context.push(AppRoutes.doctorLogin);
+                                      },
                                     ),
                                   ),
                                   const SizedBox(width: 12),
@@ -377,7 +381,10 @@ class _LandingScreenState extends ConsumerState<LandingScreen> {
                                     child: YoRoleButton(
                                       isDoctor: false,
                                       isCompact: true,
-                                      onTap: () => context.push(AppRoutes.patientLogin),
+                                      onTap: () {
+                                        ref.read(appRoleProvider.notifier).setRole(AppRole.patient);
+                                        context.push(AppRoutes.patientLogin);
+                                      },
                                     ),
                                   ),
                                 ],
@@ -386,12 +393,18 @@ class _LandingScreenState extends ConsumerState<LandingScreen> {
                           else ...[
                             YoRoleButton(
                               isDoctor: true,
-                              onTap: () => context.push(AppRoutes.doctorLogin),
+                              onTap: () {
+                                ref.read(appRoleProvider.notifier).setRole(AppRole.doctor);
+                                context.push(AppRoutes.doctorLogin);
+                              },
                             ),
                             const SizedBox(height: 12),
                             YoRoleButton(
                               isDoctor: false,
-                              onTap: () => context.push(AppRoutes.patientLogin),
+                              onTap: () {
+                                ref.read(appRoleProvider.notifier).setRole(AppRole.patient);
+                                context.push(AppRoutes.patientLogin);
+                              },
                             ),
                           ],
                         ],

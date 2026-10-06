@@ -793,6 +793,7 @@ import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
 import 'package:yodoctor/core/providers/app_role_provider.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 
 import 'package:yodoctor/modules/auth/controllers/doctor_login_controller.dart';
 import 'package:yodoctor/modules/auth/controllers/patient_auth_controller.dart';
@@ -1275,7 +1276,9 @@ class _UnifiedLoginScreenState extends ConsumerState<UnifiedLoginScreen>
               }
             },
             style: IconButton.styleFrom(
-              backgroundColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.7),
+              backgroundColor: colorScheme.surfaceContainerHighest.withValues(
+                alpha: 0.7,
+              ),
               foregroundColor: colorScheme.onSurface,
               minimumSize: const Size(40, 40),
               padding: EdgeInsets.zero,
@@ -1287,10 +1290,7 @@ class _UnifiedLoginScreenState extends ConsumerState<UnifiedLoginScreen>
                 ),
               ),
             ),
-            icon: const Icon(
-              Icons.arrow_back_rounded,
-              size: 20,
-            ),
+            icon: const Icon(Icons.arrow_back_rounded, size: 20),
           ),
 
           // Portal Tag
@@ -1359,18 +1359,50 @@ class _UnifiedLoginScreenState extends ConsumerState<UnifiedLoginScreen>
           children: [
             // Center Identity / Brand Icon
             Center(
-              child: Container(
-                width: 80,
-                height: 80,
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: colorScheme.primaryContainer.withValues(alpha: 0.7),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: colorScheme.primary.withValues(alpha: 0.2),
+              child: Hero(
+                tag: 'AppLogo',
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        colorScheme.primary.withValues(alpha: 0.85),
+                        colorScheme.secondary.withValues(alpha: 0.25),
+                      ],
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppTheme.black.withValues(alpha: 0.18),
+                        blurRadius: 18,
+                        offset: const Offset(0, 7),
+                      ),
+                      BoxShadow(
+                        color: Colors.white.withValues(alpha: 0.35),
+                        blurRadius: 10,
+                        offset: const Offset(-2, -2),
+                      ),
+                    ],
+                  ),
+                  child: Container(
+                    width: 84,
+                    height: 84,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    padding: const EdgeInsets.all(3),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(50),
+                      child: Image.asset(
+                        AppAssets.logoLightV,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
                   ),
                 ),
-                child: Image.asset(AppAssets.logoV(context)),
               ),
             ),
             const SizedBox(height: 18),
