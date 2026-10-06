@@ -62,7 +62,7 @@ class OtpBottomSheet extends ConsumerStatefulWidget {
 }
 
 class _OtpBottomSheetState extends ConsumerState<OtpBottomSheet>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   final TextEditingController _otpController = TextEditingController();
   final FocusNode _otpFocusNode = FocusNode();
 
@@ -80,21 +80,23 @@ class _OtpBottomSheetState extends ConsumerState<OtpBottomSheet>
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _shakeController = AnimationController(
       duration: const Duration(milliseconds: 400),
       vsync: this,
     );
 
-    _shakeAnimation = TweenSequence<double>([
-      TweenSequenceItem(tween: Tween(begin: 0.0, end: -8.0), weight: 1),
-      TweenSequenceItem(tween: Tween(begin: -8.0, end: 8.0), weight: 2),
-      TweenSequenceItem(tween: Tween(begin: 8.0, end: -6.0), weight: 2),
-      TweenSequenceItem(tween: Tween(begin: -6.0, end: 6.0), weight: 2),
-      TweenSequenceItem(tween: Tween(begin: 6.0, end: -3.0), weight: 2),
-      TweenSequenceItem(tween: Tween(begin: -3.0, end: 0.0), weight: 1),
-    ]).animate(
-      CurvedAnimation(parent: _shakeController, curve: Curves.easeInOut),
-    );
+    _shakeAnimation =
+        TweenSequence<double>([
+          TweenSequenceItem(tween: Tween(begin: 0.0, end: -8.0), weight: 1),
+          TweenSequenceItem(tween: Tween(begin: -8.0, end: 8.0), weight: 2),
+          TweenSequenceItem(tween: Tween(begin: 8.0, end: -6.0), weight: 2),
+          TweenSequenceItem(tween: Tween(begin: -6.0, end: 6.0), weight: 2),
+          TweenSequenceItem(tween: Tween(begin: 6.0, end: -3.0), weight: 2),
+          TweenSequenceItem(tween: Tween(begin: -3.0, end: 0.0), weight: 1),
+        ]).animate(
+          CurvedAnimation(parent: _shakeController, curve: Curves.easeInOut),
+        );
 
     // Sync remaining seconds from controller timestamp
     _syncRemainingSeconds();
@@ -140,6 +142,25 @@ class _OtpBottomSheetState extends ConsumerState<OtpBottomSheet>
           !_isResending) {
         _handleVerify();
       }
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    if (state == AppLifecycleState.resumed && mounted) {
+      Future.delayed(const Duration(milliseconds: 300), () {
+        if (!mounted || _isVerifying || _isResending) return;
+
+        _otpFocusNode.unfocus();
+
+        Future.delayed(const Duration(milliseconds: 100), () {
+          if (!mounted || _isVerifying || _isResending) return;
+
+          _otpFocusNode.requestFocus();
+        });
+      });
     }
   }
 
@@ -397,14 +418,14 @@ class _OtpBottomSheetState extends ConsumerState<OtpBottomSheet>
                               ),
                             ]
                           : (isFilled
-                              ? [
-                                  BoxShadow(
-                                    color: AppTheme.black.transparency(0.03),
-                                    blurRadius: 4,
-                                    offset: const Offset(0, 2),
-                                  ),
-                                ]
-                              : null),
+                                ? [
+                                    BoxShadow(
+                                      color: AppTheme.black.transparency(0.03),
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ]
+                                : null),
                     ),
                     alignment: Alignment.center,
                     child: isFocused && digit.isEmpty
@@ -560,17 +581,17 @@ class _OtpBottomSheetState extends ConsumerState<OtpBottomSheet>
                             ),
                           )
                         : (_resendSuccessMessage != null &&
-                                _resendSuccessMessage!.isNotEmpty)
-                            ? Text(
-                                _resendSuccessMessage!,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: textTheme.bodySmall?.copyWith(
-                                  color: widget.primaryColor,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              )
-                            : const SizedBox.shrink(),
+                              _resendSuccessMessage!.isNotEmpty)
+                        ? Text(
+                            _resendSuccessMessage!,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: textTheme.bodySmall?.copyWith(
+                              color: widget.primaryColor,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          )
+                        : const SizedBox.shrink(),
                   ),
                 ),
 
