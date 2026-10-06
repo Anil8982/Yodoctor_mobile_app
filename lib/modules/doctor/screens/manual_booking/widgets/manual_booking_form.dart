@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:yodoctor/core/constants/app_constants.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
+import 'package:yodoctor/modules/widgets/app_dropdown_field.dart';
 import 'package:yodoctor/modules/widgets/app_field_wrapper.dart';
 import 'package:yodoctor/modules/widgets/app_text_field.dart';
 
@@ -14,6 +16,8 @@ class ManualBookingForm extends StatelessWidget {
     required this.mobileController,
     required this.ageController,
     required this.selectedShift,
+    required this.selectedGender,
+    required this.onGenderChanged,
     required this.onShiftChanged,
     required this.onSubmit,
     required this.loading,
@@ -24,7 +28,9 @@ class ManualBookingForm extends StatelessWidget {
   final TextEditingController patientNameController;
   final TextEditingController mobileController;
   final TextEditingController ageController;
+  final String? selectedGender;
   final String selectedShift;
+  final ValueChanged<String?> onGenderChanged;
   final ValueChanged<String?> onShiftChanged;
   final VoidCallback onSubmit;
   final bool loading;
@@ -67,6 +73,22 @@ class ManualBookingForm extends StatelessWidget {
               final indianPhoneRegExp = RegExp(r'^[6-9]\d{9}$');
               if (!indianPhoneRegExp.hasMatch(v.trim())) {
                 return 'Enter a valid 10-digit mobile number';
+              }
+              return null;
+            },
+          ),
+          const SizedBox(height: AppSpacing.xl),
+          AppDropdownField<String>(
+            label: 'Gender',
+            isRequired: true,
+            hint: 'Select gender',
+            icon: Icons.wc_rounded,
+            value: selectedGender,
+            items: AppConstants.genderOptions,
+            onChanged: onGenderChanged,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Select gender';
               }
               return null;
             },

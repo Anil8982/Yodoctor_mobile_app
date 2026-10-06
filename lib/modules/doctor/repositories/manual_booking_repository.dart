@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/api_constants.dart';
 import 'package:yodoctor/core/network/dio_provider.dart';
 
-final manualBookingRepositoryProvider = Provider<ManualBookingRepository>((ref) {
+final manualBookingRepositoryProvider = Provider<ManualBookingRepository>((
+  ref,
+) {
   return ManualBookingRepository(ref.read(dioProvider));
 });
 
@@ -14,6 +16,7 @@ class ManualBookingRepository {
   Future<Response> bookPatient({
     required String patientName,
     required String patientMobile,
+    required String patientGender,
     required int patientAge,
     required String slot,
     String appointmentType = "CLINIC",
@@ -25,6 +28,7 @@ class ManualBookingRepository {
         "slot": slot,
         "patientName": patientName,
         "patientMobile": patientMobile,
+        "patientGender": patientGender,
         "patientAge": patientAge,
       },
     );

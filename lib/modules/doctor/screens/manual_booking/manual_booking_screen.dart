@@ -97,8 +97,14 @@ class _ManualBookingScreenState extends ConsumerState<ManualBookingScreen> {
                                 patientNameController: _patientNameController,
                                 mobileController: _mobileController,
                                 ageController: _ageController,
+                                selectedGender: state.selectedGender,
                                 selectedShift: state.selectedShift,
                                 loading: state.loading,
+                                onGenderChanged: (value) {
+                                  if (value != null) {
+                                    notifier.selectGender(value);
+                                  }
+                                },
                                 onShiftChanged: (value) {
                                   if (value != null) {
                                     notifier.changeShift(value);

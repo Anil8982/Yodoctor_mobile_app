@@ -8,32 +8,41 @@ import '../repositories/manual_booking_repository.dart';
 class ManualBookingState {
   final bool loading;
   final String selectedShift;
+  final String? selectedGender;
+  final String? genderError;
   final String? errorMessage;
 
   const ManualBookingState({
     this.loading = false,
     this.selectedShift = "Evening Shift",
+    this.selectedGender,
+    this.genderError,
     this.errorMessage,
   });
 
   ManualBookingState copyWith({
     bool? loading,
     String? selectedShift,
+    String? selectedGender,
     String? errorMessage,
+    String? genderError,
+    bool clearGenderError = false,
     bool clearError = false,
   }) {
     return ManualBookingState(
       loading: loading ?? this.loading,
       selectedShift: selectedShift ?? this.selectedShift,
+      selectedGender: selectedGender ?? this.selectedGender,
+      genderError: clearGenderError ? null : (genderError ?? this.genderError),
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
     );
   }
 }
 
 final manualBookingProvider =
-NotifierProvider<ManualBookingNotifier, ManualBookingState>(
-  ManualBookingNotifier.new,
-);
+    NotifierProvider<ManualBookingNotifier, ManualBookingState>(
+      ManualBookingNotifier.new,
+    );
 
 class ManualBookingNotifier extends Notifier<ManualBookingState> {
   static const String _subTag = 'ManualBookingNotifier';
@@ -62,11 +71,29 @@ class ManualBookingNotifier extends Notifier<ManualBookingState> {
     state = state.copyWith(selectedShift: shift);
   }
 
+  void selectGender(String gender) {
+    AppLogger.info(
+      'Gender selection updated locally to: $gender',
+      tag: LogTags.doctor,
+      subTag: _subTag,
+    );
+    state = state.copyWith(selectedGender: gender, genderError: null);
+  }
+
   Future<bool> submit({
     required String patientName,
     required String mobile,
     required String age,
   }) async {
+    if (state.selectedGender == null) {
+      AppLogger.warning(
+        'Manual Patient booking registration aborted: Missing selected Gender reference',
+        tag: LogTags.doctor,
+        subTag: _subTag,
+      );
+      state = state.copyWith(genderError: 'Please select gender');
+      return false;
+    }
     if (state.loading) {
       AppLogger.warning(
         'Submission blocked due to loading state',
@@ -84,6 +111,7 @@ class ManualBookingNotifier extends Notifier<ManualBookingState> {
     final payload = {
       "patientName": patientName,
       "patientMobile": mobile,
+      "patientGender": state.selectedGender!.toUpperCase(),
       "patientAge": int.tryParse(age) ?? 0,
       "slot": mappedSlot,
     };
@@ -104,6 +132,7 @@ class ManualBookingNotifier extends Notifier<ManualBookingState> {
       final response = await repository.bookPatient(
         patientName: patientName,
         patientMobile: mobile,
+        patientGender: state.selectedGender!.toUpperCase(),
         patientAge: int.tryParse(age) ?? 0,
         slot: mappedSlot,
       );
