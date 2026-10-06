@@ -86,10 +86,7 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
     if (result == null) {
       final authState = ref.read(patientAuthControllerProvider);
       final errorMsg = authState.error?.toString() ?? 'Login failed';
-      AppSnackBar.show(
-        message: errorMsg,
-        type: AppSnackBarType.error,
-      );
+      AppSnackBar.show(message: errorMsg, type: AppSnackBarType.error);
       return;
     }
 
@@ -132,8 +129,7 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
           if (resendResult != null && resendResult['success'] == true) {
             return true;
           } else {
-            final errorMsg =
-                resendResult?['message'] ?? 'Failed to resend OTP';
+            final errorMsg = resendResult?['message'] ?? 'Failed to resend OTP';
             return errorMsg;
           }
         },
@@ -380,15 +376,28 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
               const SizedBox(height: 16),
               YoLoginTextField(
                 color: AppTheme.secondary,
-                hint: 'Email Address',
+                hint: 'Email / Phone No.',
                 prefixIcon: Icons.email_rounded,
                 keyboardType: TextInputType.emailAddress,
                 controller: _emailController,
                 enabled: !isProcessing,
                 validator: (v) {
-                  if (v == null || v.isEmpty) return 'Enter email address';
-                  if (!RegExp(r'\S+@\S+\.\S+').hasMatch(v)) {
-                    return 'Enter valid email';
+                  final value = v?.trim() ?? '';
+
+                  if (value.isEmpty) {
+                    return 'Enter email address or phone no.';
+                  }
+
+                  if (RegExp(r'[a-zA-Z@]').hasMatch(value)) {
+                    if (!RegExp(
+                      r'^[^\s@]+@[^\s@]+\.[^\s@]+$',
+                    ).hasMatch(value)) {
+                      return 'Enter valid email';
+                    }
+                  } else {
+                    if (!RegExp(r'^[6-9]\d{9}$').hasMatch(value)) {
+                      return 'Enter valid 10-digit number';
+                    }
                   }
                   return null;
                 },
@@ -502,8 +511,9 @@ class _PatientLoginScreenState extends ConsumerState<PatientLoginScreen>
                               .setRole(AppRole.patient);
                           context.go(AppRoutes.dashboard);
                         } else {
-                          final authState =
-                              ref.read(patientAuthControllerProvider);
+                          final authState = ref.read(
+                            patientAuthControllerProvider,
+                          );
                           if (authState.hasError) {
                             final errorMsg =
                                 authState.error?.toString() ??
