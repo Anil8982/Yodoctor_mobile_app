@@ -20,8 +20,8 @@ class YoRoleButton extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     final Color buttonColor = isDoctor
-        ? colorScheme.secondary
-        : colorScheme.primary;
+        ? AppTheme.doctorColor
+        : AppTheme.patientColor;
 
     final title = isDoctor ? 'I am a Doctor' : 'I am a Patient';
     final subtitle = isDoctor

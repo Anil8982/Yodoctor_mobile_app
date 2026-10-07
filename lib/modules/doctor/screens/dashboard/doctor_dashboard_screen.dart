@@ -45,7 +45,6 @@ class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
     final dashboardAsync = ref.watch(doctorDashboardProvider);
 
     final hasData = dashboardAsync.hasValue;

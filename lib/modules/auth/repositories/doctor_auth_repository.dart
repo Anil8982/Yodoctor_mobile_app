@@ -39,17 +39,41 @@ class DoctorAuthRepository {
     }
   }
 
+  Future<Response> sendLoginOtp({required String identifier}) async {
+    final payload = {
+      "identifier": identifier.trim(),
+      "password": "",
+      "portal": "DOCTOR",
+      "loginWithOtp": true,
+    };
+    AppLogger.info('Initiating doctor send login OTP request to /auth/login', tag: LogTags.auth, subTag: _subTag);
+
+    try {
+      final response = await _dio.post(ApiConstants.login, data: payload);
+      AppLogger.success('Doctor send login OTP completed. Status: ${response.statusCode}', tag: LogTags.auth, subTag: _subTag);
+      return response;
+    } catch (e, st) {
+      AppLogger.error('Doctor send login OTP transmission failure', tag: LogTags.auth, subTag: _subTag, error: e, stackTrace: st);
+      rethrow;
+    }
+  }
+
   Future<Response> verifyLoginOtp({
     required String otp,
     String? verificationId,
     String? channel,
     String? mobile,
+    String? email,
+    String? identifier,
   }) async {
     final payload = {
       "otp": otp.trim(),
       if (channel != null && channel.isNotEmpty) "channel": channel.toUpperCase(),
       if (verificationId != null && verificationId.isNotEmpty) "verificationId": verificationId,
       if (mobile != null && mobile.isNotEmpty) "mobile": mobile,
+      if (email != null && email.isNotEmpty) "email": email,
+      if (identifier != null && identifier.isNotEmpty) "identifier": identifier,
+      "portal": "DOCTOR",
     };
     AppLogger.info('Initiating doctor OTP verification request', tag: LogTags.auth, subTag: _subTag);
 

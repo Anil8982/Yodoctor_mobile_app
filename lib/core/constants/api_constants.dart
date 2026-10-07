@@ -28,6 +28,10 @@ class ApiConstants {
 
   // --- Patient Authentication & Registration ---
   static const patientRegister = '/patient/register';
+  static const patientRegisterSendEmailOtp = '/patient/register/send-email-otp';
+  static const patientRegisterVerifyEmailOtp = '/patient/register/verify-email-otp';
+  static const patientRegisterSendMobileOtp = '/patient/register/send-mobile-otp';
+  static const patientRegisterVerifyMobileOtp = '/patient/register/verify-mobile-otp';
 
   // --- Doctor Authentication & Registration ---
   static const doctorRegisterStep1 = '/doctor/register';

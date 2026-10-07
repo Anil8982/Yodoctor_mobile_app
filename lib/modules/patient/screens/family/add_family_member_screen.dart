@@ -73,14 +73,20 @@ class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
           (gender) => gender.toLowerCase() == member.gender.trim().toLowerCase(),
       orElse: () => '',
     );
-    _selectedBloodGroup = member.bloodGroup;
+    _selectedBloodGroup = (member.bloodGroup.isNotEmpty && member.bloodGroup != 'NA')
+        ? member.bloodGroup
+        : null;
     _selectedRelation = member.relation;
     _dobController.text = DateFormat(
       'dd MMM yyyy',
     ).format(DateTime.parse(member.dob));
     _selectedDob = DateTime.tryParse(member.dob);
-    _heightController.text = member.heightCm.toString();
-    _weightController.text = member.weightKg.toString();
+    if (member.heightCm > 0) {
+      _heightController.text = member.heightCm.toString();
+    }
+    if (member.weightKg > 0) {
+      _weightController.text = member.weightKg.toString();
+    }
   }
 
   Future<void> _saveMember() async {
@@ -101,7 +107,7 @@ class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
         fullName: _nameController.text.trim(),
         gender: _selectedGender!,
         dob: _selectedDob!.toIso8601String().split('T').first,
-        bloodGroup: _selectedBloodGroup!,
+        bloodGroup: _selectedBloodGroup ?? '',
         heightCm: _heightController.text.trim(),
         weightKg: _weightController.text.trim(),
         relation: _selectedRelation!,
@@ -111,7 +117,7 @@ class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
         fullName: _nameController.text.trim(),
         gender: _selectedGender!,
         dob: _selectedDob!.toIso8601String().split('T').first,
-        bloodGroup: _selectedBloodGroup!,
+        bloodGroup: _selectedBloodGroup ?? '',
         heightCm: _heightController.text.trim(),
         weightKg: _weightController.text.trim(),
         relation: _selectedRelation!,
@@ -218,7 +224,7 @@ class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
                               width: fieldWidth,
                               child: AppDropdownField<String>(
                                 label: 'Blood Group',
-                                isRequired: true,
+                                isOptional: true,
                                 hint: 'Select blood group',
                                 icon: Icons.bloodtype_rounded,
                                 value: _selectedBloodGroup,
@@ -226,12 +232,6 @@ class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
                                 onChanged: (String? value) => setState(
                                       () => _selectedBloodGroup = value,
                                 ),
-                                validator: (String? value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Please select blood group';
-                                  }
-                                  return null;
-                                },
                               ),
                             ),
                             SizedBox(
@@ -258,7 +258,7 @@ class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
                               width: fieldWidth,
                               child: AppTextField(
                                 label: 'Height (cm)',
-                                isRequired: true,
+                                isOptional: true,
                                 hint: 'e.g. 170',
                                 maxLength: 5,
                                 icon: Icons.height_rounded,
@@ -275,7 +275,7 @@ class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
                                 validator: (String? value) {
                                   final String text = value?.trim() ?? '';
                                   if (text.isEmpty) {
-                                    return 'Please enter height';
+                                    return null;
                                   }
                                   final double? parsed = double.tryParse(text);
                                   if (parsed == null) {
@@ -292,7 +292,7 @@ class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
                               width: fieldWidth,
                               child: AppTextField(
                                 label: 'Weight (kg)',
-                                isRequired: true,
+                                isOptional: true,
                                 hint: 'e.g. 65',
                                 maxLength: 3,
                                 icon: Icons.monitor_weight_outlined,
@@ -309,7 +309,7 @@ class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
                                 validator: (String? value) {
                                   final String text = value?.trim() ?? '';
                                   if (text.isEmpty) {
-                                    return 'Please enter weight';
+                                    return null;
                                   }
                                   final double? parsed = double.tryParse(text);
                                   if (parsed == null) {

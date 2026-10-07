@@ -5,6 +5,7 @@ import 'package:yodoctor/core/debug/app_logger.dart';
 import 'package:yodoctor/core/enums/auth_type.dart';
 import 'package:yodoctor/core/providers/otp_cooldown_provider.dart';
 import 'package:yodoctor/core/providers/storage_provider.dart';
+import 'package:yodoctor/core/utils/app_error_utils.dart';
 import 'package:yodoctor/modules/auth/models/patient_user.dart';
 import 'package:yodoctor/core/providers/app_role_provider.dart';
 import 'package:yodoctor/modules/auth/repositories/patient_auth_repository.dart';
@@ -23,30 +24,24 @@ class PatientAuthController extends AsyncNotifier<PatientUser?> {
   static const String _subTag = 'PatientAuthController';
 
   Map<String, dynamic>? _pendingOtpPayload;
+  String? _pendingIdentifier;
 
   @override
   FutureOr<PatientUser?> build() {
     return null;
   }
 
-  /// Handles traditional Email & Password Sign-In flow
+  /// Handles Normal Password Sign-In flow (No OTP required)
   Future<Map<String, dynamic>?> signInWithEmail({
     required String email,
     required String password,
   }) async {
-    // 🛡️ Cooldown Guard: Prevent new network OTP triggers during active cooldown
-    final remaining = ref.read(otpCooldownProvider.notifier).remainingSeconds;
-    if (remaining > 0 && _pendingOtpPayload != null) {
-      AppLogger.info(
-        'Active OTP cooldown running (${remaining}s remaining). Returning cached pending OTP state.',
-        tag: LogTags.auth,
-        subTag: _subTag,
-      );
-      return _pendingOtpPayload;
-    }
+    _pendingIdentifier = null;
+    _pendingOtpPayload = null;
+    ref.read(otpCooldownProvider.notifier).reset();
 
     AppLogger.info(
-      'Initiating patient email authentication stream',
+      'Initiating patient normal password authentication',
       tag: LogTags.auth,
       subTag: _subTag,
     );
@@ -62,6 +57,7 @@ class PatientAuthController extends AsyncNotifier<PatientUser?> {
       );
 
       if (response.requiresOtp) {
+        _pendingIdentifier = email.trim().toLowerCase();
         _pendingOtpPayload = {
           'redirect': 'otp',
           'requiresOtp': true,
@@ -77,8 +73,9 @@ class PatientAuthController extends AsyncNotifier<PatientUser?> {
       }
 
       if (!response.success) {
-        final errorMsg =
-            response.message.isNotEmpty ? response.message : 'Login failed';
+        final errorMsg = response.message.isNotEmpty
+            ? response.message
+            : 'Unable to login. Please check your credentials.';
         state = AsyncError(errorMsg, StackTrace.current);
         return null;
       }
@@ -96,6 +93,7 @@ class PatientAuthController extends AsyncNotifier<PatientUser?> {
       );
 
       _pendingOtpPayload = null;
+      _pendingIdentifier = null;
       ref.read(otpCooldownProvider.notifier).reset();
       state = AsyncData(user);
 
@@ -103,7 +101,7 @@ class PatientAuthController extends AsyncNotifier<PatientUser?> {
       ref.read(appRoleProvider.notifier).setRole(AppRole.patient);
 
       AppLogger.success(
-        'Patient credentials authenticated and state committed successfully',
+        'Patient normal login authenticated and session committed successfully',
         tag: LogTags.auth,
         subTag: _subTag,
       );
@@ -116,7 +114,104 @@ class PatientAuthController extends AsyncNotifier<PatientUser?> {
       };
     } catch (e, st) {
       AppLogger.exception(e, st, tag: LogTags.auth, subTag: _subTag);
-      final errorMsg = e.toString().replaceAll('Exception: ', '').trim();
+      final errorMsg = AppErrorUtils.getFriendlyMessage(e, fallbackMessage: 'Unable to login. Please try again.');
+      state = AsyncError(errorMsg, st);
+      return null;
+    }
+  }
+
+  /// Sends OTP for "Login with OTP" (without password)
+  Future<Map<String, dynamic>?> sendLoginOtp({
+    required String identifier,
+  }) async {
+    final cleanId = identifier.trim().toLowerCase();
+    if (_pendingIdentifier != null && _pendingIdentifier != cleanId) {
+      _pendingOtpPayload = null;
+      ref.read(otpCooldownProvider.notifier).reset();
+    }
+    _pendingIdentifier = cleanId;
+
+    // Prevent duplicate network triggers during active cooldown
+    final remaining = ref.read(otpCooldownProvider.notifier).remainingSeconds;
+    if (remaining > 0 && _pendingOtpPayload != null) {
+      AppLogger.info(
+        'Active OTP cooldown running (${remaining}s remaining). Returning cached pending OTP state.',
+        tag: LogTags.auth,
+        subTag: _subTag,
+      );
+      return _pendingOtpPayload;
+    }
+
+    AppLogger.info(
+      'Initiating patient send login OTP for identifier: $cleanId',
+      tag: LogTags.auth,
+      subTag: _subTag,
+    );
+
+    state = const AsyncLoading();
+    final repository = ref.read(patientAuthRepositoryProvider);
+
+    try {
+      final response = await repository.sendLoginOtp(identifier: identifier);
+
+      if (response.requiresOtp) {
+        final otpPayload = {
+          'redirect': 'otp',
+          'requiresOtp': true,
+          'verificationId': response.verificationId,
+          'channel': response.channel,
+          'mobile': response.mobile,
+          'maskedDestination': response.destination ?? response.maskedDestination ?? identifier,
+          'expiresIn': response.expiresIn,
+          'message': response.message.isNotEmpty
+              ? response.message
+              : 'OTP sent successfully',
+        };
+
+        _pendingOtpPayload = otpPayload;
+        ref.read(otpCooldownProvider.notifier).startCooldown();
+        state = const AsyncData(null);
+        return otpPayload;
+      }
+
+      if (response.success && response.token?.isNotEmpty == true) {
+        final user = PatientUser(
+          id: '',
+          name: '',
+          email: identifier.trim(),
+          location: '',
+          age: 0,
+          bloodGroup: '',
+          mobileNumber: response.mobile ?? '',
+          dateOfBirth: '',
+          gender: '',
+        );
+
+        _pendingOtpPayload = null;
+        _pendingIdentifier = null;
+        ref.read(otpCooldownProvider.notifier).reset();
+        state = AsyncData(user);
+
+        final storage = ref.read(storageProvider);
+        await storage.saveAuthType(AuthType.email);
+        ref.read(appRoleProvider.notifier).setRole(AppRole.patient);
+
+        return {
+          'redirect': 'dashboard',
+          'success': true,
+          'message': response.message,
+          'token': response.token,
+        };
+      }
+
+      final errorMsg = response.message.isNotEmpty
+          ? response.message
+          : 'Failed to send OTP. Please try again.';
+      state = AsyncError(errorMsg, StackTrace.current);
+      return null;
+    } catch (e, st) {
+      AppLogger.exception(e, st, tag: LogTags.auth, subTag: _subTag);
+      final errorMsg = AppErrorUtils.getFriendlyMessage(e, fallbackMessage: 'Failed to send OTP. Please try again.');
       state = AsyncError(errorMsg, st);
       return null;
     }
@@ -129,6 +224,7 @@ class PatientAuthController extends AsyncNotifier<PatientUser?> {
     String? verificationId,
     String? channel,
     String? mobile,
+    String? identifier,
   }) async {
     AppLogger.info(
       'Initiating patient OTP verification',
@@ -141,17 +237,23 @@ class PatientAuthController extends AsyncNotifier<PatientUser?> {
     final storage = ref.read(storageProvider);
 
     try {
+      final effectiveVerificationId = verificationId ?? _pendingOtpPayload?['verificationId'];
+      final effectiveChannel = channel ?? _pendingOtpPayload?['channel'];
+      final effectiveMobile = mobile ?? _pendingOtpPayload?['mobile'];
+
       final response = await repository.verifyLoginOtp(
         otp: otp,
-        verificationId: verificationId,
-        channel: channel,
-        mobile: mobile,
+        verificationId: effectiveVerificationId,
+        channel: effectiveChannel,
+        mobile: effectiveMobile,
+        email: email,
+        identifier: identifier ?? email,
       );
 
       if (!response.success) {
         final errorMsg = response.message.isNotEmpty
             ? response.message
-            : 'Invalid or expired OTP';
+            : 'Incorrect OTP. Please check the code and try again.';
         state = AsyncError(errorMsg, StackTrace.current);
         return null;
       }
@@ -188,19 +290,19 @@ class PatientAuthController extends AsyncNotifier<PatientUser?> {
       };
     } catch (e, st) {
       AppLogger.exception(e, st, tag: LogTags.auth, subTag: _subTag);
-      final errorMsg = e.toString().replaceAll('Exception: ', '').trim();
+      final errorMsg = AppErrorUtils.getFriendlyMessage(e, fallbackMessage: 'Incorrect OTP. Please check the code and try again.');
       state = AsyncError(errorMsg, st);
       return null;
     }
   }
 
-  /// Resends OTP by re-triggering authentication
+  /// Resends OTP by calling sendLoginOtp
   Future<Map<String, dynamic>?> resendOtp({
-    required String email,
-    required String password,
+    required String identifier,
+    String? password,
   }) async {
     AppLogger.info(
-      'Initiating patient OTP resend request',
+      'Initiating patient OTP resend request for: $identifier',
       tag: LogTags.auth,
       subTag: _subTag,
     );
@@ -208,10 +310,12 @@ class PatientAuthController extends AsyncNotifier<PatientUser?> {
     final repository = ref.read(patientAuthRepositoryProvider);
 
     try {
-      final response = await repository.signInWithEmail(
-        identifier: email,
-        password: password,
-      );
+      final response = (password != null && password.isNotEmpty)
+          ? await repository.signInWithEmail(
+              identifier: identifier,
+              password: password,
+            )
+          : await repository.sendLoginOtp(identifier: identifier);
 
       if (!response.success && !response.requiresOtp) {
         return {
@@ -231,8 +335,11 @@ class PatientAuthController extends AsyncNotifier<PatientUser?> {
             response.channel ?? _pendingOtpPayload?['channel'],
         'mobile': response.mobile ?? _pendingOtpPayload?['mobile'],
         'maskedDestination': response.maskedDestination ??
-            _pendingOtpPayload?['maskedDestination'],
-        'message': response.message,
+            _pendingOtpPayload?['maskedDestination'] ??
+            identifier,
+        'message': response.message.isNotEmpty
+            ? response.message
+            : 'OTP resent successfully',
       };
       ref.read(otpCooldownProvider.notifier).startCooldown();
 
@@ -241,15 +348,15 @@ class PatientAuthController extends AsyncNotifier<PatientUser?> {
         'message': response.message.isNotEmpty
             ? response.message
             : 'OTP resent successfully',
-        'verificationId': response.verificationId,
-        'channel': response.channel,
-        'mobile': response.mobile,
+        'verificationId': response.verificationId ?? _pendingOtpPayload?['verificationId'],
+        'channel': response.channel ?? _pendingOtpPayload?['channel'],
+        'mobile': response.mobile ?? _pendingOtpPayload?['mobile'],
       };
     } catch (e, st) {
       AppLogger.exception(e, st, tag: LogTags.auth, subTag: _subTag);
       return {
         'success': false,
-        'message': e.toString().replaceAll('Exception: ', '').trim(),
+        'message': AppErrorUtils.getFriendlyMessage(e, fallbackMessage: 'Failed to resend OTP. Please try again.'),
       };
     }
   }
@@ -273,7 +380,7 @@ class PatientAuthController extends AsyncNotifier<PatientUser?> {
         final firebaseToken = await googleAuthService.getIdToken();
 
         if (firebaseToken == null || firebaseToken.isEmpty) {
-          throw Exception('Firebase token not found');
+          throw Exception('Google verification token could not be retrieved.');
         }
 
         final repository = ref.read(patientAuthRepositoryProvider);
@@ -302,7 +409,7 @@ class PatientAuthController extends AsyncNotifier<PatientUser?> {
         return patient;
       } else {
         AppLogger.warning(
-          'Google authentication sequence cancelled by user interaction parameters',
+          'Google authentication sequence cancelled by user interaction',
           tag: LogTags.auth,
           subTag: _subTag,
         );
@@ -311,7 +418,7 @@ class PatientAuthController extends AsyncNotifier<PatientUser?> {
       }
     } catch (e, st) {
       AppLogger.exception(e, st, tag: LogTags.auth, subTag: _subTag);
-      final errorMsg = e.toString().replaceAll('Exception: ', '').trim();
+      final errorMsg = AppErrorUtils.getFriendlyMessage(e, fallbackMessage: 'Google login failed. Please try again.');
       state = AsyncError(errorMsg, st);
       return null;
     }

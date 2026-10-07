@@ -26,6 +26,7 @@ class AppTextField extends StatefulWidget {
   final bool isInvalid;
   final String? errorText;
   final AutovalidateMode? autovalidateMode;
+  final Widget? suffixIcon;
 
   const AppTextField({
     super.key,
@@ -50,6 +51,7 @@ class AppTextField extends StatefulWidget {
     this.isInvalid = false,
     this.errorText,
     this.autovalidateMode,
+    this.suffixIcon,
   });
 
   @override
@@ -125,7 +127,7 @@ class _AppTextFieldState extends State<AppTextField> {
             ),
             onPressed: () => setState(() => _obscure = !_obscure),
           )
-              : null,
+              : widget.suffixIcon,
         ),
       ),
     );

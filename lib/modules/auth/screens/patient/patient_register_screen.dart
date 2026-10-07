@@ -5,11 +5,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/app_constants.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
-import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/auth/controllers/patient_register_controller.dart';
 import 'package:yodoctor/modules/auth/widgets/auth_widgets.dart';
+import 'package:yodoctor/modules/auth/widgets/otp_bottom_sheet.dart';
+import 'package:yodoctor/modules/auth/widgets/verification_badge_action.dart';
 import 'package:yodoctor/modules/widgets/app_date_picker_field.dart';
 import 'package:yodoctor/modules/widgets/app_dropdown_field.dart';
+import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 import 'package:yodoctor/modules/widgets/app_text_field.dart';
 
 class PatientRegisterScreen extends ConsumerStatefulWidget {
@@ -50,6 +52,24 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
     );
     _fadeAnim = CurvedAnimation(parent: _animController, curve: Curves.easeIn);
     _animController.forward();
+
+    // Listen to changes to reset verified state if modified
+    _emailController.addListener(_handleEmailChanged);
+    _phoneController.addListener(_handlePhoneChanged);
+  }
+
+  void _handleEmailChanged() {
+    ref
+        .read(patientRegisterControllerProvider.notifier)
+        .onEmailChanged(_emailController.text);
+    setState(() {});
+  }
+
+  void _handlePhoneChanged() {
+    ref
+        .read(patientRegisterControllerProvider.notifier)
+        .onPhoneChanged(_phoneController.text);
+    setState(() {});
   }
 
   @override
@@ -59,6 +79,8 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
       tag: LogTags.ui,
       subTag: _subTag,
     );
+    _emailController.removeListener(_handleEmailChanged);
+    _phoneController.removeListener(_handlePhoneChanged);
     _animController.dispose();
     _nameController.dispose();
     _emailController.dispose();
@@ -68,15 +90,180 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
     super.dispose();
   }
 
+  bool _validatePhone(String phone) {
+    final indianPhoneRegExp = RegExp(r'^[6-9]\d{9}$');
+    return indianPhoneRegExp.hasMatch(phone.trim());
+  }
+
+  bool _validateEmail(String email) {
+    final emailRegExp = RegExp(
+      r"^[a-zA-Z0-9.a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
+    );
+    return emailRegExp.hasMatch(email.trim());
+  }
+
+  Future<void> _handleVerifyMobile(ColorScheme colorScheme) async {
+    FocusManager.instance.primaryFocus?.unfocus();
+    final phone = _phoneController.text.trim();
+
+    if (phone.isEmpty) {
+      AppSnackBar.show(
+        message: 'Please enter your 10-digit mobile number.',
+        type: AppSnackBarType.warning,
+      );
+      return;
+    }
+
+    if (!_validatePhone(phone)) {
+      AppSnackBar.show(
+        message: 'Please enter a valid 10-digit Indian mobile number.',
+        type: AppSnackBarType.warning,
+      );
+      return;
+    }
+
+    final controllerNotifier = ref.read(
+      patientRegisterControllerProvider.notifier,
+    );
+
+    final result = await controllerNotifier.sendMobileOtp(phone);
+    if (!mounted) return;
+
+    if (!result.success || result.verificationId == null) {
+      AppSnackBar.show(
+        message: result.message.isNotEmpty
+            ? result.message
+            : 'Failed to send mobile OTP. Please try again.',
+        type: AppSnackBarType.error,
+      );
+      return;
+    }
+
+    final isVerified = await OtpBottomSheet.show(
+      context: context,
+      verificationId: result.verificationId,
+      channel: 'SMS',
+      mobile: phone,
+      maskedDestination: '+91 $phone',
+      primaryColor: colorScheme.primary,
+      onVerify: (otp) async {
+        return await controllerNotifier.verifyMobileOtp(
+          phone: phone,
+          otp: otp,
+        );
+      },
+      onResend: () async {
+        final resendRes = await controllerNotifier.sendMobileOtp(phone);
+        if (resendRes.success) {
+          return true;
+        }
+        return resendRes.message;
+      },
+    );
+
+    if (isVerified == true && mounted) {
+      AppSnackBar.show(
+        message: 'Mobile number verified successfully!',
+        type: AppSnackBarType.success,
+      );
+    }
+  }
+
+  Future<void> _handleVerifyEmail(ColorScheme colorScheme) async {
+    FocusManager.instance.primaryFocus?.unfocus();
+    final email = _emailController.text.trim();
+
+    if (email.isEmpty) {
+      AppSnackBar.show(
+        message: 'Please enter your email address to verify.',
+        type: AppSnackBarType.warning,
+      );
+      return;
+    }
+
+    if (!_validateEmail(email)) {
+      AppSnackBar.show(
+        message: 'Please enter a valid email address.',
+        type: AppSnackBarType.warning,
+      );
+      return;
+    }
+
+    final controllerNotifier = ref.read(
+      patientRegisterControllerProvider.notifier,
+    );
+
+    final result = await controllerNotifier.sendEmailOtp(email);
+    if (!mounted) return;
+
+    if (!result.success || result.verificationId == null) {
+      AppSnackBar.show(
+        message: result.message.isNotEmpty
+            ? result.message
+            : 'Failed to send email OTP. Please try again.',
+        type: AppSnackBarType.error,
+      );
+      return;
+    }
+
+    final isVerified = await OtpBottomSheet.show(
+      context: context,
+      verificationId: result.verificationId,
+      channel: 'EMAIL',
+      maskedDestination: email,
+      primaryColor: colorScheme.primary,
+      onVerify: (otp) async {
+        return await controllerNotifier.verifyEmailOtp(
+          email: email,
+          otp: otp,
+        );
+      },
+      onResend: () async {
+        final resendRes = await controllerNotifier.sendEmailOtp(email);
+        if (resendRes.success) {
+          return true;
+        }
+        return resendRes.message;
+      },
+    );
+
+    if (isVerified == true && mounted) {
+      AppSnackBar.show(
+        message: 'Email verified successfully!',
+        type: AppSnackBarType.success,
+      );
+    }
+  }
+
   void _submitForm() {
     setState(() {
       _submittedOnce = true;
     });
+
     if (!_formKey.currentState!.validate()) {
       AppLogger.warning(
         'Form validation failed for patient registration',
         tag: LogTags.ui,
         subTag: _subTag,
+      );
+      return;
+    }
+
+    final registerState = ref.read(patientRegisterControllerProvider);
+
+    if (!registerState.isMobileVerified) {
+      AppSnackBar.show(
+        message: 'Please verify your mobile number before creating your account.',
+        type: AppSnackBarType.warning,
+      );
+      return;
+    }
+
+    final emailText = _emailController.text.trim();
+    if (emailText.isNotEmpty && !registerState.isEmailVerified) {
+      AppSnackBar.show(
+        message: 'Please verify your email address before creating your account.',
+        type: AppSnackBarType.warning,
       );
       return;
     }
@@ -87,16 +274,14 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
       subTag: _subTag,
     );
 
-    ref
-        .read(patientRegisterControllerProvider.notifier)
-        .registerPatient(
-          context: context,
-          fullName: _nameController.text.trim(),
-          phone: _phoneController.text.trim(),
-          email: _emailController.text.trim(),
-          password: _passwordController.text,
-          confirmPassword: _confirmPasswordController.text,
-        );
+    ref.read(patientRegisterControllerProvider.notifier).registerPatient(
+      context: context,
+      fullName: _nameController.text.trim(),
+      phone: _phoneController.text.trim(),
+      email: emailText,
+      password: _passwordController.text,
+      confirmPassword: _confirmPasswordController.text,
+    );
   }
 
   @override
@@ -109,6 +294,8 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
       patientRegisterControllerProvider.notifier,
     );
 
+    final emailHasText = _emailController.text.trim().isNotEmpty;
+
     return Scaffold(
       backgroundColor: colorScheme.surfaceContainer,
       body: FadeTransition(
@@ -119,8 +306,8 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    AppTheme.secondary,
-                    AppTheme.secondary.transparency(0.7),
+                    colorScheme.primary,
+                    colorScheme.primary.transparency(0.7),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -210,11 +397,11 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                               height: 50,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: AppTheme.yoGreenLight,
+                                color: colorScheme.primaryContainer,
                               ),
                               child: Icon(
                                 Icons.person_rounded,
-                                color: AppTheme.yoGreen,
+                                color: colorScheme.onPrimaryContainer,
                                 size: 24,
                               ),
                             ),
@@ -230,7 +417,7 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                                   ),
                                 ),
                                 Text(
-                                  'Join yoDoctor as a Patient',
+                                  'Join as a Patient',
                                   style: textTheme.labelMedium?.copyWith(
                                     color: colorScheme.onSurfaceVariant,
                                   ),
@@ -242,6 +429,8 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                         const SizedBox(height: 28),
                         _sectionLabel(context, 'Personal Information'),
                         const SizedBox(height: 14),
+
+                        // Full Name
                         AppTextField(
                           label: 'Full Name',
                           isRequired: true,
@@ -254,37 +443,16 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                               return 'Enter name';
                             }
                             if (v.trim().length < 3) {
-                              return 'Enter a valid name';
+                              return 'Enter a valid name (at least 3 characters)';
                             }
                             return null;
                           },
                         ),
-
                         const SizedBox(height: 16),
-                        AppTextField(
-                          label: 'Email Address',
-                          isRequired: true,
-                          hint: 'patient@example.com',
-                          icon: Icons.email_rounded,
-                          controller: _emailController,
-                          keyboardType: TextInputType.emailAddress,
-                          validator: (v) {
-                            if (v == null || v.trim().isEmpty) {
-                              return 'Email required';
-                            }
-                            final emailRegExp = RegExp(
-                              r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
-                            );
-                            if (!emailRegExp.hasMatch(v.trim())) {
-                              return 'Enter a valid email address';
-                            }
-                            return null;
-                          },
-                        ),
 
-                        const SizedBox(height: 16),
+                        // Phone Number
                         AppTextField(
-                          label: 'Phone Number',
+                          label: 'Mobile Number',
                           isRequired: true,
                           hint: '9876543210',
                           icon: Icons.phone_rounded,
@@ -297,16 +465,58 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                           ],
                           validator: (v) {
                             if (v == null || v.trim().isEmpty) {
-                              return 'Enter phone number';
+                              return 'Enter mobile number';
                             }
-                            final indianPhoneRegExp = RegExp(r'^[6-9]\d{9}$');
-                            if (!indianPhoneRegExp.hasMatch(v.trim())) {
+                            if (!_validatePhone(v)) {
                               return 'Enter a valid 10-digit mobile number';
                             }
                             return null;
                           },
                         ),
-                        const SizedBox(height: 16),
+                        VerificationBadgeAction(
+                          isVerified: registerState.isMobileVerified,
+                          isLoading: registerState.isSendingMobileOtp,
+                          onVerify: () => _handleVerifyMobile(colorScheme),
+                          label: 'Verify Mobile Number',
+                          verifiedLabel: 'Mobile Number Verified',
+                          icon: Icons.verified_user_outlined,
+                          primaryColor: colorScheme.primary,
+                        ),
+                        const SizedBox(height: 12),
+
+                        // Email Address
+                        AppTextField(
+                          label: 'Email Address',
+                          isOptional: true,
+                          isRequired: false,
+                          hint: 'patient@example.com',
+                          icon: Icons.email_rounded,
+                          controller: _emailController,
+                          keyboardType: TextInputType.emailAddress,
+                          validator: (v) {
+                            if (v != null && v.trim().isNotEmpty) {
+                              if (!_validateEmail(v)) {
+                                return 'Enter a valid email address';
+                              }
+                            }
+                            return null;
+                          },
+                        ),
+                        if (emailHasText) ...[
+                          VerificationBadgeAction(
+                            isVerified: registerState.isEmailVerified,
+                            isLoading: registerState.isSendingEmailOtp,
+                            onVerify: () => _handleVerifyEmail(colorScheme),
+                            label: 'Verify Email Address',
+                            verifiedLabel: 'Email Address Verified',
+                            icon: Icons.mark_email_read_outlined,
+                            primaryColor: colorScheme.primary,
+                          ),
+                          const SizedBox(height: 12),
+                        ] else
+                          const SizedBox(height: 16),
+
+                        // Date of Birth
                         AppDatePickerField(
                           label: 'Date of Birth',
                           isRequired: true,
@@ -322,11 +532,12 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                             if (date == null) {
                               return 'Select date of birth';
                             }
-
                             return null;
                           },
                         ),
                         const SizedBox(height: 16),
+
+                        // Gender
                         AppDropdownField<String>(
                           label: 'Gender',
                           isRequired: true,
@@ -345,12 +556,15 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                           },
                         ),
                         const SizedBox(height: 24),
+
                         _sectionLabel(context, 'Account Security'),
                         const SizedBox(height: 14),
+
+                        // Password
                         AppTextField(
                           label: 'Password',
                           isRequired: true,
-                          hint: 'Create password',
+                          hint: 'Create password (min 8 chars)',
                           icon: Icons.lock_rounded,
                           controller: _passwordController,
                           isPassword: true,
@@ -365,6 +579,8 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                           },
                         ),
                         const SizedBox(height: 16),
+
+                        // Confirm Password
                         AppTextField(
                           label: 'Confirm Password',
                           isRequired: true,
@@ -383,6 +599,8 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                           },
                         ),
                         const SizedBox(height: 20),
+
+                        // Terms and Conditions
                         GestureDetector(
                           onTap: () {
                             final targetValue = !registerState.agreedToTerms;
@@ -400,22 +618,22 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                                 height: 22,
                                 decoration: BoxDecoration(
                                   color: registerState.agreedToTerms
-                                      ? AppTheme.secondary
+                                      ? colorScheme.primary
                                       : colorScheme.surface.transparency(0),
                                   border: Border.all(
                                     color: registerState.agreedToTerms
-                                        ? AppTheme.secondary
-                                        : colorScheme.outlineVariant,
+                                        ? colorScheme.primary
+                                        : colorScheme.outline,
                                     width: 2,
                                   ),
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: registerState.agreedToTerms
                                     ? Icon(
-                                        Icons.check,
-                                        color: colorScheme.onPrimary,
-                                        size: 14,
-                                      )
+                                  Icons.check,
+                                  color: colorScheme.onPrimary,
+                                  size: 14,
+                                )
                                     : null,
                               ),
                               const SizedBox(width: 10),
@@ -430,7 +648,7 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                                       TextSpan(
                                         text: 'Terms & Conditions',
                                         style: textTheme.labelMedium?.copyWith(
-                                          color: AppTheme.secondary,
+                                          color: colorScheme.primary,
                                           fontWeight: FontWeight.w600,
                                         ),
                                       ),
@@ -438,7 +656,7 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                                       TextSpan(
                                         text: 'Privacy Policy',
                                         style: textTheme.labelMedium?.copyWith(
-                                          color: AppTheme.secondary,
+                                          color: colorScheme.primary,
                                           fontWeight: FontWeight.w600,
                                         ),
                                       ),
@@ -450,17 +668,19 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                           ),
                         ),
                         const SizedBox(height: 24),
+
                         YoPrimaryButton(
                           label: 'Register as Patient',
                           onTap: _submitForm,
-                          color: AppTheme.secondary,
+                          color: colorScheme.primary,
                           isLoading: registerState.isLoading,
                         ),
                         const SizedBox(height: 20),
+
                         Container(
                           padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
-                            color: AppTheme.secondaryLight,
+                            color: colorScheme.surfaceContainerHighest,
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Row(
@@ -485,9 +705,9 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                                   'Login here',
                                   style: textTheme.labelMedium?.copyWith(
                                     fontWeight: FontWeight.w700,
-                                    color: AppTheme.secondary,
+                                    color: colorScheme.primary,
                                     decoration: TextDecoration.underline,
-                                    decorationColor: AppTheme.secondary,
+                                    decorationColor: colorScheme.primary,
                                   ),
                                 ),
                               ),
@@ -515,7 +735,7 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
           width: 4,
           height: 18,
           decoration: BoxDecoration(
-            color: AppTheme.secondary,
+            color: colorScheme.primary,
             borderRadius: BorderRadius.circular(4),
           ),
         ),

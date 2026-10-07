@@ -103,18 +103,18 @@ class FamilyController extends Notifier<FamilyState> {
     required String fullName,
     required String gender,
     required String dob,
-    required String bloodGroup,
-    required String heightCm,
-    required String weightKg,
+    String? bloodGroup,
+    String? heightCm,
+    String? weightKg,
     required String relation,
   }) async {
     final payload = {
       "fullName": fullName,
       "gender": gender,
       "dob": dob,
-      "bloodGroup": bloodGroup,
-      "heightCm": heightCm,
-      "weightKg": weightKg,
+      "bloodGroup": bloodGroup ?? "",
+      "heightCm": heightCm ?? "",
+      "weightKg": weightKg ?? "",
       "relation": relation,
     };
 
@@ -143,18 +143,18 @@ class FamilyController extends Notifier<FamilyState> {
     required String fullName,
     required String gender,
     required String dob,
-    required String bloodGroup,
-    required String heightCm,
-    required String weightKg,
+    String? bloodGroup,
+    String? heightCm,
+    String? weightKg,
     required String relation,
   }) async {
     final payload = {
       "fullName": fullName,
       "gender": gender,
       "dob": dob,
-      "bloodGroup": bloodGroup,
-      "heightCm": heightCm,
-      "weightKg": weightKg,
+      "bloodGroup": bloodGroup ?? "",
+      "heightCm": heightCm ?? "",
+      "weightKg": weightKg ?? "",
       "relation": relation,
     };
 

@@ -5,7 +5,9 @@ import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/network/dio_provider.dart';
 import 'package:yodoctor/core/providers/storage_provider.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:yodoctor/core/utils/app_error_utils.dart';
 import 'package:yodoctor/modules/auth/models/login_response.dart';
+import 'package:yodoctor/modules/auth/models/otp_response.dart';
 import 'package:yodoctor/core/storage/storage_service.dart';
 import 'auth_repository.dart';
 
@@ -92,43 +94,102 @@ class PatientAuthRepository implements AuthRepository {
       AppLogger.exception(
         e,
         st,
-        message: 'Login API request transmission failed completely',
+        message: 'Login API request transmission failed',
         tag: LogTags.auth,
         subTag: _subTag,
       );
 
-      String errorMessage = 'Unable to login. Please try again.';
-      final responseData = e.response?.data;
-
-      if (responseData is Map<String, dynamic>) {
-        errorMessage = responseData['message']?.toString() ?? errorMessage;
-      }
-
       return LoginResponse(
         success: false,
-        message: errorMessage,
+        message: AppErrorUtils.getFriendlyMessage(e, fallbackMessage: 'Unable to login. Please check your credentials.'),
       );
     } catch (e, st) {
       AppLogger.exception(
         e,
         st,
-        message: 'Unexpected run-time panic during login mapping cycle',
+        message: 'Unexpected error during login mapping',
         tag: LogTags.auth,
         subTag: _subTag,
       );
 
       return LoginResponse(
         success: false,
-        message: 'Something went wrong.',
+        message: AppErrorUtils.getFriendlyMessage(e),
       );
     }
   }
 
+  /// Sends OTP for Login without password using /auth/login
+  Future<LoginResponse> sendLoginOtp({
+    required String identifier,
+  }) async {
+    try {
+      AppLogger.info(
+        'Sending patient login OTP request to /auth/login for identifier: $identifier',
+        tag: LogTags.auth,
+        subTag: _subTag,
+      );
+
+      final payload = {
+        'identifier': identifier.trim(),
+        'password': '',
+        'portal': 'USER',
+        'loginWithOtp': true,
+      };
+
+      final response = await _dio.post(
+        ApiConstants.login,
+        data: payload,
+      );
+
+      final Map<String, dynamic> data = Map<String, dynamic>.from(response.data);
+      final loginResponse = LoginResponse.fromJson(data);
+
+      if (loginResponse.requiresOtp) {
+        AppLogger.info(
+          'Login OTP requested successfully. VerificationId: ${loginResponse.verificationId}, Channel: ${loginResponse.channel}, Destination: ${loginResponse.destination}',
+          tag: LogTags.auth,
+          subTag: _subTag,
+        );
+        return loginResponse;
+      }
+
+      if (loginResponse.success && loginResponse.token?.isNotEmpty == true) {
+        await _storage.saveToken(loginResponse.token!);
+        await _storage.saveRole('patient');
+      }
+
+      return loginResponse;
+    } on DioException catch (e, st) {
+      AppLogger.exception(
+        e,
+        st,
+        message: 'Send login OTP API request failed',
+        tag: LogTags.auth,
+        subTag: _subTag,
+      );
+
+      return LoginResponse(
+        success: false,
+        message: AppErrorUtils.getFriendlyMessage(e, fallbackMessage: 'Unable to send OTP. Please try again.'),
+      );
+    } catch (e, st) {
+      AppLogger.exception(e, st, tag: LogTags.auth, subTag: _subTag);
+      return LoginResponse(
+        success: false,
+        message: AppErrorUtils.getFriendlyMessage(e),
+      );
+    }
+  }
+
+  /// Verifies OTP for Login
   Future<LoginResponse> verifyLoginOtp({
     required String otp,
     String? verificationId,
     String? channel,
     String? mobile,
+    String? email,
+    String? identifier,
   }) async {
     try {
       AppLogger.info(
@@ -145,6 +206,11 @@ class PatientAuthRepository implements AuthRepository {
           'verificationId': verificationId,
         if (mobile != null && mobile.isNotEmpty)
           'mobile': mobile,
+        if (email != null && email.isNotEmpty)
+          'email': email,
+        if (identifier != null && identifier.isNotEmpty)
+          'identifier': identifier,
+        'portal': 'USER',
       };
 
       final response = await _dio.post(
@@ -157,7 +223,7 @@ class PatientAuthRepository implements AuthRepository {
 
       if (!loginResponse.success) {
         AppLogger.warning(
-          'OTP verification rejected by gateway branch: ${loginResponse.message}',
+          'OTP verification rejected: ${loginResponse.message}',
           tag: LogTags.auth,
           subTag: _subTag,
         );
@@ -185,16 +251,9 @@ class PatientAuthRepository implements AuthRepository {
         subTag: _subTag,
       );
 
-      String errorMessage = 'Invalid or expired OTP. Please try again.';
-      final responseData = e.response?.data;
-
-      if (responseData is Map<String, dynamic>) {
-        errorMessage = responseData['message']?.toString() ?? errorMessage;
-      }
-
       return LoginResponse(
         success: false,
-        message: errorMessage,
+        message: AppErrorUtils.getFriendlyMessage(e, fallbackMessage: 'Incorrect OTP. Please check the code and try again.'),
       );
     } catch (e, st) {
       AppLogger.exception(
@@ -207,19 +266,202 @@ class PatientAuthRepository implements AuthRepository {
 
       return LoginResponse(
         success: false,
-        message: 'Something went wrong during OTP verification.',
+        message: AppErrorUtils.getFriendlyMessage(e),
       );
     }
   }
 
+  // -------------------------------------------------------------
+  // 📨 Patient Registration OTP APIs
+  // -------------------------------------------------------------
+
+  /// Send Registration Email OTP: POST /patient/register/send-email-otp
+  Future<OtpSendResponse> sendRegistrationEmailOtp({
+    required String email,
+  }) async {
+    try {
+      AppLogger.info(
+        'Sending registration email OTP to: $email',
+        tag: LogTags.auth,
+        subTag: _subTag,
+      );
+
+      final response = await _dio.post(
+        ApiConstants.patientRegisterSendEmailOtp,
+        data: {
+          'email': email.trim().toLowerCase(),
+        },
+      );
+
+      final Map<String, dynamic> data = Map<String, dynamic>.from(response.data);
+      return OtpSendResponse.fromJson(data);
+    } on DioException catch (e, st) {
+      AppLogger.exception(
+        e,
+        st,
+        message: 'Send registration email OTP request failed',
+        tag: LogTags.auth,
+        subTag: _subTag,
+      );
+
+      return OtpSendResponse(
+        success: false,
+        message: AppErrorUtils.getFriendlyMessage(e, fallbackMessage: 'Failed to send OTP to email. Please try again.'),
+      );
+    } catch (e, st) {
+      AppLogger.exception(e, st, tag: LogTags.auth, subTag: _subTag);
+      return OtpSendResponse(
+        success: false,
+        message: AppErrorUtils.getFriendlyMessage(e),
+      );
+    }
+  }
+
+  /// Verify Registration Email OTP: POST /patient/register/verify-email-otp
+  Future<OtpVerifyResponse> verifyRegistrationEmailOtp({
+    required String email,
+    required String otp,
+    required String verificationId,
+  }) async {
+    try {
+      AppLogger.info(
+        'Verifying registration email OTP for: $email',
+        tag: LogTags.auth,
+        subTag: _subTag,
+      );
+
+      final response = await _dio.post(
+        ApiConstants.patientRegisterVerifyEmailOtp,
+        data: {
+          'email': email.trim().toLowerCase(),
+          'otp': otp.trim(),
+          'verificationId': verificationId.trim(),
+        },
+      );
+
+      final Map<String, dynamic> data = Map<String, dynamic>.from(response.data);
+      return OtpVerifyResponse.fromJson(data);
+    } on DioException catch (e, st) {
+      AppLogger.exception(
+        e,
+        st,
+        message: 'Verify registration email OTP failed',
+        tag: LogTags.auth,
+        subTag: _subTag,
+      );
+
+      return OtpVerifyResponse(
+        success: false,
+        message: AppErrorUtils.getFriendlyMessage(e, fallbackMessage: 'Incorrect OTP. Please check the code and try again.'),
+      );
+    } catch (e, st) {
+      AppLogger.exception(e, st, tag: LogTags.auth, subTag: _subTag);
+      return OtpVerifyResponse(
+        success: false,
+        message: AppErrorUtils.getFriendlyMessage(e),
+      );
+    }
+  }
+
+  /// Send Registration Mobile OTP: POST /patient/register/send-mobile-otp
+  Future<OtpSendResponse> sendRegistrationMobileOtp({
+    required String phone,
+  }) async {
+    try {
+      AppLogger.info(
+        'Sending registration mobile OTP to: $phone',
+        tag: LogTags.auth,
+        subTag: _subTag,
+      );
+
+      final response = await _dio.post(
+        ApiConstants.patientRegisterSendMobileOtp,
+        data: {
+          'phone': phone.trim(),
+        },
+      );
+
+      final Map<String, dynamic> data = Map<String, dynamic>.from(response.data);
+      return OtpSendResponse.fromJson(data);
+    } on DioException catch (e, st) {
+      AppLogger.exception(
+        e,
+        st,
+        message: 'Send registration mobile OTP request failed',
+        tag: LogTags.auth,
+        subTag: _subTag,
+      );
+
+      return OtpSendResponse(
+        success: false,
+        message: AppErrorUtils.getFriendlyMessage(e, fallbackMessage: 'Failed to send OTP to mobile number. Please try again.'),
+      );
+    } catch (e, st) {
+      AppLogger.exception(e, st, tag: LogTags.auth, subTag: _subTag);
+      return OtpSendResponse(
+        success: false,
+        message: AppErrorUtils.getFriendlyMessage(e),
+      );
+    }
+  }
+
+  /// Verify Registration Mobile OTP: POST /patient/register/verify-mobile-otp
+  Future<OtpVerifyResponse> verifyRegistrationMobileOtp({
+    required String phone,
+    required String otp,
+    required String verificationId,
+  }) async {
+    try {
+      AppLogger.info(
+        'Verifying registration mobile OTP for: $phone',
+        tag: LogTags.auth,
+        subTag: _subTag,
+      );
+
+      final response = await _dio.post(
+        ApiConstants.patientRegisterVerifyMobileOtp,
+        data: {
+          'phone': phone.trim(),
+          'otp': otp.trim(),
+          'verificationId': verificationId.trim(),
+        },
+      );
+
+      final Map<String, dynamic> data = Map<String, dynamic>.from(response.data);
+      return OtpVerifyResponse.fromJson(data);
+    } on DioException catch (e, st) {
+      AppLogger.exception(
+        e,
+        st,
+        message: 'Verify registration mobile OTP failed',
+        tag: LogTags.auth,
+        subTag: _subTag,
+      );
+
+      return OtpVerifyResponse(
+        success: false,
+        message: AppErrorUtils.getFriendlyMessage(e, fallbackMessage: 'Incorrect OTP. Please check the code and try again.'),
+      );
+    } catch (e, st) {
+      AppLogger.exception(e, st, tag: LogTags.auth, subTag: _subTag);
+      return OtpVerifyResponse(
+        success: false,
+        message: AppErrorUtils.getFriendlyMessage(e),
+      );
+    }
+  }
+
+  /// Final registration submission
   Future<LoginResponse> signUpPatient({
     required String fullName,
     required String phone,
-    required String email,
+    String? email,
     required String password,
     required String confirmPassword,
     required String gender,
     required String dob,
+    String? emailVerificationId,
+    String? mobileVerificationId,
   }) async {
     try {
       AppLogger.info(
@@ -228,17 +470,24 @@ class PatientAuthRepository implements AuthRepository {
         subTag: _subTag,
       );
 
+      final Map<String, dynamic> payload = {
+        'fullName': fullName.trim(),
+        'phone': phone.trim(),
+        if (email != null && email.trim().isNotEmpty)
+          'email': email.trim().toLowerCase(),
+        'password': password,
+        'confirmPassword': confirmPassword,
+        'gender': gender,
+        'dob': dob,
+        if (emailVerificationId != null && emailVerificationId.isNotEmpty)
+          'emailVerificationId': emailVerificationId,
+        if (mobileVerificationId != null && mobileVerificationId.isNotEmpty)
+          'mobileVerificationId': mobileVerificationId,
+      };
+
       final response = await _dio.post(
         ApiConstants.patientRegister,
-        data: {
-          'fullName': fullName.trim(),
-          'phone': phone.trim(),
-          'email': email.trim(),
-          'password': password,
-          'confirmPassword': confirmPassword,
-          'gender': gender,
-          'dob': dob,
-        },
+        data: payload,
       );
 
       final Map<String, dynamic> data = Map<String, dynamic>.from(response.data);
@@ -256,28 +505,21 @@ class PatientAuthRepository implements AuthRepository {
         subTag: _subTag,
       );
 
-      String errorMessage = 'Registration failed. Please try again.';
-      final responseData = e.response?.data;
-
-      if (responseData is Map<String, dynamic>) {
-        errorMessage = responseData['message']?.toString() ?? errorMessage;
-      }
-
       return LoginResponse(
         success: false,
-        message: errorMessage,
+        message: AppErrorUtils.getFriendlyMessage(e, fallbackMessage: 'Registration failed. Please try again.'),
       );
     } catch (e, st) {
       AppLogger.exception(
         e,
         st,
-        message: 'Unexpected structural dynamic crash during register parser',
+        message: 'Unexpected crash during register parser',
         tag: LogTags.auth,
         subTag: _subTag,
       );
       return LoginResponse(
         success: false,
-        message: 'Something went wrong.',
+        message: AppErrorUtils.getFriendlyMessage(e),
       );
     }
   }
@@ -310,29 +552,42 @@ class PatientAuthRepository implements AuthRepository {
     }
   }
 
-
   Future<LoginResponse> signInWithGoogle({
     required String firebaseToken,
   }) async {
-    final response = await _dio.post(
-      ApiConstants.googleLogin,
-      data: {
-        'token': firebaseToken,
-        'portal': 'USER',
-      },
-    );
+    try {
+      final response = await _dio.post(
+        ApiConstants.googleLogin,
+        data: {
+          'token': firebaseToken,
+          'portal': 'USER',
+        },
+      );
 
-    final loginResponse = LoginResponse.fromJson(
-      Map<String, dynamic>.from(response.data),
-    );
+      final loginResponse = LoginResponse.fromJson(
+        Map<String, dynamic>.from(response.data),
+      );
 
-    if (loginResponse.success &&
-        loginResponse.token?.isNotEmpty == true) {
-      await _storage.saveToken(loginResponse.token!);
-      await _storage.saveRole('patient');
+      if (loginResponse.success &&
+          loginResponse.token?.isNotEmpty == true) {
+        await _storage.saveToken(loginResponse.token!);
+        await _storage.saveRole('patient');
+      }
+
+      return loginResponse;
+    } on DioException catch (e, st) {
+      AppLogger.exception(e, st, tag: LogTags.auth, subTag: _subTag);
+      return LoginResponse(
+        success: false,
+        message: AppErrorUtils.getFriendlyMessage(e, fallbackMessage: 'Google login failed. Please try again.'),
+      );
+    } catch (e, st) {
+      AppLogger.exception(e, st, tag: LogTags.auth, subTag: _subTag);
+      return LoginResponse(
+        success: false,
+        message: AppErrorUtils.getFriendlyMessage(e),
+      );
     }
-
-    return loginResponse;
   }
 
   @override

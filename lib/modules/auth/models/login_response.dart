@@ -7,7 +7,9 @@ class LoginResponse {
   final String? channel;
   final String? mobile;
   final String? email;
+  final String? destination;
   final String? maskedDestination;
+  final int? expiresIn;
   final Map<String, dynamic>? rawData;
 
   LoginResponse({
@@ -19,7 +21,9 @@ class LoginResponse {
     this.channel,
     this.mobile,
     this.email,
+    this.destination,
     this.maskedDestination,
+    this.expiresIn,
     this.rawData,
   });
 
@@ -56,14 +60,22 @@ class LoginResponse {
     final String? email = json['email']?.toString() ??
         dataMap['email']?.toString();
 
-    final String? maskedDestination = json['maskedEmail']?.toString() ??
+    final String? destination = json['destination']?.toString() ??
+        dataMap['destination']?.toString() ??
+        json['maskedEmail']?.toString() ??
         dataMap['maskedEmail']?.toString() ??
         json['maskedMobile']?.toString() ??
         dataMap['maskedMobile']?.toString() ??
         json['maskedDestination']?.toString() ??
-        dataMap['maskedDestination']?.toString() ??
-        json['destination']?.toString() ??
-        dataMap['destination']?.toString();
+        dataMap['maskedDestination']?.toString();
+
+    final String? maskedDestination = destination;
+
+    final int? expiresIn = json['expiresIn'] is int
+        ? json['expiresIn'] as int
+        : (dataMap['expiresIn'] is int
+            ? dataMap['expiresIn'] as int
+            : int.tryParse(json['expiresIn']?.toString() ?? dataMap['expiresIn']?.toString() ?? ''));
 
     return LoginResponse(
       success: json['success'] ?? false,
@@ -74,7 +86,9 @@ class LoginResponse {
       channel: channel,
       mobile: mobile,
       email: email,
+      destination: destination,
       maskedDestination: maskedDestination,
+      expiresIn: expiresIn,
       rawData: json,
     );
   }

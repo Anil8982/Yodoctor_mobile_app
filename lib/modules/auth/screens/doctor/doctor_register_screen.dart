@@ -141,7 +141,7 @@ class _DoctorRegisterScreenState extends ConsumerState<DoctorRegisterScreen>
                   tag: 'docAppBar',
                   child: Container(
                     decoration: BoxDecoration(
-                      color: colorScheme.secondary,
+                      color: colorScheme.primary,
                       borderRadius: const BorderRadius.only(
                         bottomLeft: Radius.circular(28),
                         bottomRight: Radius.circular(28),
@@ -170,13 +170,13 @@ class _DoctorRegisterScreenState extends ConsumerState<DoctorRegisterScreen>
                                     width: 40,
                                     height: 40,
                                     decoration: BoxDecoration(
-                                      color: colorScheme.onSecondary
+                                      color: colorScheme.onPrimary
                                           .transparency(0.25),
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: Icon(
                                       Icons.arrow_back_rounded,
-                                      color: colorScheme.onSecondary,
+                                      color: colorScheme.onPrimary,
                                     ),
                                   ),
                                 ),
@@ -188,14 +188,14 @@ class _DoctorRegisterScreenState extends ConsumerState<DoctorRegisterScreen>
                                         text: 'Yo',
                                         style: textTheme.titleLarge?.copyWith(
                                           fontWeight: FontWeight.w800,
-                                          color: colorScheme.onSecondary,
+                                          color: colorScheme.onPrimary,
                                         ),
                                       ),
                                       TextSpan(
                                         text: 'Doctor',
                                         style: textTheme.titleLarge?.copyWith(
                                           fontWeight: FontWeight.w800,
-                                          color: colorScheme.onSecondary
+                                          color: colorScheme.onPrimary
                                               .withValues(alpha: 0.6),
                                         ),
                                       ),
@@ -209,7 +209,7 @@ class _DoctorRegisterScreenState extends ConsumerState<DoctorRegisterScreen>
                                     child: Text(
                                       '${_currentStep + 1}/${_stepLabels.length}',
                                       style: textTheme.labelMedium?.copyWith(
-                                        color: colorScheme.onSecondary,
+                                        color: colorScheme.onPrimary,
                                         fontWeight: FontWeight.w700,
                                       ),
                                     ),
@@ -225,7 +225,7 @@ class _DoctorRegisterScreenState extends ConsumerState<DoctorRegisterScreen>
                               _stepLabels[_currentStep],
                               key: ValueKey(_currentStep),
                               style: textTheme.titleMedium?.copyWith(
-                                color: colorScheme.onSecondary,
+                                color: colorScheme.onPrimary,
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
@@ -440,8 +440,8 @@ class _DoctorRegisterScreenState extends ConsumerState<DoctorRegisterScreen>
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: done || active
-                        ? colorScheme.onSecondary
-                        : colorScheme.onSecondary.transparency(0.3),
+                        ? colorScheme.onPrimary
+                        : colorScheme.onPrimary.transparency(0.3),
                   ),
                   child: Center(
                     child: done
@@ -455,7 +455,7 @@ class _DoctorRegisterScreenState extends ConsumerState<DoctorRegisterScreen>
                             style: textTheme.labelSmall?.copyWith(
                               color: active
                                   ? colorScheme.primary
-                                  : colorScheme.onSecondary.transparency(0.7),
+                                  : colorScheme.onPrimary.transparency(0.7),
                               fontWeight: FontWeight.w800,
                             ),
                           ),
@@ -466,8 +466,8 @@ class _DoctorRegisterScreenState extends ConsumerState<DoctorRegisterScreen>
                     child: Container(
                       height: 2,
                       color: i < _currentStep
-                          ? colorScheme.onSecondary
-                          : colorScheme.onSecondary.transparency(0.3),
+                          ? colorScheme.onPrimary
+                          : colorScheme.onPrimary.transparency(0.3),
                     ),
                   ),
               ],

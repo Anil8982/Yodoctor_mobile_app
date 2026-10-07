@@ -241,11 +241,9 @@ class _YoLoginTextFieldState extends State<YoLoginTextField> {
             ],
           ),
         ),
-        SizedBox(
-          height: 20,
-          child: _errorText != null && _errorText!.isNotEmpty
-              ? Padding(
-            padding: const EdgeInsets.only(left: 12, top: 4),
+        if (_errorText != null && _errorText!.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(left: 12, top: 4, bottom: 4),
             child: Text(
               _errorText!,
               style: TextStyle(
@@ -254,9 +252,7 @@ class _YoLoginTextFieldState extends State<YoLoginTextField> {
                 fontWeight: FontWeight.w500,
               ),
             ),
-          )
-              : const SizedBox.shrink(),
-        ),
+          ),
       ],
     );
   }
