@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-
-import '../../../../core/utils/dummy_data.dart';
-import '../../widgets/custom_sliver_app_bar.dart';
-import '../../widgets/patient_drawer.dart';
+import 'package:yodoctor/modules/patient/widgets/custom_sliver_app_bar.dart';
+import 'package:yodoctor/modules/patient/widgets/qr_scanner.dart';
 import 'models/services_model.dart';
 import 'widgets/service_card.dart';
 import 'widgets/services_header.dart';
@@ -17,44 +15,23 @@ class ServicesScreen extends ConsumerStatefulWidget {
 }
 
 class _ServicesScreenState extends ConsumerState<ServicesScreen> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   void _openQRScanner() {
-    showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.black,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (context) {
-        return SizedBox(
-          height: MediaQuery.of(context).size.height * 0.85,
-          child: const Center(
-            child: Text(
-              'QR Scanner Camera Open Here',
-              style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-          ),
-        );
-      },
-    );
+    QrScannerSheet.show(context);
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Scaffold(
-      key: _scaffoldKey,
-      drawer: const PatientDrawer(user: DummyData.currentUser),
-      backgroundColor: theme.scaffoldBackgroundColor,
-      body: NestedScrollView(
+    return Container(
+      color: theme.scaffoldBackgroundColor,
+      child: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return <Widget>[
             CustomSliverAppBar(
+              titleText: 'Services',
               expandedHeight: 220,
-              scaffoldKey: _scaffoldKey,
               background: ServicesHeader(
                 servicesCount: medicalServicesList.length,
               ),
@@ -70,10 +47,7 @@ class _ServicesScreenState extends ConsumerState<ServicesScreen> {
           mainAxisSpacing: 16,
           itemBuilder: (context, index) {
             final service = medicalServicesList[index];
-            return ServiceCard(
-              service: service,
-              onQrTap: _openQRScanner,
-            );
+            return ServiceCard(service: service, onQrTap: _openQRScanner);
           },
         ),
       ),

@@ -43,7 +43,7 @@ class LabSupportBanner extends StatelessWidget {
             ),
             icon: const Icon(Icons.call_rounded, size: 18),
             label: const Text(
-              'Call +91 98765 43210',
+              'Call +91 92772 07339',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),

@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../core/utils/app_spacing.dart';
-import '../../../../../core/widgets/gradient_background.dart';
 
 class HistoryHeader extends StatelessWidget {
-  const HistoryHeader({
-    super.key,
-    required this.appointmentCount,
-  });
+  const HistoryHeader({super.key, required this.appointmentCount});
 
   final int appointmentCount;
 
@@ -17,13 +13,18 @@ class HistoryHeader extends StatelessWidget {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final double topPadding = MediaQuery.of(context).padding.top;
 
-    return GradientBackground(
-      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(32)),
+    return Container(
       padding: EdgeInsets.fromLTRB(
         AppSpacing.xl,
-        topPadding + 70,
+        topPadding + 60,
         AppSpacing.xl,
-        AppSpacing.xl,
+        AppSpacing.lg,
+      ),
+      decoration: BoxDecoration(
+        color: colorScheme.primary,
+        borderRadius: const BorderRadius.vertical(
+          bottom: Radius.circular(32),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -36,16 +37,19 @@ class HistoryHeader extends StatelessWidget {
               fontWeight: FontWeight.w800,
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 5),
           Text(
             'Track completed consultations and rate doctors.',
             style: textTheme.bodyMedium?.copyWith(
               color: colorScheme.onPrimary.withValues(alpha: 0.9),
             ),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 8),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 8,
+            ),
             decoration: BoxDecoration(
               color: colorScheme.onPrimary.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(12),

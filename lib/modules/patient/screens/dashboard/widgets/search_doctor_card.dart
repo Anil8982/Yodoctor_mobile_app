@@ -2,96 +2,181 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
-import 'package:yodoctor/core/utils/app_spacing.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:yodoctor/modules/patient/screens/search/widgets/doctor_search_widget.dart';
 
 class SearchDoctorCard extends StatelessWidget {
-  const SearchDoctorCard({super.key});
+  final bool isSearch;
+
+  const SearchDoctorCard({super.key, this.isSearch = false});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
 
-    return InkWell(
-      onTap: () => context.push(AppRoutes.search),
-      borderRadius: BorderRadius.circular(24),
+    if (!isSearch) {
+      return Material(
+        color: AppTheme.transparent,
+        child: InkWell(
+          onTap: () => context.push(AppRoutes.search),
+          borderRadius: BorderRadius.circular(28),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  colorScheme.primary.transparency(0.85),
+                  colorScheme.primary.transparency(0.75),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(28),
+              border: Border.all(
+                color: colorScheme.onPrimary.transparency(0.2),
+                width: 1.5,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: colorScheme.primary.transparency(isDark ? 0.25 : 0.35),
+                  blurRadius: 24,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Positioned(
+                  right: -16,
+                  bottom: -20,
+                  child: Icon(
+                    Icons.person_search_rounded,
+                    color: colorScheme.onPrimary.transparency(0.12),
+                    size: 130,
+                  ),
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text(
+                      'Find Your',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: colorScheme.onPrimary.transparency(0.85),
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Best Doctor Near You',
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        color: colorScheme.onPrimary,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -0.5,
+                        height: 1.15,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 18,
+                        vertical: 10,
+                      ),
+                      decoration: BoxDecoration(
+                        color: colorScheme.surface,
+                        borderRadius: BorderRadius.circular(99),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppTheme.black.transparency(0.08),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Search Now',
+                            style: theme.textTheme.labelLarge?.copyWith(
+                              color: colorScheme.primary,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Icon(
+                            Icons.arrow_forward_rounded,
+                            size: 16,
+                            color: colorScheme.primary,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Material(
+      color: AppTheme.transparent,
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(AppSpacing.xl),
+        padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: colorScheme.primary.transparency(0.8),
-          borderRadius: BorderRadius.circular(24),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              colorScheme.primary.transparency(0.85),
+              colorScheme.primary.transparency(0.75),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(28),
+          border: Border.all(
+            color: colorScheme.onPrimary.transparency(0.2),
+            width: 1.5,
+          ),
           boxShadow: [
             BoxShadow(
-              color: colorScheme.primary.transparency(0.25),
-              blurRadius: 20,
+              color: colorScheme.primary.transparency(isDark ? 0.25 : 0.35),
+              blurRadius: 24,
               offset: const Offset(0, 10),
             ),
           ],
         ),
-        child: Stack(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Text(
-                  'Find Your',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: colorScheme.onPrimary.transparency(0.8),
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                Text(
-                  'Best Doctor Near You',
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    color: colorScheme.onPrimary,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.lg),
-
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    color: colorScheme.onPrimary,
-                    borderRadius: BorderRadius.circular(99),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'Search Now',
-                        style: theme.textTheme.labelLarge?.copyWith(
-                          color: colorScheme.primary,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Icon(
-                        Icons.arrow_forward_rounded,
-                        size: 16,
-                        color: colorScheme.primary,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-
-            Positioned(
-              right: -10,
-              bottom: -10,
-              child: Icon(
-                Icons.person_search_rounded,
-                color: colorScheme.onPrimary.transparency(0.12),
-                size: 100,
+            Text(
+              'Find Your',
+              style: theme.textTheme.titleMedium?.copyWith(
+                color: colorScheme.onPrimary.transparency(0.85),
+                fontWeight: FontWeight.w600,
+                letterSpacing: -0.2,
               ),
             ),
+            const SizedBox(height: 2),
+            Text(
+              'Best Doctor Near You',
+              style: theme.textTheme.headlineSmall?.copyWith(
+                color: colorScheme.onPrimary,
+                fontWeight: FontWeight.w900,
+                letterSpacing: -0.5,
+                height: 1.15,
+              ),
+            ),
+            const SizedBox(height: 20),
+            const DoctorSearchWidget(),
           ],
         ),
       ),

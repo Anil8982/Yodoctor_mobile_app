@@ -1,37 +1,44 @@
 import 'package:flutter/material.dart';
-import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
+import 'package:yodoctor/modules/widgets/app_bottom_nav.dart';
 
-class DoctorBottomNav {
-  const DoctorBottomNav._();
+class DoctorBottomNav extends StatelessWidget {
+  const DoctorBottomNav({
+    super.key,
+    required this.currentIndex,
+    required this.onTap,
+  });
 
-  static List<PersistentBottomNavBarItem> navBarItems(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+  final int currentIndex;
+  final ValueChanged<int> onTap;
 
-    return [
-      PersistentBottomNavBarItem(
-        icon: const Icon(Icons.home_rounded),
-        title: "Home",
-        activeColorPrimary: colorScheme.primary,
-        inactiveColorPrimary: colorScheme.onSurfaceVariant,
-      ),
-      PersistentBottomNavBarItem(
-        icon: const Icon(Icons.calendar_month_rounded),
-        title: "History",
-        activeColorPrimary: colorScheme.primary,
-        inactiveColorPrimary: colorScheme.onSurfaceVariant,
-      ),
-      PersistentBottomNavBarItem(
-        icon: const Icon(Icons.wallet_membership_rounded),
-        title: "Certificates",
-        activeColorPrimary: colorScheme.primary,
-        inactiveColorPrimary: colorScheme.onSurfaceVariant,
-      ),
-      PersistentBottomNavBarItem(
-        icon: const Icon(Icons.star_rounded),
-        title: "Reviews",
-        activeColorPrimary: colorScheme.primary,
-        inactiveColorPrimary: colorScheme.onSurfaceVariant,
-      ),
-    ];
+  @override
+  Widget build(BuildContext context) {
+    return AppBottomNav(
+      currentIndex: currentIndex,
+      onTap: onTap,
+      items: const [
+        NavItemData(
+          icon: Icons.home_outlined,
+          activeIcon: Icons.home_rounded,
+          label: "Home",
+        ),
+        NavItemData(
+          icon: Icons.person_add_alt_1_outlined,
+          activeIcon: Icons.person_add_alt_1_rounded,
+          label: "Manual Booking",
+        ),
+
+        NavItemData(
+          icon: Icons.workspace_premium_outlined,
+          activeIcon: Icons.workspace_premium_rounded,
+          label: "Certificates",
+        ),
+        NavItemData(
+          icon: Icons.calendar_month_outlined,
+          activeIcon: Icons.calendar_month_rounded,
+          label: "History",
+        ),
+      ],
+    );
   }
 }

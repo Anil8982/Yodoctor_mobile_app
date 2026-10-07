@@ -1,151 +1,163 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:yodoctor/core/providers/app_role_provider.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
+import 'package:yodoctor/core/profile_image/profile_image_controller.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:yodoctor/modules/widgets/app_drawer.dart';
+import '../controllers/profile_controller.dart';
+import '../../widgets/logout_dialog.dart';
 
-import '../../../core/utils/dummy_data.dart';
-
-class PatientDrawer extends StatelessWidget {
-  const PatientDrawer({super.key, required this.user});
-
-  final PatientUser user;
+class PatientDrawer extends ConsumerWidget {
+  const PatientDrawer({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
 
-    return Drawer(
-      backgroundColor: colorScheme.surface,
-      child: Column(
-        children: [
-          // Header Section
-          UserAccountsDrawerHeader(
-            margin: EdgeInsets.zero,
-            decoration: BoxDecoration(
-              gradient: AppTheme.patientGradient,
-            ),
-            accountName: Text(
-              user.name,
-              style: theme.textTheme.titleMedium?.copyWith(
+    final profileState = ref.watch(profileControllerProvider);
+    final user = profileState.user;
+    final imageState = ref.watch(profileImageController);
+
+    final String drawerName =
+        (user?.fullName != null && user!.fullName.isNotEmpty)
+        ? user.fullName
+        : "Patient";
+    final String drawerEmail = (user?.email != null && user!.email.isNotEmpty)
+        ? user.email
+        : "N/A";
+
+    final currentRoute = GoRouterState.of(context).uri.path;
+
+    return AppDrawer(
+      footerText: 'YoDoctor Patient',
+      headerData: DrawerHeaderData(
+        title: drawerName,
+        subtitle: drawerEmail,
+        avatarChild: imageState.when(
+          data: (imageUrl) {
+            if (imageUrl != null && imageUrl.isNotEmpty) {
+              return Image.network(
+                imageUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) =>
+                    _buildDefaultAvatar(colorScheme),
+              );
+            }
+            return _buildDefaultAvatar(colorScheme);
+          },
+          loading: () => Center(
+            child: SizedBox(
+              width: 18,
+              height: 18,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
                 color: colorScheme.onPrimary,
-                fontWeight: FontWeight.bold,
               ),
             ),
-            accountEmail: Text(
-              user.email,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: colorScheme.onPrimary.withValues(alpha: 0.8),
-              ),
-            ),
-            currentAccountPicture: CircleAvatar(
-              backgroundColor: colorScheme.onPrimaryContainer,
-              child: Icon(Icons.person, color: colorScheme.primary, size: 32),
-            ),
           ),
-
-          // Menu Items
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-              children: [
-                _buildDrawerItem(
-                  context,
-                  icon: Icons.home_rounded,
-                  label: 'Home',
-                  colorScheme: colorScheme,
-                  onTap: () => Navigator.pop(context),
-                ),
-                _buildDrawerItem(
-                  context,
-                  icon: Icons.person_outline_rounded,
-                  label: 'My Profile',
-                  colorScheme: colorScheme,
-                  onTap: () {
-                    Navigator.pop(context);
-                    context.push(AppRoutes.profile);
-                  },
-                ),
-                _buildDrawerItem(
-                  context,
-                  icon: Icons.history_rounded,
-                  label: 'Appointments',
-                  colorScheme: colorScheme,
-                  onTap: () {
-                    Navigator.pop(context);
-                    context.push(AppRoutes.history);
-                  },
-                ),
-
-                _buildDrawerItem(
-                  context,
-                  icon: Icons.family_restroom_rounded,
-                  label: 'Family Members',
-                  colorScheme: colorScheme,
-                  onTap: () {
-                    Navigator.pop(context);
-                    context.push(AppRoutes.family);
-                  },
-                ),
-
-                _buildDrawerItem(
-                  context,
-                  icon: Icons.card_membership_rounded,
-                  label: 'Medical Certificates',
-                  colorScheme: colorScheme,
-                  onTap: () {
-                    Navigator.pop(context);
-                    context.push(AppRoutes.certificateWallet);
-                  },
-                ),
-                const Divider(indent: 8, endIndent: 8),
-                _buildDrawerItem(
-                  context,
-                  icon: Icons.logout_rounded,
-                  label: 'Logout',
-                  colorScheme: colorScheme,
-                  textColor: colorScheme.error,
-                  onTap: () {
-                    Navigator.pop(context);
-                    context.go(AppRoutes.landing);
-                  },
-                ),
-              ],
-            ),
-          ),
-
-          // Footer / Version Info
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              'v1.0.0',
-              style: theme.textTheme.labelSmall?.copyWith(color: colorScheme.outline),
-            ),
-          ),
-        ],
+          error: (_, _) => _buildDefaultAvatar(colorScheme),
+        ),
       ),
+      items: [
+        GlassDrawerItem(
+          icon: Icons.home_rounded,
+          label: 'Home',
+          selected: currentRoute == AppRoutes.dashboard,
+          onTap: () {
+            Navigator.pop(context);
+            context.go(AppRoutes.dashboard);
+          },
+        ),
+        GlassDrawerItem(
+          icon: Icons.person_outline_rounded,
+          label: 'My Profile',
+          selected: currentRoute == AppRoutes.profile,
+          onTap: () {
+            Navigator.pop(context);
+            context.push(AppRoutes.profile);
+          },
+        ),
+        GlassDrawerItem(
+          icon: Icons.family_restroom_rounded,
+          label: 'Family',
+          selected: currentRoute == AppRoutes.family,
+          onTap: () {
+            Navigator.pop(context);
+            context.push(AppRoutes.family);
+          },
+        ),
+        GlassDrawerItem(
+          icon: Icons.history_rounded,
+          label: 'Appointments',
+          selected: currentRoute == AppRoutes.history,
+          onTap: () {
+            Navigator.pop(context);
+            context.go(AppRoutes.history);
+          },
+        ),
+        GlassDrawerItem(
+          icon: Icons.description_rounded,
+          label: 'Certificate',
+          selected: currentRoute == AppRoutes.certificateWallet,
+          onTap: () {
+            Navigator.pop(context);
+            context.push(AppRoutes.certificateWallet);
+          },
+        ),
+        GlassDrawerItem(
+          icon: Icons.home_repair_service_rounded,
+          label: 'Book Care Service',
+          selected: currentRoute == AppRoutes.homeServiceBooking,
+          onTap: () {
+            Navigator.pop(context);
+            context.push(AppRoutes.homeServiceBooking);
+          },
+        ),
+        GlassDrawerItem(
+          icon: Icons.medical_services_rounded,
+          label: 'Home Care History',
+          selected: currentRoute == AppRoutes.homeCareHistory,
+          onTap: () {
+            Navigator.pop(context);
+            context.push(AppRoutes.homeCareHistory);
+          },
+        ),
+        GlassDrawerItem(
+          icon: Icons.science_rounded,
+          label: 'Book Lab Test',
+          selected: currentRoute == AppRoutes.labTest,
+          onTap: () {
+            Navigator.pop(context);
+            context.push(AppRoutes.labTest);
+          },
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          child: Divider(
+            color: colorScheme.outlineVariant.withValues(alpha: 0.3),
+            height: 1,
+          ),
+        ),
+        GlassDrawerItem(
+          icon: Icons.logout_rounded,
+          label: 'Logout',
+          foregroundColor: colorScheme.error,
+          onTap: () {
+            Navigator.pop(context);
+            LogoutDialog.show(context, ref, role: AppRole.patient);
+          },
+        ),
+      ],
     );
   }
 
-  Widget _buildDrawerItem(
-      BuildContext context, {
-        required IconData icon,
-        required String label,
-        required ColorScheme colorScheme,
-        required VoidCallback onTap,
-        Color? textColor,
-      }) {
-    return ListTile(
-      leading: Icon(icon, color: textColor ?? colorScheme.onSurfaceVariant),
-      title: Text(
-        label,
-        style: TextStyle(
-          color: textColor ?? colorScheme.onSurface,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      onTap: onTap,
+  Widget _buildDefaultAvatar(ColorScheme colorScheme) {
+    return Container(
+      color: AppTheme.white.withValues(alpha: 0.15),
+      alignment: Alignment.center,
+      child: Icon(Icons.person_rounded, color: colorScheme.onPrimary, size: 26),
     );
   }
 }

@@ -1,12 +1,30 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/core/providers/storage_provider.dart';
 
-enum AppRole { patient, doctor }
+enum AppRole { patient, doctor, admin }
 
 class AppRoleNotifier extends Notifier<AppRole> {
   @override
-  AppRole build() => AppRole.patient;
+  AppRole build() {
+    final storage = ref.read(storageProvider);
+    final savedRole = storage.getRole();
 
-  void setRole(AppRole newRole) => state = newRole;
+    if (savedRole == 'doctor') return AppRole.doctor;
+    if (savedRole == 'admin') return AppRole.admin;
+    return AppRole.patient;
+  }
+
+  Future<void> setRole(AppRole newRole) async {
+    state = newRole;
+    final storage = ref.read(storageProvider);
+    await storage.saveRole(newRole.name);
+  }
+
+  Future<void> clearRole() async {
+    state = AppRole.patient;
+    final storage = ref.read(storageProvider);
+    await storage.clearRole();
+  }
 }
 
 final appRoleProvider = NotifierProvider<AppRoleNotifier, AppRole>(

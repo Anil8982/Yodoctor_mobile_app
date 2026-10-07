@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../core/utils/app_spacing.dart';
-import '../../../../../core/widgets/gradient_background.dart';
 
 class ServicesHeader extends StatelessWidget {
   const ServicesHeader({
@@ -17,13 +16,17 @@ class ServicesHeader extends StatelessWidget {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final double topPadding = MediaQuery.of(context).padding.top;
 
-    return GradientBackground(
-      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(32)),
+    return Container(
       padding: EdgeInsets.fromLTRB(
         AppSpacing.xl,
         topPadding + 70,
         AppSpacing.xl,
         AppSpacing.xl,
+      ),
+      decoration: const BoxDecoration(
+        borderRadius: BorderRadius.vertical(
+          bottom: Radius.circular(32),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -44,10 +47,11 @@ class ServicesHeader extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 14),
-
-          // M3 Tag/Badge for total active services
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 8,
+            ),
             decoration: BoxDecoration(
               color: colorScheme.onPrimary.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(12),

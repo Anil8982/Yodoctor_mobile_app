@@ -1,5 +1,6 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
 
 import '../../../../../core/utils/app_spacing.dart';
 
@@ -33,7 +34,9 @@ class DoctorProfileCard extends StatelessWidget {
             decoration: BoxDecoration(
               color: colorScheme.primaryContainer,
               borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: colorScheme.primary.withValues(alpha: 0.22)),
+              border: Border.all(
+                color: colorScheme.primary.withValues(alpha: 0.22),
+              ),
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(15),
@@ -43,7 +46,11 @@ class DoctorProfileCard extends StatelessWidget {
                 errorBuilder: (context, error, stackTrace) {
                   return ColoredBox(
                     color: colorScheme.primaryContainer,
-                    child: Icon(Icons.person_rounded, size: 40, color: colorScheme.primary),
+                    child: Icon(
+                      Icons.person_rounded,
+                      size: 40,
+                      color: colorScheme.primary,
+                    ),
                   );
                 },
               ),
@@ -95,7 +102,9 @@ class DoctorProfileCard extends StatelessWidget {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.xs,
+                      ),
                       child: Text(
                         '•',
                         style: TextStyle(color: colorScheme.outline),
@@ -113,7 +122,11 @@ class DoctorProfileCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: AppSpacing.xxs),
-                    Icon(Icons.star_rounded, size: 14, color: Colors.amber.shade700),
+                    Icon(
+                      Icons.star_rounded,
+                      size: 14,
+                      color: AppTheme.amber.shade700,
+                    ),
                   ],
                 ),
               ],
@@ -154,7 +167,9 @@ class StatCard extends StatelessWidget {
     return _DoctorDashboardCard(
       padding: EdgeInsets.zero, // Handle padding carefully
       child: Padding(
-        padding: const EdgeInsets.all(12.0), // Reduced internal padding for mobile compatibility
+        padding: const EdgeInsets.all(
+          12.0,
+        ), // Reduced internal padding for mobile compatibility
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
@@ -178,8 +193,9 @@ class StatCard extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 14.0), // Reduced breathing room for clean fit
-
+            const SizedBox(
+              height: 14.0,
+            ), // Reduced breathing room for clean fit
             // Metric display
             Text(
               count.toString(),
@@ -199,7 +215,8 @@ class StatCard extends StatelessWidget {
               style: theme.textTheme.labelSmall?.copyWith(
                 color: colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.bold,
-                fontSize: 10, // Hard limit to ensure it fits mobile screens perfectly
+                fontSize:
+                    10, // Hard limit to ensure it fits mobile screens perfectly
                 letterSpacing: 0.2,
               ),
             ),
@@ -227,7 +244,6 @@ class StatCard extends StatelessWidget {
   }
 }
 
-
 class ActionCard extends StatelessWidget {
   const ActionCard({
     super.key,
@@ -235,27 +251,57 @@ class ActionCard extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.onTap,
+    this.badgeCount,
+    this.badgeColor,
   });
 
   final IconData icon;
   final String title;
   final String subtitle;
   final VoidCallback onTap;
+  final int? badgeCount; // Optional count
+  final Color? badgeColor; // Optional badge color
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
+    final showBadge = badgeCount != null && badgeCount! > 0;
+
     return _DoctorDashboardCard(
       onTap: onTap,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _IconTile(
-            icon: icon,
-            backgroundColor: colorScheme.primaryContainer,
-            foregroundColor: colorScheme.primary,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _IconTile(
+                icon: icon,
+                backgroundColor: colorScheme.primaryContainer,
+                foregroundColor: colorScheme.primary,
+              ),
+              if (showBadge)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: badgeColor ?? colorScheme.error,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    badgeCount.toString(),
+                    style: TextStyle(
+                      color: colorScheme.onError,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ),
+            ],
           ),
           const SizedBox(height: AppSpacing.xl),
           Text(
@@ -284,10 +330,7 @@ class ActionCard extends StatelessWidget {
 }
 
 class DirectBookingCard extends StatelessWidget {
-  const DirectBookingCard({
-    super.key,
-    required this.onShowQR,
-  });
+  const DirectBookingCard({super.key, required this.onShowQR});
 
   final VoidCallback onShowQR;
 
@@ -297,7 +340,7 @@ class DirectBookingCard extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     return Material(
-      color: Colors.transparent,
+      color: AppTheme.transparent,
       borderRadius: BorderRadius.circular(24),
       child: InkWell(
         onTap: onShowQR,
@@ -307,10 +350,7 @@ class DirectBookingCard extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                colorScheme.primary,
-                colorScheme.tertiary,
-              ],
+              colors: [colorScheme.primary, colorScheme.tertiary],
             ),
             borderRadius: BorderRadius.circular(24),
             boxShadow: [
@@ -339,7 +379,9 @@ class DirectBookingCard extends StatelessWidget {
                   children: [
                     _IconTile(
                       icon: Icons.qr_code_scanner_rounded,
-                      backgroundColor: colorScheme.onPrimary.withValues(alpha: 0.16),
+                      backgroundColor: colorScheme.onPrimary.withValues(
+                        alpha: 0.16,
+                      ),
                       foregroundColor: colorScheme.onPrimary,
                     ),
                     const SizedBox(height: AppSpacing.md),
@@ -367,8 +409,13 @@ class DirectBookingCard extends StatelessWidget {
                       style: FilledButton.styleFrom(
                         backgroundColor: colorScheme.onPrimary,
                         foregroundColor: colorScheme.primary,
-                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(99)),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.md,
+                          vertical: AppSpacing.sm,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(99),
+                        ),
                       ),
                       child: const Text(
                         'Show QR Code',
@@ -385,7 +432,6 @@ class DirectBookingCard extends StatelessWidget {
     );
   }
 }
-
 
 class MiniActionCard extends StatelessWidget {
   const MiniActionCard({
@@ -436,7 +482,7 @@ class MiniActionCard extends StatelessWidget {
             const SizedBox(height: AppSpacing.xs),
             Text(
               subtitle,
-              maxLines: 2,
+              maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: colorScheme.onSurfaceVariant,
@@ -478,7 +524,9 @@ class _DoctorDashboardCard extends StatelessWidget {
           padding: padding,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.20)),
+            border: Border.all(
+              color: colorScheme.outlineVariant.withValues(alpha: 0.20),
+            ),
           ),
           child: child,
         ),
@@ -525,7 +573,10 @@ class _StatusBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xxs),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.xxs,
+      ),
       decoration: BoxDecoration(
         color: backgroundColor.withValues(alpha: 0.72),
         borderRadius: BorderRadius.circular(99),
@@ -535,11 +586,11 @@ class _StatusBadge extends StatelessWidget {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: foregroundColor,
-              fontSize: 10,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 0.55,
-            ),
+          color: foregroundColor,
+          fontSize: 10,
+          fontWeight: FontWeight.w900,
+          letterSpacing: 0.55,
+        ),
       ),
     );
   }
