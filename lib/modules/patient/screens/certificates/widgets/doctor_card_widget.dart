@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/models/certificate/patient_doctor_model.dart';
 
 class DoctorCardWidget extends StatelessWidget {
@@ -19,6 +20,7 @@ class DoctorCardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
@@ -146,7 +148,7 @@ class DoctorCardWidget extends StatelessWidget {
                               ),
                               const SizedBox(width: 3),
                               Text(
-                                '${doctor.experience} yrs',
+                                l10n.experienceYears(doctor.experience.toString()),
                                 style: theme.textTheme.labelSmall?.copyWith(
                                   fontWeight: FontWeight.w500,
                                   color: colorScheme.onSurfaceVariant,
@@ -156,7 +158,7 @@ class DoctorCardWidget extends StatelessWidget {
                             ],
                           ),
                           Text(
-                            'Certificate Fee — ₹${doctor.certificateFee.toStringAsFixed(0)}',
+                            l10n.certificateFee(doctor.certificateFee.toStringAsFixed(0)),
                             style: theme.textTheme.bodySmall?.copyWith(
                               fontWeight: FontWeight.w600,
                               color: colorScheme.onSurfaceVariant,

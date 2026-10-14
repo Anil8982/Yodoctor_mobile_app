@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/controllers/qr_scanner_controller.dart';
 
 class QrScannerSheet extends ConsumerStatefulWidget {
@@ -33,11 +34,27 @@ class _QrScannerSheetState extends ConsumerState<QrScannerSheet> {
     super.dispose();
   }
 
+  String _getLocalizedQrErrorMessage(String? error, AppLocalizations? l10n) {
+    if (l10n == null) return error ?? 'Invalid QR - Try Again';
+    if (error == null || error.isEmpty) return l10n.invalidQrTryAgain;
+    if (error.contains('Doctor ID not found')) {
+      return l10n.invalidQrDoctorIdNotFound;
+    }
+    if (error.contains('Malformed Doctor ID')) {
+      return l10n.invalidQrMalformedDoctorId;
+    }
+    if (error.contains('Invalid QR structure')) {
+      return l10n.invalidQrStructure;
+    }
+    return error;
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
+    final l10n = AppLocalizations.of(context);
     final state = ref.watch(qrScannerControllerProvider);
     final controller = ref.read(qrScannerControllerProvider.notifier);
 
@@ -130,7 +147,7 @@ class _QrScannerSheetState extends ConsumerState<QrScannerSheet> {
                       CircularProgressIndicator(color: AppTheme.white),
                       const SizedBox(height: 16),
                       Text(
-                        'Verifying...',
+                        l10n?.verifying ?? 'Verifying...',
                         style: textTheme.titleMedium?.copyWith(
                           color: AppTheme.white,
                           fontWeight: FontWeight.w600,
@@ -151,7 +168,7 @@ class _QrScannerSheetState extends ConsumerState<QrScannerSheet> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "Scan Doctor QR",
+                  l10n?.scanDoctorQr ?? "Scan Doctor QR",
                   style: textTheme.titleMedium?.copyWith(
                     color: AppTheme.white,
                     fontWeight: FontWeight.bold,
@@ -189,8 +206,11 @@ class _QrScannerSheetState extends ConsumerState<QrScannerSheet> {
                   ),
                   child: Text(
                     state.isCooldownActive
-                        ? state.errorMessage ?? "Invalid QR - Try Again"
-                        : "Scan Doctor QR",
+                        ? _getLocalizedQrErrorMessage(
+                            state.errorMessage,
+                            l10n,
+                          )
+                        : (l10n?.scanDoctorQr ?? "Scan Doctor QR"),
                     style: textTheme.labelLarge?.copyWith(
                       color: state.isCooldownActive
                           ? colorScheme.onErrorContainer
@@ -202,8 +222,10 @@ class _QrScannerSheetState extends ConsumerState<QrScannerSheet> {
                 const SizedBox(height: 12),
                 Text(
                   state.isCooldownActive
-                      ? "Scanner will resume shortly..."
-                      : "Align the QR code within the frame",
+                      ? (l10n?.scannerWillResumeShortly ??
+                          "Scanner will resume shortly...")
+                      : (l10n?.alignQrCodeWithinFrame ??
+                          "Align the QR code within the frame"),
                   style: textTheme.bodySmall?.copyWith(
                     color: AppTheme.white.withValues(alpha: 0.70),
                   ),

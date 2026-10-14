@@ -12,7 +12,6 @@ import '../../../../l10n/app_localizations.dart';
 
 import '../../controllers/patient_dashboard_controller.dart';
 import 'widgets/appointment_card.dart';
-import 'widgets/language_selector_button.dart';
 import 'widgets/token_card.dart';
 import 'widgets/search_doctor_card.dart';
 
@@ -62,7 +61,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 titleText: l10n.dashboard,
                 expandedHeight: 190.0,
                 background: const PatientHeader(dashboard: null),
-                actions: const [LanguageSelectorButton()],
               ),
             ];
           },
@@ -137,7 +135,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               titleText: l10n.dashboard,
               expandedHeight: 190.0,
               background: PatientHeader(dashboard: data),
-              actions: const [LanguageSelectorButton()],
             ),
           ];
         },

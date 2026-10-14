@@ -11,6 +11,7 @@ import '../../controllers/certificate_request.dart';
 import '../../widgets/custom_sliver_app_bar.dart';
 import 'widgets/certificate_header.dart';
 import '../../../patient/models/certificate/patient_certificate_request_model.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 
 class CertificateWalletScreen extends ConsumerStatefulWidget {
   const CertificateWalletScreen({super.key});
@@ -23,6 +24,37 @@ class CertificateWalletScreen extends ConsumerStatefulWidget {
 class _CertificateWalletScreenState
     extends ConsumerState<CertificateWalletScreen> {
   final TextEditingController _searchController = TextEditingController();
+
+  String _getLocalizedFilter(String filter, AppLocalizations l10n) {
+    switch (filter.toLowerCase()) {
+      case 'pending':
+        return l10n.filterPending;
+      case 'approved':
+        return l10n.filterApproved;
+      case 'rejected':
+        return l10n.filterRejected;
+      case 'all':
+      default:
+        return l10n.filterAll;
+    }
+  }
+
+  String _getLocalizedCertType(String type, AppLocalizations l10n) {
+    switch (type.toLowerCase()) {
+      case 'medical fitness':
+        return l10n.certMedicalFitness;
+      case 'vaccination':
+        return l10n.certVaccination;
+      case 'disability':
+        return l10n.certDisability;
+      case 'second opinion':
+        return l10n.certSecondOpinion;
+      case 'discharge summary':
+        return l10n.certDischargeSummary;
+      default:
+        return type;
+    }
+  }
 
   @override
   void initState() {
@@ -43,6 +75,7 @@ class _CertificateWalletScreenState
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final horizontalPadding = Responsive.horizontalPadding(context);
+    final l10n = AppLocalizations.of(context)!;
 
     final formState = ref.watch(certificateProvider);
     final notifier = ref.read(certificateProvider.notifier);
@@ -59,7 +92,7 @@ class _CertificateWalletScreenState
                 (BuildContext context, bool innerBoxIsScrolled) {
                   return <Widget>[
                     CustomSliverAppBar(
-                      titleText: 'Certificate Wallet',
+                      titleText: l10n.certificateWallet,
                       expandedHeight: 220,
                       background: CertificateHeader(
                         certificateCount: filteredCertificates.length,
@@ -94,7 +127,7 @@ class _CertificateWalletScreenState
                                   onChanged: notifier.setSearchQuery,
                                   style: theme.textTheme.bodyMedium,
                                   decoration: InputDecoration(
-                                    hintText: 'Search by type or doctor...',
+                                    hintText: l10n.searchByTypeOrDoctor,
                                     prefixIcon: const Icon(
                                       Icons.search_rounded,
                                       size: 22,
@@ -156,7 +189,9 @@ class _CertificateWalletScreenState
                                           right: 8.0,
                                         ),
                                         child: FilterChip(
-                                          label: Text(filter),
+                                          label: Text(
+                                            _getLocalizedFilter(filter, l10n),
+                                          ),
                                           selected: isSelected,
                                           onSelected: (_) =>
                                               notifier.setFilter(filter),
@@ -230,7 +265,7 @@ class _CertificateWalletScreenState
               backgroundColor: colorScheme.secondaryContainer,
               foregroundColor: colorScheme.onSecondaryContainer,
               icon: const Icon(Icons.add_rounded),
-              label: const Text('Apply Certificate'),
+              label: Text(l10n.applyCertificate),
               elevation: 2,
             ),
           ),
@@ -245,6 +280,7 @@ class _CertificateWalletScreenState
   ) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
     final dateStr = DateFormat('dd MMM yyyy').format(cert.createdAt);
 
     IconData getIcon() {
@@ -321,7 +357,7 @@ class _CertificateWalletScreenState
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          cert.certificateType,
+                          _getLocalizedCertType(cert.certificateType, l10n),
                           style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: colorScheme.onSurface,
@@ -346,7 +382,7 @@ class _CertificateWalletScreenState
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'Assigned to: ',
+                    l10n.assignedTo,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: colorScheme.onSurfaceVariant,
                     ),
@@ -382,7 +418,7 @@ class _CertificateWalletScreenState
                           .downloadCertificate(cert.id);
                     },
                     icon: const Icon(Icons.verified_rounded, size: 16),
-                    label: const Text('View & Download Certificate'),
+                    label: Text(l10n.viewAndDownloadCertificate),
                     style: OutlinedButton.styleFrom(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -394,7 +430,7 @@ class _CertificateWalletScreenState
               ] else if (cert.status.toUpperCase() == 'REJECTED') ...[
                 const SizedBox(height: 4),
                 Text(
-                  'Note: Request was declined by doctor due to insufficient medical evidence.',
+                  l10n.requestDeclinedNote,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: colorScheme.error,
                     fontStyle: FontStyle.italic,
@@ -411,6 +447,7 @@ class _CertificateWalletScreenState
   Widget _buildEmptyState(BuildContext context, String filter) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return Center(
       child: Column(
@@ -427,7 +464,7 @@ class _CertificateWalletScreenState
           ),
           const SizedBox(height: 16),
           Text(
-            'No Certificates Found',
+            l10n.noCertificatesFound,
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
               color: colorScheme.onSurface,
@@ -435,7 +472,7 @@ class _CertificateWalletScreenState
           ),
           const SizedBox(height: 4),
           Text(
-            'No certificate match the "$filter" filter.',
+            l10n.noCertificatesMatchFilter(_getLocalizedFilter(filter, l10n)),
             style: theme.textTheme.bodyMedium?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),

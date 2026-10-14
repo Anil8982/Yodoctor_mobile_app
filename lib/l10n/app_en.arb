@@ -36,7 +36,7 @@
   "@patientDashboard": {
     "description": "Header title when dashboard has not loaded data"
   },
-  "upcomingVisitsCount": "{count, plural, =1{1 upcoming visit} other{{count} upcoming visits}}",
+  "upcomingVisitsCount": "{count, plural, =0{0 upcoming visits} =1{1 upcoming visit} other{{count} upcoming visits}}",
   "@upcomingVisitsCount": {
     "description": "Badge showing number of upcoming visits",
     "placeholders": {
@@ -123,6 +123,18 @@
   "changeLanguage": "Change Language",
   "@changeLanguage": {
     "description": "Tooltip or action description for language switcher"
+  },
+  "language": "Language",
+  "@language": {
+    "description": "Language setting label"
+  },
+  "chooseAppLanguage": "Choose application language",
+  "@chooseAppLanguage": {
+    "description": "Subtitle for language settings option"
+  },
+  "profileSettings": "Profile Settings",
+  "@profileSettings": {
+    "description": "Profile settings screen title"
   },
   "estimatedMinutes": "{count} mins",
   "@estimatedMinutes": {
@@ -219,5 +231,687 @@
         "example": "5"
       }
     }
+  },
+  "certificateWallet": "Certificate Wallet",
+  "@certificateWallet": {
+    "description": "Certificate Wallet screen title"
+  },
+  "medicalCertificates": "Medical Certificates",
+  "@medicalCertificates": {
+    "description": "Medical certificates header title"
+  },
+  "trackRequestsSubtitle": "Track requests and download approved certificate.",
+  "@trackRequestsSubtitle": {
+    "description": "Subtitle explaining certificate wallet functionality"
+  },
+  "certificateCountWithFilter": "{count, plural, =0{0 certificates | {filter}} =1{1 certificate | {filter}} other{{count} certificates | {filter}}}",
+  "@certificateCountWithFilter": {
+    "description": "Certificate count badge with active filter label",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      },
+      "filter": {
+        "type": "String",
+        "example": "All"
+      }
+    }
+  },
+  "searchByTypeOrDoctor": "Search by type or doctor...",
+  "@searchByTypeOrDoctor": {
+    "description": "Search input placeholder in certificate wallet"
+  },
+  "filterAll": "All",
+  "@filterAll": {
+    "description": "All filter option"
+  },
+  "filterPending": "Pending",
+  "@filterPending": {
+    "description": "Pending filter option"
+  },
+  "filterApproved": "Approved",
+  "@filterApproved": {
+    "description": "Approved filter option"
+  },
+  "filterRejected": "Rejected",
+  "@filterRejected": {
+    "description": "Rejected filter option"
+  },
+  "applyCertificate": "Apply Certificate",
+  "@applyCertificate": {
+    "description": "Floating action button label for applying certificate"
+  },
+  "assignedTo": "Assigned to: ",
+  "@assignedTo": {
+    "description": "Label indicating which doctor is assigned"
+  },
+  "viewAndDownloadCertificate": "View & Download Certificate",
+  "@viewAndDownloadCertificate": {
+    "description": "Button to view and download approved certificate"
+  },
+  "requestDeclinedNote": "Note: Request was declined by doctor due to insufficient medical evidence.",
+  "@requestDeclinedNote": {
+    "description": "Note displayed on rejected certificate card"
+  },
+  "noCertificatesFound": "No Certificates Found",
+  "@noCertificatesFound": {
+    "description": "Title when no certificates match the search or filter"
+  },
+  "noCertificatesMatchFilter": "No certificate match the \"{filter}\" filter.",
+  "@noCertificatesMatchFilter": {
+    "description": "Subtitle when filter yields no certificates",
+    "placeholders": {
+      "filter": {
+        "type": "String",
+        "example": "Pending"
+      }
+    }
+  },
+  "selectCertificateDoctor": "Select Certificate Doctor",
+  "@selectCertificateDoctor": {
+    "description": "Screen title for doctor selection screen"
+  },
+  "noCertificateDoctorsAvailable": "No certificate doctors available at the moment.",
+  "@noCertificateDoctorsAvailable": {
+    "description": "Message when no certificate doctors are available"
+  },
+  "certificateFee": "Certificate Fee — ₹{fee}",
+  "@certificateFee": {
+    "description": "Doctor card certificate fee display",
+    "placeholders": {
+      "fee": {
+        "type": "String",
+        "example": "200"
+      }
+    }
+  },
+  "applyForCertificate": "Apply for Certificate",
+  "@applyForCertificate": {
+    "description": "Screen title for certificate application"
+  },
+  "requestingFromDoctor": "Requesting from {name} — {specialty}",
+  "@requestingFromDoctor": {
+    "description": "Subtitle showing assigned doctor and specialty",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Dr. Sarah"
+      },
+      "specialty": {
+        "type": "String",
+        "example": "Cardiology"
+      }
+    }
+  },
+  "chooseCertificateTypeSubtitle": "Choose certificate type and details",
+  "@chooseCertificateTypeSubtitle": {
+    "description": "Default subtitle on certificate application screen"
+  },
+  "stepType": "Type",
+  "@stepType": {
+    "description": "Step 1 name: certificate type"
+  },
+  "stepMedicalInfo": "Medical Info",
+  "@stepMedicalInfo": {
+    "description": "Step 2 name: medical info"
+  },
+  "stepDocuments": "Documents",
+  "@stepDocuments": {
+    "description": "Step 3 name: documents"
+  },
+  "stepReview": "Review",
+  "@stepReview": {
+    "description": "Step 4 name: review and submit"
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel button label"
+  },
+  "back": "Back",
+  "@back": {
+    "description": "Back button label"
+  },
+  "continueButton": "Continue",
+  "@continueButton": {
+    "description": "Continue button label"
+  },
+  "submitRequest": "Submit Request",
+  "@submitRequest": {
+    "description": "Submit request button label"
+  },
+  "pleaseSelectCertificateType": "Please select a certificate type",
+  "@pleaseSelectCertificateType": {
+    "description": "Validation message when no certificate type is selected"
+  },
+  "pleaseUploadRequiredFiles": "Please upload required verification files.",
+  "@pleaseUploadRequiredFiles": {
+    "description": "Validation message when mandatory files are missing"
+  },
+  "pleaseConfirmAccuracy": "Please confirm accuracy verification to proceed.",
+  "@pleaseConfirmAccuracy": {
+    "description": "Validation message when disclaimer checkbox is not ticked"
+  },
+  "certificateRequestSuccess": "Payment completed and certificate request submitted successfully.",
+  "@certificateRequestSuccess": {
+    "description": "Success message after completing certificate application and payment"
+  },
+  "certificateRequestFailed": "We couldn’t complete your certificate request. Please try again in a moment.",
+  "@certificateRequestFailed": {
+    "description": "Error message when certificate request submission fails"
+  },
+  "selectCertificateType": "Select Certificate Type",
+  "@selectCertificateType": {
+    "description": "Header title for step 1"
+  },
+  "selectCertificateTypeDesc": "Choose the matching variant for your application.",
+  "@selectCertificateTypeDesc": {
+    "description": "Header description for step 1"
+  },
+  "certMedicalFitness": "Medical Fitness",
+  "@certMedicalFitness": {
+    "description": "Medical Fitness certificate option"
+  },
+  "certMedicalFitnessDesc": "For employment or sports",
+  "@certMedicalFitnessDesc": {
+    "description": "Medical Fitness certificate description"
+  },
+  "certVaccination": "Vaccination",
+  "@certVaccination": {
+    "description": "Vaccination certificate option"
+  },
+  "certVaccinationDesc": "Immunization records",
+  "@certVaccinationDesc": {
+    "description": "Vaccination certificate description"
+  },
+  "certDisability": "Disability",
+  "@certDisability": {
+    "description": "Disability certificate option"
+  },
+  "certDisabilityDesc": "Official disability proof",
+  "@certDisabilityDesc": {
+    "description": "Disability certificate description"
+  },
+  "certSecondOpinion": "Second Opinion",
+  "@certSecondOpinion": {
+    "description": "Second Opinion certificate option"
+  },
+  "certSecondOpinionDesc": "Expert medical review",
+  "@certSecondOpinionDesc": {
+    "description": "Second Opinion certificate description"
+  },
+  "certDischargeSummary": "Discharge Summary",
+  "@certDischargeSummary": {
+    "description": "Discharge Summary certificate option"
+  },
+  "certDischargeSummaryDesc": "Summary of hospital discharge",
+  "@certDischargeSummaryDesc": {
+    "description": "Discharge Summary certificate description"
+  },
+  "assignedDoctor": "Assigned Doctor",
+  "@assignedDoctor": {
+    "description": "Assigned Doctor card title"
+  },
+  "purposeOfCertificate": "Purpose of Certificate",
+  "@purposeOfCertificate": {
+    "description": "Dropdown label for purpose of certificate"
+  },
+  "selectPurpose": "Select Purpose",
+  "@selectPurpose": {
+    "description": "Dropdown hint for certificate purpose"
+  },
+  "purposeTravel": "Travel",
+  "@purposeTravel": {
+    "description": "Travel purpose option"
+  },
+  "purposeEmployment": "Employment",
+  "@purposeEmployment": {
+    "description": "Employment purpose option"
+  },
+  "purposeSports": "Sports",
+  "@purposeSports": {
+    "description": "Sports purpose option"
+  },
+  "purposeSchoolUniversity": "School/University",
+  "@purposeSchoolUniversity": {
+    "description": "School/University purpose option"
+  },
+  "purposeInsurance": "Insurance",
+  "@purposeInsurance": {
+    "description": "Insurance purpose option"
+  },
+  "purposeOther": "Other",
+  "@purposeOther": {
+    "description": "Other purpose option"
+  },
+  "pleaseSelectPurpose": "Please select a purpose",
+  "@pleaseSelectPurpose": {
+    "description": "Validation error for purpose field"
+  },
+  "additionalNotesForDoctor": "Additional Notes For Doctor",
+  "@additionalNotesForDoctor": {
+    "description": "Label for additional notes text field"
+  },
+  "additionalNotesHint": "Describe specific conditions or background details contextually...",
+  "@additionalNotesHint": {
+    "description": "Hint for additional notes field"
+  },
+  "medicalDetails": "Medical Details",
+  "@medicalDetails": {
+    "description": "Header title for step 2"
+  },
+  "medicalDetailsDesc": "Provide baseline biometrics to appear on your medical clearance.",
+  "@medicalDetailsDesc": {
+    "description": "Header description for step 2"
+  },
+  "fullName": "Full Name",
+  "@fullName": {
+    "description": "Full name input field label"
+  },
+  "enterFullName": "Enter full name",
+  "@enterFullName": {
+    "description": "Full name field hint"
+  },
+  "pleaseEnterName": "Please enter name",
+  "@pleaseEnterName": {
+    "description": "Validation message when name is empty"
+  },
+  "nameMinCharacters": "Name should have at least 2 characters",
+  "@nameMinCharacters": {
+    "description": "Validation message for minimum characters in name"
+  },
+  "onlyAlphabetsAllowed": "Only alphabets are allowed",
+  "@onlyAlphabetsAllowed": {
+    "description": "Validation message when non-alphabetic characters are entered in name"
+  },
+  "dateOfBirth": "Date of Birth",
+  "@dateOfBirth": {
+    "description": "Date of birth field label"
+  },
+  "selectDate": "Select Date",
+  "@selectDate": {
+    "description": "Date field placeholder"
+  },
+  "requiredField": "Required",
+  "@requiredField": {
+    "description": "Required field validation message"
+  },
+  "gender": "Gender",
+  "@gender": {
+    "description": "Gender dropdown label"
+  },
+  "selectGender": "Select Gender",
+  "@selectGender": {
+    "description": "Gender dropdown hint"
+  },
+  "genderMale": "Male",
+  "@genderMale": {
+    "description": "Male gender option"
+  },
+  "genderFemale": "Female",
+  "@genderFemale": {
+    "description": "Female gender option"
+  },
+  "genderOther": "Other",
+  "@genderOther": {
+    "description": "Other gender option"
+  },
+  "bloodGroup": "Blood Group",
+  "@bloodGroup": {
+    "description": "Blood group dropdown label"
+  },
+  "selectBloodGroup": "Select Blood Group",
+  "@selectBloodGroup": {
+    "description": "Blood group dropdown hint"
+  },
+  "height": "Height",
+  "@height": {
+    "description": "Height field label"
+  },
+  "heightHint": "e.g. 175",
+  "@heightHint": {
+    "description": "Height field hint"
+  },
+  "enterValidNumber": "Enter a valid number",
+  "@enterValidNumber": {
+    "description": "Validation for non-numeric number"
+  },
+  "enterValidHeight": "Enter a valid height (1 - 300 cm)",
+  "@enterValidHeight": {
+    "description": "Validation for out-of-range height"
+  },
+  "weight": "Weight",
+  "@weight": {
+    "description": "Weight field label"
+  },
+  "weightHint": "e.g. 70",
+  "@weightHint": {
+    "description": "Weight field hint"
+  },
+  "enterValidWeight": "Enter a valid weight (1 - 500 kg)",
+  "@enterValidWeight": {
+    "description": "Validation for out-of-range weight"
+  },
+  "knownMedicalConditions": "Known Medical Conditions",
+  "@knownMedicalConditions": {
+    "description": "Known medical conditions label"
+  },
+  "medicalConditionsHint": "e.g., Diabetes, Hypertension, Asthma",
+  "@medicalConditionsHint": {
+    "description": "Medical conditions hint"
+  },
+  "currentMedications": "Current Medications",
+  "@currentMedications": {
+    "description": "Current medications label"
+  },
+  "medicationsHint": "e.g., Metformin 500mg, Daily Multivitamins",
+  "@medicationsHint": {
+    "description": "Medications hint"
+  },
+  "uploadSupportingFiles": "Upload Supporting Files",
+  "@uploadSupportingFiles": {
+    "description": "Header title for step 3"
+  },
+  "uploadSupportingFilesDesc": "Provide documentation for validation processing.",
+  "@uploadSupportingFilesDesc": {
+    "description": "Header description for step 3"
+  },
+  "docProfilePhoto": "Profile Photo",
+  "@docProfilePhoto": {
+    "description": "Profile photo upload label"
+  },
+  "docProfilePhotoHint": "Upload your profile picture (jpg, png)",
+  "@docProfilePhotoHint": {
+    "description": "Profile photo upload hint"
+  },
+  "docGovtId": "Government ID Proof",
+  "@docGovtId": {
+    "description": "Government ID proof upload label"
+  },
+  "docGovtIdHint": "Official Identity Documentation",
+  "@docGovtIdHint": {
+    "description": "Government ID proof upload hint"
+  },
+  "docMedicalReports": "Medical Reports",
+  "@docMedicalReports": {
+    "description": "Medical reports upload label"
+  },
+  "docMedicalReportsHint": "Previous diagnostic data reports",
+  "@docMedicalReportsHint": {
+    "description": "Medical reports upload hint"
+  },
+  "docPrescription": "Prescription",
+  "@docPrescription": {
+    "description": "Prescription upload label"
+  },
+  "docPrescriptionHint": "Doctor's authorized prescriptions",
+  "@docPrescriptionHint": {
+    "description": "Prescription upload hint"
+  },
+  "uploadingDocument": "Uploading document...",
+  "@uploadingDocument": {
+    "description": "Status text while uploading a file"
+  },
+  "documentUploadedSuccess": "Document uploaded successfully",
+  "@documentUploadedSuccess": {
+    "description": "Status text when file upload is complete"
+  },
+  "deleteUploadTooltip": "Delete Upload",
+  "@deleteUploadTooltip": {
+    "description": "Tooltip for removing uploaded file"
+  },
+  "clickToUpload": "Click to upload",
+  "@clickToUpload": {
+    "description": "CTA text inside document upload box"
+  },
+  "documentRequired": "This document is required!",
+  "@documentRequired": {
+    "description": "Error text when required document is missing"
+  },
+  "reviewApplication": "Review Application",
+  "@reviewApplication": {
+    "description": "Header title for step 4"
+  },
+  "reviewApplicationDesc": "Confirm accuracy of entries before submitting to evaluation channels.",
+  "@reviewApplicationDesc": {
+    "description": "Header description for step 4"
+  },
+  "certificateBaselineParameters": "Certificate Baseline Parameters",
+  "@certificateBaselineParameters": {
+    "description": "Card header for certificate info in review step"
+  },
+  "certificateTypeLabel": "Certificate Type",
+  "@certificateTypeLabel": {
+    "description": "Certificate type review label"
+  },
+  "assignedDoctorLabel": "Assigned Medical Doctor",
+  "@assignedDoctorLabel": {
+    "description": "Assigned doctor review label"
+  },
+  "medicalSpecialtyLabel": "Medical Specialty",
+  "@medicalSpecialtyLabel": {
+    "description": "Specialty review label"
+  },
+  "intendedPurposeLabel": "Intended Purpose",
+  "@intendedPurposeLabel": {
+    "description": "Purpose review label"
+  },
+  "additionalNotesLabel": "Additional Context Notes",
+  "@additionalNotesLabel": {
+    "description": "Additional notes review label"
+  },
+  "noneLabel": "None",
+  "@noneLabel": {
+    "description": "Default label when field is empty"
+  },
+  "notAvailableLabel": "N/A",
+  "@notAvailableLabel": {
+    "description": "Not available placeholder"
+  },
+  "patientDiagnosticInformation": "Patient Diagnostic Information",
+  "@patientDiagnosticInformation": {
+    "description": "Card header for patient info in review step"
+  },
+  "fullLegalNameLabel": "Full Legal Name",
+  "@fullLegalNameLabel": {
+    "description": "Full legal name review label"
+  },
+  "dateOfBirthLabel": "Date of Birth",
+  "@dateOfBirthLabel": {
+    "description": "Date of birth review label"
+  },
+  "biologicalGenderLabel": "Biological Gender",
+  "@biologicalGenderLabel": {
+    "description": "Gender review label"
+  },
+  "bloodGroupStagingLabel": "Blood Group Staging",
+  "@bloodGroupStagingLabel": {
+    "description": "Blood group review label"
+  },
+  "heightMetricLabel": "Height Metric",
+  "@heightMetricLabel": {
+    "description": "Height review label"
+  },
+  "weightMetricLabel": "Weight Metric",
+  "@weightMetricLabel": {
+    "description": "Weight review label"
+  },
+  "chronicMedicalConditionsLabel": "Chronic Medical Conditions",
+  "@chronicMedicalConditionsLabel": {
+    "description": "Conditions review label"
+  },
+  "activePrescriptionsLabel": "Current Active Prescriptions",
+  "@activePrescriptionsLabel": {
+    "description": "Prescriptions review label"
+  },
+  "uploadedVerificationMaterials": "Uploaded Verification Materials",
+  "@uploadedVerificationMaterials": {
+    "description": "Header for uploaded files list in review step"
+  },
+  "disclaimerNotice": "By dispatching this electronic request profile, you explicitly affirm that all biometric info matches verified personal medical tracking history.",
+  "@disclaimerNotice": {
+    "description": "Legal disclaimer notice box in review step"
+  },
+  "disclaimerCheckbox": "I legally verify that my submitted profile fields are accurate.",
+  "@disclaimerCheckbox": {
+    "description": "Legal confirmation checkbox in review step"
+  },
+  "certificateDetails": "Certificate Details",
+  "@certificateDetails": {
+    "description": "Certificate details screen title"
+  },
+  "certificateNotFound": "Certificate not found",
+  "@certificateNotFound": {
+    "description": "Message when certificate is not found"
+  },
+  "certificateLabel": "Certificate",
+  "@certificateLabel": {
+    "description": "Certificate label"
+  },
+  "doctorLabel": "Doctor",
+  "@doctorLabel": {
+    "description": "Doctor label"
+  },
+  "purposeLabel": "Purpose",
+  "@purposeLabel": {
+    "description": "Purpose label"
+  },
+  "statusLabel": "Status",
+  "@statusLabel": {
+    "description": "Status label"
+  },
+  "medicinesLabel": "Medicines",
+  "@medicinesLabel": {
+    "description": "Medicines label"
+  },
+  "notesLabel": "Notes",
+  "@notesLabel": {
+    "description": "Notes label"
+  },
+  "timelineLabel": "Timeline",
+  "@timelineLabel": {
+    "description": "Timeline label"
+  },
+  "certificatesTab": "Certificates",
+  "@certificatesTab": {
+    "description": "Certificates tab label on bottom nav"
+  },
+  "certificateDrawerItem": "Certificate",
+  "@certificateDrawerItem": {
+    "description": "Certificate item label in drawer"
+  },
+  "services": "Services",
+  "@services": {
+    "description": "Services header or screen title"
+  },
+  "servicesTab": "Services",
+  "@servicesTab": {
+    "description": "Services tab label on bottom nav"
+  },
+  "servicesHeaderTitle": "YoDoctor Services",
+  "@servicesHeaderTitle": {
+    "description": "Title displayed on services header"
+  },
+  "servicesHeaderSubtitle": "Select a service to get instant medical care.",
+  "@servicesHeaderSubtitle": {
+    "description": "Subtitle displayed on services header"
+  },
+  "activeServicesCount": "{count, plural, =0{0 active services} =1{1 active service} other{{count} active services}}",
+  "@activeServicesCount": {
+    "description": "Active services count badge",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "6"
+      }
+    }
+  },
+  "serviceMedicineDeliveryTitle": "Medicine Delivery",
+  "@serviceMedicineDeliveryTitle": {
+    "description": "Medicine Delivery service title"
+  },
+  "serviceMedicineDeliverySubtitle": "Essentials at your doorstep",
+  "@serviceMedicineDeliverySubtitle": {
+    "description": "Medicine Delivery service subtitle"
+  },
+  "medicineDeliveryComingSoon": "Medicine delivery coming soon",
+  "@medicineDeliveryComingSoon": {
+    "description": "Message shown when medicine delivery is tapped"
+  },
+  "serviceLabTestTitle": "Lab Test",
+  "@serviceLabTestTitle": {
+    "description": "Lab Test service title"
+  },
+  "serviceLabTestSubtitle": "Sample Pickup at Your Door",
+  "@serviceLabTestSubtitle": {
+    "description": "Lab Test service subtitle"
+  },
+  "serviceQrScanTokenTitle": "Scan Qr & get Appointment Token",
+  "@serviceQrScanTokenTitle": {
+    "description": "Scan QR service title"
+  },
+  "serviceQrScanTokenSubtitle": "Scan & Book Instantly",
+  "@serviceQrScanTokenSubtitle": {
+    "description": "Scan QR service subtitle"
+  },
+  "serviceOnlineAppointmentTitle": "Online Booking Appointment",
+  "@serviceOnlineAppointmentTitle": {
+    "description": "Online booking service title"
+  },
+  "serviceOnlineAppointmentSubtitle": "Book from anywhere",
+  "@serviceOnlineAppointmentSubtitle": {
+    "description": "Online booking service subtitle"
+  },
+  "serviceMedicalCertificateTitle": "Apply for Medical Certificate",
+  "@serviceMedicalCertificateTitle": {
+    "description": "Medical certificate service title"
+  },
+  "serviceMedicalCertificateSubtitle": "Consult from home",
+  "@serviceMedicalCertificateSubtitle": {
+    "description": "Medical certificate service subtitle"
+  },
+  "serviceHomeNursingCareTitle": "Home Nursing Care Service booking",
+  "@serviceHomeNursingCareTitle": {
+    "description": "Home nursing care service title"
+  },
+  "serviceHomeNursingCareSubtitle": "Care at your home",
+  "@serviceHomeNursingCareSubtitle": {
+    "description": "Home nursing care service subtitle"
+  },
+  "scanDoctorQr": "Scan Doctor QR",
+  "@scanDoctorQr": {
+    "description": "Scan doctor QR sheet title"
+  },
+  "verifying": "Verifying...",
+  "@verifying": {
+    "description": "Verifying state in QR scanner"
+  },
+  "alignQrCodeWithinFrame": "Align the QR code within the frame",
+  "@alignQrCodeWithinFrame": {
+    "description": "Instruction text in QR scanner"
+  },
+  "invalidQrTryAgain": "Invalid QR - Try Again",
+  "@invalidQrTryAgain": {
+    "description": "Error label in QR scanner"
+  },
+  "scannerWillResumeShortly": "Scanner will resume shortly...",
+  "@scannerWillResumeShortly": {
+    "description": "Cooldown message in QR scanner"
+  },
+  "scanQrCodeTooltip": "Scan QR Code",
+  "@scanQrCodeTooltip": {
+    "description": "Tooltip for QR scan FAB"
+  },
+  "invalidQrDoctorIdNotFound": "Invalid QR: Doctor ID not found.",
+  "@invalidQrDoctorIdNotFound": {
+    "description": "Error when doctor ID is missing in scanned QR"
+  },
+  "invalidQrMalformedDoctorId": "Invalid QR: Malformed Doctor ID.",
+  "@invalidQrMalformedDoctorId": {
+    "description": "Error when doctor ID in scanned QR is not a valid number"
+  },
+  "invalidQrStructure": "Invalid QR structure.",
+  "@invalidQrStructure": {
+    "description": "Error when QR format/structure is invalid"
   }
 }

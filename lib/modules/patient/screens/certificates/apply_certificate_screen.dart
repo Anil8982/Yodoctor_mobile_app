@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/models/certificate/patient_doctor_model.dart';
 import 'package:yodoctor/modules/widgets/app_header.dart';
 import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
@@ -32,8 +33,6 @@ class _ApplyCertificateScreenState
   bool _confirmDisclaimer = false;
   bool _submittedOnce = false;
 
-  final List<String> _steps = ['Type', 'Medical Info', 'Documents', 'Review'];
-
   @override
   void initState() {
     super.initState();
@@ -52,19 +51,30 @@ class _ApplyCertificateScreenState
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final horizontalPadding = Responsive.horizontalPadding(context);
+    final l10n = AppLocalizations.of(context)!;
+
+    final steps = [
+      l10n.stepType,
+      l10n.stepMedicalInfo,
+      l10n.stepDocuments,
+      l10n.stepReview,
+    ];
 
     // Watch dynamic form properties and notifier triggers from state wrapper
     final formState = ref.watch(certificateProvider);
     final notifier = ref.read(certificateProvider.notifier);
 
     final subtitleText = formState.assignedDoctor != null
-        ? 'Requesting from ${formState.assignedDoctor!.name} — ${formState.assignedDoctor!.specialty}'
-        : 'Choose certificate type and details';
+        ? l10n.requestingFromDoctor(
+            formState.assignedDoctor!.name,
+            formState.assignedDoctor!.specialty,
+          )
+        : l10n.chooseCertificateTypeSubtitle;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
 
-      appBar: AppHeader(title: 'Apply for Certificate'),
+      appBar: AppHeader(title: l10n.applyForCertificate),
       body: Column(
         children: [
           Container(
@@ -99,7 +109,7 @@ class _ApplyCertificateScreenState
                   ),
                 ),
                 const SizedBox(height: 12),
-                StepProgressIndicator(currentStep: _currentStep, steps: _steps),
+                StepProgressIndicator(currentStep: _currentStep, steps: steps),
               ],
             ),
           ),
@@ -155,7 +165,7 @@ class _ApplyCertificateScreenState
                     borderRadius: BorderRadius.circular(14),
                   ),
                 ),
-                child: Text(_currentStep == 1 ? 'Cancel' : 'Back'),
+                child: Text(_currentStep == 1 ? l10n.cancel : l10n.back),
               ),
             ),
             const SizedBox(width: 16),
@@ -180,7 +190,7 @@ class _ApplyCertificateScreenState
                           color: AppTheme.white,
                         ),
                       )
-                    : Text(_currentStep == 4 ? 'Submit Request' : 'Continue'),
+                    : Text(_currentStep == 4 ? l10n.submitRequest : l10n.continueButton),
               ),
             ),
           ],
@@ -236,6 +246,7 @@ class _ApplyCertificateScreenState
     CertificateFormState formState,
     CertificateNotifier notifier,
   ) async {
+    final l10n = AppLocalizations.of(context)!;
     setState(() {
       _submittedOnce = true;
     });
@@ -243,7 +254,7 @@ class _ApplyCertificateScreenState
     if (_currentStep == 1) {
       if (formState.selectedType == null) {
         AppSnackBar.show(
-          message: 'Please select a certificate type',
+          message: l10n.pleaseSelectCertificateType,
           type: AppSnackBarType.warning,
         );
         return;
@@ -260,14 +271,14 @@ class _ApplyCertificateScreenState
         setState(() => _currentStep = 4);
       } else {
         AppSnackBar.show(
-          message: 'Please upload required verification files.',
+          message: l10n.pleaseUploadRequiredFiles,
           type: AppSnackBarType.warning,
         );
       }
     } else if (_currentStep == 4) {
       if (!_confirmDisclaimer) {
         AppSnackBar.show(
-          message: 'Please confirm accuracy verification to proceed.',
+          message: l10n.pleaseConfirmAccuracy,
           type: AppSnackBarType.warning,
         );
         return;
@@ -279,16 +290,14 @@ class _ApplyCertificateScreenState
 
       if (success) {
         AppSnackBar.show(
-          message:
-              'Payment completed and certificate request submitted successfully.',
+          message: l10n.certificateRequestSuccess,
           type: AppSnackBarType.success,
         );
 
         return;
       }
       AppSnackBar.show(
-        message:
-            'We couldn’t complete your certificate request. Please try again in a moment.',
+        message: l10n.certificateRequestFailed,
         type: AppSnackBarType.error,
       );
     }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/widgets/custom_sliver_app_bar.dart';
 import 'package:yodoctor/modules/patient/widgets/qr_scanner.dart';
 import 'models/services_model.dart';
@@ -23,6 +24,7 @@ class _ServicesScreenState extends ConsumerState<ServicesScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
 
     return Container(
       color: theme.scaffoldBackgroundColor,
@@ -30,7 +32,7 @@ class _ServicesScreenState extends ConsumerState<ServicesScreen> {
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return <Widget>[
             CustomSliverAppBar(
-              titleText: 'Services',
+              titleText: l10n?.servicesTab ?? 'Services',
               expandedHeight: 220,
               background: ServicesHeader(
                 servicesCount: medicalServicesList.length,

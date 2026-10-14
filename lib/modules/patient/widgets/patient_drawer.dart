@@ -5,6 +5,7 @@ import 'package:yodoctor/core/providers/app_role_provider.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/core/profile_image/profile_image_controller.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/widgets/app_drawer.dart';
 import '../controllers/profile_controller.dart';
 import '../../widgets/logout_dialog.dart';
@@ -15,6 +16,7 @@ class PatientDrawer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context);
 
     final profileState = ref.watch(profileControllerProvider);
     final user = profileState.user;
@@ -99,7 +101,7 @@ class PatientDrawer extends ConsumerWidget {
         ),
         GlassDrawerItem(
           icon: Icons.description_rounded,
-          label: 'Certificate',
+          label: l10n?.certificateDrawerItem ?? 'Certificate',
           selected: currentRoute == AppRoutes.certificateWallet,
           onTap: () {
             Navigator.pop(context);

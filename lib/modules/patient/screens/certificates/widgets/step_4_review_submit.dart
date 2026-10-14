@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/controllers/certificate_request.dart';
 import 'step_header_helper.dart';
 
@@ -15,10 +16,78 @@ class Step4ReviewSubmit extends ConsumerWidget {
     required this.onDisclaimerChanged,
   });
 
+  String _getLocalizedCertType(String? key, AppLocalizations l10n) {
+    if (key == null) return l10n.notAvailableLabel;
+    switch (key) {
+      case 'Medical Fitness':
+        return l10n.certMedicalFitness;
+      case 'Vaccination':
+        return l10n.certVaccination;
+      case 'Disability':
+        return l10n.certDisability;
+      case 'Second Opinion':
+        return l10n.certSecondOpinion;
+      case 'Discharge Summary':
+        return l10n.certDischargeSummary;
+      default:
+        return key;
+    }
+  }
+
+  String _getLocalizedPurpose(String? purpose, AppLocalizations l10n) {
+    if (purpose == null) return l10n.notAvailableLabel;
+    switch (purpose) {
+      case 'Travel':
+        return l10n.purposeTravel;
+      case 'Employment':
+        return l10n.purposeEmployment;
+      case 'Sports':
+        return l10n.purposeSports;
+      case 'School/University':
+        return l10n.purposeSchoolUniversity;
+      case 'Insurance':
+        return l10n.purposeInsurance;
+      case 'Other':
+        return l10n.purposeOther;
+      default:
+        return purpose;
+    }
+  }
+
+  String _getLocalizedGender(String? gender, AppLocalizations l10n) {
+    if (gender == null) return l10n.notAvailableLabel;
+    switch (gender) {
+      case 'Male':
+        return l10n.genderMale;
+      case 'Female':
+        return l10n.genderFemale;
+      case 'Other':
+        return l10n.genderOther;
+      default:
+        return gender;
+    }
+  }
+
+  String _getLocalizedDocName(String key, AppLocalizations l10n) {
+    switch (key) {
+      case 'Profile Photo':
+        return l10n.docProfilePhoto;
+      case 'Government ID Proof':
+        return l10n.docGovtId;
+      case 'Medical Reports':
+        return l10n.docMedicalReports;
+      case 'Prescription':
+        return l10n.docPrescription;
+      default:
+        return key;
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     // Watch current form state reactively from provider
     final formState = ref.watch(certificateProvider);
@@ -26,92 +95,102 @@ class Step4ReviewSubmit extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const StepHeader(
-          title: 'Review Application',
-          desc:
-              'Confirm accuracy of entries before submitting to evaluation channels.',
+        StepHeader(
+          title: l10n.reviewApplication,
+          desc: l10n.reviewApplicationDesc,
         ),
         const SizedBox(height: 20),
         _buildReviewListCard(
           context,
-          title: 'Certificate Baseline Parameters',
+          title: l10n.certificateBaselineParameters,
           items: [
             {
-              'label': 'Certificate Type',
-              'value': formState.selectedType ?? 'N/A',
+              'label': l10n.certificateTypeLabel,
+              'value': _getLocalizedCertType(formState.selectedType, l10n),
             },
             {
-              'label': 'Assigned Medical Doctor',
-              'value': formState.assignedDoctor?.name ?? 'N/A',
+              'label': l10n.assignedDoctorLabel,
+              'value': formState.assignedDoctor?.name ?? l10n.notAvailableLabel,
             },
             {
-              'label': 'Medical Specialty',
-              'value': formState.assignedDoctor?.specialty ?? 'N/A',
+              'label': l10n.medicalSpecialtyLabel,
+              'value': formState.assignedDoctor?.specialty ?? l10n.notAvailableLabel,
             },
-            {'label': 'Intended Purpose', 'value': formState.purpose ?? 'N/A'},
             {
-              'label': 'Additional Context Notes',
+              'label': l10n.intendedPurposeLabel,
+              'value': _getLocalizedPurpose(formState.purpose, l10n),
+            },
+            {
+              'label': l10n.additionalNotesLabel,
               'value': controller.additionalNotesController.text.isNotEmpty
                   ? controller.additionalNotesController.text
-                  : 'None',
+                  : l10n.noneLabel,
             },
           ],
         ),
         const SizedBox(height: 16),
         _buildReviewListCard(
           context,
-          title: 'Patient Diagnostic Information',
+          title: l10n.patientDiagnosticInformation,
           items: [
             {
-              'label': 'Full Legal Name',
-              'value': controller.fullNameController.text,
+              'label': l10n.fullLegalNameLabel,
+              'value': controller.fullNameController.text.isNotEmpty
+                  ? controller.fullNameController.text
+                  : l10n.notAvailableLabel,
             },
             {
-              'label': 'Date of Birth',
+              'label': l10n.dateOfBirthLabel,
               'value': formState.dateOfBirth != null
                   ? '${formState.dateOfBirth!.day.toString().padLeft(2, '0')}-'
                         '${formState.dateOfBirth!.month.toString().padLeft(2, '0')}-'
                         '${formState.dateOfBirth!.year}'
-                  : 'N/A',
+                  : l10n.notAvailableLabel,
             },
-            {'label': 'Biological Gender', 'value': formState.gender ?? 'N/A'},
-            {'label': 'Blood Group Staging', 'value': formState.bloodGroup},
             {
-              'label': 'Height Metric',
+              'label': l10n.biologicalGenderLabel,
+              'value': _getLocalizedGender(formState.gender, l10n),
+            },
+            {
+              'label': l10n.bloodGroupStagingLabel,
+              'value': formState.bloodGroup,
+            },
+            {
+              'label': l10n.heightMetricLabel,
               'value': controller.heightController.text.isNotEmpty
                   ? '${controller.heightController.text} cm'
-                  : 'N/A',
+                  : l10n.notAvailableLabel,
             },
             {
-              'label': 'Weight Metric',
+              'label': l10n.weightMetricLabel,
               'value': controller.weightController.text.isNotEmpty
                   ? '${controller.weightController.text} kg'
-                  : 'N/A',
+                  : l10n.notAvailableLabel,
             },
             {
-              'label': 'Chronic Medical Conditions',
+              'label': l10n.chronicMedicalConditionsLabel,
               'value': controller.medicalConditionsController.text.isNotEmpty
                   ? controller.medicalConditionsController.text
-                  : 'None',
+                  : l10n.noneLabel,
             },
             {
-              'label': 'Current Active Prescriptions',
+              'label': l10n.activePrescriptionsLabel,
               'value': controller.medicationsController.text.isNotEmpty
                   ? controller.medicationsController.text
-                  : 'None',
+                  : l10n.noneLabel,
             },
           ],
         ),
         const SizedBox(height: 20),
         Text(
-          'Uploaded Verification Materials',
+          l10n.uploadedVerificationMaterials,
           style: theme.textTheme.titleSmall?.copyWith(
             fontWeight: FontWeight.bold,
             color: colorScheme.onSurface,
           ),
         ),
         const SizedBox(height: 10),
-        _buildDocumentReviewRow(context, formState),
+        _buildDocumentReviewRow(context, formState, l10n),
         const SizedBox(height: 24),
         Container(
           padding: const EdgeInsets.all(16),
@@ -129,7 +208,7 @@ class Step4ReviewSubmit extends ConsumerWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  'By dispatching this electronic request profile, you explicitly affirm that all biometric info matches verified personal medical tracking history.',
+                  l10n.disclaimerNotice,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                     height: 1.4,
@@ -152,7 +231,7 @@ class Step4ReviewSubmit extends ConsumerWidget {
             value: confirmDisclaimer,
             onChanged: onDisclaimerChanged,
             title: Text(
-              'I legally verify that my submitted profile fields are accurate.',
+              l10n.disclaimerCheckbox,
               style: theme.textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.w500,
               ),
@@ -241,6 +320,7 @@ class Step4ReviewSubmit extends ConsumerWidget {
   Widget _buildDocumentReviewRow(
     BuildContext context,
     CertificateFormState formState,
+    AppLocalizations l10n,
   ) {
     final docs = [
       'Profile Photo',
@@ -295,7 +375,7 @@ class Step4ReviewSubmit extends ConsumerWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      docKey,
+                      _getLocalizedDocName(docKey, l10n),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: theme.textTheme.bodySmall?.copyWith(

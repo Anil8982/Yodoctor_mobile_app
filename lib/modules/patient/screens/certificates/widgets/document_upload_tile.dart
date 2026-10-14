@@ -2,6 +2,7 @@ import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 
 class DocumentUploadTile extends StatelessWidget {
   const DocumentUploadTile({
@@ -29,6 +30,7 @@ class DocumentUploadTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
     final isUploading = uploadProgress != null;
     final isUploaded = uploadedFileName != null;
 
@@ -136,7 +138,7 @@ class DocumentUploadTile extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Uploading document...',
+                                    l10n.uploadingDocument,
                                     style: theme.textTheme.bodyMedium?.copyWith(
                                       fontWeight: FontWeight.bold,
                                       color: colorScheme.onSurface,
@@ -191,7 +193,7 @@ class DocumentUploadTile extends StatelessWidget {
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
-                                    'Document uploaded successfully',
+                                    l10n.documentUploadedSuccess,
                                     style: theme.textTheme.bodySmall?.copyWith(
                                       color: colorScheme.primary,
                                       fontWeight: FontWeight.w600,
@@ -206,7 +208,7 @@ class DocumentUploadTile extends StatelessWidget {
                                 color: colorScheme.error,
                               ),
                               onPressed: onRemove,
-                              tooltip: 'Delete Upload',
+                              tooltip: l10n.deleteUploadTooltip,
                             ),
                           ],
                         ),
@@ -235,7 +237,7 @@ class DocumentUploadTile extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Click to upload',
+                                    l10n.clickToUpload,
                                     style: theme.textTheme.bodyMedium?.copyWith(
                                       fontWeight: FontWeight.bold,
                                       color: hasError
@@ -246,7 +248,7 @@ class DocumentUploadTile extends StatelessWidget {
                                   const SizedBox(height: 2),
                                   Text(
                                     hasError
-                                        ? 'This document is required!'
+                                        ? l10n.documentRequired
                                         : hint,
                                     style: theme.textTheme.bodySmall?.copyWith(
                                       color: hasError

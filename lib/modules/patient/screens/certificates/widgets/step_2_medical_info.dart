@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/utils/app_field_helper.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/controllers/certificate_request.dart';
 import 'package:yodoctor/modules/widgets/app_date_picker_field.dart';
 import 'package:yodoctor/modules/widgets/app_dropdown_field.dart';
@@ -20,10 +21,24 @@ class Step2MedicalInfo extends ConsumerWidget {
     this.autovalidateMode,
   });
 
+  String _getLocalizedGender(String gender, AppLocalizations l10n) {
+    switch (gender) {
+      case 'Male':
+        return l10n.genderMale;
+      case 'Female':
+        return l10n.genderFemale;
+      case 'Other':
+        return l10n.genderOther;
+      default:
+        return gender;
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // Watch current form state reactively from provider
     final formState = ref.watch(certificateProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Form(
       key: formKey,
@@ -31,17 +46,16 @@ class Step2MedicalInfo extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const StepHeader(
-            title: 'Medical Details',
-            desc:
-            'Provide baseline biometrics to appear on your medical clearance.',
+          StepHeader(
+            title: l10n.medicalDetails,
+            desc: l10n.medicalDetailsDesc,
           ),
           const SizedBox(height: 20),
           AppTextField(
             controller: controller.fullNameController,
-            label: 'Full Name',
+            label: l10n.fullName,
             isRequired: true,
-            hint: 'Enter full name',
+            hint: l10n.enterFullName,
             icon: Icons.badge_rounded,
             textCapitalization: TextCapitalization.words,
             inputFormatters: [
@@ -49,17 +63,17 @@ class Step2MedicalInfo extends ConsumerWidget {
             ],
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
-                return 'Please enter name';
+                return l10n.pleaseEnterName;
               }
 
               final cleanedValue = value.trim().replaceAll(RegExp(r'\s+'), ' ');
 
               if (cleanedValue.length < 2) {
-                return 'Name should have at least 2 characters';
+                return l10n.nameMinCharacters;
               }
 
               if (!RegExp(r'^[A-Za-z]+(?: [A-Za-z]+)*$').hasMatch(cleanedValue)) {
-                return 'Only alphabets are allowed';
+                return l10n.onlyAlphabetsAllowed;
               }
 
               return null;
@@ -67,9 +81,9 @@ class Step2MedicalInfo extends ConsumerWidget {
           ),
           const SizedBox(height: 20),
           AppDatePickerField(
-            label: 'Date of Birth',
+            label: l10n.dateOfBirth,
             isRequired: true,
-            hint: 'Select Date',
+            hint: l10n.selectDate,
             icon: Icons.calendar_today_rounded,
             value: formState.dateOfBirth,
             firstDate: DateTime(1900),
@@ -81,7 +95,7 @@ class Step2MedicalInfo extends ConsumerWidget {
             },
             validator: (value) {
               if (formState.dateOfBirth == null) {
-                return 'Required';
+                return l10n.requiredField;
               }
               return null;
             },
@@ -92,28 +106,29 @@ class Step2MedicalInfo extends ConsumerWidget {
             children: [
               Expanded(
                 child: AppDropdownField<String>(
-                  label: 'Gender',
+                  label: l10n.gender,
                   isRequired: true,
-                  hint: 'Select Gender',
+                  hint: l10n.selectGender,
                   icon: Icons.people_outline_rounded,
                   value: formState.gender,
                   items: const ['Male', 'Female', 'Other'],
+                  itemLabelBuilder: (item) => _getLocalizedGender(item, l10n),
                   onChanged: (value) =>
-                  value != null ? controller.setGender(value) : null,
+                      value != null ? controller.setGender(value) : null,
                   validator: (value) =>
-                  value == null || value.trim().isEmpty ? 'Required' : null,
+                      value == null || value.trim().isEmpty ? l10n.requiredField : null,
                 ),
               ),
               const SizedBox(width: 16),
               Expanded(
                 child: AppDropdownField<String>(
-                  label: 'Blood Group',
-                  hint: 'Select Blood Group',
+                  label: l10n.bloodGroup,
+                  hint: l10n.selectBloodGroup,
                   icon: Icons.bloodtype_outlined,
                   value: formState.bloodGroup,
                   items: const ['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'],
                   onChanged: (value) =>
-                  value != null ? controller.setBloodGroup(value) : null,
+                      value != null ? controller.setBloodGroup(value) : null,
                 ),
               ),
             ],
@@ -125,8 +140,8 @@ class Step2MedicalInfo extends ConsumerWidget {
               Expanded(
                 child: AppTextField(
                   controller: controller.heightController,
-                  label: 'Height',
-                  hint: 'e.g. 175',
+                  label: l10n.height,
+                  hint: l10n.heightHint,
                   maxLength: 3,
                   icon: Icons.height_rounded,
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -137,10 +152,10 @@ class Step2MedicalInfo extends ConsumerWidget {
                     if (value != null && value.trim().isNotEmpty) {
                       final height = double.tryParse(value.trim());
                       if (height == null) {
-                        return 'Enter a valid number';
+                        return l10n.enterValidNumber;
                       }
                       if (height <= 0 || height > 300) {
-                        return 'Enter a valid height (1 - 300 cm)';
+                        return l10n.enterValidHeight;
                       }
                     }
                     return null;
@@ -151,8 +166,8 @@ class Step2MedicalInfo extends ConsumerWidget {
               Expanded(
                 child: AppTextField(
                   controller: controller.weightController,
-                  label: 'Weight',
-                  hint: 'e.g. 70',
+                  label: l10n.weight,
+                  hint: l10n.weightHint,
                   maxLength: 3,
                   icon: Icons.scale_rounded,
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -163,10 +178,10 @@ class Step2MedicalInfo extends ConsumerWidget {
                     if (value != null && value.trim().isNotEmpty) {
                       final weight = double.tryParse(value.trim());
                       if (weight == null) {
-                        return 'Enter a valid number';
+                        return l10n.enterValidNumber;
                       }
                       if (weight <= 0 || weight > 500) {
-                        return 'Enter a valid weight (1 - 500 kg)';
+                        return l10n.enterValidWeight;
                       }
                     }
                     return null;
@@ -178,8 +193,8 @@ class Step2MedicalInfo extends ConsumerWidget {
           const SizedBox(height: 20),
           AppTextField(
             controller: controller.medicalConditionsController,
-            label: 'Known Medical Conditions',
-            hint: 'e.g., Diabetes, Hypertension, Asthma',
+            label: l10n.knownMedicalConditions,
+            hint: l10n.medicalConditionsHint,
             icon: Icons.medical_information_outlined,
             maxLines: 2,
             minLines: 1,
@@ -188,8 +203,8 @@ class Step2MedicalInfo extends ConsumerWidget {
           const SizedBox(height: 20),
           AppTextField(
             controller: controller.medicationsController,
-            label: 'Current Medications',
-            hint: 'e.g., Metformin 500mg, Daily Multivitamins',
+            label: l10n.currentMedications,
+            hint: l10n.medicationsHint,
             icon: Icons.medication_outlined,
             maxLines: 2,
             minLines: 1,

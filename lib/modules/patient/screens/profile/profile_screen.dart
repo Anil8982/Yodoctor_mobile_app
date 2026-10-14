@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/widgets/app_header.dart';
 import '../../controllers/profile_controller.dart';
 import '../../../../core/utils/app_spacing.dart';
 import 'widgets/profile_header.dart';
 import 'widgets/profile_info_card.dart';
 import 'widgets/profile_action_bar.dart';
+import 'widgets/profile_language_setting_card.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -47,11 +49,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final profileState = ref.watch(profileControllerProvider);
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppHeader(
-        title: 'Profile Settings',
+        title: l10n?.profileSettings ?? 'Profile Settings',
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 12.0),
@@ -118,6 +121,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                 isEditing: isEditing,
                               ),
                             ),
+                            const SizedBox(height: 16),
+                            const ProfileLanguageSettingCard(),
                           ] else if (profileState.errorMessage != null) ...[
                             Center(
                               child: Padding(

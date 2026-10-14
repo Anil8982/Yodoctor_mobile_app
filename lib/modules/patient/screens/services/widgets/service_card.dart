@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/screens/services/models/services_model.dart';
 import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 
@@ -14,6 +15,7 @@ class ServiceCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
+    final l10n = AppLocalizations.of(context);
 
     return Material(
       clipBehavior: Clip.antiAlias,
@@ -23,9 +25,11 @@ class ServiceCard extends StatelessWidget {
         onTap: () {
           if (service.isQrScanner && onQrTap != null) {
             onQrTap!();
-          } else if (service.title == 'Medicine Delivery') {
+          } else if (service.type == MedicalServiceType.medicineDelivery ||
+              service.title == 'Medicine Delivery') {
             AppSnackBar.show(
-              message: 'Medicine delivery coming soon',
+              message: l10n?.medicineDeliveryComingSoon ??
+                  'Medicine delivery coming soon',
               type: AppSnackBarType.info,
             );
             return;
@@ -125,7 +129,7 @@ class ServiceCard extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             Text(
-                              service.title,
+                              service.getLocalizedTitle(l10n),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: textTheme.titleMedium?.copyWith(
@@ -137,7 +141,7 @@ class ServiceCard extends StatelessWidget {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              service.subtitle,
+                              service.getLocalizedSubtitle(l10n),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: textTheme.bodySmall?.copyWith(

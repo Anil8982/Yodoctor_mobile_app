@@ -43,6 +43,7 @@ class AppLocalizationsEn extends AppLocalizations {
       locale: localeName,
       other: '$count upcoming visits',
       one: '1 upcoming visit',
+      zero: '0 upcoming visits',
     );
     return '$_temp0';
   }
@@ -97,6 +98,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get changeLanguage => 'Change Language';
+
+  @override
+  String get language => 'Language';
+
+  @override
+  String get chooseAppLanguage => 'Choose application language';
+
+  @override
+  String get profileSettings => 'Profile Settings';
 
   @override
   String estimatedMinutes(String count) {
@@ -166,4 +176,527 @@ class AppLocalizationsEn extends AppLocalizations {
   String experienceYears(String count) {
     return '$count Yrs';
   }
+
+  @override
+  String get certificateWallet => 'Certificate Wallet';
+
+  @override
+  String get medicalCertificates => 'Medical Certificates';
+
+  @override
+  String get trackRequestsSubtitle =>
+      'Track requests and download approved certificate.';
+
+  @override
+  String certificateCountWithFilter(int count, String filter) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count certificates | $filter',
+      one: '1 certificate | $filter',
+      zero: '0 certificates | $filter',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get searchByTypeOrDoctor => 'Search by type or doctor...';
+
+  @override
+  String get filterAll => 'All';
+
+  @override
+  String get filterPending => 'Pending';
+
+  @override
+  String get filterApproved => 'Approved';
+
+  @override
+  String get filterRejected => 'Rejected';
+
+  @override
+  String get applyCertificate => 'Apply Certificate';
+
+  @override
+  String get assignedTo => 'Assigned to: ';
+
+  @override
+  String get viewAndDownloadCertificate => 'View & Download Certificate';
+
+  @override
+  String get requestDeclinedNote =>
+      'Note: Request was declined by doctor due to insufficient medical evidence.';
+
+  @override
+  String get noCertificatesFound => 'No Certificates Found';
+
+  @override
+  String noCertificatesMatchFilter(String filter) {
+    return 'No certificate match the \"$filter\" filter.';
+  }
+
+  @override
+  String get selectCertificateDoctor => 'Select Certificate Doctor';
+
+  @override
+  String get noCertificateDoctorsAvailable =>
+      'No certificate doctors available at the moment.';
+
+  @override
+  String certificateFee(String fee) {
+    return 'Certificate Fee — ₹$fee';
+  }
+
+  @override
+  String get applyForCertificate => 'Apply for Certificate';
+
+  @override
+  String requestingFromDoctor(String name, String specialty) {
+    return 'Requesting from $name — $specialty';
+  }
+
+  @override
+  String get chooseCertificateTypeSubtitle =>
+      'Choose certificate type and details';
+
+  @override
+  String get stepType => 'Type';
+
+  @override
+  String get stepMedicalInfo => 'Medical Info';
+
+  @override
+  String get stepDocuments => 'Documents';
+
+  @override
+  String get stepReview => 'Review';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get back => 'Back';
+
+  @override
+  String get continueButton => 'Continue';
+
+  @override
+  String get submitRequest => 'Submit Request';
+
+  @override
+  String get pleaseSelectCertificateType => 'Please select a certificate type';
+
+  @override
+  String get pleaseUploadRequiredFiles =>
+      'Please upload required verification files.';
+
+  @override
+  String get pleaseConfirmAccuracy =>
+      'Please confirm accuracy verification to proceed.';
+
+  @override
+  String get certificateRequestSuccess =>
+      'Payment completed and certificate request submitted successfully.';
+
+  @override
+  String get certificateRequestFailed =>
+      'We couldn’t complete your certificate request. Please try again in a moment.';
+
+  @override
+  String get selectCertificateType => 'Select Certificate Type';
+
+  @override
+  String get selectCertificateTypeDesc =>
+      'Choose the matching variant for your application.';
+
+  @override
+  String get certMedicalFitness => 'Medical Fitness';
+
+  @override
+  String get certMedicalFitnessDesc => 'For employment or sports';
+
+  @override
+  String get certVaccination => 'Vaccination';
+
+  @override
+  String get certVaccinationDesc => 'Immunization records';
+
+  @override
+  String get certDisability => 'Disability';
+
+  @override
+  String get certDisabilityDesc => 'Official disability proof';
+
+  @override
+  String get certSecondOpinion => 'Second Opinion';
+
+  @override
+  String get certSecondOpinionDesc => 'Expert medical review';
+
+  @override
+  String get certDischargeSummary => 'Discharge Summary';
+
+  @override
+  String get certDischargeSummaryDesc => 'Summary of hospital discharge';
+
+  @override
+  String get assignedDoctor => 'Assigned Doctor';
+
+  @override
+  String get purposeOfCertificate => 'Purpose of Certificate';
+
+  @override
+  String get selectPurpose => 'Select Purpose';
+
+  @override
+  String get purposeTravel => 'Travel';
+
+  @override
+  String get purposeEmployment => 'Employment';
+
+  @override
+  String get purposeSports => 'Sports';
+
+  @override
+  String get purposeSchoolUniversity => 'School/University';
+
+  @override
+  String get purposeInsurance => 'Insurance';
+
+  @override
+  String get purposeOther => 'Other';
+
+  @override
+  String get pleaseSelectPurpose => 'Please select a purpose';
+
+  @override
+  String get additionalNotesForDoctor => 'Additional Notes For Doctor';
+
+  @override
+  String get additionalNotesHint =>
+      'Describe specific conditions or background details contextually...';
+
+  @override
+  String get medicalDetails => 'Medical Details';
+
+  @override
+  String get medicalDetailsDesc =>
+      'Provide baseline biometrics to appear on your medical clearance.';
+
+  @override
+  String get fullName => 'Full Name';
+
+  @override
+  String get enterFullName => 'Enter full name';
+
+  @override
+  String get pleaseEnterName => 'Please enter name';
+
+  @override
+  String get nameMinCharacters => 'Name should have at least 2 characters';
+
+  @override
+  String get onlyAlphabetsAllowed => 'Only alphabets are allowed';
+
+  @override
+  String get dateOfBirth => 'Date of Birth';
+
+  @override
+  String get selectDate => 'Select Date';
+
+  @override
+  String get requiredField => 'Required';
+
+  @override
+  String get gender => 'Gender';
+
+  @override
+  String get selectGender => 'Select Gender';
+
+  @override
+  String get genderMale => 'Male';
+
+  @override
+  String get genderFemale => 'Female';
+
+  @override
+  String get genderOther => 'Other';
+
+  @override
+  String get bloodGroup => 'Blood Group';
+
+  @override
+  String get selectBloodGroup => 'Select Blood Group';
+
+  @override
+  String get height => 'Height';
+
+  @override
+  String get heightHint => 'e.g. 175';
+
+  @override
+  String get enterValidNumber => 'Enter a valid number';
+
+  @override
+  String get enterValidHeight => 'Enter a valid height (1 - 300 cm)';
+
+  @override
+  String get weight => 'Weight';
+
+  @override
+  String get weightHint => 'e.g. 70';
+
+  @override
+  String get enterValidWeight => 'Enter a valid weight (1 - 500 kg)';
+
+  @override
+  String get knownMedicalConditions => 'Known Medical Conditions';
+
+  @override
+  String get medicalConditionsHint => 'e.g., Diabetes, Hypertension, Asthma';
+
+  @override
+  String get currentMedications => 'Current Medications';
+
+  @override
+  String get medicationsHint => 'e.g., Metformin 500mg, Daily Multivitamins';
+
+  @override
+  String get uploadSupportingFiles => 'Upload Supporting Files';
+
+  @override
+  String get uploadSupportingFilesDesc =>
+      'Provide documentation for validation processing.';
+
+  @override
+  String get docProfilePhoto => 'Profile Photo';
+
+  @override
+  String get docProfilePhotoHint => 'Upload your profile picture (jpg, png)';
+
+  @override
+  String get docGovtId => 'Government ID Proof';
+
+  @override
+  String get docGovtIdHint => 'Official Identity Documentation';
+
+  @override
+  String get docMedicalReports => 'Medical Reports';
+
+  @override
+  String get docMedicalReportsHint => 'Previous diagnostic data reports';
+
+  @override
+  String get docPrescription => 'Prescription';
+
+  @override
+  String get docPrescriptionHint => 'Doctor\'s authorized prescriptions';
+
+  @override
+  String get uploadingDocument => 'Uploading document...';
+
+  @override
+  String get documentUploadedSuccess => 'Document uploaded successfully';
+
+  @override
+  String get deleteUploadTooltip => 'Delete Upload';
+
+  @override
+  String get clickToUpload => 'Click to upload';
+
+  @override
+  String get documentRequired => 'This document is required!';
+
+  @override
+  String get reviewApplication => 'Review Application';
+
+  @override
+  String get reviewApplicationDesc =>
+      'Confirm accuracy of entries before submitting to evaluation channels.';
+
+  @override
+  String get certificateBaselineParameters => 'Certificate Baseline Parameters';
+
+  @override
+  String get certificateTypeLabel => 'Certificate Type';
+
+  @override
+  String get assignedDoctorLabel => 'Assigned Medical Doctor';
+
+  @override
+  String get medicalSpecialtyLabel => 'Medical Specialty';
+
+  @override
+  String get intendedPurposeLabel => 'Intended Purpose';
+
+  @override
+  String get additionalNotesLabel => 'Additional Context Notes';
+
+  @override
+  String get noneLabel => 'None';
+
+  @override
+  String get notAvailableLabel => 'N/A';
+
+  @override
+  String get patientDiagnosticInformation => 'Patient Diagnostic Information';
+
+  @override
+  String get fullLegalNameLabel => 'Full Legal Name';
+
+  @override
+  String get dateOfBirthLabel => 'Date of Birth';
+
+  @override
+  String get biologicalGenderLabel => 'Biological Gender';
+
+  @override
+  String get bloodGroupStagingLabel => 'Blood Group Staging';
+
+  @override
+  String get heightMetricLabel => 'Height Metric';
+
+  @override
+  String get weightMetricLabel => 'Weight Metric';
+
+  @override
+  String get chronicMedicalConditionsLabel => 'Chronic Medical Conditions';
+
+  @override
+  String get activePrescriptionsLabel => 'Current Active Prescriptions';
+
+  @override
+  String get uploadedVerificationMaterials => 'Uploaded Verification Materials';
+
+  @override
+  String get disclaimerNotice =>
+      'By dispatching this electronic request profile, you explicitly affirm that all biometric info matches verified personal medical tracking history.';
+
+  @override
+  String get disclaimerCheckbox =>
+      'I legally verify that my submitted profile fields are accurate.';
+
+  @override
+  String get certificateDetails => 'Certificate Details';
+
+  @override
+  String get certificateNotFound => 'Certificate not found';
+
+  @override
+  String get certificateLabel => 'Certificate';
+
+  @override
+  String get doctorLabel => 'Doctor';
+
+  @override
+  String get purposeLabel => 'Purpose';
+
+  @override
+  String get statusLabel => 'Status';
+
+  @override
+  String get medicinesLabel => 'Medicines';
+
+  @override
+  String get notesLabel => 'Notes';
+
+  @override
+  String get timelineLabel => 'Timeline';
+
+  @override
+  String get certificatesTab => 'Certificates';
+
+  @override
+  String get certificateDrawerItem => 'Certificate';
+
+  @override
+  String get services => 'Services';
+
+  @override
+  String get servicesTab => 'Services';
+
+  @override
+  String get servicesHeaderTitle => 'YoDoctor Services';
+
+  @override
+  String get servicesHeaderSubtitle =>
+      'Select a service to get instant medical care.';
+
+  @override
+  String activeServicesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count active services',
+      one: '1 active service',
+      zero: '0 active services',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get serviceMedicineDeliveryTitle => 'Medicine Delivery';
+
+  @override
+  String get serviceMedicineDeliverySubtitle => 'Essentials at your doorstep';
+
+  @override
+  String get medicineDeliveryComingSoon => 'Medicine delivery coming soon';
+
+  @override
+  String get serviceLabTestTitle => 'Lab Test';
+
+  @override
+  String get serviceLabTestSubtitle => 'Sample Pickup at Your Door';
+
+  @override
+  String get serviceQrScanTokenTitle => 'Scan Qr & get Appointment Token';
+
+  @override
+  String get serviceQrScanTokenSubtitle => 'Scan & Book Instantly';
+
+  @override
+  String get serviceOnlineAppointmentTitle => 'Online Booking Appointment';
+
+  @override
+  String get serviceOnlineAppointmentSubtitle => 'Book from anywhere';
+
+  @override
+  String get serviceMedicalCertificateTitle => 'Apply for Medical Certificate';
+
+  @override
+  String get serviceMedicalCertificateSubtitle => 'Consult from home';
+
+  @override
+  String get serviceHomeNursingCareTitle => 'Home Nursing Care Service booking';
+
+  @override
+  String get serviceHomeNursingCareSubtitle => 'Care at your home';
+
+  @override
+  String get scanDoctorQr => 'Scan Doctor QR';
+
+  @override
+  String get verifying => 'Verifying...';
+
+  @override
+  String get alignQrCodeWithinFrame => 'Align the QR code within the frame';
+
+  @override
+  String get invalidQrTryAgain => 'Invalid QR - Try Again';
+
+  @override
+  String get scannerWillResumeShortly => 'Scanner will resume shortly...';
+
+  @override
+  String get scanQrCodeTooltip => 'Scan QR Code';
+
+  @override
+  String get invalidQrDoctorIdNotFound => 'Invalid QR: Doctor ID not found.';
+
+  @override
+  String get invalidQrMalformedDoctorId => 'Invalid QR: Malformed Doctor ID.';
+
+  @override
+  String get invalidQrStructure => 'Invalid QR structure.';
 }

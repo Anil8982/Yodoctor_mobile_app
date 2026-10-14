@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/controllers/certificate_request.dart';
 import 'package:yodoctor/modules/patient/screens/certificates/widgets/doctor_card_widget.dart';
 import 'package:yodoctor/modules/widgets/app_header.dart';
@@ -39,6 +40,7 @@ class _DoctorSelectionScreenState extends ConsumerState<DoctorSelectionScreen> {
     final state = ref.watch(certificateProvider);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     // Use state.isDoctorsLoading to correctly check loading status
     final bool isFetching = state.isDoctorsLoading;
@@ -46,7 +48,7 @@ class _DoctorSelectionScreenState extends ConsumerState<DoctorSelectionScreen> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppHeader(
-        title: 'Select Certificate Doctor',
+        title: l10n.selectCertificateDoctor,
       ),
       body: SafeArea(
         child: RefreshIndicator(
@@ -68,7 +70,7 @@ class _DoctorSelectionScreenState extends ConsumerState<DoctorSelectionScreen> {
                 height: constraints.maxHeight,
                 child: Center(
                   child: Text(
-                    'No certificate doctors available at the moment.',
+                    l10n.noCertificateDoctorsAvailable,
                     style: theme.textTheme.bodyLarge?.copyWith(
                       color: colorScheme.onSurfaceVariant,
                     ),

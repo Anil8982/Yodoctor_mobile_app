@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/controllers/certificate_request.dart';
 import 'document_upload_tile.dart';
 import 'step_header_helper.dart';
@@ -13,18 +14,19 @@ class Step3DocumentUpload extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // Watch current form state reactively for dynamic uploads and verification errors
     final formState = ref.watch(certificateProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const StepHeader(
-          title: 'Upload Supporting Files',
-          desc: 'Provide documentation for validation processing.',
+        StepHeader(
+          title: l10n.uploadSupportingFiles,
+          desc: l10n.uploadSupportingFilesDesc,
         ),
         const SizedBox(height: 20),
         DocumentUploadTile(
-          label: 'Profile Photo',
-          hint: 'Upload your profile picture (jpg, png)',
+          label: l10n.docProfilePhoto,
+          hint: l10n.docProfilePhotoHint,
           isRequired: true,
           hasError:
               formState.showValidationError &&
@@ -37,8 +39,8 @@ class Step3DocumentUpload extends ConsumerWidget {
           onRemove: () => controller.removeDocument('Profile Photo'),
         ),
         DocumentUploadTile(
-          label: 'Government ID Proof',
-          hint: 'Official Identity Documentation',
+          label: l10n.docGovtId,
+          hint: l10n.docGovtIdHint,
           isRequired: true,
           hasError:
               formState.showValidationError &&
@@ -52,8 +54,8 @@ class Step3DocumentUpload extends ConsumerWidget {
           onRemove: () => controller.removeDocument('Government ID Proof'),
         ),
         DocumentUploadTile(
-          label: 'Medical Reports',
-          hint: 'Previous diagnostic data reports',
+          label: l10n.docMedicalReports,
+          hint: l10n.docMedicalReportsHint,
           uploadedFileName: formState.uploadedDocs['Medical Reports'],
           uploadProgress: formState.uploadProgress['Medical Reports'],
 
@@ -63,8 +65,8 @@ class Step3DocumentUpload extends ConsumerWidget {
           onRemove: () => controller.removeDocument('Medical Reports'),
         ),
         DocumentUploadTile(
-          label: 'Prescription',
-          hint: "Doctor's authorized prescriptions",
+          label: l10n.docPrescription,
+          hint: l10n.docPrescriptionHint,
           uploadedFileName: formState.uploadedDocs['Prescription'],
           uploadProgress: formState.uploadProgress['Prescription'],
 
@@ -77,3 +79,4 @@ class Step3DocumentUpload extends ConsumerWidget {
     );
   }
 }
+
