@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/controllers/patient_dashboard_controller.dart';
 import 'package:yodoctor/modules/patient/models/dashboard/appointment_model.dart';
 import 'package:yodoctor/modules/widgets/app_dialog.dart';
@@ -11,14 +12,15 @@ class CancelAppointmentDialog {
     WidgetRef ref, {
     required AppointmentModel appointment,
   }) {
+    final l10n = AppLocalizations.of(context)!;
+
     AppDialog.show(
       context: context,
-      title: 'Cancel Appointment',
-      content:
-          'Are you sure you want to cancel this appointment?\n\nThis action cannot be undone.',
+      title: l10n.cancelAppointment,
+      content: l10n.cancelAppointmentConfirmation,
       icon: Icons.warning_rounded,
-      confirmLabel: 'Cancel Appointment',
-      cancelLabel: 'Keep',
+      confirmLabel: l10n.cancelAppointment,
+      cancelLabel: l10n.keepAppointment,
       isDestructive: true,
       onConfirm: () async {
         if (!context.mounted) return;
@@ -32,18 +34,33 @@ class CancelAppointmentDialog {
         if (success) {
           Navigator.pop(context);
           AppSnackBar.show(
-            message: 'Appointment cancelled successfully',
+            message: l10n.appointmentCancelledSuccess,
             type: AppSnackBarType.success,
           );
         } else {
           final currentState = ref.read(patientDashboardControllerProvider);
           AppSnackBar.show(
-            message:
-                currentState.errorMessage ?? "Unable to cancel appointment",
+            message: _getLocalizedErrorMessage(
+              currentState.errorMessage,
+              l10n,
+            ),
             type: AppSnackBarType.error,
           );
         }
       },
     );
+  }
+
+  static String _getLocalizedErrorMessage(
+    String? error,
+    AppLocalizations l10n,
+  ) {
+    if (error == null ||
+        error.isEmpty ||
+        error == 'Unable to cancel appointment' ||
+        error == 'Failed to cancel appointment') {
+      return l10n.unableToCancelAppointment;
+    }
+    return error;
   }
 }

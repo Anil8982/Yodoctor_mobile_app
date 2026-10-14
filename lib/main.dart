@@ -9,8 +9,10 @@ import 'core/storage/hive_boxes.dart';
 import 'core/storage/storage_service.dart';
 import 'firebase_options.dart';
 import 'core/providers/app_role_provider.dart';
+import 'core/providers/locale_provider.dart';
 import 'core/routes/app_router.dart';
 import 'core/theme/app_theme.dart';
+import 'l10n/app_localizations.dart';
 import 'modules/widgets/app_snack_bar.dart';
 
 Future<void> main() async {
@@ -54,12 +56,16 @@ class YoDoctorApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final currentRole = ref.watch(appRoleProvider);
     final goRouter = ref.watch(routerProvider);
+    final currentLocale = ref.watch(localeProvider);
 
     return MaterialApp.router(
       scaffoldMessengerKey: appScaffoldMessengerKey,
       title: 'YoDoctor',
       debugShowCheckedModeBanner: false,
       routerConfig: goRouter,
+      locale: currentLocale,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       theme: _getThemeForRole(currentRole, Brightness.light),
       darkTheme: _getThemeForRole(currentRole, Brightness.dark),
       themeMode: ThemeMode.system,

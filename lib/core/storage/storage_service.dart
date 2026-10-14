@@ -275,6 +275,19 @@ class StorageService {
     await _appConfigBox.delete(HiveKeys.appConfig);
   }
 
+  // Locale Management
+  Future<void> saveLocale(String languageCode) async {
+    await _box.put(HiveKeys.appLocale, languageCode);
+  }
+
+  String? getLocale() {
+    return _box.get(HiveKeys.appLocale) as String?;
+  }
+
+  Future<void> clearLocale() async {
+    await _box.delete(HiveKeys.appLocale);
+  }
+
   // Clear All
   Future<void> clearAll() async {
     _cachedToken = null;

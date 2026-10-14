@@ -1,6 +1,7 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import '../../../models/dashboard/today_token_model.dart';
 
 class TokenCard extends StatelessWidget {
@@ -13,18 +14,20 @@ class TokenCard extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context)!;
 
     if (token == null) {
-      return _buildEmptyState(theme, colorScheme, isDark);
+      return _buildEmptyState(theme, colorScheme, isDark, l10n);
     }
 
-    return _buildActiveToken(theme, colorScheme, isDark);
+    return _buildActiveToken(theme, colorScheme, isDark, l10n);
   }
 
   Widget _buildEmptyState(
     ThemeData theme,
     ColorScheme colorScheme,
     bool isDark,
+    AppLocalizations l10n,
   ) {
     return Container(
       height: 110,
@@ -80,7 +83,7 @@ class TokenCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "No Active Token",
+                  l10n.noActiveToken,
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w800,
                     letterSpacing: -0.5,
@@ -89,7 +92,7 @@ class TokenCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  "Your token for today will appear here",
+                  l10n.tokenAppearHere,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: colorScheme.onSurfaceVariant.transparency(0.8),
                     height: 1.3,
@@ -107,6 +110,7 @@ class TokenCard extends StatelessWidget {
     ThemeData theme,
     ColorScheme colorScheme,
     bool isDark,
+    AppLocalizations l10n,
   ) {
     return Container(
       height: 130,
@@ -138,7 +142,7 @@ class TokenCard extends StatelessWidget {
             highlightColor: colorScheme.secondary.transparency(0.02),
             child: Row(
               children: [
-                _buildTokenNumberBox(theme, colorScheme),
+                _buildTokenNumberBox(theme, colorScheme, l10n),
 
                 Expanded(
                   child: Padding(
@@ -164,7 +168,7 @@ class TokenCard extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(width: 8),
-                            _buildStatusBadge(theme, colorScheme),
+                            _buildStatusBadge(theme, colorScheme, l10n),
                           ],
                         ),
 
@@ -181,7 +185,9 @@ class TokenCard extends StatelessWidget {
                             const SizedBox(width: 4),
                             Expanded(
                               child: Text(
-                                'Serving: ${token!.nowServing ?? "--"}',
+                                l10n.servingToken(
+                                  token!.nowServing?.toString() ?? "--",
+                                ),
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   color: colorScheme.onSurfaceVariant,
                                   fontWeight: FontWeight.w600,
@@ -207,14 +213,19 @@ class TokenCard extends StatelessWidget {
                           children: [
                             _buildStatItem(
                               icon: Icons.people_alt_rounded,
-                              label: '${token!.patientsAhead ?? "--"} ahead',
+                              label: l10n.patientsAhead(
+                                token!.patientsAhead?.toString() ?? "--",
+                              ),
                               color: colorScheme.secondary,
                               theme: theme,
                             ),
                             const SizedBox(width: 16),
                             _buildStatItem(
                               icon: Icons.timer_outlined,
-                              label: token!.estimatedTime ?? "--",
+                              label: _formatEstimatedTime(
+                                token!.estimatedTime,
+                                l10n,
+                              ),
                               color: colorScheme.onSurfaceVariant,
                               theme: theme,
                             ),
@@ -241,7 +252,11 @@ class TokenCard extends StatelessWidget {
     );
   }
 
-  Widget _buildTokenNumberBox(ThemeData theme, ColorScheme colorScheme) {
+  Widget _buildTokenNumberBox(
+    ThemeData theme,
+    ColorScheme colorScheme,
+    AppLocalizations l10n,
+  ) {
     return Container(
       width: 95,
       decoration: BoxDecoration(
@@ -273,7 +288,7 @@ class TokenCard extends StatelessWidget {
               ),
               const SizedBox(width: 4),
               Text(
-                'TOKEN',
+                l10n.tokenLabel,
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: colorScheme.onSecondary,
                   fontWeight: FontWeight.w900,
@@ -305,7 +320,11 @@ class TokenCard extends StatelessWidget {
     );
   }
 
-  Widget _buildStatusBadge(ThemeData theme, ColorScheme colorScheme) {
+  Widget _buildStatusBadge(
+    ThemeData theme,
+    ColorScheme colorScheme,
+    AppLocalizations l10n,
+  ) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
@@ -329,7 +348,7 @@ class TokenCard extends StatelessWidget {
           ),
           const SizedBox(width: 5),
           Text(
-            'WAITING',
+            l10n.waiting,
             style: theme.textTheme.labelSmall?.copyWith(
               color: colorScheme.onTertiaryContainer,
               fontWeight: FontWeight.w800,
@@ -398,5 +417,18 @@ class TokenCard extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  String _formatEstimatedTime(String? time, AppLocalizations l10n) {
+    if (time == null || time.isEmpty) return "--";
+    final match = RegExp(
+      r'^(\d+)\s*(?:mins?|minutes?)?$',
+      caseSensitive: false,
+    ).firstMatch(time.trim());
+    if (match != null) {
+      final minutes = match.group(1)!;
+      return l10n.estimatedMinutes(minutes);
+    }
+    return time;
   }
 }

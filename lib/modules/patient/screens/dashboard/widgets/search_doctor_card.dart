@@ -1,8 +1,9 @@
-﻿import 'package:chroma_kit/chroma_kit.dart';
+import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/screens/search/widgets/doctor_search_widget.dart';
 
 class SearchDoctorCard extends StatelessWidget {
@@ -15,6 +16,7 @@ class SearchDoctorCard extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context)!;
 
     if (!isSearch) {
       return Material(
@@ -64,7 +66,7 @@ class SearchDoctorCard extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
                     Text(
-                      'Find Your',
+                      l10n.findYour,
                       style: theme.textTheme.titleMedium?.copyWith(
                         color: colorScheme.onPrimary.transparency(0.85),
                         fontWeight: FontWeight.w600,
@@ -73,7 +75,7 @@ class SearchDoctorCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'Best Doctor Near You',
+                      l10n.bestDoctorNearYou,
                       style: theme.textTheme.headlineSmall?.copyWith(
                         color: colorScheme.onPrimary,
                         fontWeight: FontWeight.w900,
@@ -102,7 +104,7 @@ class SearchDoctorCard extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            'Search Now',
+                            l10n.searchNow,
                             style: theme.textTheme.labelLarge?.copyWith(
                               color: colorScheme.primary,
                               fontWeight: FontWeight.w900,
@@ -158,7 +160,7 @@ class SearchDoctorCard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Find Your',
+              l10n.findYour,
               style: theme.textTheme.titleMedium?.copyWith(
                 color: colorScheme.onPrimary.transparency(0.85),
                 fontWeight: FontWeight.w600,
@@ -167,7 +169,7 @@ class SearchDoctorCard extends StatelessWidget {
             ),
             const SizedBox(height: 2),
             Text(
-              'Best Doctor Near You',
+              l10n.bestDoctorNearYou,
               style: theme.textTheme.headlineSmall?.copyWith(
                 color: colorScheme.onPrimary,
                 fontWeight: FontWeight.w900,

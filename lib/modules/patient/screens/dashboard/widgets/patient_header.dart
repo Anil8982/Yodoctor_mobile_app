@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../core/utils/app_spacing.dart';
+import '../../../../../l10n/app_localizations.dart';
 import '../../../models/dashboard/dashboard_model.dart';
 
 class PatientHeader extends StatelessWidget {
@@ -13,6 +14,7 @@ class PatientHeader extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final topPadding = MediaQuery.of(context).padding.top;
+    final l10n = AppLocalizations.of(context)!;
 
     final String safePatientName = dashboard?.patientName ?? 'YoDoctor';
 
@@ -62,7 +64,7 @@ class PatientHeader extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    '${dashboard!.upcomingCount} upcoming visits',
+                    l10n.upcomingVisitsCount(dashboard!.upcomingCount),
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: colorScheme.onPrimary,
                       fontWeight: FontWeight.w700,
@@ -73,7 +75,7 @@ class PatientHeader extends StatelessWidget {
             )
           else
             Text(
-              'Patient Dashboard',
+              l10n.patientDashboard,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onPrimary.withValues(alpha: 0.8),
                 fontWeight: FontWeight.w600,

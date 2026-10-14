@@ -1,0 +1,223 @@
+{
+  "@@locale": "en",
+  "dashboard": "Dashboard",
+  "@dashboard": {
+    "description": "Dashboard title"
+  },
+  "dashboardLoadError": "Dashboard Load Error",
+  "@dashboardLoadError": {
+    "description": "Error title shown when dashboard fails to load"
+  },
+  "dashboardLoadErrorSubtitle": "Unable to connect to the server. Please check your internet connection.",
+  "@dashboardLoadErrorSubtitle": {
+    "description": "Error message when dashboard loading fails"
+  },
+  "tryAgain": "Try Again",
+  "@tryAgain": {
+    "description": "Retry button label"
+  },
+  "upcomingAppointments": "Upcoming Appointments",
+  "@upcomingAppointments": {
+    "description": "Section header for upcoming appointments"
+  },
+  "noAppointments": "No Appointments",
+  "@noAppointments": {
+    "description": "Title shown when there are no appointments"
+  },
+  "bookAppointmentSubtitle": "Book an appointment with a doctor",
+  "@bookAppointmentSubtitle": {
+    "description": "Subtitle suggesting user to book an appointment"
+  },
+  "bookAppointment": "Book Appointment",
+  "@bookAppointment": {
+    "description": "Button to book an appointment"
+  },
+  "patientDashboard": "Patient Dashboard",
+  "@patientDashboard": {
+    "description": "Header title when dashboard has not loaded data"
+  },
+  "upcomingVisitsCount": "{count, plural, =1{1 upcoming visit} other{{count} upcoming visits}}",
+  "@upcomingVisitsCount": {
+    "description": "Badge showing number of upcoming visits",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "findYour": "Find Your",
+  "@findYour": {
+    "description": "Find your prefix in doctor search promo"
+  },
+  "bestDoctorNearYou": "Best Doctor Near You",
+  "@bestDoctorNearYou": {
+    "description": "Headline in doctor search card"
+  },
+  "searchNow": "Search Now",
+  "@searchNow": {
+    "description": "Search button CTA text"
+  },
+  "noActiveToken": "No Active Token",
+  "@noActiveToken": {
+    "description": "Title when user has no active token today"
+  },
+  "tokenAppearHere": "Your token for today will appear here",
+  "@tokenAppearHere": {
+    "description": "Subtitle for empty token card"
+  },
+  "tokenLabel": "TOKEN",
+  "@tokenLabel": {
+    "description": "Token badge label"
+  },
+  "waiting": "WAITING",
+  "@waiting": {
+    "description": "Status badge for waiting token"
+  },
+  "servingToken": "Serving: {token}",
+  "@servingToken": {
+    "description": "Current serving token display",
+    "placeholders": {
+      "token": {
+        "type": "String",
+        "example": "12"
+      }
+    }
+  },
+  "patientsAhead": "{count} ahead",
+  "@patientsAhead": {
+    "description": "Number of patients ahead in the queue",
+    "placeholders": {
+      "count": {
+        "type": "String",
+        "example": "3"
+      }
+    }
+  },
+  "patientLabel": "Patient: {name}",
+  "@patientLabel": {
+    "description": "Label displaying patient name in appointment card",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Self"
+      }
+    }
+  },
+  "patientSelf": "Self",
+  "@patientSelf": {
+    "description": "Default name when appointment is for the user themselves"
+  },
+  "selectLanguage": "Select Language",
+  "@selectLanguage": {
+    "description": "Modal title for language selector"
+  },
+  "languageEnglish": "English",
+  "@languageEnglish": {
+    "description": "English language option"
+  },
+  "languageHindi": "Hindi",
+  "@languageHindi": {
+    "description": "Hindi language option"
+  },
+  "changeLanguage": "Change Language",
+  "@changeLanguage": {
+    "description": "Tooltip or action description for language switcher"
+  },
+  "estimatedMinutes": "{count} mins",
+  "@estimatedMinutes": {
+    "description": "Estimated wait time in minutes",
+    "placeholders": {
+      "count": {
+        "type": "String",
+        "example": "15"
+      }
+    }
+  },
+  "unableToCancelAppointment": "Unable to cancel appointment",
+  "@unableToCancelAppointment": {
+    "description": "Error message when appointment cancellation fails"
+  },
+  "appointmentCancelledSuccess": "Appointment cancelled successfully",
+  "@appointmentCancelledSuccess": {
+    "description": "Success message when appointment is cancelled"
+  },
+  "cancelAppointment": "Cancel Appointment",
+  "@cancelAppointment": {
+    "description": "Cancel appointment button or dialog title"
+  },
+  "cancelAppointmentConfirmation": "Are you sure you want to cancel this appointment?\n\nThis action cannot be undone.",
+  "@cancelAppointmentConfirmation": {
+    "description": "Confirmation message when canceling appointment"
+  },
+  "keepAppointment": "Keep",
+  "@keepAppointment": {
+    "description": "Button to keep appointment"
+  },
+  "close": "Close",
+  "@close": {
+    "description": "Close button label"
+  },
+  "appointmentTitle": "Appointment",
+  "@appointmentTitle": {
+    "description": "Appointment header line 1"
+  },
+  "detailsTitle": "Details",
+  "@detailsTitle": {
+    "description": "Appointment header line 2"
+  },
+  "appointmentInformation": "Appointment Information",
+  "@appointmentInformation": {
+    "description": "Section header for appointment info"
+  },
+  "clinicInformation": "Clinic Information",
+  "@clinicInformation": {
+    "description": "Section header for clinic info"
+  },
+  "clinicAddress": "Clinic Address",
+  "@clinicAddress": {
+    "description": "Clinic address card label"
+  },
+  "patientInfoLabel": "Patient",
+  "@patientInfoLabel": {
+    "description": "Patient card label"
+  },
+  "dateLabel": "Date",
+  "@dateLabel": {
+    "description": "Date card label"
+  },
+  "timeSlotLabel": "Time Slot",
+  "@timeSlotLabel": {
+    "description": "Time slot card label"
+  },
+  "tokenNumberLabel": "Token",
+  "@tokenNumberLabel": {
+    "description": "Token number card label"
+  },
+  "clinicLabel": "Clinic",
+  "@clinicLabel": {
+    "description": "Clinic name card label"
+  },
+  "feeLabel": "Fee",
+  "@feeLabel": {
+    "description": "Fee card label"
+  },
+  "cityLabel": "City",
+  "@cityLabel": {
+    "description": "City card label"
+  },
+  "experienceLabel": "Experience",
+  "@experienceLabel": {
+    "description": "Experience card label"
+  },
+  "experienceYears": "{count} Yrs",
+  "@experienceYears": {
+    "description": "Doctor years of experience",
+    "placeholders": {
+      "count": {
+        "type": "String",
+        "example": "5"
+      }
+    }
+  }
+}

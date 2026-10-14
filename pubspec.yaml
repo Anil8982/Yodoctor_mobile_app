@@ -2,13 +2,15 @@ name: yodoctor
 description: "A comprehensive medical application for patients and doctors."
 publish_to: 'none'
 
-version: 1.0.1+7
+version: 1.0.1+8
 
 environment:
   sdk: '>=3.11.1 <4.0.0'
 
 dependencies:
   flutter:
+    sdk: flutter
+  flutter_localizations:
     sdk: flutter
 
   # Icons
@@ -80,6 +82,7 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  generate: true
 
   assets:
     - assets/logos/

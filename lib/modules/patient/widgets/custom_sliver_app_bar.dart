@@ -11,12 +11,14 @@ class CustomSliverAppBar extends StatefulWidget {
     required this.background,
     this.titleText,
     this.onNotificationTap,
+    this.actions,
   });
 
   final double expandedHeight;
   final Widget background;
   final String? titleText;
   final VoidCallback? onNotificationTap;
+  final List<Widget>? actions;
 
   @override
   State<CustomSliverAppBar> createState() => _CustomSliverAppBarState();
@@ -83,6 +85,11 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar> {
               ],
 
               if (titleOpacity < 0.5 || widget.titleText == null) const Spacer(),
+
+              if (widget.actions != null) ...[
+                ...widget.actions!,
+                const SizedBox(width: 8),
+              ],
 
               // 2. Notification Button
               _buildActionButton(

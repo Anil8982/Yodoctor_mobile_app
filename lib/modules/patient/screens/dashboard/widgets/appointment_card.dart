@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../../core/utils/app_spacing.dart';
+import '../../../../../l10n/app_localizations.dart';
 import '../../../models/dashboard/appointment_model.dart';
 import 'appointment_details/appointment_details_bottom_sheet.dart';
 import 'appointment_details/widgets/doctor_profile_card.dart';
@@ -13,6 +14,7 @@ class AppointmentCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.sm),
@@ -32,7 +34,7 @@ class AppointmentCard extends StatelessWidget {
               ),
               const SizedBox(width: 6),
               Text(
-                'Patient: ${appointment.familyName ?? "Self"}',
+                l10n.patientLabel(appointment.familyName ?? l10n.patientSelf),
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                   fontWeight: FontWeight.w700,

@@ -36,6 +36,7 @@ class _UnifiedLoginScreenState extends ConsumerState<UnifiedLoginScreen>
   final _passwordController = TextEditingController();
 
   bool _isOtpLogin = false;
+  bool _obscurePassword = true;
 
   late final AnimationController _animController;
   late final Animation<double> _fadeAnimation;
@@ -117,6 +118,13 @@ class _UnifiedLoginScreenState extends ConsumerState<UnifiedLoginScreen>
   }
 
   Future<void> _handleSubmit() async {
+    // Hide password immediately when login is clicked
+    if (!_obscurePassword) {
+      setState(() {
+        _obscurePassword = true;
+      });
+    }
+
     if (!_formKey.currentState!.validate()) return;
 
     FocusManager.instance.primaryFocus?.unfocus();
@@ -805,6 +813,14 @@ class _UnifiedLoginScreenState extends ConsumerState<UnifiedLoginScreen>
                           hint: 'Password',
                           prefixIcon: Icons.lock_outline_rounded,
                           isPassword: true,
+                          obscureText: _obscurePassword,
+                          onObscureToggle: (val) {
+                            setState(() {
+                              _obscurePassword = val;
+                            });
+                          },
+                          textInputAction: TextInputAction.done,
+                          onFieldSubmitted: (_) => _handleSubmit(),
                           controller: _passwordController,
                           enabled: !isProcessing,
                           validator: (v) {
@@ -861,6 +877,9 @@ class _UnifiedLoginScreenState extends ConsumerState<UnifiedLoginScreen>
               onChanged: (val) {
                 setState(() {
                   _isOtpLogin = val;
+                  if (val) {
+                    _obscurePassword = true;
+                  }
                 });
               },
               activeColor: _themeColor,

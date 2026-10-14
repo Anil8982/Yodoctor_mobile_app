@@ -115,7 +115,12 @@ class PatientDashboardController extends Notifier<PatientDashboardState> {
       state = state.copyWith(errorMessage: msg);
       return false;
     } catch (e, st) {
-      _handleException(e, st, 'Failed to cancel appointment');
+      _handleException(
+        e,
+        st,
+        'Failed to cancel appointment',
+        userErrorMessage: 'Unable to cancel appointment',
+      );
       return false;
     }
   }
@@ -148,7 +153,13 @@ class PatientDashboardController extends Notifier<PatientDashboardState> {
         state = state.copyWith(dashboardData: updatedDashboard);
       }
     } catch (e, st) {
-      _handleException(e, st, 'Failed to refresh token status');
+      AppLogger.exception(
+        e,
+        st,
+        message: 'Failed to refresh token status',
+        tag: LogTags.patient,
+        subTag: _subTag,
+      );
     } finally {
       state = state.copyWith(isRefreshingToken: false);
     }
@@ -167,7 +178,12 @@ class PatientDashboardController extends Notifier<PatientDashboardState> {
     state = state.copyWith(isLoading: false, errorMessage: message);
   }
 
-  void _handleException(Object e, StackTrace st, String logMessage) {
+  void _handleException(
+    Object e,
+    StackTrace st,
+    String logMessage, {
+    String? userErrorMessage,
+  }) {
     AppLogger.exception(
       e,
       st,
@@ -177,7 +193,7 @@ class PatientDashboardController extends Notifier<PatientDashboardState> {
     );
     state = state.copyWith(
       isLoading: false,
-      errorMessage: "Unable to load dashboard",
+      errorMessage: userErrorMessage ?? "Unable to load dashboard",
     );
   }
 

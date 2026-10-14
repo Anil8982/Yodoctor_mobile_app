@@ -13,6 +13,10 @@ class YoLoginTextField extends StatefulWidget {
   final TextEditingController? controller;
   final String? Function(String?)? validator;
   final bool enabled;
+  final bool? obscureText;
+  final ValueChanged<bool>? onObscureToggle;
+  final TextInputAction? textInputAction;
+  final ValueChanged<String>? onFieldSubmitted;
 
   const YoLoginTextField({
     super.key,
@@ -26,6 +30,10 @@ class YoLoginTextField extends StatefulWidget {
     this.controller,
     this.validator,
     this.enabled = true,
+    this.obscureText,
+    this.onObscureToggle,
+    this.textInputAction,
+    this.onFieldSubmitted,
   });
 
   @override
@@ -34,6 +42,8 @@ class YoLoginTextField extends StatefulWidget {
 
 class _YoLoginTextFieldState extends State<YoLoginTextField> {
   bool _obscure = true;
+
+  bool get _isObscured => widget.obscureText ?? _obscure;
   late FocusNode _focusNode;
   bool _isFocused = false;
   String? _errorText;
@@ -188,7 +198,9 @@ class _YoLoginTextFieldState extends State<YoLoginTextField> {
                     return error != null ? '' : null;
                   },
                   keyboardType: widget.keyboardType,
-                  obscureText: widget.isPassword && _obscure,
+                  textInputAction: widget.textInputAction,
+                  onFieldSubmitted: widget.onFieldSubmitted,
+                  obscureText: widget.isPassword && _isObscured,
                   cursorColor: widget.color,
                   style: TextStyle(
                     fontSize: 16,
@@ -221,14 +233,18 @@ class _YoLoginTextFieldState extends State<YoLoginTextField> {
                       padding: const EdgeInsets.only(right: 4),
                       child: IconButton(
                         icon: Icon(
-                          _obscure
+                          _isObscured
                               ? Icons.visibility_outlined
                               : Icons.visibility_off_outlined,
                           color: widget.color,
                           size: 22,
                         ),
                         onPressed: () {
-                          setState(() => _obscure = !_obscure);
+                          if (widget.onObscureToggle != null) {
+                            widget.onObscureToggle!(!_isObscured);
+                          } else {
+                            setState(() => _obscure = !_obscure);
+                          }
                         },
                         constraints: const BoxConstraints(),
                         padding: EdgeInsets.zero,

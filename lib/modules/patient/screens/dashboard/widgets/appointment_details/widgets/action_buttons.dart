@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/models/dashboard/appointment_model.dart';
 import 'package:yodoctor/modules/patient/screens/dashboard/widgets/appointment_details/widgets/cancel_appointment_dialog.dart';
 
@@ -17,12 +18,13 @@ class ActionButtons extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return Column(
       children: [
-        _buildCancelButton(context, ref, appointment, colorScheme),
+        _buildCancelButton(context, ref, appointment, colorScheme, l10n),
         const SizedBox(height: 12),
-        _buildCloseButton(colorScheme),
+        _buildCloseButton(colorScheme, l10n),
       ],
     );
   }
@@ -32,6 +34,7 @@ class ActionButtons extends ConsumerWidget {
     WidgetRef ref,
     AppointmentModel appointment,
     ColorScheme colorScheme,
+    AppLocalizations l10n,
   ) {
     return SizedBox(
       width: double.infinity,
@@ -43,9 +46,9 @@ class ActionButtons extends ConsumerWidget {
           appointment: appointment,
         ),
         icon: const Icon(Icons.cancel_outlined, size: 20),
-        label: const Text(
-          'Cancel Appointment',
-          style: TextStyle(
+        label: Text(
+          l10n.cancelAppointment,
+          style: const TextStyle(
             fontWeight: FontWeight.w800,
             fontSize: 15,
             letterSpacing: -0.3,
@@ -67,16 +70,16 @@ class ActionButtons extends ConsumerWidget {
     );
   }
 
-  Widget _buildCloseButton(ColorScheme colorScheme) {
+  Widget _buildCloseButton(ColorScheme colorScheme, AppLocalizations l10n) {
     return SizedBox(
       width: double.infinity,
       height: 56,
       child: FilledButton.icon(
         onPressed: onClose,
         icon: const Icon(Icons.check_circle_outline_rounded, size: 20),
-        label: const Text(
-          'Close',
-          style: TextStyle(
+        label: Text(
+          l10n.close,
+          style: const TextStyle(
             fontWeight: FontWeight.w800,
             fontSize: 15,
             letterSpacing: -0.3,

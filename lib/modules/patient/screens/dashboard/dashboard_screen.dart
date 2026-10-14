@@ -8,9 +8,11 @@ import 'package:yodoctor/modules/patient/widgets/custom_sliver_app_bar.dart';
 
 import '../../../../core/utils/app_spacing.dart';
 import '../../../../core/utils/responsive.dart';
+import '../../../../l10n/app_localizations.dart';
 
 import '../../controllers/patient_dashboard_controller.dart';
 import 'widgets/appointment_card.dart';
+import 'widgets/language_selector_button.dart';
 import 'widgets/token_card.dart';
 import 'widgets/search_doctor_card.dart';
 
@@ -37,6 +39,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     final state = ref.watch(patientDashboardControllerProvider);
     final loading = state.isLoading;
@@ -56,9 +59,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           headerSliverBuilder: (context, innerBoxIsScrolled) {
             return [
               CustomSliverAppBar(
-                titleText: 'Dashboard',
+                titleText: l10n.dashboard,
                 expandedHeight: 190.0,
                 background: const PatientHeader(dashboard: null),
+                actions: const [LanguageSelectorButton()],
               ),
             ];
           },
@@ -82,7 +86,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   Text(
-                    'Dashboard Load Error',
+                    l10n.dashboardLoadError,
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w800,
                       color: colorScheme.onSurface,
@@ -90,8 +94,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   ),
                   const SizedBox(height: AppSpacing.xs),
                   Text(
-                    state.errorMessage ??
-                        "Unable to connect to the server. Please check your internet connection.",
+                    _getLocalizedErrorMessage(state.errorMessage, l10n),
                     textAlign: TextAlign.center,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: colorScheme.onSurfaceVariant,
@@ -105,7 +108,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                           .loadDashboard();
                     },
                     icon: const Icon(Icons.refresh_rounded, size: 20),
-                    label: const Text('Try Again'),
+                    label: Text(l10n.tryAgain),
                     style: FilledButton.styleFrom(
                       backgroundColor: colorScheme.primary,
                       foregroundColor: colorScheme.onPrimary,
@@ -131,9 +134,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
             CustomSliverAppBar(
-              titleText: 'Dashboard',
+              titleText: l10n.dashboard,
               expandedHeight: 190.0,
               background: PatientHeader(dashboard: data),
+              actions: const [LanguageSelectorButton()],
             ),
           ];
         },
@@ -165,7 +169,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                     _buildSectionHeader(
                       context,
                       colorScheme,
-                      'Upcoming Appointments',
+                      l10n.upcomingAppointments,
                     ),
                     const SizedBox(height: AppSpacing.md),
                     if (loading)
@@ -238,6 +242,16 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       },
     );
   }
+
+  String _getLocalizedErrorMessage(String? error, AppLocalizations l10n) {
+    if (error == null ||
+        error.isEmpty ||
+        error == 'Unable to load dashboard' ||
+        error == 'Failed to load dashboard') {
+      return l10n.dashboardLoadErrorSubtitle;
+    }
+    return error;
+  }
 }
 
 class _EmptyAppointments extends StatelessWidget {
@@ -247,6 +261,7 @@ class _EmptyAppointments extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return Center(
       child: Padding(
@@ -279,7 +294,7 @@ class _EmptyAppointments extends StatelessWidget {
             const SizedBox(height: 24),
 
             Text(
-              'No Appointments',
+              l10n.noAppointments,
               style: textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w800,
                 letterSpacing: -0.5,
@@ -289,7 +304,7 @@ class _EmptyAppointments extends StatelessWidget {
             const SizedBox(height: 8),
 
             Text(
-              'Book an appointment with a doctor',
+              l10n.bookAppointmentSubtitle,
               textAlign: TextAlign.center,
               style: textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,
@@ -327,7 +342,7 @@ class _EmptyAppointments extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      'Book Appointment',
+                      l10n.bookAppointment,
                       style: textTheme.labelLarge?.copyWith(
                         color: colorScheme.onPrimary,
                         fontWeight: FontWeight.w700,

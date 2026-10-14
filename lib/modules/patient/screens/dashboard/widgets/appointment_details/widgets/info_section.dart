@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/models/dashboard/appointment_model.dart';
 import 'section_header.dart';
 import 'info_card.dart';
@@ -10,26 +11,28 @@ class InfoSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SectionHeader(
+        SectionHeader(
           icon: Icons.event_rounded,
-          title: 'Appointment Information',
+          title: l10n.appointmentInformation,
         ),
         const SizedBox(height: 14),
-        _AppointmentInfoGrid(appointment: appointment),
+        _AppointmentInfoGrid(appointment: appointment, l10n: l10n),
         const SizedBox(height: 24),
-        const SectionHeader(
+        SectionHeader(
           icon: Icons.local_hospital_rounded,
-          title: 'Clinic Information',
+          title: l10n.clinicInformation,
         ),
         const SizedBox(height: 14),
-        _ClinicInfoGrid(appointment: appointment),
+        _ClinicInfoGrid(appointment: appointment, l10n: l10n),
         const SizedBox(height: 14),
         InfoCard(
           icon: Icons.location_on_rounded,
-          label: 'Clinic Address',
+          label: l10n.clinicAddress,
           value: appointment.address,
           isFullWidth: true,
         ),
@@ -40,8 +43,12 @@ class InfoSection extends StatelessWidget {
 
 class _AppointmentInfoGrid extends StatelessWidget {
   final AppointmentModel appointment;
+  final AppLocalizations l10n;
 
-  const _AppointmentInfoGrid({required this.appointment});
+  const _AppointmentInfoGrid({
+    required this.appointment,
+    required this.l10n,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -55,22 +62,22 @@ class _AppointmentInfoGrid extends StatelessWidget {
       children: [
         InfoCard(
           icon: Icons.person_rounded,
-          label: 'Patient',
-          value: appointment.familyName ?? "Self",
+          label: l10n.patientInfoLabel,
+          value: appointment.familyName ?? l10n.patientSelf,
         ),
         InfoCard(
           icon: Icons.calendar_month_rounded,
-          label: 'Date',
+          label: l10n.dateLabel,
           value: appointment.appointmentDate,
         ),
         InfoCard(
           icon: Icons.access_time_filled_rounded,
-          label: 'Time Slot',
+          label: l10n.timeSlotLabel,
           value: appointment.appointmentSlot,
         ),
         InfoCard(
           icon: Icons.confirmation_number_rounded,
-          label: 'Token',
+          label: l10n.tokenNumberLabel,
           value: '#${appointment.tokenNumber}',
         ),
       ],
@@ -80,8 +87,12 @@ class _AppointmentInfoGrid extends StatelessWidget {
 
 class _ClinicInfoGrid extends StatelessWidget {
   final AppointmentModel appointment;
+  final AppLocalizations l10n;
 
-  const _ClinicInfoGrid({required this.appointment});
+  const _ClinicInfoGrid({
+    required this.appointment,
+    required this.l10n,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -95,23 +106,23 @@ class _ClinicInfoGrid extends StatelessWidget {
       children: [
         InfoCard(
           icon: Icons.local_hospital_rounded,
-          label: 'Clinic',
+          label: l10n.clinicLabel,
           value: appointment.clinicName,
         ),
         InfoCard(
           icon: Icons.payments_rounded,
-          label: 'Fee',
+          label: l10n.feeLabel,
           value: '₹${appointment.consultationFee}',
         ),
         InfoCard(
           icon: Icons.location_city_rounded,
-          label: 'City',
+          label: l10n.cityLabel,
           value: appointment.city,
         ),
         InfoCard(
           icon: Icons.workspace_premium_rounded,
-          label: 'Experience',
-          value: '${appointment.experience} Yrs',
+          label: l10n.experienceLabel,
+          value: l10n.experienceYears(appointment.experience.toString()),
         ),
       ],
     );

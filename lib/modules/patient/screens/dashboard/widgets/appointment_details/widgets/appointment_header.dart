@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 
 class AppointmentHeader extends StatelessWidget {
   const AppointmentHeader({super.key});
@@ -9,6 +10,7 @@ class AppointmentHeader extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(28, 8, 20, 16),
@@ -19,14 +21,14 @@ class AppointmentHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildTitleLine(
-                'Appointment',
+                l10n.appointmentTitle,
                 textTheme,
                 colorScheme.onSurface,
                 FontWeight.w900,
               ),
               const SizedBox(height: 2),
               _buildTitleLine(
-                'Details',
+                l10n.detailsTitle,
                 textTheme,
                 colorScheme.primary,
                 FontWeight.w300,
