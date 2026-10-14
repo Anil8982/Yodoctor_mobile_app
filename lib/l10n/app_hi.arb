@@ -9,7 +9,7 @@
   "bookAppointmentSubtitle": "डॉक्टर के साथ अपॉइंटमेंट बुक करें",
   "bookAppointment": "अपॉइंटमेंट बुक करें",
   "patientDashboard": "मरीज़ डैशबोर्ड",
-  "upcomingVisitsCount": "{count, plural, =1{1 आगामी विज़िट} other{{count} आगामी विज़िट}}",
+  "upcomingVisitsCount": "{count, plural, =0{0 आगामी विज़िट} =1{1 आगामी विज़िट} other{{count} आगामी विज़िट}}",
   "findYour": "ढूंढें अपना",
   "bestDoctorNearYou": "नज़दीकी सर्वश्रेष्ठ डॉक्टर",
   "searchNow": "अभी खोजें",

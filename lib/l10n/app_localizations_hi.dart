@@ -43,6 +43,7 @@ class AppLocalizationsHi extends AppLocalizations {
       locale: localeName,
       other: '$count आगामी विज़िट',
       one: '1 आगामी विज़िट',
+      zero: '0 आगामी विज़िट',
     );
     return '$_temp0';
   }
