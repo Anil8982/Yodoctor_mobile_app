@@ -4,21 +4,26 @@ import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
 import 'package:yodoctor/core/providers/app_role_provider.dart';
 import 'package:yodoctor/core/session/app_session_controller.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import 'app_dialog.dart';
 
 class LogoutDialog {
-  static void show(BuildContext context, WidgetRef ref, {required AppRole role}) {
+  static void show(
+    BuildContext context,
+    WidgetRef ref, {
+    required AppRole role,
+  }) {
     final isDoctor = role == AppRole.doctor;
-
+    final l10n = AppLocalizations.of(context)!;
     final sessionController = ref.read(appSessionProvider);
 
     AppDialog.show(
       context: context,
-      title: 'Ending Session?',
-      content: 'Are you sure you want to log out? You will need to re-authenticate to access your medical dashboard.',
+      title: l10n.endingSessionTitle,
+      content: l10n.logoutContent,
       icon: Icons.power_settings_new_rounded,
-      confirmLabel: 'Log Out',
-      cancelLabel: 'Cancel',
+      confirmLabel: l10n.logoutButtonLabel,
+      cancelLabel: l10n.cancel,
       isDestructive: true,
       onConfirm: () async {
         AppLogger.info(
