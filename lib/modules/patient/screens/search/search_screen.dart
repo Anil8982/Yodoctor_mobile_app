@@ -451,6 +451,7 @@ class _EmptyDoctorsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -463,12 +464,12 @@ class _EmptyDoctorsView extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'No doctors found',
+            l10n.noDoctorsFound,
             style: Theme.of(
               context,
             ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
           ),
-          const Text('Try adjusting your search terms or location'),
+          Text(l10n.noDoctorsMatchFilter),
         ],
       ),
     );

@@ -2,6 +2,7 @@ import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/widgets/app_header.dart';
 import '../controllers/notification_controller.dart';
 import '../widgets/notification_card.dart';
@@ -15,6 +16,7 @@ class NotificationScreen extends ConsumerWidget {
     final colorScheme = theme.colorScheme;
     final state = ref.watch(notificationProvider);
     final notifier = ref.read(notificationProvider.notifier);
+    final l10n = AppLocalizations.of(context)!;
 
     // Proper "Today" calculation using calendar day boundary
     final now = DateTime.now();
@@ -31,7 +33,7 @@ class NotificationScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: colorScheme.surface,
       appBar: AppHeader(
-        title: 'Notification',
+        title: l10n.notification,
         subtitle: state.unreadCount > 0 ? "${state.unreadCount} unread" : null,
         actions: [
           IconButton(
@@ -90,7 +92,7 @@ class NotificationScreen extends ConsumerWidget {
                                               height: AppSpacing.md,
                                             ),
                                             Text(
-                                              "All caught up!",
+                                              l10n.allCaughtUp,
                                               style: theme.textTheme.titleMedium
                                                   ?.copyWith(
                                                     fontWeight: FontWeight.w600,
@@ -98,7 +100,7 @@ class NotificationScreen extends ConsumerWidget {
                                             ),
                                             Text(
                                               state.errorMessage ??
-                                                  "You don't have any notifications right now.",
+                                                  l10n.noNotificationsMatchFilter,
                                               style: theme.textTheme.bodyMedium
                                                   ?.copyWith(
                                                     color: colorScheme
