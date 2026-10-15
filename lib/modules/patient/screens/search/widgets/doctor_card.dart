@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 
 import '../../../../../core/utils/app_spacing.dart';
 import '../../../models/search/doctor_search_model.dart';
@@ -21,6 +22,7 @@ class DoctorCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return Card(
       elevation: 0,
@@ -69,7 +71,7 @@ class DoctorCard extends StatelessWidget {
                         const SizedBox(height: 6),
                         // Consultation Fee (Compact)
                         Text(
-                          'Consultation: ₹${doctor.consultationFee}',
+                          '${l10n.consultation}: ₹${doctor.consultationFee}',
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                             fontWeight: FontWeight.w500,
@@ -136,8 +138,8 @@ class DoctorCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: const Text(
-                        'Contact',
+                      child: Text(
+                        l10n.contact,
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -152,8 +154,8 @@ class DoctorCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: const Text(
-                        'Book Now',
+                      child: Text(
+                        l10n.bookNow,
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),

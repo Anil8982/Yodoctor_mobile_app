@@ -58,6 +58,12 @@ class AppLocalizationsHi extends AppLocalizations {
   String get searchNow => 'अभी खोजें';
 
   @override
+  String get location => 'स्थान के आधार पर';
+
+  @override
+  String get searchDoctors => 'डॉक्टर खोजें';
+
+  @override
   String get noActiveToken => 'कोई सक्रिय टोकन नहीं';
 
   @override
@@ -175,6 +181,36 @@ class AppLocalizationsHi extends AppLocalizations {
   String experienceYears(String count) {
     return '$count वर्ष';
   }
+
+  @override
+  String get findDoctors => 'डॉक्टर खोजें';
+
+  @override
+  String foundCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count मिले',
+      one: '1 मिले',
+      zero: '0 मिले',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get featuredSpecialties => 'विशेष विशेषज्ञ';
+
+  @override
+  String get availableDoctors => 'उपलब्ध डॉक्टर';
+
+  @override
+  String get consultation => 'परामर्श';
+
+  @override
+  String get contact => 'संपर्क';
+
+  @override
+  String get bookNow => 'अभी बुक करें';
 
   @override
   String get certificateWallet => 'प्रमाणपत्र वॉलेट';
@@ -605,10 +641,31 @@ class AppLocalizationsHi extends AppLocalizations {
   String get timelineLabel => 'समयरेखा';
 
   @override
+  String get logoutDrawerItem => 'लॉग आउट';
+
+  @override
+  String get myProfileDrawerItem => 'मेरी प्रोफ़ाइल';
+
+  @override
+  String get familyDrawerItem => 'परिवार';
+
+  @override
+  String get homeTab => 'होम';
+
+  @override
+  String get homeDrawerItem => 'होम';
+
+  @override
   String get certificatesTab => 'प्रमाणपत्र';
 
   @override
   String get certificateDrawerItem => 'प्रमाणपत्र';
+
+  @override
+  String get appointmentsTab => 'हिस्ट्री';
+
+  @override
+  String get appointmentsDrawerItem => 'अपॉइंटमेंट्स';
 
   @override
   String get services => 'सेवाएं';

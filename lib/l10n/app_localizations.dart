@@ -176,6 +176,18 @@ abstract class AppLocalizations {
   /// **'Search Now'**
   String get searchNow;
 
+  /// Search doctors by location
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get location;
+
+  /// Search doctors by name etc.
+  ///
+  /// In en, this message translates to:
+  /// **'Search doctors'**
+  String get searchDoctors;
+
   /// Title when user has no active token today
   ///
   /// In en, this message translates to:
@@ -391,6 +403,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count} Yrs'**
   String experienceYears(String count);
+
+  /// Find Doctors screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Find Doctors'**
+  String get findDoctors;
+
+  /// Doctor count badge
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{0 found} =1{1 found} other{{count} found}}'**
+  String foundCount(int count);
+
+  /// Featured Specialties header line 1 on Find doctors screen
+  ///
+  /// In en, this message translates to:
+  /// **'Featured Specialties'**
+  String get featuredSpecialties;
+
+  /// Available Doctors header line 2 on Find doctors screen
+  ///
+  /// In en, this message translates to:
+  /// **'Available Doctors'**
+  String get availableDoctors;
+
+  /// Consultation fees of doctor
+  ///
+  /// In en, this message translates to:
+  /// **'Consultation'**
+  String get consultation;
+
+  /// Contact to doctor
+  ///
+  /// In en, this message translates to:
+  /// **'Contact'**
+  String get contact;
+
+  /// Button to book an appointment now
+  ///
+  /// In en, this message translates to:
+  /// **'Book Now'**
+  String get bookNow;
 
   /// Certificate Wallet screen title
   ///
@@ -1184,6 +1238,36 @@ abstract class AppLocalizations {
   /// **'Timeline'**
   String get timelineLabel;
 
+  /// Logout item label in drawer
+  ///
+  /// In en, this message translates to:
+  /// **'Logout'**
+  String get logoutDrawerItem;
+
+  /// My Profile item label in drawer
+  ///
+  /// In en, this message translates to:
+  /// **'My Profile'**
+  String get myProfileDrawerItem;
+
+  /// Family item label in drawer
+  ///
+  /// In en, this message translates to:
+  /// **'Family'**
+  String get familyDrawerItem;
+
+  /// Home tab label on bottom nav
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get homeTab;
+
+  /// Home item label in drawer
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get homeDrawerItem;
+
   /// Certificates tab label on bottom nav
   ///
   /// In en, this message translates to:
@@ -1195,6 +1279,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Certificate'**
   String get certificateDrawerItem;
+
+  /// Appointments history tab label on bottom nav
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get appointmentsTab;
+
+  /// Appointments history item label in drawer
+  ///
+  /// In en, this message translates to:
+  /// **'Appointments'**
+  String get appointmentsDrawerItem;
 
   /// Services header or screen title
   ///

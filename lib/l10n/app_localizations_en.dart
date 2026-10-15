@@ -58,6 +58,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchNow => 'Search Now';
 
   @override
+  String get location => 'Location';
+
+  @override
+  String get searchDoctors => 'Search doctors';
+
+  @override
   String get noActiveToken => 'No Active Token';
 
   @override
@@ -176,6 +182,36 @@ class AppLocalizationsEn extends AppLocalizations {
   String experienceYears(String count) {
     return '$count Yrs';
   }
+
+  @override
+  String get findDoctors => 'Find Doctors';
+
+  @override
+  String foundCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count found',
+      one: '1 found',
+      zero: '0 found',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get featuredSpecialties => 'Featured Specialties';
+
+  @override
+  String get availableDoctors => 'Available Doctors';
+
+  @override
+  String get consultation => 'Consultation';
+
+  @override
+  String get contact => 'Contact';
+
+  @override
+  String get bookNow => 'Book Now';
 
   @override
   String get certificateWallet => 'Certificate Wallet';
@@ -604,10 +640,31 @@ class AppLocalizationsEn extends AppLocalizations {
   String get timelineLabel => 'Timeline';
 
   @override
+  String get logoutDrawerItem => 'Logout';
+
+  @override
+  String get myProfileDrawerItem => 'My Profile';
+
+  @override
+  String get familyDrawerItem => 'Family';
+
+  @override
+  String get homeTab => 'Home';
+
+  @override
+  String get homeDrawerItem => 'Home';
+
+  @override
   String get certificatesTab => 'Certificates';
 
   @override
   String get certificateDrawerItem => 'Certificate';
+
+  @override
+  String get appointmentsTab => 'History';
+
+  @override
+  String get appointmentsDrawerItem => 'Appointments';
 
   @override
   String get services => 'Services';

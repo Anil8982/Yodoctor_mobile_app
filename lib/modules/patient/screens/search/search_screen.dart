@@ -3,6 +3,8 @@ import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/models/search/doctor_search_model.dart';
 import 'package:yodoctor/modules/patient/screens/search/widgets/find_doctors_shimmer.dart';
 import 'package:yodoctor/modules/patient/screens/search/widgets/search_suggestions_overlay.dart';
@@ -108,7 +110,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       search: params.search,
       city: params.city,
     );
-    ref.read(doctorListingControllerProvider.notifier).searchDoctors(listingParams);
+    ref
+        .read(doctorListingControllerProvider.notifier)
+        .searchDoctors(listingParams);
   }
 
   void _handleSpecialtySelected(String specialtyName) {
@@ -122,6 +126,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final horizontalPadding = Responsive.horizontalPadding(context);
+    final l10n = AppLocalizations.of(context)!;
 
     final searchState = ref.watch(patientSearchControllerProvider);
     final notifier = ref.read(patientSearchControllerProvider.notifier);
@@ -164,22 +169,25 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 stretch: true,
                 elevation: 0,
                 backgroundColor: colorScheme.primary,
+                iconTheme: IconThemeData(color: AppTheme.white),
                 title: Text(
-                  'Find Doctors',
+                  l10n.findDoctors,
                   style: theme.textTheme.titleLarge?.copyWith(
                     color: colorScheme.onPrimary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 actions: [
-                  _buildResultCounter(listingState.doctors.length, colorScheme),
+                  _buildResultCounter(
+                    listingState.doctors.length,
+                    colorScheme,
+                    l10n,
+                  ),
                   const SizedBox(width: AppSpacing.md),
                 ],
                 flexibleSpace: FlexibleSpaceBar(
                   stretchModes: const [StretchMode.zoomBackground],
-                  background: HeroSection(
-                    onSearch: _triggerSearch,
-                  ),
+                  background: HeroSection(onSearch: _triggerSearch),
                 ),
               ),
 
@@ -192,10 +200,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                   curve: Curves.easeInOut,
                   child: _specialtyFilterVisible
                       ? AutoHideSpecialtyFilter(
-                    specialties: searchState.specialties,
-                    selectedSpecialty: searchState.selectedSpecialty,
-                    onSpecialtySelected: _handleSpecialtySelected,
-                  )
+                          specialties: searchState.specialties,
+                          selectedSpecialty: searchState.selectedSpecialty,
+                          onSpecialtySelected: _handleSpecialtySelected,
+                        )
                       : const SizedBox.shrink(),
                 ),
               ),
@@ -212,15 +220,19 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                   ),
                 )
               else if (listingState.doctors.isEmpty)
-                  const SliverFillRemaining(
-                    hasScrollBody: false,
-                    child: _EmptyDoctorsView(),
-                  )
-                else
-                  SliverPadding(
-                    padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                    sliver: _buildDoctorGrid(listingState.doctors, mobile, desktop),
+                const SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: _EmptyDoctorsView(),
+                )
+              else
+                SliverPadding(
+                  padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                  sliver: _buildDoctorGrid(
+                    listingState.doctors,
+                    mobile,
+                    desktop,
                   ),
+                ),
 
               // --- Load More Indicator ---
               if (listingState.isLoading && listingState.doctors.isNotEmpty)
@@ -244,7 +256,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           // --- Search Suggestions Overlay (Search Field) ---
           if (hasSearchSuggestions)
             Positioned(
-              width: MediaQuery.of(context).size.width - (horizontalPadding * 2) - 64,
+              width:
+                  MediaQuery.of(context).size.width -
+                  (horizontalPadding * 2) -
+                  64,
               child: CompositedTransformFollower(
                 link: _searchLink,
                 showWhenUnlinked: false,
@@ -278,7 +293,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           // --- Location Suggestions Overlay ---
           if (hasCitySuggestions)
             Positioned(
-              width: MediaQuery.of(context).size.width - (horizontalPadding * 2) - 64,
+              width:
+                  MediaQuery.of(context).size.width -
+                  (horizontalPadding * 2) -
+                  64,
               child: CompositedTransformFollower(
                 link: _locationLink,
                 showWhenUnlinked: false,
@@ -313,7 +331,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     );
   }
 
-  Widget _buildResultCounter(int count, ColorScheme colorScheme) {
+  Widget _buildResultCounter(
+    int count,
+    ColorScheme colorScheme,
+    AppLocalizations l10n,
+  ) {
     return Center(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -322,7 +344,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           color: colorScheme.secondaryContainer,
         ),
         child: Text(
-          '$count found',
+          l10n.foundCount(count),
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 12,
@@ -334,14 +356,14 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   }
 
   Widget _buildDoctorGrid(
-      List<DoctorSearchModel> doctors,
-      bool mobile,
-      bool desktop,
-      ) {
+    List<DoctorSearchModel> doctors,
+    bool mobile,
+    bool desktop,
+  ) {
     if (mobile) {
       return SliverList(
         delegate: SliverChildBuilderDelegate(
-              (context, index) => DoctorCard(
+          (context, index) => DoctorCard(
             doctor: doctors[index],
             onProfileTap: () => _openDoctorProfile(context, doctors[index]),
             onBookTap: () => _openBookAppointment(context, doctors[index]),
@@ -360,7 +382,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         childAspectRatio: desktop ? 1.4 : 1.1,
       ),
       delegate: SliverChildBuilderDelegate(
-            (context, index) => DoctorCard(
+        (context, index) => DoctorCard(
           doctor: doctors[index],
           onProfileTap: () => _openDoctorProfile(context, doctors[index]),
           onBookTap: () => _openBookAppointment(context, doctors[index]),
@@ -375,9 +397,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   }
 
   Future<void> _openBookAppointment(
-      BuildContext context,
-      DoctorSearchModel doctor,
-      ) async {
+    BuildContext context,
+    DoctorSearchModel doctor,
+  ) async {
     final detailNotifier = ref.read(doctorDetailControllerProvider.notifier);
     await detailNotifier.loadDoctor(doctor.doctorId);
     final detailState = ref.read(doctorDetailControllerProvider);
@@ -390,7 +412,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       context.push(AppRoutes.bookAppointment, extra: detailState.doctor);
     }
   }
-
 }
 
 class _ErrorView extends StatelessWidget {

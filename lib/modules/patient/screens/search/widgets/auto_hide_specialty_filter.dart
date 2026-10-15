@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
 import 'package:yodoctor/core/utils/responsive.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/widgets/app_dropdown_field.dart';
 
 class AutoHideSpecialtyFilter extends StatelessWidget {
@@ -20,6 +21,7 @@ class AutoHideSpecialtyFilter extends StatelessWidget {
     final theme = Theme.of(context);
     final horizontalPadding = Responsive.horizontalPadding(context);
     final isMobile = Responsive.isMobile(context);
+    final l10n = AppLocalizations.of(context)!;
 
     final specialtyItems = <String>['All Specialties', ...specialties];
     final currentValue = selectedSpecialty == null || selectedSpecialty!.isEmpty
@@ -34,7 +36,7 @@ class AutoHideSpecialtyFilter extends StatelessWidget {
           SizedBox(
             width: isMobile ? double.infinity : 300,
             child: AppDropdownField(
-              label: 'Featured Specialties',
+              label: l10n.featuredSpecialties,
               labelStyle: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w900,
               ),
@@ -58,7 +60,7 @@ class AutoHideSpecialtyFilter extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.lg),
           Text(
-            'Available Doctors',
+            l10n.availableDoctors,
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w900,
             ),

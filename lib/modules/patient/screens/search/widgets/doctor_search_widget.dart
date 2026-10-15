@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/controllers/patient_search_controller.dart';
 import 'package:yodoctor/modules/patient/screens/search/widgets/search_suggestions_overlay.dart';
 import '../../../../widgets/app_search_field.dart';
@@ -125,6 +126,7 @@ class _DoctorSearchWidgetState extends ConsumerState<DoctorSearchWidget>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     final searchState = ref.watch(patientSearchControllerProvider);
     final notifier = ref.read(patientSearchControllerProvider.notifier);
@@ -174,7 +176,7 @@ class _DoctorSearchWidgetState extends ConsumerState<DoctorSearchWidget>
               builder: (context, value, child) {
                 return AppSearchField(
                   controller: _locationController,
-                  hintText: 'Location',
+                  hintText: l10n.location,
                   onChanged: (val) => notifier.updateLocation(val),
                   prefixIcon: Icon(
                     Icons.location_on_rounded,
@@ -210,7 +212,7 @@ class _DoctorSearchWidgetState extends ConsumerState<DoctorSearchWidget>
                     builder: (context, value, child) {
                       return AppSearchField(
                         controller: _searchController,
-                        hintText: 'Search doctors...',
+                        hintText: '${l10n.searchDoctors}...',
                         onChanged: (val) => notifier.updateSearch(val),
                         prefixIcon: Icon(
                           Icons.search_rounded,
