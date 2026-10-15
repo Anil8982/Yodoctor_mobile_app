@@ -15,18 +15,20 @@ class PatientBottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final homeLabel = l10n?.homeTab ?? "Home";
     final certLabel = l10n?.certificatesTab ?? "Certificates";
     final servicesLabel = l10n?.servicesTab ?? "Services";
+    final historyLabel = l10n?.appointmentsTab ?? "History";
 
     return AppBottomNav(
       currentIndex: currentIndex,
       onTap: onTap,
       centerWidgetGapIndex: 2,
       items: [
-        const NavItemData(
+        NavItemData(
           icon: Icons.home_outlined,
           activeIcon: Icons.home_rounded,
-          label: "Home",
+          label: homeLabel,
         ),
         NavItemData(
           icon: Icons.wallet_membership_outlined,
@@ -38,10 +40,10 @@ class PatientBottomNav extends StatelessWidget {
           activeIcon: Icons.medical_services_rounded,
           label: servicesLabel,
         ),
-        const NavItemData(
+        NavItemData(
           icon: Icons.history_outlined,
           activeIcon: Icons.history_rounded,
-          label: "History",
+          label: historyLabel,
         ),
       ],
     );

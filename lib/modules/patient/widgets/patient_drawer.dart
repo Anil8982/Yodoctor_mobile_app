@@ -65,7 +65,7 @@ class PatientDrawer extends ConsumerWidget {
       items: [
         GlassDrawerItem(
           icon: Icons.home_rounded,
-          label: 'Home',
+          label: l10n?.homeDrawerItem ?? 'Home',
           selected: currentRoute == AppRoutes.dashboard,
           onTap: () {
             Navigator.pop(context);
@@ -74,7 +74,7 @@ class PatientDrawer extends ConsumerWidget {
         ),
         GlassDrawerItem(
           icon: Icons.person_outline_rounded,
-          label: 'My Profile',
+          label: l10n?.myProfileDrawerItem ?? 'My Profile',
           selected: currentRoute == AppRoutes.profile,
           onTap: () {
             Navigator.pop(context);
@@ -83,7 +83,7 @@ class PatientDrawer extends ConsumerWidget {
         ),
         GlassDrawerItem(
           icon: Icons.family_restroom_rounded,
-          label: 'Family',
+          label: l10n?.familyDrawerItem ?? 'Family',
           selected: currentRoute == AppRoutes.family,
           onTap: () {
             Navigator.pop(context);
@@ -92,7 +92,7 @@ class PatientDrawer extends ConsumerWidget {
         ),
         GlassDrawerItem(
           icon: Icons.history_rounded,
-          label: 'Appointments',
+          label: l10n?.appointmentsDrawerItem ?? 'Appointments',
           selected: currentRoute == AppRoutes.history,
           onTap: () {
             Navigator.pop(context);
@@ -144,7 +144,7 @@ class PatientDrawer extends ConsumerWidget {
         ),
         GlassDrawerItem(
           icon: Icons.logout_rounded,
-          label: 'Logout',
+          label: l10n?.logoutDrawerItem ?? 'Logout',
           foregroundColor: colorScheme.error,
           onTap: () {
             Navigator.pop(context);
