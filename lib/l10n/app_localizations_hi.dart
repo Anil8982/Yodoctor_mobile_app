@@ -94,6 +94,16 @@ class AppLocalizationsHi extends AppLocalizations {
   String get patientSelf => 'स्वयं';
 
   @override
+  String get notification => 'नोटिफ़िकेशन ';
+
+  @override
+  String get allCaughtUp => 'अभी कोई नया अपडेट नहीं!';
+
+  @override
+  String get noNotificationsMatchFilter =>
+      'फ़िलहाल आपके पास कोई नोटिफ़िकेशन नहीं है।';
+
+  @override
   String get selectLanguage => 'भाषा चुनें';
 
   @override
@@ -202,6 +212,12 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get availableDoctors => 'उपलब्ध डॉक्टर';
+
+  @override
+  String get noDoctorsFound => 'कोई डॉक्टर नहीं मिला';
+
+  @override
+  String get noDoctorsMatchFilter => 'अपनी खोज या लोकेशन बदलकर देखें';
 
   @override
   String get consultation => 'परामर्श';
@@ -419,6 +435,9 @@ class AppLocalizationsHi extends AppLocalizations {
       'अपने मेडिकल क्लीयरेंस पर प्रदर्शित करने के लिए बुनियादी बायोमेट्रिक्स प्रदान करें।';
 
   @override
+  String get notProvided => 'उपलब्ध नहीं है';
+
+  @override
   String get fullName => 'पूरा नाम';
 
   @override
@@ -432,6 +451,27 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get onlyAlphabetsAllowed => 'केवल अक्षरों की अनुमति है';
+
+  @override
+  String get emailAddress => 'ईमेल पता';
+
+  @override
+  String get enterEmailAddress => 'ईमेल पता दर्ज करें';
+
+  @override
+  String get pleaseEnterEmailAddress => 'कृपया ईमेल पता दर्ज करें';
+
+  @override
+  String get phoneNumber => 'मोबाइल नंबर';
+
+  @override
+  String get enterPhoneNumber => 'मोबाइल नंबर दर्ज करें';
+
+  @override
+  String get pleaseEnterPhoneNumber => 'कृपया मोबाइल नंबर दर्ज करें';
+
+  @override
+  String get phoneMinDigitsAllowed => '10 अंकों का सही मोबाइल नंबर दर्ज करें';
 
   @override
   String get dateOfBirth => 'जन्म तिथि';
@@ -639,6 +679,16 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get timelineLabel => 'समयरेखा';
+
+  @override
+  String get logoutButtonLabel => 'लॉग आउट';
+
+  @override
+  String get endingSessionTitle => 'सेशन समाप्त करें?';
+
+  @override
+  String get logoutContent =>
+      'क्या आप वाकई लॉग आउट करना चाहते हैं? अपने मेडिकल डैशबोर्ड का उपयोग करने के लिए आपको फिर से लॉग इन करना होगा।';
 
   @override
   String get logoutDrawerItem => 'लॉग आउट';

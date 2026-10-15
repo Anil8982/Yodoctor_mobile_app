@@ -80,6 +80,11 @@ void main() {
       expect(l10n.foundCount(5), '5 found');
       expect(l10n.featuredSpecialties, "Featured Specialties");
       expect(l10n.availableDoctors, "Available Doctors");
+      expect(l10n.noDoctorsFound, "No doctors found");
+      expect(
+        l10n.noDoctorsMatchFilter,
+        "Try adjusting your search terms or location",
+      );
       expect(l10n.consultation, "Consultation");
       expect(l10n.contact, "Contact");
       expect(l10n.bookNow, "Book Now");
@@ -97,6 +102,12 @@ void main() {
       expect(l10n.docProfilePhoto, 'Profile Photo');
       expect(l10n.docGovtId, 'Government ID Proof');
       expect(l10n.certificateDetails, 'Certificate Details');
+      expect(l10n.logoutButtonLabel, "Log Out");
+      expect(l10n.endingSessionTitle, "Ending Session?");
+      expect(
+        l10n.logoutContent,
+        'Are you sure you want to log out? You will need to re-authenticate to access your medical dashboard.',
+      );
       expect(l10n.logoutDrawerItem, 'Logout');
       expect(l10n.myProfileDrawerItem, "My Profile");
       expect(l10n.familyDrawerItem, "Family");
@@ -153,6 +164,17 @@ void main() {
       expect(l10n.invalidQrTryAgain, 'Invalid QR - Try Again');
       expect(l10n.scannerWillResumeShortly, 'Scanner will resume shortly...');
       expect(l10n.scanQrCodeTooltip, 'Scan QR Code');
+
+      // Notification section keys
+      expect(l10n.notification, "Notification");
+      expect(l10n.allCaughtUp, "All caught up!");
+      expect(
+        l10n.noNotificationsMatchFilter,
+        "You don't have any notifications right now.",
+      );
+
+      // Profile section keys
+      expect(l10n.notProvided, "Not Provided");
     });
 
     test('Hindi translations match expected keys and render correctly', () {
@@ -203,6 +225,8 @@ void main() {
       expect(l10n.foundCount(5), '5 मिले');
       expect(l10n.featuredSpecialties, "विशेष विशेषज्ञ");
       expect(l10n.availableDoctors, "उपलब्ध डॉक्टर");
+      expect(l10n.noDoctorsFound, "कोई डॉक्टर नहीं मिला");
+      expect(l10n.noDoctorsMatchFilter, "अपनी खोज या लोकेशन बदलकर देखें");
       expect(l10n.consultation, "परामर्श");
       expect(l10n.contact, "संपर्क");
       expect(l10n.bookNow, "अभी बुक करें");
@@ -220,6 +244,12 @@ void main() {
       expect(l10n.docProfilePhoto, 'प्रोफ़ाइल फ़ोटो');
       expect(l10n.docGovtId, 'सरकारी पहचान पत्र');
       expect(l10n.certificateDetails, 'प्रमाणपत्र विवरण');
+      expect(l10n.logoutButtonLabel, "लॉग आउट");
+      expect(l10n.endingSessionTitle, "सेशन समाप्त करें?");
+      expect(
+        l10n.logoutContent,
+        'क्या आप वाकई लॉग आउट करना चाहते हैं? अपने मेडिकल डैशबोर्ड का उपयोग करने के लिए आपको फिर से लॉग इन करना होगा।',
+      );
       expect(l10n.logoutDrawerItem, 'लॉग आउट');
       expect(l10n.myProfileDrawerItem, "मेरी प्रोफ़ाइल");
       expect(l10n.familyDrawerItem, "परिवार");
@@ -276,6 +306,17 @@ void main() {
       expect(l10n.invalidQrTryAgain, 'अमान्य QR - पुनः प्रयास करें');
       expect(l10n.scannerWillResumeShortly, 'स्कैनर शीघ्र पुनः शुरू होगा...');
       expect(l10n.scanQrCodeTooltip, 'QR कोड स्कैन करें');
+
+      // Notification section keys
+      expect(l10n.notification, "नोटिफ़िकेशन");
+      expect(l10n.allCaughtUp, "अभी कोई नया अपडेट नहीं!");
+      expect(
+        l10n.noNotificationsMatchFilter,
+        "फ़िलहाल आपके पास कोई नोटिफ़िकेशन नहीं है।",
+      );
+
+      // Profile section keys
+      expect(l10n.notProvided, "उपलब्ध नहीं है");
     });
   });
 

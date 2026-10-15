@@ -116,6 +116,18 @@
   "@patientSelf": {
     "description": "Default name when appointment is for the user themselves"
   },
+   "notification": "Notification",
+  "@notification": {
+    "description": "Notification screen title"
+  },
+   "allCaughtUp": "All caught up!",
+  "@allCaughtUp": {
+    "description": "Title when no notifications match the search or filter"
+  },
+   "noNotificationsMatchFilter": "You don't have any notifications right now.",
+  "@noNotificationsMatchFilter": {
+    "description": "Subtitle when filter don't have any notifications."
+  },
   "selectLanguage": "Select Language",
   "@selectLanguage": {
     "description": "Modal title for language selector"
@@ -261,6 +273,14 @@
   "availableDoctors": "Available Doctors",
   "@availableDoctors": {
     "description": "Available Doctors header line 2 on Find doctors screen "
+  },
+     "noDoctorsFound": "No doctors found",
+  "@noDoctorsFound": {
+    "description": "Title when no doctors match the search or filter"
+  },
+     "noDoctorsMatchFilter": "Try adjusting your search terms or location",
+  "@noDoctorsMatchFilter": {
+    "description": "Subtitle when filter yields no doctors"
   },
    "consultation": "Consultation",
   "@consultation": {
@@ -546,6 +566,10 @@
   "@medicalDetailsDesc": {
     "description": "Header description for step 2"
   },
+  "notProvided": "Not Provided",
+  "@notProvided": {
+    "description": "It shows when no data/value is available"
+  },
   "fullName": "Full Name",
   "@fullName": {
     "description": "Full name input field label"
@@ -565,6 +589,34 @@
   "onlyAlphabetsAllowed": "Only alphabets are allowed",
   "@onlyAlphabetsAllowed": {
     "description": "Validation message when non-alphabetic characters are entered in name"
+  },  
+  "emailAddress": "Email Address",
+  "@emailAddress": {
+    "description": "Email address input field label"
+  },
+  "enterEmailAddress": "Enter email address",
+  "@enterEmailAddress": {
+    "description": "Email address field hint"
+  },
+  "pleaseEnterEmailAddress": "Please enter email address",
+  "@pleaseEnterEmailAddress": {
+    "description": "Validation message when email address is empty"
+  },
+    "phoneNumber": "Phone Number",
+  "@phoneNumber": {
+    "description": "Phone number input field label"
+  },
+  "enterPhoneNumber": "Enter phone number",
+  "@enterPhoneNumber": {
+    "description": "Phone Number field hint"
+  },
+  "pleaseEnterPhoneNumber": "Please enter phone number",
+  "@pleaseEnterPhoneNumber": {
+    "description": "Validation message when phone number is empty"
+  },
+  "phoneMinDigitsAllowed": "Enter a valid 10-digit mobile number",
+  "@phoneMinDigitsAllowed": {
+    "description": "Validation message when less than 10 digits are entered in number"
   },
   "dateOfBirth": "Date of Birth",
   "@dateOfBirth": {
@@ -833,6 +885,18 @@
   "timelineLabel": "Timeline",
   "@timelineLabel": {
     "description": "Timeline label"
+  },
+   "logoutButtonLabel": "Log Out",
+  "@logoutButtonLabel": {
+    "description": "When press Log Out, user exists out of the app"
+  },
+   "endingSessionTitle": "Ending Session?",
+  "@endingSessionTitle": {
+    "description": "Session ends"
+  },
+   "logoutContent": "Are you sure you want to log out? You will need to re-authenticate to access your medical dashboard.",
+  "@logoutContent": {
+    "description": "Take confirmation from user when they exists out of app."
   },
    "logoutDrawerItem": "Logout",
   "@logoutDrawerItem": {

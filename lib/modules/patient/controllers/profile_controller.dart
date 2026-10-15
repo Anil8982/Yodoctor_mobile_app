@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -5,6 +7,7 @@ import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
 import 'package:yodoctor/core/enums/auth_type.dart' show AuthType;
 import 'package:yodoctor/core/providers/storage_provider.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 
 import '../repositories/patient_profile_repository.dart';
 import '../screens/profile/models/profile_model.dart';
@@ -121,15 +124,17 @@ class ProfileController extends Notifier<ProfileState> {
     // Store API format
     dobController.text = formattedDate;
   }
-  String formatDob(String? value) {
+
+  String formatDob(String? value, BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     if (value == null || value.trim().isEmpty) {
-      return 'Not provided';
+      return l10n.notProvided;
     }
 
     final date = DateTime.tryParse(value.trim());
 
     if (date == null) {
-      return 'Not provided';
+      return l10n.notProvided;
     }
 
     return DateFormat('dd MMM yyyy').format(date);

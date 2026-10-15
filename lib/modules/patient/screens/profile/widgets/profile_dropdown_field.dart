@@ -1,6 +1,7 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 
 class ProfileDropdownField extends StatelessWidget {
   final String label;
@@ -23,6 +24,7 @@ class ProfileDropdownField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context)!;
     final activeColor = !isEditing
         ? colorScheme.primary
         : colorScheme.secondary;
@@ -32,11 +34,11 @@ class ProfileDropdownField extends StatelessWidget {
       child: DropdownButtonFormField<String>(
         initialValue: items.contains(value) ? value : null,
         hint: Text(
-          isEditing ? 'Select ${label.toLowerCase()}' : 'Not provided',
+          isEditing ? l10n.selectGender : l10n.notProvided,
           style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w500,
-            color: colorScheme.onSurfaceVariant.transparency(0.5),
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: colorScheme.onSurface.transparency(isEditing ? 1.0 : 0.9),
           ),
         ),
         onChanged: isEditing ? onChanged : null,

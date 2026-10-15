@@ -1,6 +1,7 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 
 import '../../../controllers/profile_controller.dart';
 import 'profile_date_picker_field.dart';
@@ -20,6 +21,7 @@ class ProfileInfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     Widget buildDivider() => Divider(
       indent: 60,
@@ -41,22 +43,31 @@ class ProfileInfoCard extends StatelessWidget {
         child: Column(
           children: [
             ProfileTextField(
-              label: "Full Name",
+              label: l10n.fullName,
               icon: Icons.person_rounded,
+              hintText: l10n.enterFullName,
               controller: controller.nameController,
               isEditing: isEditing,
               validator: (value) {
                 if (!isEditing) return null;
 
                 if (value == null || value.trim().isEmpty) {
-                  return "Enter name";
+                  return "l10n.pleaseEnterName";
                 }
 
-                if (value.trim().length < 2) {
-                  return "Name should have at least 2 characters";
+                final cleanedValue = value.trim().replaceAll(
+                  RegExp(r'\s+'),
+                  ' ',
+                );
+
+                if (cleanedValue.length < 2) {
+                  return l10n.nameMinCharacters;
                 }
-                if (!RegExp(r'^[A-Za-z]+(?: [A-Za-z]+)*$').hasMatch(value)) {
-                  return 'Only alphabets are allowed';
+
+                if (!RegExp(
+                  r'^[A-Za-z]+(?: [A-Za-z]+)*$',
+                ).hasMatch(cleanedValue)) {
+                  return l10n.onlyAlphabetsAllowed;
                 }
 
                 return null;
@@ -66,8 +77,9 @@ class ProfileInfoCard extends StatelessWidget {
             buildDivider(),
 
             ProfileTextField(
-              label: "Email Address",
+              label: l10n.emailAddress,
               icon: Icons.alternate_email_rounded,
+              hintText: l10n.enterEmailAddress,
               controller: controller.emailController,
               isEditing: false,
             ),
@@ -75,12 +87,11 @@ class ProfileInfoCard extends StatelessWidget {
             buildDivider(),
 
             ProfileTextField(
-              label: "Phone Number",
+              label: l10n.phoneNumber,
               icon: Icons.phone_android_rounded,
+              hintText: l10n.enterPhoneNumber,
               controller: controller.mobileController,
-
               isEditing: isEditing && controller.canEditMobile,
-
               inputFormatters: [
                 FilteringTextInputFormatter.digitsOnly,
                 LengthLimitingTextInputFormatter(10),
@@ -92,11 +103,11 @@ class ProfileInfoCard extends StatelessWidget {
                 }
 
                 if (value == null || value.trim().isEmpty) {
-                  return "Enter phone number";
+                  return l10n.pleaseEnterPhoneNumber;
                 }
 
                 if (!RegExp(r'^[6-9]\d{9}$').hasMatch(value.trim())) {
-                  return "Enter a valid 10-digit mobile number";
+                  return l10n.phoneMinDigitsAllowed;
                 }
 
                 return null;
@@ -106,7 +117,7 @@ class ProfileInfoCard extends StatelessWidget {
             buildDivider(),
 
             ProfileDropdownField(
-              label: "GENDER",
+              label: l10n.gender,
               icon: Icons.wc_rounded,
               value: controller.genderController.text.toUpperCase(),
               items: const ["MALE", "FEMALE", "OTHER"],
@@ -121,9 +132,12 @@ class ProfileInfoCard extends StatelessWidget {
             buildDivider(),
 
             ProfileDatePickerField(
-              label: "Date of Birth",
+              label: l10n.dateOfBirth,
               icon: Icons.cake_rounded,
-              value: controller.formatDob(controller.dobController.text),
+              value: controller.formatDob(
+                controller.dobController.text,
+                context,
+              ),
               isEditing: isEditing,
               onTap: () => controller.pickDateOfBirth(context),
             ),

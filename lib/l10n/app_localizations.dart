@@ -236,6 +236,24 @@ abstract class AppLocalizations {
   /// **'Self'**
   String get patientSelf;
 
+  /// Notification screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Notification'**
+  String get notification;
+
+  /// Title when no notifications match the search or filter
+  ///
+  /// In en, this message translates to:
+  /// **'All caught up!'**
+  String get allCaughtUp;
+
+  /// Subtitle when filter don't have any notifications.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have any notifications right now.'**
+  String get noNotificationsMatchFilter;
+
   /// Modal title for language selector
   ///
   /// In en, this message translates to:
@@ -427,6 +445,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Available Doctors'**
   String get availableDoctors;
+
+  /// Title when no doctors match the search or filter
+  ///
+  /// In en, this message translates to:
+  /// **'No doctors found'**
+  String get noDoctorsFound;
+
+  /// Subtitle when filter yields no doctors
+  ///
+  /// In en, this message translates to:
+  /// **'Try adjusting your search terms or location'**
+  String get noDoctorsMatchFilter;
 
   /// Consultation fees of doctor
   ///
@@ -806,6 +836,12 @@ abstract class AppLocalizations {
   /// **'Provide baseline biometrics to appear on your medical clearance.'**
   String get medicalDetailsDesc;
 
+  /// It shows when no data/value is available
+  ///
+  /// In en, this message translates to:
+  /// **'Not Provided'**
+  String get notProvided;
+
   /// Full name input field label
   ///
   /// In en, this message translates to:
@@ -835,6 +871,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Only alphabets are allowed'**
   String get onlyAlphabetsAllowed;
+
+  /// Email address input field label
+  ///
+  /// In en, this message translates to:
+  /// **'Email Address'**
+  String get emailAddress;
+
+  /// Email address field hint
+  ///
+  /// In en, this message translates to:
+  /// **'Enter email address'**
+  String get enterEmailAddress;
+
+  /// Validation message when email address is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter email address'**
+  String get pleaseEnterEmailAddress;
+
+  /// Phone number input field label
+  ///
+  /// In en, this message translates to:
+  /// **'Phone Number'**
+  String get phoneNumber;
+
+  /// Phone Number field hint
+  ///
+  /// In en, this message translates to:
+  /// **'Enter phone number'**
+  String get enterPhoneNumber;
+
+  /// Validation message when phone number is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter phone number'**
+  String get pleaseEnterPhoneNumber;
+
+  /// Validation message when less than 10 digits are entered in number
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid 10-digit mobile number'**
+  String get phoneMinDigitsAllowed;
 
   /// Date of birth field label
   ///
@@ -1237,6 +1315,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Timeline'**
   String get timelineLabel;
+
+  /// When press Log Out, user exists out of the app
+  ///
+  /// In en, this message translates to:
+  /// **'Log Out'**
+  String get logoutButtonLabel;
+
+  /// Session ends
+  ///
+  /// In en, this message translates to:
+  /// **'Ending Session?'**
+  String get endingSessionTitle;
+
+  /// Take confirmation from user when they exists out of app.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to log out? You will need to re-authenticate to access your medical dashboard.'**
+  String get logoutContent;
 
   /// Logout item label in drawer
   ///

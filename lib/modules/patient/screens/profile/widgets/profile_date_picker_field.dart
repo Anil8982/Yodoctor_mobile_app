@@ -1,6 +1,7 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 
 class ProfileDatePickerField extends StatefulWidget {
   final String label;
@@ -30,6 +31,7 @@ class _ProfileDatePickerFieldState extends State<ProfileDatePickerField> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context)!;
     final activeColor = !widget.isEditing
         ? colorScheme.primary
         : colorScheme.secondary;
@@ -89,7 +91,7 @@ class _ProfileDatePickerFieldState extends State<ProfileDatePickerField> {
                     const SizedBox(height: 2),
                     Text(
                       widget.value.trim().isEmpty
-                          ? 'Select Date'
+                          ? l10n.selectDate
                           : widget.value,
                       style: TextStyle(
                         fontSize: 15,

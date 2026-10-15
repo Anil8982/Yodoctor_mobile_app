@@ -2,10 +2,12 @@ import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 
 class ProfileTextField extends StatelessWidget {
   final String label;
   final IconData icon;
+  final String? hintText;
   final TextEditingController controller;
   final bool isEditing;
   final List<TextInputFormatter>? inputFormatters;
@@ -15,6 +17,7 @@ class ProfileTextField extends StatelessWidget {
     super.key,
     required this.label,
     required this.icon,
+    this.hintText,
     required this.controller,
     required this.isEditing,
     this.inputFormatters,
@@ -24,6 +27,7 @@ class ProfileTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return Focus(
       canRequestFocus: isEditing,
@@ -39,7 +43,7 @@ class ProfileTextField extends StatelessWidget {
 
           labelText: label,
           hintText: controller.text.trim().isEmpty
-              ? (isEditing ? 'Enter $label' : 'Not provided')
+              ? (isEditing ? hintText : l10n.notProvided)
               : null,
           labelStyle: TextStyle(
             color: !isEditing ? colorScheme.primary : colorScheme.secondary,

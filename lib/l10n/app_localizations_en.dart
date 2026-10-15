@@ -94,6 +94,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get patientSelf => 'Self';
 
   @override
+  String get notification => 'Notification';
+
+  @override
+  String get allCaughtUp => 'All caught up!';
+
+  @override
+  String get noNotificationsMatchFilter =>
+      'You don\'t have any notifications right now.';
+
+  @override
   String get selectLanguage => 'Select Language';
 
   @override
@@ -203,6 +213,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get availableDoctors => 'Available Doctors';
+
+  @override
+  String get noDoctorsFound => 'No doctors found';
+
+  @override
+  String get noDoctorsMatchFilter =>
+      'Try adjusting your search terms or location';
 
   @override
   String get consultation => 'Consultation';
@@ -420,6 +437,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Provide baseline biometrics to appear on your medical clearance.';
 
   @override
+  String get notProvided => 'Not Provided';
+
+  @override
   String get fullName => 'Full Name';
 
   @override
@@ -433,6 +453,27 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onlyAlphabetsAllowed => 'Only alphabets are allowed';
+
+  @override
+  String get emailAddress => 'Email Address';
+
+  @override
+  String get enterEmailAddress => 'Enter email address';
+
+  @override
+  String get pleaseEnterEmailAddress => 'Please enter email address';
+
+  @override
+  String get phoneNumber => 'Phone Number';
+
+  @override
+  String get enterPhoneNumber => 'Enter phone number';
+
+  @override
+  String get pleaseEnterPhoneNumber => 'Please enter phone number';
+
+  @override
+  String get phoneMinDigitsAllowed => 'Enter a valid 10-digit mobile number';
 
   @override
   String get dateOfBirth => 'Date of Birth';
@@ -638,6 +679,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get timelineLabel => 'Timeline';
+
+  @override
+  String get logoutButtonLabel => 'Log Out';
+
+  @override
+  String get endingSessionTitle => 'Ending Session?';
+
+  @override
+  String get logoutContent =>
+      'Are you sure you want to log out? You will need to re-authenticate to access your medical dashboard.';
 
   @override
   String get logoutDrawerItem => 'Logout';
