@@ -94,7 +94,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get patientSelf => 'स्वयं';
 
   @override
-  String get notification => 'नोटिफ़िकेशन ';
+  String get notification => 'नोटिफ़िकेशन';
 
   @override
   String get allCaughtUp => 'अभी कोई नया अपडेट नहीं!';
@@ -502,8 +502,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get additionalNotesForDoctor => 'डॉक्टर के लिए अतिरिक्त नोट्स';
 
   @override
-  String get additionalNotesHint =>
-      'विशिष्ट स्थितियों या पृष्ठभूमि विवरणों का वर्णन करें...';
+  String get additionalNotesHint => 'कोई विशेष निर्देश? (वैकल्पिक)';
 
   @override
   String get medicalDetails => 'चिकित्सा विवरण';
@@ -555,7 +554,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get dateOfBirth => 'जन्म तिथि';
 
   @override
-  String get selectDate => 'तिथि चुनें';
+  String get selectDate => 'तारीख चुनें';
 
   @override
   String get selectedDate => 'चुनी गई तारीख';
@@ -588,22 +587,22 @@ class AppLocalizationsHi extends AppLocalizations {
   String get height => 'ऊंचाई';
 
   @override
-  String get heightHint => 'उदा. 175';
+  String get heightHint => 'उदा. 170';
 
   @override
   String get enterValidNumber => 'एक मान्य संख्या दर्ज करें';
 
   @override
-  String get enterValidHeight => 'एक मान्य ऊंचाई दर्ज करें (1 - 300 सेमी)';
+  String get enterValidHeight => 'मान्य ऊंचाई दर्ज करें';
 
   @override
   String get weight => 'वजन';
 
   @override
-  String get weightHint => 'उदा. 70';
+  String get weightHint => 'उदा. 65';
 
   @override
-  String get enterValidWeight => 'एक मान्य वजन दर्ज करें (1 - 500 किग्रा)';
+  String get enterValidWeight => 'मान्य वजन दर्ज करें';
 
   @override
   String get knownMedicalConditions => 'ज्ञात चिकित्सा स्थितियां';
@@ -889,4 +888,446 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get invalidQrStructure => 'अमान्य QR संरचना।';
+
+  @override
+  String get bookCareService => 'केयर सेवा बुक करें';
+
+  @override
+  String get bookCareServiceDrawerItem => 'केयर सेवा बुक करें';
+
+  @override
+  String get homeCareHistoryDrawerItem => 'होम केयर हिस्ट्री';
+
+  @override
+  String get homeHealthcareServices => 'गृह स्वास्थ्य सेवाएं';
+
+  @override
+  String get scheduleNurseDesc =>
+      'नर्स, गृह देखभाल, या परामर्श अपने दरवाजे पर प्राप्त करें।';
+
+  @override
+  String get personalDetails => 'व्यक्तिगत विवरण';
+
+  @override
+  String get caregiverAndUrgency => 'देखभालकर्ता और तात्कालिकता';
+
+  @override
+  String get typeOfService => 'सेवा का प्रकार';
+
+  @override
+  String get medicalCondition => 'चिकित्सा स्थिति';
+
+  @override
+  String get serviceDuration => 'सेवा अवधि';
+
+  @override
+  String get timePreference => 'समय प्राथमिकता';
+
+  @override
+  String get additionalNotes => 'अतिरिक्त नोट्स';
+
+  @override
+  String get serviceTypeGeneralNursing => 'सामान्य नर्सिंग';
+
+  @override
+  String get serviceTypeElderlyCare => 'बुजुर्गों की देखभाल';
+
+  @override
+  String get serviceTypePostSurgery => 'सर्जरी के बाद देखभाल';
+
+  @override
+  String get serviceTypeIcuNurse => 'आईसीयू नर्स';
+
+  @override
+  String get serviceTypeAttendant => 'सहायक (अटेंडेंट)';
+
+  @override
+  String get timeSlotMorning => 'सुबह (6 पूर्वाह्न - 12 अपराह्न)';
+
+  @override
+  String get timeSlotAfternoon => 'दोपहर (12 अपराह्न - 5 अपराह्न)';
+
+  @override
+  String get timeSlotEvening => 'शाम (5 अपराह्न - 9 अपराह्न)';
+
+  @override
+  String get timeSlotNight => 'रात (9 अपराह्न - 6 पूर्वाह्न)';
+
+  @override
+  String get medicalConditionHint =>
+      'चिकित्सा स्थिति, लक्षणों का वर्णन करें...';
+
+  @override
+  String get submitBookingRequest => 'बुकिंग अनुरोध सबमिट करें';
+
+  @override
+  String get bookingSubmittedSuccess => 'बुकिंग सफलतापूर्वक सबमिट की गई';
+
+  @override
+  String get bookingRequestFailed => 'बुकिंग अनुरोध विफल रहा';
+
+  @override
+  String get pleaseSelectServiceDuration => 'कृपया सेवा अवधि चुनें';
+
+  @override
+  String get pleaseSelectStartDate => 'कृपया प्रारंभ तिथि चुनें';
+
+  @override
+  String get contactNumber => 'संपर्क नंबर';
+
+  @override
+  String get patientAge => 'मरीज़ की आयु';
+
+  @override
+  String get patientGender => 'मरीज़ का लिंग';
+
+  @override
+  String get address => 'पता';
+
+  @override
+  String get enterContactNumber => 'संपर्क नंबर दर्ज करें';
+
+  @override
+  String get enterAge => 'आयु दर्ज करें';
+
+  @override
+  String get enterCompleteAddress => 'पूरा पता दर्ज करें';
+
+  @override
+  String get fullNameRequired => 'पूरा नाम आवश्यक है';
+
+  @override
+  String get enterValidName => 'एक मान्य नाम दर्ज करें';
+
+  @override
+  String get phoneRequired => 'फोन नंबर आवश्यक है';
+
+  @override
+  String get phoneInvalidPrefix => 'फोन नंबर 6, 7, 8, या 9 से शुरू होना चाहिए';
+
+  @override
+  String get ageRequired => 'आयु आवश्यक है';
+
+  @override
+  String get ageMinValidation => 'आयु 0 से अधिक होनी चाहिए';
+
+  @override
+  String get ageMaxValidation => 'आयु 120 से अधिक नहीं हो सकती';
+
+  @override
+  String get selectGenderValidation => 'लिंग चुनें';
+
+  @override
+  String get addressRequired => 'पता आवश्यक है';
+
+  @override
+  String get addressMinValidation => 'पता कम से कम 5 अक्षर का होना चाहिए';
+
+  @override
+  String get useCurrentLocation => 'वर्तमान स्थान का उपयोग करें';
+
+  @override
+  String get preferredCaregiverGender => 'देखभालकर्ता लिंग प्राथमिकता';
+
+  @override
+  String get selectPreference => 'प्राथमिकता चुनें';
+
+  @override
+  String get noPreference => 'कोई प्राथमिकता नहीं';
+
+  @override
+  String get selectGenderPreferenceValidation => 'कृपया लिंग प्राथमिकता चुनें';
+
+  @override
+  String get needEmergencyService => 'आपातकालीन सेवा आवश्यक';
+
+  @override
+  String get within2Hours => '2 घंटे के भीतर';
+
+  @override
+  String get duration1Day => '1 दिन';
+
+  @override
+  String get durationMultipleDays => 'कई दिन';
+
+  @override
+  String get durationWeekly => 'साप्ताहिक';
+
+  @override
+  String get durationMonthly => 'मासिक';
+
+  @override
+  String get numberOfDays => 'दिनों की संख्या';
+
+  @override
+  String get enterDays => 'दिन दर्ज करें';
+
+  @override
+  String get invalidDays => 'अमान्य दिन';
+
+  @override
+  String get max365Days => 'अधिकतम 365 दिन';
+
+  @override
+  String get startDate => 'प्रारंभ तिथि';
+
+  @override
+  String get homeCareHistory => 'होम केयर हिस्ट्री';
+
+  @override
+  String get noHomeCareHistoryYet => 'अभी तक कोई होम केयर हिस्ट्री नहीं';
+
+  @override
+  String get noHomeCareHistoryDesc =>
+      'विशेषज्ञों के साथ सत्र निर्धारित करने के बाद आपकी अनुरोधित सेवाएं यहां दिखाई देंगी।';
+
+  @override
+  String get emergencyBadge => 'आपातकालीन';
+
+  @override
+  String get tapForFullDetails => 'पूर्ण विवरण के लिए टैप करें';
+
+  @override
+  String get cancelBooking => 'बुकिंग रद्द करें';
+
+  @override
+  String get homeCareService => 'होम केयर सेवा';
+
+  @override
+  String yearsOld(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count वर्ष',
+      one: '1 वर्ष',
+      zero: '0 वर्ष',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String daysCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count दिन',
+      one: '1 दिन',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get homeCareFilterAll => 'सभी';
+
+  @override
+  String get homeCareFilterPending => 'लंबित';
+
+  @override
+  String get homeCareFilterConfirmed => 'पुष्ट';
+
+  @override
+  String get homeCareFilterCompleted => 'पूर्ण';
+
+  @override
+  String get homeCareFilterCancelled => 'रद्द';
+
+  @override
+  String get bookingDetails => 'बुकिंग विवरण';
+
+  @override
+  String get patientInformation => 'मरीज़ की जानकारी';
+
+  @override
+  String get patientName => 'मरीज़ का नाम';
+
+  @override
+  String get ageGender => 'आयु / लिंग';
+
+  @override
+  String get preference => 'प्राथमिकता';
+
+  @override
+  String get serviceInformation => 'सेवा की जानकारी';
+
+  @override
+  String get serviceType => 'सेवा प्रकार';
+
+  @override
+  String get durationType => 'अवधि प्रकार';
+
+  @override
+  String get timeSlot => 'समय स्लॉट';
+
+  @override
+  String get preferredDate => 'पसंदीदा तारीख';
+
+  @override
+  String get locationAndNotes => 'स्थान और नोट्स';
+
+  @override
+  String get serviceAddress => 'सेवा का पता';
+
+  @override
+  String get standardBooking => 'मानक';
+
+  @override
+  String get failedToLoadDetails => 'विवरण लोड करने में विफल';
+
+  @override
+  String get unableToRetrieveBookingDetails =>
+      'बुकिंग विवरण लोड करने में असमर्थ। कृपया बाद में पुनः प्रयास करें।';
+
+  @override
+  String get cancelBookingConfirmation =>
+      'क्या आप वाकई इस होम केयर बुकिंग को रद्द करना चाहते हैं?';
+
+  @override
+  String get yesCancel => 'हाँ, रद्द करें';
+
+  @override
+  String get noKeep => 'नहीं';
+
+  @override
+  String get cancellingBooking => 'बुकिंग रद्द की जा रही है...';
+
+  @override
+  String get bookingCancelledSuccess => 'बुकिंग सफलतापूर्वक रद्द कर दी गई';
+
+  @override
+  String get bookNewCareService => 'नई देखभाल सेवा बुक करें';
+
+  @override
+  String get regularBooking => 'सामान्य';
+
+  @override
+  String get familyMembers => 'परिवार के सदस्य';
+
+  @override
+  String get familyHealthNetwork => 'फैमिली हेल्थ नेटवर्क';
+
+  @override
+  String get familyHealthNetworkSubtitle =>
+      'अपने लिंक किए गए परिवार के सदस्यों के मेडिकल डेटा की निगरानी और प्रबंधन करें।';
+
+  @override
+  String activeProfilesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count प्रोफ़ाइल सक्रिय',
+      one: '1 प्रोफ़ाइल सक्रिय',
+      zero: '0 प्रोफ़ाइल सक्रिय',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get addMember => 'सदस्य जोड़ें';
+
+  @override
+  String get addFamilyMember => 'परिवार का सदस्य जोड़ें';
+
+  @override
+  String get chooseMember => 'सदस्य चुनें';
+
+  @override
+  String get addNewMember => 'नया सदस्य जोड़ें';
+
+  @override
+  String get updateMember => 'सदस्य अपडेट करें';
+
+  @override
+  String get memberAddedSuccess => 'सदस्य सफलतापूर्वक जोड़ा गया।';
+
+  @override
+  String get memberUpdatedSuccess => 'सदस्य सफलतापूर्वक अपडेट किया गया।';
+
+  @override
+  String get noFamilyMembersYet => 'अभी तक कोई परिवार का सदस्य नहीं';
+
+  @override
+  String get createFamilyProfilesDesc =>
+      'अपने परिवार के सदस्यों के स्वास्थ्य रिकॉर्ड को आसानी से प्रबंधित करने के लिए प्रोफ़ाइल बनाएं।';
+
+  @override
+  String get age => 'आयु';
+
+  @override
+  String get heightCmLabel => 'ऊंचाई (सेमी)';
+
+  @override
+  String get weightKgLabel => 'वजन (किग्रा)';
+
+  @override
+  String get remove => 'हटाएं';
+
+  @override
+  String get update => 'अपडेट करें';
+
+  @override
+  String get saveChanges => 'परिवर्तन सहेजें';
+
+  @override
+  String get saveMember => 'सदस्य सहेजें';
+
+  @override
+  String get relation => 'संबंध';
+
+  @override
+  String get selectRelation => 'संबंध चुनें';
+
+  @override
+  String get relationFather => 'पिता';
+
+  @override
+  String get relationMother => 'माता';
+
+  @override
+  String get relationSpouse => 'पति/पत्नी';
+
+  @override
+  String get relationSon => 'बेटा';
+
+  @override
+  String get relationDaughter => 'बेटी';
+
+  @override
+  String get relationBrother => 'भाई';
+
+  @override
+  String get relationSister => 'बहन';
+
+  @override
+  String get relationOther => 'अन्य';
+
+  @override
+  String get pleaseEnterFullName => 'कृपया पूरा नाम दर्ज करें';
+
+  @override
+  String get nameMinLengthError => 'नाम में कम से कम 2 अक्षर होने चाहिए';
+
+  @override
+  String get pleaseSelectGender => 'कृपया लिंग चुनें';
+
+  @override
+  String get selectDateOfBirth => 'जन्म तिथि चुनें';
+
+  @override
+  String get pleaseSelectRelation => 'कृपया संबंध चुनें';
+
+  @override
+  String get heightRangeError => 'ऊंचाई 30 और 250 सेमी के बीच होनी चाहिए';
+
+  @override
+  String get weightRangeError => 'वजन 2 और 350 किग्रा के बीच होना चाहिए';
+
+  @override
+  String heightInCm(String height) {
+    return '$height सेमी';
+  }
+
+  @override
+  String weightInKg(String weight) {
+    return '$weight किग्रा';
+  }
 }

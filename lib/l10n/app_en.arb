@@ -1144,5 +1144,623 @@
   "invalidQrStructure": "Invalid QR structure.",
   "@invalidQrStructure": {
     "description": "Error when QR format/structure is invalid"
+  },
+  "bookCareService": "Book a Care Service",
+  "@bookCareService": {
+    "description": "Title for Book a Care Service screen"
+  },
+  "bookCareServiceDrawerItem": "Book Care Service",
+  "@bookCareServiceDrawerItem": {
+    "description": "Drawer item label for Book Care Service"
+  },
+  "homeCareHistoryDrawerItem": "Home Care History",
+  "@homeCareHistoryDrawerItem": {
+    "description": "Drawer item label for Home Care History"
+  },
+  "homeHealthcareServices": "HOME HEALTHCARE SERVICES",
+  "@homeHealthcareServices": {
+    "description": "Category badge on Book Care Service screen"
+  },
+  "scheduleNurseDesc": "Schedule a nurse, home care, or consultation at your doorstep.",
+  "@scheduleNurseDesc": {
+    "description": "Subtitle describing home care booking"
+  },
+  "personalDetails": "Personal Details",
+  "@personalDetails": {
+    "description": "Personal Details section header"
+  },
+  "caregiverAndUrgency": "Caregiver & Urgency",
+  "@caregiverAndUrgency": {
+    "description": "Caregiver & Urgency section header"
+  },
+  "typeOfService": "Type of Service",
+  "@typeOfService": {
+    "description": "Type of Service section header"
+  },
+  "medicalCondition": "Medical Condition",
+  "@medicalCondition": {
+    "description": "Medical Condition field/section header"
+  },
+  "serviceDuration": "Service Duration",
+  "@serviceDuration": {
+    "description": "Service Duration section header"
+  },
+  "timePreference": "Time Preference",
+  "@timePreference": {
+    "description": "Time Preference section header"
+  },
+  "additionalNotes": "Additional Notes",
+  "@additionalNotes": {
+    "description": "Additional Notes field/section header"
+  },
+  "serviceTypeGeneralNursing": "General Nursing",
+  "@serviceTypeGeneralNursing": {
+    "description": "General Nursing service option"
+  },
+  "serviceTypeElderlyCare": "Elderly Care",
+  "@serviceTypeElderlyCare": {
+    "description": "Elderly Care service option"
+  },
+  "serviceTypePostSurgery": "Post Surgery",
+  "@serviceTypePostSurgery": {
+    "description": "Post Surgery service option"
+  },
+  "serviceTypeIcuNurse": "ICU Nurse",
+  "@serviceTypeIcuNurse": {
+    "description": "ICU Nurse service option"
+  },
+  "serviceTypeAttendant": "Attendant",
+  "@serviceTypeAttendant": {
+    "description": "Attendant service option"
+  },
+  "timeSlotMorning": "Morning (6am - 12pm)",
+  "@timeSlotMorning": {
+    "description": "Morning time slot option"
+  },
+  "timeSlotAfternoon": "Afternoon (12pm - 5pm)",
+  "@timeSlotAfternoon": {
+    "description": "Afternoon time slot option"
+  },
+  "timeSlotEvening": "Evening (5pm - 9pm)",
+  "@timeSlotEvening": {
+    "description": "Evening time slot option"
+  },
+  "timeSlotNight": "Night (9pm - 6am)",
+  "@timeSlotNight": {
+    "description": "Night time slot option"
+  },
+  "medicalConditionHint": "Describe medical condition, symptoms...",
+  "@medicalConditionHint": {
+    "description": "Hint text for medical condition field"
+  },
+  "additionalNotesHint": "Any special instructions? (Optional)",
+  "@additionalNotesHint": {
+    "description": "Hint text for additional notes field"
+  },
+  "submitBookingRequest": "Submit Booking Request",
+  "@submitBookingRequest": {
+    "description": "Button to submit booking request"
+  },
+  "bookingSubmittedSuccess": "Booking submitted successfully",
+  "@bookingSubmittedSuccess": {
+    "description": "Success message when booking is submitted"
+  },
+  "bookingRequestFailed": "Booking request failed",
+  "@bookingRequestFailed": {
+    "description": "Error message when booking submission fails"
+  },
+  "pleaseSelectServiceDuration": "Please select service duration",
+  "@pleaseSelectServiceDuration": {
+    "description": "Validation message when duration is empty"
+  },
+  "pleaseSelectStartDate": "Please select start date",
+  "@pleaseSelectStartDate": {
+    "description": "Validation message when start date is not selected"
+  },
+  "contactNumber": "Contact Number",
+  "@contactNumber": {
+    "description": "Contact number field label"
+  },
+  "patientAge": "Patient Age",
+  "@patientAge": {
+    "description": "Patient age field label"
+  },
+  "patientGender": "Patient Gender",
+  "@patientGender": {
+    "description": "Patient gender field label"
+  },
+  "address": "Address",
+  "@address": {
+    "description": "Address field label"
+  },
+  "enterContactNumber": "Enter contact number",
+  "@enterContactNumber": {
+    "description": "Contact number field hint"
+  },
+  "enterAge": "Enter age",
+  "@enterAge": {
+    "description": "Patient age field hint"
+  },
+  "enterCompleteAddress": "Enter complete address",
+  "@enterCompleteAddress": {
+    "description": "Address field hint"
+  },
+  "fullNameRequired": "Full name required",
+  "@fullNameRequired": {
+    "description": "Validation message when full name is empty"
+  },
+  "enterValidName": "Enter a valid name",
+  "@enterValidName": {
+    "description": "Validation message for invalid name"
+  },
+  "onlyAlphabetsAllowed": "Only alphabets are allowed",
+  "@onlyAlphabetsAllowed": {
+    "description": "Validation message when non-alphabets are entered in name"
+  },
+  "phoneRequired": "Phone number is required",
+  "@phoneRequired": {
+    "description": "Validation message when phone is empty"
+  },
+  "phoneInvalidPrefix": "Phone no. must start with 6, 7, 8, or 9",
+  "@phoneInvalidPrefix": {
+    "description": "Validation message when phone has invalid starting digit"
+  },
+  "ageRequired": "Age is required",
+  "@ageRequired": {
+    "description": "Validation message when age is empty"
+  },
+  "enterValidNumber": "Enter a valid number",
+  "@enterValidNumber": {
+    "description": "Validation message when age is not a valid number"
+  },
+  "ageMinValidation": "Age must be greater than 0",
+  "@ageMinValidation": {
+    "description": "Validation message when age <= 0"
+  },
+  "ageMaxValidation": "Age cannot be more than 120",
+  "@ageMaxValidation": {
+    "description": "Validation message when age > 120"
+  },
+  "selectGenderValidation": "Select gender",
+  "@selectGenderValidation": {
+    "description": "Validation message when gender is not selected"
+  },
+  "addressRequired": "Address is required",
+  "@addressRequired": {
+    "description": "Validation message when address is empty"
+  },
+  "addressMinValidation": "Address at least 5 characters",
+  "@addressMinValidation": {
+    "description": "Validation message when address is too short"
+  },
+  "useCurrentLocation": "Use Current Location",
+  "@useCurrentLocation": {
+    "description": "Button to autofill location using GPS"
+  },
+  "preferredCaregiverGender": "Preferred Caregiver Gender",
+  "@preferredCaregiverGender": {
+    "description": "Label for caregiver gender preference"
+  },
+  "selectPreference": "Select Preference",
+  "@selectPreference": {
+    "description": "Hint for caregiver gender preference"
+  },
+  "noPreference": "No Preference",
+  "@noPreference": {
+    "description": "Option for no caregiver gender preference"
+  },
+  "selectGenderPreferenceValidation": "Please select gender preference",
+  "@selectGenderPreferenceValidation": {
+    "description": "Validation message when caregiver gender is empty"
+  },
+  "needEmergencyService": "Need Emergency Service",
+  "@needEmergencyService": {
+    "description": "Checkbox title for emergency service"
+  },
+  "within2Hours": "Within 2 hours",
+  "@within2Hours": {
+    "description": "Subtitle explaining emergency turnaround time"
+  },
+  "duration1Day": "1 Day",
+  "@duration1Day": {
+    "description": "1 Day duration option"
+  },
+  "durationMultipleDays": "Multiple Days",
+  "@durationMultipleDays": {
+    "description": "Multiple Days duration option"
+  },
+  "durationWeekly": "Weekly",
+  "@durationWeekly": {
+    "description": "Weekly duration option"
+  },
+  "durationMonthly": "Monthly",
+  "@durationMonthly": {
+    "description": "Monthly duration option"
+  },
+  "numberOfDays": "Number of Days",
+  "@numberOfDays": {
+    "description": "Label for number of days field"
+  },
+  "enterDays": "Enter days",
+  "@enterDays": {
+    "description": "Hint for number of days field"
+  },
+  "requiredField": "Required",
+  "@requiredField": {
+    "description": "Generic required validation text"
+  },
+  "invalidDays": "Invalid days",
+  "@invalidDays": {
+    "description": "Validation message for invalid days value"
+  },
+  "max365Days": "Max 365 days",
+  "@max365Days": {
+    "description": "Validation message when days exceed 365"
+  },
+  "startDate": "Start Date",
+  "@startDate": {
+    "description": "Label for start date field"
+  },
+  "selectDate": "Select Date",
+  "@selectDate": {
+    "description": "Hint for date picker field"
+  },
+  "homeCareHistory": "Home Care History",
+  "@homeCareHistory": {
+    "description": "Title for Home Care History screen"
+  },
+  "noHomeCareHistoryYet": "No Home Care History Yet",
+  "@noHomeCareHistoryYet": {
+    "description": "Title when home care history is empty"
+  },
+  "noHomeCareHistoryDesc": "Your requested home care services will appear here once you schedule a session with our specialists.",
+  "@noHomeCareHistoryDesc": {
+    "description": "Description when home care history is empty"
+  },
+  "emergencyBadge": "Emergency",
+  "@emergencyBadge": {
+    "description": "Badge label for emergency booking"
+  },
+  "tapForFullDetails": "Tap for full details",
+  "@tapForFullDetails": {
+    "description": "Hint on card indicating it can be tapped"
+  },
+  "cancelBooking": "Cancel Booking",
+  "@cancelBooking": {
+    "description": "Button and dialog title to cancel booking"
+  },
+  "homeCareService": "Home Care Service",
+  "@homeCareService": {
+    "description": "Fallback service title"
+  },
+  "yearsOld": "{count, plural, =0{0 Years} =1{1 Year} other{{count} Years}}",
+  "@yearsOld": {
+    "description": "Age with years suffix",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "25"
+      }
+    }
+  },
+  "daysCount": "{count, plural, =1{1 Day} other{{count} Days}}",
+  "@daysCount": {
+    "description": "Number of days with days suffix",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "homeCareFilterAll": "ALL",
+  "@homeCareFilterAll": {
+    "description": "All filter option for home care history"
+  },
+  "homeCareFilterPending": "PENDING",
+  "@homeCareFilterPending": {
+    "description": "Pending filter option for home care history"
+  },
+  "homeCareFilterConfirmed": "CONFIRMED",
+  "@homeCareFilterConfirmed": {
+    "description": "Confirmed filter option for home care history"
+  },
+  "homeCareFilterCompleted": "COMPLETED",
+  "@homeCareFilterCompleted": {
+    "description": "Completed filter option for home care history"
+  },
+  "homeCareFilterCancelled": "CANCELLED",
+  "@homeCareFilterCancelled": {
+    "description": "Cancelled filter option for home care history"
+  },
+  "bookingDetails": "Booking Details",
+  "@bookingDetails": {
+    "description": "Header for booking details sheet"
+  },
+  "patientInformation": "Patient Information",
+  "@patientInformation": {
+    "description": "Patient information section header"
+  },
+  "patientName": "Patient Name",
+  "@patientName": {
+    "description": "Patient name label"
+  },
+  "ageGender": "Age / Gender",
+  "@ageGender": {
+    "description": "Combined age and gender label"
+  },
+  "preference": "Preference",
+  "@preference": {
+    "description": "Caregiver preference label"
+  },
+  "contact": "Contact",
+  "@contact": {
+    "description": "Contact number label"
+  },
+  "serviceInformation": "Service Information",
+  "@serviceInformation": {
+    "description": "Service information section header"
+  },
+  "serviceType": "Service Type",
+  "@serviceType": {
+    "description": "Service type label"
+  },
+  "durationType": "Duration Type",
+  "@durationType": {
+    "description": "Duration type label"
+  },
+  "timeSlot": "Time Slot",
+  "@timeSlot": {
+    "description": "Time slot label"
+  },
+  "preferredDate": "Preferred Date",
+  "@preferredDate": {
+    "description": "Preferred date label"
+  },
+  "locationAndNotes": "Location & Notes",
+  "@locationAndNotes": {
+    "description": "Location & Notes section header"
+  },
+  "serviceAddress": "Service Address",
+  "@serviceAddress": {
+    "description": "Service address label"
+  },
+  "standardBooking": "Standard",
+  "@standardBooking": {
+    "description": "Standard non-emergency booking badge"
+  },
+  "failedToLoadDetails": "Failed to Load Details",
+  "@failedToLoadDetails": {
+    "description": "Error header when booking details cannot be loaded"
+  },
+  "unableToRetrieveBookingDetails": "Unable to retrieve complete booking details. Please try again later.",
+  "@unableToRetrieveBookingDetails": {
+    "description": "Error message when booking details cannot be loaded"
+  },
+  "cancelBookingConfirmation": "Are you sure you want to cancel this home care booking?",
+  "@cancelBookingConfirmation": {
+    "description": "Confirmation message when canceling a home care booking"
+  },
+  "yesCancel": "Yes, Cancel",
+  "@yesCancel": {
+    "description": "Confirmation button to cancel"
+  },
+  "noKeep": "No",
+  "@noKeep": {
+    "description": "Cancel button to keep booking"
+  },
+  "cancellingBooking": "Cancelling booking...",
+  "@cancellingBooking": {
+    "description": "Loading message while cancellation is in progress"
+  },
+  "bookingCancelledSuccess": "Booking cancelled successfully",
+  "@bookingCancelledSuccess": {
+    "description": "Success message when booking is cancelled"
+  },
+  "bookNewCareService": "Book New Care Service",
+  "@bookNewCareService": {
+    "description": "Button to book new care service"
+  },
+  "regularBooking": "Regular",
+  "@regularBooking": {
+    "description": "Regular non-emergency booking badge"
+  },
+  "familyMembers": "Family Members",
+  "@familyMembers": {
+    "description": "Family members screen title"
+  },
+  "familyHealthNetwork": "Family Health Network",
+  "@familyHealthNetwork": {
+    "description": "Header title on family members screen"
+  },
+  "familyHealthNetworkSubtitle": "Monitor and manage medical data for your linked family profiles.",
+  "@familyHealthNetworkSubtitle": {
+    "description": "Subtitle describing family health network"
+  },
+  "activeProfilesCount": "{count, plural, =0{0 profiles active} =1{1 profile active} other{{count} profiles active}}",
+  "@activeProfilesCount": {
+    "description": "Active linked family member profile count",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "addMember": "Add Member",
+  "@addMember": {
+    "description": "Floating action button to add family member"
+  },
+  "addFamilyMember": "Add Family Member",
+  "@addFamilyMember": {
+    "description": "Button to add family member in selection sheet"
+  },
+  "chooseMember": "Choose Member",
+  "@chooseMember": {
+    "description": "Dropdown placeholder to choose family member"
+  },
+  "addNewMember": "Add New Member",
+  "@addNewMember": {
+    "description": "Screen header when adding a new family member"
+  },
+  "updateMember": "Update Member",
+  "@updateMember": {
+    "description": "Screen header when updating an existing family member"
+  },
+  "memberAddedSuccess": "Member added successfully.",
+  "@memberAddedSuccess": {
+    "description": "Snackbar message when a family member is added"
+  },
+  "memberUpdatedSuccess": "Member updated successfully.",
+  "@memberUpdatedSuccess": {
+    "description": "Snackbar message when a family member is updated"
+  },
+  "noFamilyMembersYet": "No family members yet",
+  "@noFamilyMembersYet": {
+    "description": "Empty state title when no family members exist"
+  },
+  "createFamilyProfilesDesc": "Create profiles for your family members to manage their health records easily.",
+  "@createFamilyProfilesDesc": {
+    "description": "Empty state description for family members"
+  },
+  "age": "Age",
+  "@age": {
+    "description": "Age label"
+  },
+  "height": "Height",
+  "@height": {
+    "description": "Height label"
+  },
+  "weight": "Weight",
+  "@weight": {
+    "description": "Weight label"
+  },
+  "heightCmLabel": "Height (cm)",
+  "@heightCmLabel": {
+    "description": "Height field label with unit"
+  },
+  "weightKgLabel": "Weight (kg)",
+  "@weightKgLabel": {
+    "description": "Weight field label with unit"
+  },
+  "heightHint": "e.g. 170",
+  "@heightHint": {
+    "description": "Hint for height field"
+  },
+  "weightHint": "e.g. 65",
+  "@weightHint": {
+    "description": "Hint for weight field"
+  },
+  "remove": "Remove",
+  "@remove": {
+    "description": "Remove button label"
+  },
+  "update": "Update",
+  "@update": {
+    "description": "Update button label"
+  },
+  "saveChanges": "Save Changes",
+  "@saveChanges": {
+    "description": "Button label to save updated member details"
+  },
+  "saveMember": "Save Member",
+  "@saveMember": {
+    "description": "Button label to save new member"
+  },
+  "relation": "Relation",
+  "@relation": {
+    "description": "Relation label"
+  },
+  "selectRelation": "Select Relation",
+  "@selectRelation": {
+    "description": "Select relation dropdown hint"
+  },
+  "relationFather": "Father",
+  "@relationFather": {
+    "description": "Father relation label"
+  },
+  "relationMother": "Mother",
+  "@relationMother": {
+    "description": "Mother relation label"
+  },
+  "relationSpouse": "Spouse",
+  "@relationSpouse": {
+    "description": "Spouse relation label"
+  },
+  "relationSon": "Son",
+  "@relationSon": {
+    "description": "Son relation label"
+  },
+  "relationDaughter": "Daughter",
+  "@relationDaughter": {
+    "description": "Daughter relation label"
+  },
+  "relationBrother": "Brother",
+  "@relationBrother": {
+    "description": "Brother relation label"
+  },
+  "relationSister": "Sister",
+  "@relationSister": {
+    "description": "Sister relation label"
+  },
+  "relationOther": "Other",
+  "@relationOther": {
+    "description": "Other relation label"
+  },
+  "pleaseEnterFullName": "Please enter full name",
+  "@pleaseEnterFullName": {
+    "description": "Validation error when name is empty"
+  },
+  "nameMinLengthError": "Name should have at least 2 characters",
+  "@nameMinLengthError": {
+    "description": "Validation error when name has fewer than 2 characters"
+  },
+  "pleaseSelectGender": "Please select gender",
+  "@pleaseSelectGender": {
+    "description": "Validation error when gender is not selected"
+  },
+  "selectDateOfBirth": "Select date of birth",
+  "@selectDateOfBirth": {
+    "description": "Hint for date of birth field"
+  },
+  "pleaseSelectRelation": "Please select relation",
+  "@pleaseSelectRelation": {
+    "description": "Validation error when relation is not selected"
+  },
+  "enterValidHeight": "Enter a valid height",
+  "@enterValidHeight": {
+    "description": "Validation error when height is invalid"
+  },
+  "heightRangeError": "Height should be between 30 and 250 cm",
+  "@heightRangeError": {
+    "description": "Validation error when height is out of range"
+  },
+  "enterValidWeight": "Enter a valid weight",
+  "@enterValidWeight": {
+    "description": "Validation error when weight is invalid"
+  },
+  "weightRangeError": "Weight should be between 2 and 350 kg",
+  "@weightRangeError": {
+    "description": "Validation error when weight is out of range"
+  },
+  "heightInCm": "{height} cm",
+  "@heightInCm": {
+    "description": "Height with cm unit",
+    "placeholders": {
+      "height": {
+        "type": "String",
+        "example": "170"
+      }
+    }
+  },
+  "weightInKg": "{weight} kg",
+  "@weightInKg": {
+    "description": "Weight with kg unit",
+    "placeholders": {
+      "weight": {
+        "type": "String",
+        "example": "65"
+      }
+    }
   }
 }

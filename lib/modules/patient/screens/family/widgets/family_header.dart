@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 
 import '../../../../../core/utils/app_spacing.dart';
 
@@ -11,6 +12,7 @@ class FamilyHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final TextTheme textTheme = Theme.of(context).textTheme;
+    final l10n = AppLocalizations.of(context);
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.xl),
@@ -25,7 +27,7 @@ class FamilyHeader extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           Text(
-            'Family Health Network',
+            l10n?.familyHealthNetwork ?? 'Family Health Network',
             style: textTheme.titleLarge?.copyWith(
               color: colorScheme.onPrimary,
               fontWeight: FontWeight.w900,
@@ -34,7 +36,8 @@ class FamilyHeader extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            'Monitor and manage medical data for your linked family profiles.',
+            l10n?.familyHealthNetworkSubtitle ??
+                'Monitor and manage medical data for your linked family profiles.',
             style: textTheme.bodySmall?.copyWith(
               color: colorScheme.onPrimary.withValues(alpha: 0.85),
               height: 1.3,
@@ -63,7 +66,8 @@ class FamilyHeader extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  '$membersCount profiles active',
+                  l10n?.activeProfilesCount(membersCount) ??
+                      '$membersCount profiles active',
                   style: textTheme.bodySmall?.copyWith(
                     color: colorScheme.onPrimary,
                     fontWeight: FontWeight.w700,

@@ -504,8 +504,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get additionalNotesForDoctor => 'Additional Notes For Doctor';
 
   @override
-  String get additionalNotesHint =>
-      'Describe specific conditions or background details contextually...';
+  String get additionalNotesHint => 'Any special instructions? (Optional)';
 
   @override
   String get medicalDetails => 'Medical Details';
@@ -590,22 +589,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get height => 'Height';
 
   @override
-  String get heightHint => 'e.g. 175';
+  String get heightHint => 'e.g. 170';
 
   @override
   String get enterValidNumber => 'Enter a valid number';
 
   @override
-  String get enterValidHeight => 'Enter a valid height (1 - 300 cm)';
+  String get enterValidHeight => 'Enter a valid height';
 
   @override
   String get weight => 'Weight';
 
   @override
-  String get weightHint => 'e.g. 70';
+  String get weightHint => 'e.g. 65';
 
   @override
-  String get enterValidWeight => 'Enter a valid weight (1 - 500 kg)';
+  String get enterValidWeight => 'Enter a valid weight';
 
   @override
   String get knownMedicalConditions => 'Known Medical Conditions';
@@ -888,4 +887,446 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get invalidQrStructure => 'Invalid QR structure.';
+
+  @override
+  String get bookCareService => 'Book a Care Service';
+
+  @override
+  String get bookCareServiceDrawerItem => 'Book Care Service';
+
+  @override
+  String get homeCareHistoryDrawerItem => 'Home Care History';
+
+  @override
+  String get homeHealthcareServices => 'HOME HEALTHCARE SERVICES';
+
+  @override
+  String get scheduleNurseDesc =>
+      'Schedule a nurse, home care, or consultation at your doorstep.';
+
+  @override
+  String get personalDetails => 'Personal Details';
+
+  @override
+  String get caregiverAndUrgency => 'Caregiver & Urgency';
+
+  @override
+  String get typeOfService => 'Type of Service';
+
+  @override
+  String get medicalCondition => 'Medical Condition';
+
+  @override
+  String get serviceDuration => 'Service Duration';
+
+  @override
+  String get timePreference => 'Time Preference';
+
+  @override
+  String get additionalNotes => 'Additional Notes';
+
+  @override
+  String get serviceTypeGeneralNursing => 'General Nursing';
+
+  @override
+  String get serviceTypeElderlyCare => 'Elderly Care';
+
+  @override
+  String get serviceTypePostSurgery => 'Post Surgery';
+
+  @override
+  String get serviceTypeIcuNurse => 'ICU Nurse';
+
+  @override
+  String get serviceTypeAttendant => 'Attendant';
+
+  @override
+  String get timeSlotMorning => 'Morning (6am - 12pm)';
+
+  @override
+  String get timeSlotAfternoon => 'Afternoon (12pm - 5pm)';
+
+  @override
+  String get timeSlotEvening => 'Evening (5pm - 9pm)';
+
+  @override
+  String get timeSlotNight => 'Night (9pm - 6am)';
+
+  @override
+  String get medicalConditionHint => 'Describe medical condition, symptoms...';
+
+  @override
+  String get submitBookingRequest => 'Submit Booking Request';
+
+  @override
+  String get bookingSubmittedSuccess => 'Booking submitted successfully';
+
+  @override
+  String get bookingRequestFailed => 'Booking request failed';
+
+  @override
+  String get pleaseSelectServiceDuration => 'Please select service duration';
+
+  @override
+  String get pleaseSelectStartDate => 'Please select start date';
+
+  @override
+  String get contactNumber => 'Contact Number';
+
+  @override
+  String get patientAge => 'Patient Age';
+
+  @override
+  String get patientGender => 'Patient Gender';
+
+  @override
+  String get address => 'Address';
+
+  @override
+  String get enterContactNumber => 'Enter contact number';
+
+  @override
+  String get enterAge => 'Enter age';
+
+  @override
+  String get enterCompleteAddress => 'Enter complete address';
+
+  @override
+  String get fullNameRequired => 'Full name required';
+
+  @override
+  String get enterValidName => 'Enter a valid name';
+
+  @override
+  String get phoneRequired => 'Phone number is required';
+
+  @override
+  String get phoneInvalidPrefix => 'Phone no. must start with 6, 7, 8, or 9';
+
+  @override
+  String get ageRequired => 'Age is required';
+
+  @override
+  String get ageMinValidation => 'Age must be greater than 0';
+
+  @override
+  String get ageMaxValidation => 'Age cannot be more than 120';
+
+  @override
+  String get selectGenderValidation => 'Select gender';
+
+  @override
+  String get addressRequired => 'Address is required';
+
+  @override
+  String get addressMinValidation => 'Address at least 5 characters';
+
+  @override
+  String get useCurrentLocation => 'Use Current Location';
+
+  @override
+  String get preferredCaregiverGender => 'Preferred Caregiver Gender';
+
+  @override
+  String get selectPreference => 'Select Preference';
+
+  @override
+  String get noPreference => 'No Preference';
+
+  @override
+  String get selectGenderPreferenceValidation =>
+      'Please select gender preference';
+
+  @override
+  String get needEmergencyService => 'Need Emergency Service';
+
+  @override
+  String get within2Hours => 'Within 2 hours';
+
+  @override
+  String get duration1Day => '1 Day';
+
+  @override
+  String get durationMultipleDays => 'Multiple Days';
+
+  @override
+  String get durationWeekly => 'Weekly';
+
+  @override
+  String get durationMonthly => 'Monthly';
+
+  @override
+  String get numberOfDays => 'Number of Days';
+
+  @override
+  String get enterDays => 'Enter days';
+
+  @override
+  String get invalidDays => 'Invalid days';
+
+  @override
+  String get max365Days => 'Max 365 days';
+
+  @override
+  String get startDate => 'Start Date';
+
+  @override
+  String get homeCareHistory => 'Home Care History';
+
+  @override
+  String get noHomeCareHistoryYet => 'No Home Care History Yet';
+
+  @override
+  String get noHomeCareHistoryDesc =>
+      'Your requested home care services will appear here once you schedule a session with our specialists.';
+
+  @override
+  String get emergencyBadge => 'Emergency';
+
+  @override
+  String get tapForFullDetails => 'Tap for full details';
+
+  @override
+  String get cancelBooking => 'Cancel Booking';
+
+  @override
+  String get homeCareService => 'Home Care Service';
+
+  @override
+  String yearsOld(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Years',
+      one: '1 Year',
+      zero: '0 Years',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String daysCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Days',
+      one: '1 Day',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get homeCareFilterAll => 'ALL';
+
+  @override
+  String get homeCareFilterPending => 'PENDING';
+
+  @override
+  String get homeCareFilterConfirmed => 'CONFIRMED';
+
+  @override
+  String get homeCareFilterCompleted => 'COMPLETED';
+
+  @override
+  String get homeCareFilterCancelled => 'CANCELLED';
+
+  @override
+  String get bookingDetails => 'Booking Details';
+
+  @override
+  String get patientInformation => 'Patient Information';
+
+  @override
+  String get patientName => 'Patient Name';
+
+  @override
+  String get ageGender => 'Age / Gender';
+
+  @override
+  String get preference => 'Preference';
+
+  @override
+  String get serviceInformation => 'Service Information';
+
+  @override
+  String get serviceType => 'Service Type';
+
+  @override
+  String get durationType => 'Duration Type';
+
+  @override
+  String get timeSlot => 'Time Slot';
+
+  @override
+  String get preferredDate => 'Preferred Date';
+
+  @override
+  String get locationAndNotes => 'Location & Notes';
+
+  @override
+  String get serviceAddress => 'Service Address';
+
+  @override
+  String get standardBooking => 'Standard';
+
+  @override
+  String get failedToLoadDetails => 'Failed to Load Details';
+
+  @override
+  String get unableToRetrieveBookingDetails =>
+      'Unable to retrieve complete booking details. Please try again later.';
+
+  @override
+  String get cancelBookingConfirmation =>
+      'Are you sure you want to cancel this home care booking?';
+
+  @override
+  String get yesCancel => 'Yes, Cancel';
+
+  @override
+  String get noKeep => 'No';
+
+  @override
+  String get cancellingBooking => 'Cancelling booking...';
+
+  @override
+  String get bookingCancelledSuccess => 'Booking cancelled successfully';
+
+  @override
+  String get bookNewCareService => 'Book New Care Service';
+
+  @override
+  String get regularBooking => 'Regular';
+
+  @override
+  String get familyMembers => 'Family Members';
+
+  @override
+  String get familyHealthNetwork => 'Family Health Network';
+
+  @override
+  String get familyHealthNetworkSubtitle =>
+      'Monitor and manage medical data for your linked family profiles.';
+
+  @override
+  String activeProfilesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count profiles active',
+      one: '1 profile active',
+      zero: '0 profiles active',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get addMember => 'Add Member';
+
+  @override
+  String get addFamilyMember => 'Add Family Member';
+
+  @override
+  String get chooseMember => 'Choose Member';
+
+  @override
+  String get addNewMember => 'Add New Member';
+
+  @override
+  String get updateMember => 'Update Member';
+
+  @override
+  String get memberAddedSuccess => 'Member added successfully.';
+
+  @override
+  String get memberUpdatedSuccess => 'Member updated successfully.';
+
+  @override
+  String get noFamilyMembersYet => 'No family members yet';
+
+  @override
+  String get createFamilyProfilesDesc =>
+      'Create profiles for your family members to manage their health records easily.';
+
+  @override
+  String get age => 'Age';
+
+  @override
+  String get heightCmLabel => 'Height (cm)';
+
+  @override
+  String get weightKgLabel => 'Weight (kg)';
+
+  @override
+  String get remove => 'Remove';
+
+  @override
+  String get update => 'Update';
+
+  @override
+  String get saveChanges => 'Save Changes';
+
+  @override
+  String get saveMember => 'Save Member';
+
+  @override
+  String get relation => 'Relation';
+
+  @override
+  String get selectRelation => 'Select Relation';
+
+  @override
+  String get relationFather => 'Father';
+
+  @override
+  String get relationMother => 'Mother';
+
+  @override
+  String get relationSpouse => 'Spouse';
+
+  @override
+  String get relationSon => 'Son';
+
+  @override
+  String get relationDaughter => 'Daughter';
+
+  @override
+  String get relationBrother => 'Brother';
+
+  @override
+  String get relationSister => 'Sister';
+
+  @override
+  String get relationOther => 'Other';
+
+  @override
+  String get pleaseEnterFullName => 'Please enter full name';
+
+  @override
+  String get nameMinLengthError => 'Name should have at least 2 characters';
+
+  @override
+  String get pleaseSelectGender => 'Please select gender';
+
+  @override
+  String get selectDateOfBirth => 'Select date of birth';
+
+  @override
+  String get pleaseSelectRelation => 'Please select relation';
+
+  @override
+  String get heightRangeError => 'Height should be between 30 and 250 cm';
+
+  @override
+  String get weightRangeError => 'Weight should be between 2 and 350 kg';
+
+  @override
+  String heightInCm(String height) {
+    return '$height cm';
+  }
+
+  @override
+  String weightInKg(String weight) {
+    return '$weight kg';
+  }
 }

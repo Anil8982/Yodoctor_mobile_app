@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/models/home_care/home_care_history_model.dart';
 import 'package:yodoctor/modules/widgets/status_chip.dart';
 
@@ -15,10 +16,43 @@ class HomeCareHistoryCard extends StatelessWidget {
     this.onCancel,
   });
 
+  String _getServiceTitle(AppLocalizations? l10n, String type) {
+    switch (type) {
+      case 'General Nursing':
+        return l10n?.serviceTypeGeneralNursing ?? 'General Nursing';
+      case 'Elderly Care':
+        return l10n?.serviceTypeElderlyCare ?? 'Elderly Care';
+      case 'Post Surgery':
+        return l10n?.serviceTypePostSurgery ?? 'Post Surgery';
+      case 'ICU Nurse':
+        return l10n?.serviceTypeIcuNurse ?? 'ICU Nurse';
+      case 'Attendant':
+        return l10n?.serviceTypeAttendant ?? 'Attendant';
+      default:
+        return type.isNotEmpty
+            ? type
+            : (l10n?.homeCareService ?? 'Home Care Service');
+    }
+  }
+
+  String _getGenderLabel(AppLocalizations? l10n, String gender) {
+    switch (gender.toLowerCase()) {
+      case 'male':
+        return l10n?.genderMale ?? 'Male';
+      case 'female':
+        return l10n?.genderFemale ?? 'Female';
+      case 'other':
+        return l10n?.genderOther ?? 'Other';
+      default:
+        return gender;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = AppLocalizations.of(context);
     final isEmergency = booking.emergencyBooking;
 
     return Container(
@@ -114,8 +148,8 @@ class HomeCareHistoryCard extends StatelessWidget {
                                   color: colorScheme.error,
                                 ),
                                 const SizedBox(width: 4),
-                                Text(
-                                  'Emergency',
+                                 Text(
+                                  l10n?.emergencyBadge ?? 'Emergency',
                                   style: theme.textTheme.labelSmall?.copyWith(
                                     color: colorScheme.onErrorContainer,
                                     fontWeight: FontWeight.w700,
@@ -136,9 +170,7 @@ class HomeCareHistoryCard extends StatelessWidget {
 
                 // Service Title
                 Text(
-                  booking.serviceType.isNotEmpty
-                      ? booking.serviceType
-                      : 'Home Care Service',
+                  _getServiceTitle(l10n, booking.serviceType),
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w800,
                     color: colorScheme.onSurface,
@@ -184,7 +216,7 @@ class HomeCareHistoryCard extends StatelessWidget {
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              '${booking.patientAge} Years / ${booking.patientGender}',
+                              '${l10n?.yearsOld(booking.patientAge) ?? '${booking.patientAge} Years'} / ${_getGenderLabel(l10n, booking.patientGender)}',
                               style: theme.textTheme.bodySmall?.copyWith(
                                 color: colorScheme.onSurfaceVariant,
                                 fontWeight: FontWeight.w500,
@@ -270,7 +302,7 @@ class HomeCareHistoryCard extends StatelessWidget {
                           ),
                           const SizedBox(width: 6),
                           Text(
-                            'Tap for full details',
+                            l10n?.tapForFullDetails ?? 'Tap for full details',
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: colorScheme.onSurfaceVariant.withValues(
                                 alpha: 0.7,
@@ -289,7 +321,7 @@ class HomeCareHistoryCard extends StatelessWidget {
                           size: 15,
                         ),
                         label: Text(
-                          'Cancel Booking',
+                          l10n?.cancelBooking ?? 'Cancel Booking',
                           style: theme.textTheme.labelMedium?.copyWith(
                             color: colorScheme.error,
                             fontWeight: FontWeight.w700,

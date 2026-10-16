@@ -72,7 +72,7 @@ class PatientSelectionSection extends StatelessWidget {
               child: FilledButton.icon(
                 onPressed: onAddFamilyPressed,
                 icon: const Icon(Icons.person_add),
-                label: const Text("Add Family Member"),
+                label: Text(l10n.addFamilyMember),
               ),
             )
           else
@@ -81,7 +81,7 @@ class PatientSelectionSection extends StatelessWidget {
                 Expanded(
                   child: DropdownButtonFormField<FamilyMemberModel>(
                     initialValue: currentSelectedFamilyMember,
-                    hint: const Text("Choose Member"),
+                    hint: Text(l10n.chooseMember),
                     decoration: InputDecoration(
                       fillColor: onMemberChanged == null
                           ? colorScheme.surfaceContainerHighest.transparency(

@@ -11,6 +11,7 @@ import 'package:yodoctor/modules/patient/screens/profile/widgets/profile_languag
 import 'package:yodoctor/modules/patient/screens/services/models/services_model.dart';
 import 'package:yodoctor/modules/patient/screens/services/widgets/services_header.dart';
 import 'package:yodoctor/modules/patient/screens/services/widgets/service_card.dart';
+import 'package:yodoctor/modules/patient/screens/home_care/widgets/home_care_history_empty.dart';
 
 class MockStorageService extends StorageService {
   String? _savedLocale;
@@ -191,6 +192,45 @@ void main() {
 
       // Profile section keys
       expect(l10n.notProvided, "Not Provided");
+
+      // Book Care Services & Home Care keys
+      expect(l10n.bookCareService, "Book a Care Service");
+      expect(l10n.bookCareServiceDrawerItem, "Book Care Service");
+      expect(l10n.homeCareHistoryDrawerItem, "Home Care History");
+      expect(l10n.homeHealthcareServices, "HOME HEALTHCARE SERVICES");
+      expect(l10n.personalDetails, "Personal Details");
+      expect(l10n.caregiverAndUrgency, "Caregiver & Urgency");
+      expect(l10n.typeOfService, "Type of Service");
+      expect(l10n.medicalCondition, "Medical Condition");
+      expect(l10n.serviceDuration, "Service Duration");
+      expect(l10n.timePreference, "Time Preference");
+      expect(l10n.additionalNotes, "Additional Notes");
+      expect(l10n.serviceTypeGeneralNursing, "General Nursing");
+      expect(l10n.serviceTypeElderlyCare, "Elderly Care");
+      expect(l10n.serviceTypePostSurgery, "Post Surgery");
+      expect(l10n.serviceTypeIcuNurse, "ICU Nurse");
+      expect(l10n.serviceTypeAttendant, "Attendant");
+      expect(l10n.submitBookingRequest, "Submit Booking Request");
+      expect(l10n.bookingSubmittedSuccess, "Booking submitted successfully");
+      expect(l10n.bookingRequestFailed, "Booking request failed");
+      expect(l10n.homeCareHistory, "Home Care History");
+      expect(l10n.noHomeCareHistoryYet, "No Home Care History Yet");
+      expect(l10n.cancelBooking, "Cancel Booking");
+      expect(l10n.bookingCancelledSuccess, "Booking cancelled successfully");
+      expect(l10n.yearsOld(1), "1 Year");
+      expect(l10n.yearsOld(25), "25 Years");
+      expect(l10n.daysCount(1), "1 Day");
+      expect(l10n.daysCount(5), "5 Days");
+      expect(l10n.filterAll, "All");
+      expect(l10n.filterPending, "Pending");
+      expect(l10n.homeCareFilterAll, "ALL");
+      expect(l10n.homeCareFilterPending, "PENDING");
+      expect(l10n.homeCareFilterConfirmed, "CONFIRMED");
+      expect(l10n.homeCareFilterCompleted, "COMPLETED");
+      expect(l10n.homeCareFilterCancelled, "CANCELLED");
+      expect(l10n.bookingDetails, "Booking Details");
+      expect(l10n.emergencyBadge, "Emergency");
+      expect(l10n.regularBooking, "Regular");
     });
 
     test('Hindi translations match expected keys and render correctly', () {
@@ -205,7 +245,7 @@ void main() {
       expect(l10n.findYour, 'ढूंढें अपना');
       expect(l10n.bestDoctorNearYou, 'नज़दीकी सर्वश्रेष्ठ डॉक्टर');
       expect(l10n.searchNow, 'अभी खोजें');
-      expect(l10n.location, "स्थान के आधार पर खोजें");
+      expect(l10n.location, "स्थान के आधार पर");
       expect(l10n.searchDoctors, "डॉक्टर खोजें");
       expect(l10n.noActiveToken, 'कोई सक्रिय टोकन नहीं');
       expect(l10n.tokenLabel, 'टोकन');
@@ -351,6 +391,45 @@ void main() {
 
       // Profile section keys
       expect(l10n.notProvided, "उपलब्ध नहीं है");
+
+      // Book Care Services & Home Care keys
+      expect(l10n.bookCareService, "केयर सेवा बुक करें");
+      expect(l10n.bookCareServiceDrawerItem, "केयर सेवा बुक करें");
+      expect(l10n.homeCareHistoryDrawerItem, "होम केयर हिस्ट्री");
+      expect(l10n.homeHealthcareServices, "गृह स्वास्थ्य सेवाएं");
+      expect(l10n.personalDetails, "व्यक्तिगत विवरण");
+      expect(l10n.caregiverAndUrgency, "देखभालकर्ता और तात्कालिकता");
+      expect(l10n.typeOfService, "सेवा का प्रकार");
+      expect(l10n.medicalCondition, "चिकित्सा स्थिति");
+      expect(l10n.serviceDuration, "सेवा अवधि");
+      expect(l10n.timePreference, "समय प्राथमिकता");
+      expect(l10n.additionalNotes, "अतिरिक्त नोट्स");
+      expect(l10n.serviceTypeGeneralNursing, "सामान्य नर्सिंग");
+      expect(l10n.serviceTypeElderlyCare, "बुजुर्गों की देखभाल");
+      expect(l10n.serviceTypePostSurgery, "सर्जरी के बाद देखभाल");
+      expect(l10n.serviceTypeIcuNurse, "आईसीयू नर्स");
+      expect(l10n.serviceTypeAttendant, "सहायक (अटेंडेंट)");
+      expect(l10n.submitBookingRequest, "बुकिंग अनुरोध सबमिट करें");
+      expect(l10n.bookingSubmittedSuccess, "बुकिंग सफलतापूर्वक सबमिट की गई");
+      expect(l10n.bookingRequestFailed, "बुकिंग अनुरोध विफल रहा");
+      expect(l10n.homeCareHistory, "होम केयर हिस्ट्री");
+      expect(l10n.noHomeCareHistoryYet, "अभी तक कोई होम केयर हिस्ट्री नहीं");
+      expect(l10n.cancelBooking, "बुकिंग रद्द करें");
+      expect(l10n.bookingCancelledSuccess, "बुकिंग सफलतापूर्वक रद्द कर दी गई");
+      expect(l10n.yearsOld(1), "1 वर्ष");
+      expect(l10n.yearsOld(25), "25 वर्ष");
+      expect(l10n.daysCount(1), "1 दिन");
+      expect(l10n.daysCount(5), "5 दिन");
+      expect(l10n.filterAll, "सभी");
+      expect(l10n.filterPending, "लंबित");
+      expect(l10n.homeCareFilterAll, "सभी");
+      expect(l10n.homeCareFilterPending, "लंबित");
+      expect(l10n.homeCareFilterConfirmed, "पुष्ट");
+      expect(l10n.homeCareFilterCompleted, "पूर्ण");
+      expect(l10n.homeCareFilterCancelled, "रद्द");
+      expect(l10n.bookingDetails, "बुकिंग विवरण");
+      expect(l10n.emergencyBadge, "आपातकालीन");
+      expect(l10n.regularBooking, "सामान्य");
     });
   });
 
@@ -589,5 +668,48 @@ void main() {
         );
       },
     );
+
+    testWidgets(
+      'Home Care History empty state renders correctly in English and Hindi',
+      (tester) async {
+        Widget buildHistoryTestApp(Locale locale) {
+          return MaterialApp(
+            locale: locale,
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(
+              body: HomeCareHistoryEmpty(onBookNew: () {}),
+            ),
+          );
+        }
+
+        // 1. English
+        await tester.pumpWidget(buildHistoryTestApp(const Locale('en')));
+        await tester.pumpAndSettle();
+
+        expect(find.text('No Home Care History Yet'), findsOneWidget);
+        expect(
+          find.text(
+            'Your requested home care services will appear here once you schedule a session with our specialists.',
+          ),
+          findsOneWidget,
+        );
+        expect(find.text('Book Care Service'), findsOneWidget);
+
+        // 2. Hindi
+        await tester.pumpWidget(buildHistoryTestApp(const Locale('hi')));
+        await tester.pumpAndSettle();
+
+        expect(find.text('अभी तक कोई होम केयर हिस्ट्री नहीं'), findsOneWidget);
+        expect(
+          find.text(
+            'विशेषज्ञों के साथ सत्र निर्धारित करने के बाद आपकी अनुरोधित सेवाएं यहां दिखाई देंगी।',
+          ),
+          findsOneWidget,
+        );
+        expect(find.text('केयर सेवा बुक करें'), findsOneWidget);
+      },
+    );
   });
 }
+

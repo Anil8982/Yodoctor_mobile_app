@@ -110,7 +110,7 @@ class PatientDrawer extends ConsumerWidget {
         ),
         GlassDrawerItem(
           icon: Icons.home_repair_service_rounded,
-          label: 'Book Care Service',
+          label: l10n?.bookCareServiceDrawerItem ?? 'Book Care Service',
           selected: currentRoute == AppRoutes.homeServiceBooking,
           onTap: () {
             Navigator.pop(context);
@@ -119,7 +119,7 @@ class PatientDrawer extends ConsumerWidget {
         ),
         GlassDrawerItem(
           icon: Icons.medical_services_rounded,
-          label: 'Home Care History',
+          label: l10n?.homeCareHistoryDrawerItem ?? 'Home Care History',
           selected: currentRoute == AppRoutes.homeCareHistory,
           onTap: () {
             Navigator.pop(context);

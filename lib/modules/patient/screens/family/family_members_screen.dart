@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/widgets/app_header.dart';
 import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 
@@ -23,13 +24,14 @@ class _FamilyMembersScreenState extends ConsumerState<FamilyMembersScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = AppLocalizations.of(context);
 
     final familyState = ref.watch(familyControllerProvider);
     final notifier = ref.read(familyControllerProvider.notifier);
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: const AppHeader(title: 'Family Members'),
+      appBar: AppHeader(title: l10n?.familyMembers ?? 'Family Members'),
       body: familyState.members.isEmpty
           ? Column(
               children: [
@@ -38,7 +40,7 @@ class _FamilyMembersScreenState extends ConsumerState<FamilyMembersScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: FamilyHeader(membersCount: 0),
                 ),
-                Expanded(child: _buildEmptyState(context)),
+                Expanded(child: _buildEmptyState(context, l10n)),
               ],
             )
           : ListView(
@@ -55,7 +57,7 @@ class _FamilyMembersScreenState extends ConsumerState<FamilyMembersScreen> {
                       onDelete: () async {
                         await notifier.deleteMember(member.id);
                       },
-                      onEdit: () => _openEditMemberScreen(context, member),
+                      onEdit: () => _openEditMemberScreen(context, member, l10n),
                     ),
                   );
                 }),
@@ -64,22 +66,25 @@ class _FamilyMembersScreenState extends ConsumerState<FamilyMembersScreen> {
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'family_members_screen_fab_tag',
-        onPressed: () => _openAddMemberScreen(context),
+        onPressed: () => _openAddMemberScreen(context, l10n),
         icon: const Icon(Icons.person_add_rounded),
-        label: const Text('Add Member'),
+        label: Text(l10n?.addMember ?? 'Add Member'),
         backgroundColor: colorScheme.primary,
         foregroundColor: colorScheme.onPrimary,
       ),
     );
   }
 
-  Future<void> _openAddMemberScreen(BuildContext context) async {
+  Future<void> _openAddMemberScreen(
+    BuildContext context,
+    AppLocalizations? l10n,
+  ) async {
     final bool? wasAdded = await context.push<bool>(AppRoutes.addFamilyMember);
 
     if (!mounted || wasAdded != true) return;
 
     AppSnackBar.show(
-      message: 'Member added successfully.',
+      message: l10n?.memberAddedSuccess ?? 'Member added successfully.',
       type: AppSnackBarType.success,
     );
   }
@@ -87,6 +92,7 @@ class _FamilyMembersScreenState extends ConsumerState<FamilyMembersScreen> {
   Future<void> _openEditMemberScreen(
     BuildContext context,
     FamilyMemberModel member,
+    AppLocalizations? l10n,
   ) async {
     final bool? wasUpdated = await context.push<bool>(
       AppRoutes.addFamilyMember,
@@ -96,12 +102,12 @@ class _FamilyMembersScreenState extends ConsumerState<FamilyMembersScreen> {
     if (!mounted || wasUpdated != true) return;
 
     AppSnackBar.show(
-      message: 'Member updated successfully.',
+      message: l10n?.memberUpdatedSuccess ?? 'Member updated successfully.',
       type: AppSnackBarType.success,
     );
   }
 
-  Widget _buildEmptyState(BuildContext context) {
+  Widget _buildEmptyState(BuildContext context, AppLocalizations? l10n) {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -126,14 +132,15 @@ class _FamilyMembersScreenState extends ConsumerState<FamilyMembersScreen> {
             ),
             const SizedBox(height: 20),
             Text(
-              'No family members yet',
+              l10n?.noFamilyMembersYet ?? 'No family members yet',
               style: textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              'Create profiles for your family members to manage their health records easily.',
+              l10n?.createFamilyProfilesDesc ??
+                  'Create profiles for your family members to manage their health records easily.',
               textAlign: TextAlign.center,
               style: textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,

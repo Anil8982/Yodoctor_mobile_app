@@ -512,7 +512,7 @@ abstract class AppLocalizations {
   /// **'Consultation'**
   String get consultation;
 
-  /// Contact to doctor
+  /// Contact number label
   ///
   /// In en, this message translates to:
   /// **'Contact'**
@@ -956,10 +956,10 @@ abstract class AppLocalizations {
   /// **'Additional Notes For Doctor'**
   String get additionalNotesForDoctor;
 
-  /// Hint for additional notes field
+  /// Hint text for additional notes field
   ///
   /// In en, this message translates to:
-  /// **'Describe specific conditions or background details contextually...'**
+  /// **'Any special instructions? (Optional)'**
   String get additionalNotesHint;
 
   /// Header title for step 2
@@ -1004,7 +1004,7 @@ abstract class AppLocalizations {
   /// **'Name should have at least 2 characters'**
   String get nameMinCharacters;
 
-  /// Validation message when non-alphabetic characters are entered in name
+  /// Validation message when non-alphabets are entered in name
   ///
   /// In en, this message translates to:
   /// **'Only alphabets are allowed'**
@@ -1058,7 +1058,7 @@ abstract class AppLocalizations {
   /// **'Date of Birth'**
   String get dateOfBirth;
 
-  /// Date field placeholder
+  /// Hint for date picker field
   ///
   /// In en, this message translates to:
   /// **'Select Date'**
@@ -1070,7 +1070,7 @@ abstract class AppLocalizations {
   /// **'Selected Date'**
   String get selectedDate;
 
-  /// Required field validation message
+  /// Generic required validation text
   ///
   /// In en, this message translates to:
   /// **'Required'**
@@ -1118,46 +1118,46 @@ abstract class AppLocalizations {
   /// **'Select Blood Group'**
   String get selectBloodGroup;
 
-  /// Height field label
+  /// Height label
   ///
   /// In en, this message translates to:
   /// **'Height'**
   String get height;
 
-  /// Height field hint
+  /// Hint for height field
   ///
   /// In en, this message translates to:
-  /// **'e.g. 175'**
+  /// **'e.g. 170'**
   String get heightHint;
 
-  /// Validation for non-numeric number
+  /// Validation message when age is not a valid number
   ///
   /// In en, this message translates to:
   /// **'Enter a valid number'**
   String get enterValidNumber;
 
-  /// Validation for out-of-range height
+  /// Validation error when height is invalid
   ///
   /// In en, this message translates to:
-  /// **'Enter a valid height (1 - 300 cm)'**
+  /// **'Enter a valid height'**
   String get enterValidHeight;
 
-  /// Weight field label
+  /// Weight label
   ///
   /// In en, this message translates to:
   /// **'Weight'**
   String get weight;
 
-  /// Weight field hint
+  /// Hint for weight field
   ///
   /// In en, this message translates to:
-  /// **'e.g. 70'**
+  /// **'e.g. 65'**
   String get weightHint;
 
-  /// Validation for out-of-range weight
+  /// Validation error when weight is invalid
   ///
   /// In en, this message translates to:
-  /// **'Enter a valid weight (1 - 500 kg)'**
+  /// **'Enter a valid weight'**
   String get enterValidWeight;
 
   /// Known medical conditions label
@@ -1693,6 +1693,816 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Invalid QR structure.'**
   String get invalidQrStructure;
+
+  /// Title for Book a Care Service screen
+  ///
+  /// In en, this message translates to:
+  /// **'Book a Care Service'**
+  String get bookCareService;
+
+  /// Drawer item label for Book Care Service
+  ///
+  /// In en, this message translates to:
+  /// **'Book Care Service'**
+  String get bookCareServiceDrawerItem;
+
+  /// Drawer item label for Home Care History
+  ///
+  /// In en, this message translates to:
+  /// **'Home Care History'**
+  String get homeCareHistoryDrawerItem;
+
+  /// Category badge on Book Care Service screen
+  ///
+  /// In en, this message translates to:
+  /// **'HOME HEALTHCARE SERVICES'**
+  String get homeHealthcareServices;
+
+  /// Subtitle describing home care booking
+  ///
+  /// In en, this message translates to:
+  /// **'Schedule a nurse, home care, or consultation at your doorstep.'**
+  String get scheduleNurseDesc;
+
+  /// Personal Details section header
+  ///
+  /// In en, this message translates to:
+  /// **'Personal Details'**
+  String get personalDetails;
+
+  /// Caregiver & Urgency section header
+  ///
+  /// In en, this message translates to:
+  /// **'Caregiver & Urgency'**
+  String get caregiverAndUrgency;
+
+  /// Type of Service section header
+  ///
+  /// In en, this message translates to:
+  /// **'Type of Service'**
+  String get typeOfService;
+
+  /// Medical Condition field/section header
+  ///
+  /// In en, this message translates to:
+  /// **'Medical Condition'**
+  String get medicalCondition;
+
+  /// Service Duration section header
+  ///
+  /// In en, this message translates to:
+  /// **'Service Duration'**
+  String get serviceDuration;
+
+  /// Time Preference section header
+  ///
+  /// In en, this message translates to:
+  /// **'Time Preference'**
+  String get timePreference;
+
+  /// Additional Notes field/section header
+  ///
+  /// In en, this message translates to:
+  /// **'Additional Notes'**
+  String get additionalNotes;
+
+  /// General Nursing service option
+  ///
+  /// In en, this message translates to:
+  /// **'General Nursing'**
+  String get serviceTypeGeneralNursing;
+
+  /// Elderly Care service option
+  ///
+  /// In en, this message translates to:
+  /// **'Elderly Care'**
+  String get serviceTypeElderlyCare;
+
+  /// Post Surgery service option
+  ///
+  /// In en, this message translates to:
+  /// **'Post Surgery'**
+  String get serviceTypePostSurgery;
+
+  /// ICU Nurse service option
+  ///
+  /// In en, this message translates to:
+  /// **'ICU Nurse'**
+  String get serviceTypeIcuNurse;
+
+  /// Attendant service option
+  ///
+  /// In en, this message translates to:
+  /// **'Attendant'**
+  String get serviceTypeAttendant;
+
+  /// Morning time slot option
+  ///
+  /// In en, this message translates to:
+  /// **'Morning (6am - 12pm)'**
+  String get timeSlotMorning;
+
+  /// Afternoon time slot option
+  ///
+  /// In en, this message translates to:
+  /// **'Afternoon (12pm - 5pm)'**
+  String get timeSlotAfternoon;
+
+  /// Evening time slot option
+  ///
+  /// In en, this message translates to:
+  /// **'Evening (5pm - 9pm)'**
+  String get timeSlotEvening;
+
+  /// Night time slot option
+  ///
+  /// In en, this message translates to:
+  /// **'Night (9pm - 6am)'**
+  String get timeSlotNight;
+
+  /// Hint text for medical condition field
+  ///
+  /// In en, this message translates to:
+  /// **'Describe medical condition, symptoms...'**
+  String get medicalConditionHint;
+
+  /// Button to submit booking request
+  ///
+  /// In en, this message translates to:
+  /// **'Submit Booking Request'**
+  String get submitBookingRequest;
+
+  /// Success message when booking is submitted
+  ///
+  /// In en, this message translates to:
+  /// **'Booking submitted successfully'**
+  String get bookingSubmittedSuccess;
+
+  /// Error message when booking submission fails
+  ///
+  /// In en, this message translates to:
+  /// **'Booking request failed'**
+  String get bookingRequestFailed;
+
+  /// Validation message when duration is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Please select service duration'**
+  String get pleaseSelectServiceDuration;
+
+  /// Validation message when start date is not selected
+  ///
+  /// In en, this message translates to:
+  /// **'Please select start date'**
+  String get pleaseSelectStartDate;
+
+  /// Contact number field label
+  ///
+  /// In en, this message translates to:
+  /// **'Contact Number'**
+  String get contactNumber;
+
+  /// Patient age field label
+  ///
+  /// In en, this message translates to:
+  /// **'Patient Age'**
+  String get patientAge;
+
+  /// Patient gender field label
+  ///
+  /// In en, this message translates to:
+  /// **'Patient Gender'**
+  String get patientGender;
+
+  /// Address field label
+  ///
+  /// In en, this message translates to:
+  /// **'Address'**
+  String get address;
+
+  /// Contact number field hint
+  ///
+  /// In en, this message translates to:
+  /// **'Enter contact number'**
+  String get enterContactNumber;
+
+  /// Patient age field hint
+  ///
+  /// In en, this message translates to:
+  /// **'Enter age'**
+  String get enterAge;
+
+  /// Address field hint
+  ///
+  /// In en, this message translates to:
+  /// **'Enter complete address'**
+  String get enterCompleteAddress;
+
+  /// Validation message when full name is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Full name required'**
+  String get fullNameRequired;
+
+  /// Validation message for invalid name
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid name'**
+  String get enterValidName;
+
+  /// Validation message when phone is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Phone number is required'**
+  String get phoneRequired;
+
+  /// Validation message when phone has invalid starting digit
+  ///
+  /// In en, this message translates to:
+  /// **'Phone no. must start with 6, 7, 8, or 9'**
+  String get phoneInvalidPrefix;
+
+  /// Validation message when age is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Age is required'**
+  String get ageRequired;
+
+  /// Validation message when age <= 0
+  ///
+  /// In en, this message translates to:
+  /// **'Age must be greater than 0'**
+  String get ageMinValidation;
+
+  /// Validation message when age > 120
+  ///
+  /// In en, this message translates to:
+  /// **'Age cannot be more than 120'**
+  String get ageMaxValidation;
+
+  /// Validation message when gender is not selected
+  ///
+  /// In en, this message translates to:
+  /// **'Select gender'**
+  String get selectGenderValidation;
+
+  /// Validation message when address is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Address is required'**
+  String get addressRequired;
+
+  /// Validation message when address is too short
+  ///
+  /// In en, this message translates to:
+  /// **'Address at least 5 characters'**
+  String get addressMinValidation;
+
+  /// Button to autofill location using GPS
+  ///
+  /// In en, this message translates to:
+  /// **'Use Current Location'**
+  String get useCurrentLocation;
+
+  /// Label for caregiver gender preference
+  ///
+  /// In en, this message translates to:
+  /// **'Preferred Caregiver Gender'**
+  String get preferredCaregiverGender;
+
+  /// Hint for caregiver gender preference
+  ///
+  /// In en, this message translates to:
+  /// **'Select Preference'**
+  String get selectPreference;
+
+  /// Option for no caregiver gender preference
+  ///
+  /// In en, this message translates to:
+  /// **'No Preference'**
+  String get noPreference;
+
+  /// Validation message when caregiver gender is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Please select gender preference'**
+  String get selectGenderPreferenceValidation;
+
+  /// Checkbox title for emergency service
+  ///
+  /// In en, this message translates to:
+  /// **'Need Emergency Service'**
+  String get needEmergencyService;
+
+  /// Subtitle explaining emergency turnaround time
+  ///
+  /// In en, this message translates to:
+  /// **'Within 2 hours'**
+  String get within2Hours;
+
+  /// 1 Day duration option
+  ///
+  /// In en, this message translates to:
+  /// **'1 Day'**
+  String get duration1Day;
+
+  /// Multiple Days duration option
+  ///
+  /// In en, this message translates to:
+  /// **'Multiple Days'**
+  String get durationMultipleDays;
+
+  /// Weekly duration option
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly'**
+  String get durationWeekly;
+
+  /// Monthly duration option
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly'**
+  String get durationMonthly;
+
+  /// Label for number of days field
+  ///
+  /// In en, this message translates to:
+  /// **'Number of Days'**
+  String get numberOfDays;
+
+  /// Hint for number of days field
+  ///
+  /// In en, this message translates to:
+  /// **'Enter days'**
+  String get enterDays;
+
+  /// Validation message for invalid days value
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid days'**
+  String get invalidDays;
+
+  /// Validation message when days exceed 365
+  ///
+  /// In en, this message translates to:
+  /// **'Max 365 days'**
+  String get max365Days;
+
+  /// Label for start date field
+  ///
+  /// In en, this message translates to:
+  /// **'Start Date'**
+  String get startDate;
+
+  /// Title for Home Care History screen
+  ///
+  /// In en, this message translates to:
+  /// **'Home Care History'**
+  String get homeCareHistory;
+
+  /// Title when home care history is empty
+  ///
+  /// In en, this message translates to:
+  /// **'No Home Care History Yet'**
+  String get noHomeCareHistoryYet;
+
+  /// Description when home care history is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Your requested home care services will appear here once you schedule a session with our specialists.'**
+  String get noHomeCareHistoryDesc;
+
+  /// Badge label for emergency booking
+  ///
+  /// In en, this message translates to:
+  /// **'Emergency'**
+  String get emergencyBadge;
+
+  /// Hint on card indicating it can be tapped
+  ///
+  /// In en, this message translates to:
+  /// **'Tap for full details'**
+  String get tapForFullDetails;
+
+  /// Button and dialog title to cancel booking
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel Booking'**
+  String get cancelBooking;
+
+  /// Fallback service title
+  ///
+  /// In en, this message translates to:
+  /// **'Home Care Service'**
+  String get homeCareService;
+
+  /// Age with years suffix
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{0 Years} =1{1 Year} other{{count} Years}}'**
+  String yearsOld(int count);
+
+  /// Number of days with days suffix
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 Day} other{{count} Days}}'**
+  String daysCount(int count);
+
+  /// All filter option for home care history
+  ///
+  /// In en, this message translates to:
+  /// **'ALL'**
+  String get homeCareFilterAll;
+
+  /// Pending filter option for home care history
+  ///
+  /// In en, this message translates to:
+  /// **'PENDING'**
+  String get homeCareFilterPending;
+
+  /// Confirmed filter option for home care history
+  ///
+  /// In en, this message translates to:
+  /// **'CONFIRMED'**
+  String get homeCareFilterConfirmed;
+
+  /// Completed filter option for home care history
+  ///
+  /// In en, this message translates to:
+  /// **'COMPLETED'**
+  String get homeCareFilterCompleted;
+
+  /// Cancelled filter option for home care history
+  ///
+  /// In en, this message translates to:
+  /// **'CANCELLED'**
+  String get homeCareFilterCancelled;
+
+  /// Header for booking details sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Booking Details'**
+  String get bookingDetails;
+
+  /// Patient information section header
+  ///
+  /// In en, this message translates to:
+  /// **'Patient Information'**
+  String get patientInformation;
+
+  /// Patient name label
+  ///
+  /// In en, this message translates to:
+  /// **'Patient Name'**
+  String get patientName;
+
+  /// Combined age and gender label
+  ///
+  /// In en, this message translates to:
+  /// **'Age / Gender'**
+  String get ageGender;
+
+  /// Caregiver preference label
+  ///
+  /// In en, this message translates to:
+  /// **'Preference'**
+  String get preference;
+
+  /// Service information section header
+  ///
+  /// In en, this message translates to:
+  /// **'Service Information'**
+  String get serviceInformation;
+
+  /// Service type label
+  ///
+  /// In en, this message translates to:
+  /// **'Service Type'**
+  String get serviceType;
+
+  /// Duration type label
+  ///
+  /// In en, this message translates to:
+  /// **'Duration Type'**
+  String get durationType;
+
+  /// Time slot label
+  ///
+  /// In en, this message translates to:
+  /// **'Time Slot'**
+  String get timeSlot;
+
+  /// Preferred date label
+  ///
+  /// In en, this message translates to:
+  /// **'Preferred Date'**
+  String get preferredDate;
+
+  /// Location & Notes section header
+  ///
+  /// In en, this message translates to:
+  /// **'Location & Notes'**
+  String get locationAndNotes;
+
+  /// Service address label
+  ///
+  /// In en, this message translates to:
+  /// **'Service Address'**
+  String get serviceAddress;
+
+  /// Standard non-emergency booking badge
+  ///
+  /// In en, this message translates to:
+  /// **'Standard'**
+  String get standardBooking;
+
+  /// Error header when booking details cannot be loaded
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to Load Details'**
+  String get failedToLoadDetails;
+
+  /// Error message when booking details cannot be loaded
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to retrieve complete booking details. Please try again later.'**
+  String get unableToRetrieveBookingDetails;
+
+  /// Confirmation message when canceling a home care booking
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to cancel this home care booking?'**
+  String get cancelBookingConfirmation;
+
+  /// Confirmation button to cancel
+  ///
+  /// In en, this message translates to:
+  /// **'Yes, Cancel'**
+  String get yesCancel;
+
+  /// Cancel button to keep booking
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get noKeep;
+
+  /// Loading message while cancellation is in progress
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelling booking...'**
+  String get cancellingBooking;
+
+  /// Success message when booking is cancelled
+  ///
+  /// In en, this message translates to:
+  /// **'Booking cancelled successfully'**
+  String get bookingCancelledSuccess;
+
+  /// Button to book new care service
+  ///
+  /// In en, this message translates to:
+  /// **'Book New Care Service'**
+  String get bookNewCareService;
+
+  /// Regular non-emergency booking badge
+  ///
+  /// In en, this message translates to:
+  /// **'Regular'**
+  String get regularBooking;
+
+  /// Family members screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Family Members'**
+  String get familyMembers;
+
+  /// Header title on family members screen
+  ///
+  /// In en, this message translates to:
+  /// **'Family Health Network'**
+  String get familyHealthNetwork;
+
+  /// Subtitle describing family health network
+  ///
+  /// In en, this message translates to:
+  /// **'Monitor and manage medical data for your linked family profiles.'**
+  String get familyHealthNetworkSubtitle;
+
+  /// Active linked family member profile count
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{0 profiles active} =1{1 profile active} other{{count} profiles active}}'**
+  String activeProfilesCount(int count);
+
+  /// Floating action button to add family member
+  ///
+  /// In en, this message translates to:
+  /// **'Add Member'**
+  String get addMember;
+
+  /// Button to add family member in selection sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Add Family Member'**
+  String get addFamilyMember;
+
+  /// Dropdown placeholder to choose family member
+  ///
+  /// In en, this message translates to:
+  /// **'Choose Member'**
+  String get chooseMember;
+
+  /// Screen header when adding a new family member
+  ///
+  /// In en, this message translates to:
+  /// **'Add New Member'**
+  String get addNewMember;
+
+  /// Screen header when updating an existing family member
+  ///
+  /// In en, this message translates to:
+  /// **'Update Member'**
+  String get updateMember;
+
+  /// Snackbar message when a family member is added
+  ///
+  /// In en, this message translates to:
+  /// **'Member added successfully.'**
+  String get memberAddedSuccess;
+
+  /// Snackbar message when a family member is updated
+  ///
+  /// In en, this message translates to:
+  /// **'Member updated successfully.'**
+  String get memberUpdatedSuccess;
+
+  /// Empty state title when no family members exist
+  ///
+  /// In en, this message translates to:
+  /// **'No family members yet'**
+  String get noFamilyMembersYet;
+
+  /// Empty state description for family members
+  ///
+  /// In en, this message translates to:
+  /// **'Create profiles for your family members to manage their health records easily.'**
+  String get createFamilyProfilesDesc;
+
+  /// Age label
+  ///
+  /// In en, this message translates to:
+  /// **'Age'**
+  String get age;
+
+  /// Height field label with unit
+  ///
+  /// In en, this message translates to:
+  /// **'Height (cm)'**
+  String get heightCmLabel;
+
+  /// Weight field label with unit
+  ///
+  /// In en, this message translates to:
+  /// **'Weight (kg)'**
+  String get weightKgLabel;
+
+  /// Remove button label
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get remove;
+
+  /// Update button label
+  ///
+  /// In en, this message translates to:
+  /// **'Update'**
+  String get update;
+
+  /// Button label to save updated member details
+  ///
+  /// In en, this message translates to:
+  /// **'Save Changes'**
+  String get saveChanges;
+
+  /// Button label to save new member
+  ///
+  /// In en, this message translates to:
+  /// **'Save Member'**
+  String get saveMember;
+
+  /// Relation label
+  ///
+  /// In en, this message translates to:
+  /// **'Relation'**
+  String get relation;
+
+  /// Select relation dropdown hint
+  ///
+  /// In en, this message translates to:
+  /// **'Select Relation'**
+  String get selectRelation;
+
+  /// Father relation label
+  ///
+  /// In en, this message translates to:
+  /// **'Father'**
+  String get relationFather;
+
+  /// Mother relation label
+  ///
+  /// In en, this message translates to:
+  /// **'Mother'**
+  String get relationMother;
+
+  /// Spouse relation label
+  ///
+  /// In en, this message translates to:
+  /// **'Spouse'**
+  String get relationSpouse;
+
+  /// Son relation label
+  ///
+  /// In en, this message translates to:
+  /// **'Son'**
+  String get relationSon;
+
+  /// Daughter relation label
+  ///
+  /// In en, this message translates to:
+  /// **'Daughter'**
+  String get relationDaughter;
+
+  /// Brother relation label
+  ///
+  /// In en, this message translates to:
+  /// **'Brother'**
+  String get relationBrother;
+
+  /// Sister relation label
+  ///
+  /// In en, this message translates to:
+  /// **'Sister'**
+  String get relationSister;
+
+  /// Other relation label
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get relationOther;
+
+  /// Validation error when name is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter full name'**
+  String get pleaseEnterFullName;
+
+  /// Validation error when name has fewer than 2 characters
+  ///
+  /// In en, this message translates to:
+  /// **'Name should have at least 2 characters'**
+  String get nameMinLengthError;
+
+  /// Validation error when gender is not selected
+  ///
+  /// In en, this message translates to:
+  /// **'Please select gender'**
+  String get pleaseSelectGender;
+
+  /// Hint for date of birth field
+  ///
+  /// In en, this message translates to:
+  /// **'Select date of birth'**
+  String get selectDateOfBirth;
+
+  /// Validation error when relation is not selected
+  ///
+  /// In en, this message translates to:
+  /// **'Please select relation'**
+  String get pleaseSelectRelation;
+
+  /// Validation error when height is out of range
+  ///
+  /// In en, this message translates to:
+  /// **'Height should be between 30 and 250 cm'**
+  String get heightRangeError;
+
+  /// Validation error when weight is out of range
+  ///
+  /// In en, this message translates to:
+  /// **'Weight should be between 2 and 350 kg'**
+  String get weightRangeError;
+
+  /// Height with cm unit
+  ///
+  /// In en, this message translates to:
+  /// **'{height} cm'**
+  String heightInCm(String height);
+
+  /// Weight with kg unit
+  ///
+  /// In en, this message translates to:
+  /// **'{weight} kg'**
+  String weightInKg(String weight);
 }
 
 class _AppLocalizationsDelegate

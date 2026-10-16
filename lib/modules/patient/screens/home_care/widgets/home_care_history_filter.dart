@@ -1,10 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/controllers/home_care_history_controller.dart';
 
 class HomeCareHistoryFilter extends ConsumerWidget {
   const HomeCareHistoryFilter({super.key});
+
+  String _getFilterLabel(String filter, AppLocalizations? l10n) {
+    switch (filter) {
+      case 'ALL':
+        return l10n?.homeCareFilterAll ?? 'ALL';
+      case 'PENDING':
+        return l10n?.homeCareFilterPending ?? 'PENDING';
+      case 'CONFIRMED':
+        return l10n?.homeCareFilterConfirmed ?? 'CONFIRMED';
+      case 'COMPLETED':
+        return l10n?.homeCareFilterCompleted ?? 'COMPLETED';
+      case 'CANCELLED':
+        return l10n?.homeCareFilterCancelled ?? 'CANCELLED';
+      default:
+        return filter;
+    }
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -12,6 +30,7 @@ class HomeCareHistoryFilter extends ConsumerWidget {
     final colorScheme = theme.colorScheme;
     final state = ref.watch(homeCareHistoryProvider);
     final notifier = ref.read(homeCareHistoryProvider.notifier);
+    final l10n = AppLocalizations.of(context);
 
     final filters = ['ALL', 'PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED'];
 
@@ -62,7 +81,7 @@ class HomeCareHistoryFilter extends ConsumerWidget {
                       : [],
                 ),
                 child: Text(
-                  filter,
+                  _getFilterLabel(filter, l10n),
                   style: theme.textTheme.labelMedium?.copyWith(
                     color: isSelected
                         ? colorScheme.onPrimary
