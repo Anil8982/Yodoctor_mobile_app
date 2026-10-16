@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/widgets/app_header.dart';
 import '../../../../core/utils/app_spacing.dart';
 import '../../../../core/utils/responsive.dart';
@@ -43,12 +44,13 @@ class _DoctorDetailScreenState extends ConsumerState<DoctorDetailScreen> {
     final isDesktop = Responsive.isDesktop(context);
     final isTablet = Responsive.isTablet(context);
     final isMobile = Responsive.isMobile(context);
+    final l10n = AppLocalizations.of(context)!;
 
     final doctorState = ref.watch(doctorDetailControllerProvider);
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppHeader(title: 'Doctor Details'),
+      appBar: AppHeader(title: l10n.doctorDetails),
       body: () {
         if (doctorState.isLoading) {
           return const Center(child: CircularProgressIndicator());
@@ -78,6 +80,7 @@ class _DoctorDetailScreenState extends ConsumerState<DoctorDetailScreen> {
                 isTablet,
                 isDesktop,
                 doctor,
+                l10n,
               ),
             ),
           ),
@@ -96,7 +99,7 @@ class _DoctorDetailScreenState extends ConsumerState<DoctorDetailScreen> {
                     ),
                   ),
                 ),
-                child: _buildBookingButton(context, doctorState.doctor!),
+                child: _buildBookingButton(context, doctorState.doctor!, l10n),
               ),
             )
           : null,
@@ -109,6 +112,7 @@ class _DoctorDetailScreenState extends ConsumerState<DoctorDetailScreen> {
     bool isTablet,
     bool isDesktop,
     DoctorDetailModel doctor,
+    AppLocalizations l10n,
   ) {
     if (isDesktop || isTablet) {
       return Row(
@@ -148,7 +152,7 @@ class _DoctorDetailScreenState extends ConsumerState<DoctorDetailScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Consultation Fee',
+                        '${l10n.consultation} ${l10n.feeLabel}',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(context).colorScheme.outline,
                           fontWeight: FontWeight.w600,
@@ -165,7 +169,7 @@ class _DoctorDetailScreenState extends ConsumerState<DoctorDetailScreen> {
                     ],
                   ),
                   const SizedBox(height: 20),
-                  _buildBookingButton(context, doctor),
+                  _buildBookingButton(context, doctor, l10n),
                 ],
               ),
             ),
@@ -185,7 +189,11 @@ class _DoctorDetailScreenState extends ConsumerState<DoctorDetailScreen> {
     );
   }
 
-  Widget _buildBookingButton(BuildContext context, DoctorDetailModel doctor) {
+  Widget _buildBookingButton(
+    BuildContext context,
+    DoctorDetailModel doctor,
+    AppLocalizations l10n,
+  ) {
     return SizedBox(
       width: double.infinity,
       child: FilledButton.icon(
@@ -199,8 +207,8 @@ class _DoctorDetailScreenState extends ConsumerState<DoctorDetailScreen> {
           ),
         ),
         icon: const Icon(Icons.calendar_month_rounded, size: 20),
-        label: const Text(
-          'Book Appointment',
+        label: Text(
+          l10n.bookAppointment,
           style: TextStyle(fontWeight: FontWeight.w900, fontSize: 15),
         ),
       ),

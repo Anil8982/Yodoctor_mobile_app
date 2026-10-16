@@ -1,6 +1,7 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/widgets/status_chip.dart';
 import '../../../models/search/doctor_detail_model.dart';
 
@@ -35,6 +36,7 @@ class _DoctorHeaderCardState extends State<DoctorHeaderCard> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
+    final l10n = AppLocalizations.of(context)!;
 
     final bool hasImage =
         widget.doctor.profileImage.isNotEmpty &&
@@ -131,7 +133,7 @@ class _DoctorHeaderCardState extends State<DoctorHeaderCard> {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          '${widget.doctor.experienceYears} Yrs Exp',
+                          '${l10n.experienceYears(widget.doctor.experienceYears.toString())} Exp',
                           style: textTheme.bodySmall?.copyWith(
                             color: colorScheme.onSurface,
                             fontWeight: FontWeight.w700,
@@ -158,8 +160,8 @@ class _DoctorHeaderCardState extends State<DoctorHeaderCard> {
             children: [
               StatusChip(
                 status: widget.doctor.isAvailable == 1
-                    ? 'Available'
-                    : 'Not Available',
+                    ? l10n.available
+                    : l10n.notAvailable,
                 isSmall: true,
                 customColor: widget.doctor.isAvailable == 1
                     ? AppTheme.success(context)
@@ -247,7 +249,7 @@ class _DoctorHeaderCardState extends State<DoctorHeaderCard> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                'About Doctor',
+                l10n.aboutDoctor,
                 style: textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.w900,
                   color: colorScheme.onSurface,
@@ -270,7 +272,7 @@ class _DoctorHeaderCardState extends State<DoctorHeaderCard> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        _isAboutExpanded ? "Read Less" : "Read More",
+                        _isAboutExpanded ? l10n.readLess : l10n.readMore,
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w800,
@@ -295,7 +297,7 @@ class _DoctorHeaderCardState extends State<DoctorHeaderCard> {
           AnimatedCrossFade(
             firstChild: Text(
               widget.doctor.description.isEmpty
-                  ? "No description available."
+                  ? l10n.noDescriptionFound
                   : widget.doctor.description,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
@@ -307,7 +309,7 @@ class _DoctorHeaderCardState extends State<DoctorHeaderCard> {
             ),
             secondChild: Text(
               widget.doctor.description.isEmpty
-                  ? "No description available."
+                  ? l10n.noDescriptionFound
                   : widget.doctor.description,
               style: textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,

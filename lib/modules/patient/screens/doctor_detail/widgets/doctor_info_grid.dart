@@ -1,5 +1,6 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import '../../../models/search/doctor_detail_model.dart';
 
 class DoctorInfoGrid extends StatelessWidget {
@@ -10,6 +11,7 @@ class DoctorInfoGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return Container(
       decoration: BoxDecoration(
@@ -27,7 +29,7 @@ class DoctorInfoGrid extends StatelessWidget {
               Expanded(
                 child: _CompactItem(
                   icon: Icons.local_hospital_rounded,
-                  label: "Clinic Name",
+                  label: l10n.clinicLabel,
                   value: doctor.clinicName,
                 ),
               ),
@@ -39,7 +41,7 @@ class DoctorInfoGrid extends StatelessWidget {
               Expanded(
                 child: _CompactItem(
                   icon: Icons.location_city_rounded,
-                  label: "City",
+                  label: l10n.cityLabel,
                   value: doctor.city,
                 ),
               ),
@@ -57,7 +59,7 @@ class DoctorInfoGrid extends StatelessWidget {
               Expanded(
                 child: _CompactItem(
                   icon: Icons.map_rounded,
-                  label: "Address",
+                  label: l10n.clinicAddress,
                   value: doctor.address,
                 ),
               ),
@@ -69,7 +71,7 @@ class DoctorInfoGrid extends StatelessWidget {
               Expanded(
                 child: _CompactItem(
                   icon: Icons.badge_rounded,
-                  label: "License No",
+                  label: l10n.licenseNum,
                   value: doctor.licenseNumber,
                 ),
               ),
@@ -87,9 +89,9 @@ class DoctorInfoGrid extends StatelessWidget {
               Expanded(
                 child: _CompactItem(
                   icon: Icons.wb_sunny_rounded,
-                  label: "Morning",
+                  label: l10n.morning,
                   value: doctor.sessionTimings.morning.isEmpty
-                      ? "Not Available"
+                      ? l10n.notAvailable
                       : doctor.sessionTimings.morning,
                 ),
               ),
@@ -101,9 +103,9 @@ class DoctorInfoGrid extends StatelessWidget {
               Expanded(
                 child: _CompactItem(
                   icon: Icons.nights_stay_rounded,
-                  label: "Evening",
+                  label: l10n.evening,
                   value: doctor.sessionTimings.evening.isEmpty
-                      ? "Not Available"
+                      ? l10n.notAvailable
                       : doctor.sessionTimings.evening,
                 ),
               ),
@@ -118,9 +120,9 @@ class DoctorInfoGrid extends StatelessWidget {
 
           _CompactItem(
             icon: Icons.calendar_month_rounded,
-            label: "Available Days",
+            label: l10n.availableDays,
             value: doctor.availableDays.isEmpty
-                ? "Not Available"
+                ? l10n.notAvailable
                 : doctor.availableDays.join(", "),
             isFullWidth: true,
           ),
