@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/screens/appointments/models/appointment_queue_info.dart';
 import 'package:yodoctor/modules/widgets/app_dialog.dart';
 
@@ -12,11 +13,12 @@ class AppointmentQueueDialog {
     final theme = Theme.of(context);
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = theme.textTheme;
+    final l10n = AppLocalizations.of(context)!;
 
     AppDialog.show(
       context: context,
       icon: Icons.check_circle_rounded,
-      title: 'Booking Confirmed!',
+      title: l10n.bookingConfirmed,
       content: Container(
         constraints: const BoxConstraints(maxWidth: 340),
         child: Column(
@@ -35,7 +37,7 @@ class AppointmentQueueDialog {
               child: Divider(height: 1),
             ),
             Text(
-              'Patient: ${queueInfo.patientLabel}',
+              '${l10n.patientInfoLabel}: ${queueInfo.patientLabel}',
               style: textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.w700,
@@ -88,7 +90,7 @@ class AppointmentQueueDialog {
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  'Est. Wait Time: ${queueInfo.estimatedWait}',
+                  '${l10n.estimatedWaitingTime}: ${queueInfo.estimatedWait}',
                   style: textTheme.bodyMedium?.copyWith(
                     color: colorScheme.secondary,
                     fontWeight: FontWeight.bold,
@@ -99,7 +101,7 @@ class AppointmentQueueDialog {
           ],
         ),
       ),
-      confirmLabel: 'Back to Home',
+      confirmLabel: l10n.backToHome,
       showCancel: false,
       onConfirm: () {
         Navigator.of(context).pop();
