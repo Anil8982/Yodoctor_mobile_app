@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/controllers/book_appointment_controller.dart';
 import 'package:yodoctor/modules/patient/controllers/family_controller.dart';
 import 'package:yodoctor/modules/patient/screens/appointments/widgets/appointment_queue_dialog.dart';
@@ -26,10 +27,10 @@ class BookAppointmentScreen extends ConsumerWidget {
   static const String _subTag = 'BookAppointmentScreen';
 
   Future<void> _pickCustomDate(
-      BuildContext context,
-      WidgetRef ref,
-      DateTime currentDate,
-      ) async {
+    BuildContext context,
+    WidgetRef ref,
+    DateTime currentDate,
+  ) async {
     final DateTime now = DateTime.now();
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -42,7 +43,11 @@ class BookAppointmentScreen extends ConsumerWidget {
     ref.read(bookAppointmentControllerProvider.notifier).updateDate(picked);
   }
 
-  Future<void> _confirmAppointment(BuildContext context, WidgetRef ref) async {
+  Future<void> _confirmAppointment(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) async {
     AppLogger.info(
       'User triggered appointment confirmation process',
       tag: LogTags.patient,
@@ -60,7 +65,7 @@ class BookAppointmentScreen extends ConsumerWidget {
           .bookingStatus;
       final errorMsg =
           controllerState.error?.toString() ??
-              "Booking Failed. Please try again.";
+          "Booking Failed. Please try again.";
 
       AppSnackBar.show(message: errorMsg, type: AppSnackBarType.error);
       return;
@@ -77,11 +82,11 @@ class BookAppointmentScreen extends ConsumerWidget {
         doctorName: doctor.doctorName,
         specialty: doctor.specialization,
         patientLabel: currentState.isSelf
-            ? "Self"
+            ? l10n.patientSelf
             : currentState.selectedFamilyMember!.fullName,
         tokenNumber: "#${result?.token ?? ''}",
         nowServing: "-",
-        estimatedWait: "Not Available",
+        estimatedWait: l10n.notAvailable,
       ),
     );
   }
@@ -91,6 +96,7 @@ class BookAppointmentScreen extends ConsumerWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
+    final l10n = AppLocalizations.of(context)!;
 
     // 🎯 Accessing global data cleanly
     final familyState = ref.watch(familyControllerProvider);
@@ -113,7 +119,7 @@ class BookAppointmentScreen extends ConsumerWidget {
               ),
             ),
           ),
-          child: AppHeader(title: 'Book Appointment'),
+          child: AppHeader(title: l10n.bookAppointment),
         ),
       ),
       body: SafeArea(
@@ -136,30 +142,30 @@ class BookAppointmentScreen extends ConsumerWidget {
                         _buildSectionHeader(
                           textTheme,
                           colorScheme,
-                          '1. Patient Profile',
+                          '1. ${l10n.patientProfile}',
                         ),
                         const SizedBox(height: 12),
                         PatientSelectionSection(
                           isSelf: bookingCtrl.isSelf,
                           familyMembers: familyMembers,
                           selectedFamilyMember:
-                          bookingCtrl.selectedFamilyMember,
+                              bookingCtrl.selectedFamilyMember,
                           onProfileTypeChanged: isBookingLoading
                               ? null
                               : (value) => ref
-                              .read(
-                            bookAppointmentControllerProvider
-                                .notifier,
-                          )
-                              .updateProfileType(value),
+                                    .read(
+                                      bookAppointmentControllerProvider
+                                          .notifier,
+                                    )
+                                    .updateProfileType(value),
                           onMemberChanged: isBookingLoading
                               ? null
                               : (value) => ref
-                              .read(
-                            bookAppointmentControllerProvider
-                                .notifier,
-                          )
-                              .updateFamilyMember(value),
+                                    .read(
+                                      bookAppointmentControllerProvider
+                                          .notifier,
+                                    )
+                                    .updateFamilyMember(value),
                           onAddFamilyPressed: isBookingLoading
                               ? null
                               : () => context.push(AppRoutes.addFamilyMember),
@@ -169,7 +175,7 @@ class BookAppointmentScreen extends ConsumerWidget {
                         _buildSectionHeader(
                           textTheme,
                           colorScheme,
-                          '2. Select Date',
+                          '2. ${l10n.selectDate}',
                         ),
                         const SizedBox(height: 12),
                         DateTimelinePicker(
@@ -177,25 +183,25 @@ class BookAppointmentScreen extends ConsumerWidget {
                           onDateSelected: isBookingLoading
                               ? null
                               : (date) => ref
-                              .read(
-                            bookAppointmentControllerProvider
-                                .notifier,
-                          )
-                              .updateDate(date),
+                                    .read(
+                                      bookAppointmentControllerProvider
+                                          .notifier,
+                                    )
+                                    .updateDate(date),
                           onCustomDatePick: isBookingLoading
                               ? null
                               : () => _pickCustomDate(
-                            context,
-                            ref,
-                            bookingCtrl.selectedDate,
-                          ),
+                                  context,
+                                  ref,
+                                  bookingCtrl.selectedDate,
+                                ),
                         ),
                         const SizedBox(height: 28),
 
                         _buildSectionHeader(
                           textTheme,
                           colorScheme,
-                          '3. Time Session',
+                          '3. ${l10n.timeSessionLabel}',
                         ),
                         const SizedBox(height: 12),
                         SessionSelectionSection(
@@ -203,11 +209,11 @@ class BookAppointmentScreen extends ConsumerWidget {
                           onSessionChanged: isBookingLoading
                               ? null
                               : (session) => ref
-                              .read(
-                            bookAppointmentControllerProvider
-                                .notifier,
-                          )
-                              .updateSession(session),
+                                    .read(
+                                      bookAppointmentControllerProvider
+                                          .notifier,
+                                    )
+                                    .updateSession(session),
                           morningTime: doctor.sessionTimings.morning,
                           eveningTime: doctor.sessionTimings.evening,
                         ),
@@ -221,13 +227,13 @@ class BookAppointmentScreen extends ConsumerWidget {
             AppointmentBottomBar(
               consultationFee: doctor.consultationFee.toDouble(),
               canConfirm:
-              ref
-                  .read(bookAppointmentControllerProvider.notifier)
-                  .canConfirm &&
+                  ref
+                      .read(bookAppointmentControllerProvider.notifier)
+                      .canConfirm &&
                   !isBookingLoading,
               onConfirmPressed: isBookingLoading
                   ? null
-                  : () => _confirmAppointment(context, ref),
+                  : () => _confirmAppointment(context, ref, l10n),
             ),
           ],
         ),
@@ -236,10 +242,10 @@ class BookAppointmentScreen extends ConsumerWidget {
   }
 
   Widget _buildSectionHeader(
-      TextTheme textTheme,
-      ColorScheme colorScheme,
-      String title,
-      ) {
+    TextTheme textTheme,
+    ColorScheme colorScheme,
+    String title,
+  ) {
     return Text(
       title,
       style: textTheme.titleMedium?.copyWith(

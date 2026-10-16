@@ -1,5 +1,6 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import '../../../models/family/family_member_model.dart';
 
 class PatientSelectionSection extends StatelessWidget {
@@ -25,6 +26,7 @@ class PatientSelectionSection extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
+    final l10n = AppLocalizations.of(context)!;
     final currentSelectedFamilyMember =
         familyMembers.any((member) => member.id == selectedFamilyMember?.id)
         ? familyMembers.firstWhere(
@@ -37,7 +39,7 @@ class PatientSelectionSection extends StatelessWidget {
           children: [
             Expanded(
               child: _buildSegmentButton(
-                label: 'For Self',
+                label: l10n.forSelf,
                 icon: Icons.person_rounded,
                 isSelected: isSelf,
                 onTap: onProfileTypeChanged != null
@@ -50,7 +52,7 @@ class PatientSelectionSection extends StatelessWidget {
             const SizedBox(width: 12),
             Expanded(
               child: _buildSegmentButton(
-                label: 'Family Member',
+                label: l10n.familyMember,
                 icon: Icons.group_rounded,
                 isSelected: !isSelf,
                 onTap: onProfileTypeChanged != null

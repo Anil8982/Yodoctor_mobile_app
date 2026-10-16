@@ -1,5 +1,6 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 
 class DateTimelinePicker extends StatelessWidget {
   const DateTimelinePicker({
@@ -18,6 +19,7 @@ class DateTimelinePicker extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
+    final l10n = AppLocalizations.of(context)!;
 
     final DateTime today = DateTime.now();
     const List<String> weekdays = [
@@ -42,7 +44,7 @@ class DateTimelinePicker extends StatelessWidget {
                 final DateTime date = today.add(Duration(days: index));
                 final bool isSelected = _isSameDay(selectedDate, date);
                 final String dayLabel = index == 0
-                    ? 'Today'
+                    ? l10n.today
                     : index == 1
                     ? 'Tom'
                     : weekdays[date.weekday - 1];
@@ -120,7 +122,7 @@ class DateTimelinePicker extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.only(left: 4),
           child: Text(
-            'Selected Date: ${_formatDate(selectedDate)}',
+            '${l10n.selectedDate}: ${_formatDate(selectedDate)}',
             style: textTheme.bodySmall?.copyWith(
               color: colorScheme.primary,
               fontWeight: FontWeight.bold,

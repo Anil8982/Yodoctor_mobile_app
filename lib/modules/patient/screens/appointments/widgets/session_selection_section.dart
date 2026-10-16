@@ -1,5 +1,6 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 
 class SessionSelectionSection extends StatelessWidget {
   const SessionSelectionSection({
@@ -21,6 +22,7 @@ class SessionSelectionSection extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
+    final l10n = AppLocalizations.of(context)!;
 
     final bool hasMorning = morningTime.trim().isNotEmpty;
     final bool hasEvening = eveningTime.trim().isNotEmpty;
@@ -44,7 +46,7 @@ class SessionSelectionSection extends StatelessWidget {
         if (hasMorning) ...[
           Expanded(
             child: _buildSessionCard(
-              label: 'Morning',
+              label: l10n.morning,
               subLabel: morningTime,
               icon: Icons.light_mode_rounded,
               isSelected: selectedSession == 'Morning',
@@ -60,7 +62,7 @@ class SessionSelectionSection extends StatelessWidget {
         if (hasEvening)
           Expanded(
             child: _buildSessionCard(
-              label: 'Evening',
+              label: l10n.evening,
               subLabel: eveningTime,
               icon: Icons.dark_mode_rounded,
               isSelected: selectedSession == 'Evening',
