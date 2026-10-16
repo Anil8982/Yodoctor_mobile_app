@@ -128,6 +128,18 @@
   "@noNotificationsMatchFilter": {
     "description": "Subtitle when filter don't have any notifications."
   },
+   "today": "Today",
+  "@today": {
+    "description": "Shows notifications for today"
+  },
+   "older": "Older",
+  "@older": {
+    "description": "Shows older notifications"
+  },
+  "unreadCount": "{count, plural, =0{0 unread} =1{1 unread} other{{count} unread}}",
+  "@unreadCount": {
+    "description": "Shows badge of unread notifications"
+  },
   "selectLanguage": "Select Language",
   "@selectLanguage": {
     "description": "Modal title for language selector"
@@ -222,6 +234,10 @@
   "@timeSlotLabel": {
     "description": "Time slot card label"
   },
+  "timeSessionLabel": "Time Session",
+  "@timeSessionLabel": {
+    "description": "Time session card label"
+  },
   "tokenNumberLabel": "Token",
   "@tokenNumberLabel": {
     "description": "Token number card label"
@@ -251,6 +267,22 @@
         "example": "5"
       }
     }
+  },
+   "morning": "Morning",
+  "@morning": {
+    "description": "Morning slot label"
+  },
+   "evening": "Evening",
+  "@evening": {
+    "description": "Evening slot label"
+  },
+   "licenseNum": "License No.",
+  "@licenseNum": {
+    "description": "License number label"
+  },
+   "availableDays": "Available Days",
+  "@availableDays": {
+    "description": "Available days label"
   },
   "findDoctors": "Find Doctors",
   "@findDoctors": {
@@ -293,6 +325,66 @@
    "bookNow": "Book Now",
   "@bookNow": {
     "description": "Button to book an appointment now"
+  },
+   "doctorDetails": "Doctor Details",
+  "@doctorDetails": {
+    "description": "Doctor Details screen title"
+  },
+   "available": "Available",
+  "@available": {
+    "description": "Shows status of doctor availability."
+  },
+   "notAvailable": "Not Available",
+  "@notAvailable": {
+    "description": "Shows status of doctor availability."
+  },
+   "aboutDoctor": "About Doctor",
+  "@aboutDoctor": {
+    "description": "Header 1 on doctor details screen"
+  },
+   "readMore": "Read More",
+  "@readMore": {
+    "description": "When need to read, doctor details more"
+  },
+   "readLess": "Read Less",
+  "@readLess": {
+    "description": "When need to read, doctor details less"
+  },
+   "noDescriptionFound": "No description available.",
+  "@noDescriptionFound": {
+    "description": "When no details found for doctor"
+  },
+   "patientProfile": "Patient Profile",
+  "@patientProfile": {
+    "description": "Heading 1 on book appointment screen"
+  },
+   "forSelf": "For Self",
+  "@forSelf": {
+    "description": "Subtitle 1 on book appointment screen"
+  },
+   "familyMember": "Family Member",
+  "@familyMember": {
+    "description": "Subtitle 2 on book appointment screen"
+  },
+   "confirmAppointment": "Confirm Appointment",
+  "@confirmAppointment": {
+    "description": "Button label to confirms the appointment "
+  },
+   "payableAtClinic": "Payable at clinic during visit",
+  "@payableAtClinic": {
+    "description": "Message for payable information"
+  },
+   "bookingConfirmed": "Booking Confirmed",
+  "@bookingConfirmed": {
+    "description": "Dialog title to confirms appointment"
+  },
+   "estimatedWaitingTime": "Est. Wait Time",
+  "@estimatedWaitingTime": {
+    "description": "Shows waiting time for own turn"
+  },
+   "backToHome": "Back to Home",
+  "@backToHome": {
+    "description": "Button label back to home"
   },
   "certificateWallet": "Certificate Wallet",
   "@certificateWallet": {
@@ -626,6 +718,11 @@
   "@selectDate": {
     "description": "Date field placeholder"
   },
+  "selectedDate": "Selected Date",
+  "@selectedDate": {
+    "description": "Shows Selected Date"
+  },
+  
   "requiredField": "Required",
   "@requiredField": {
     "description": "Required field validation message"

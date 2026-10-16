@@ -74,6 +74,10 @@ void main() {
       expect(l10n.cityLabel, 'City');
       expect(l10n.experienceLabel, 'Experience');
       expect(l10n.experienceYears('5'), '5 Yrs');
+      expect(l10n.morning, "Morning");
+      expect(l10n.evening, "Evening");
+      expect(l10n.licenseNum, "License No.");
+      expect(l10n.availableDays, "Available Days");
       expect(l10n.findDoctors, "Find Doctors");
       expect(l10n.foundCount(0), '0 found');
       expect(l10n.foundCount(1), '1 found');
@@ -88,6 +92,13 @@ void main() {
       expect(l10n.consultation, "Consultation");
       expect(l10n.contact, "Contact");
       expect(l10n.bookNow, "Book Now");
+      expect(l10n.doctorDetails, "Doctor Details");
+      expect(l10n.available, "Available");
+      expect(l10n.notAvailable, "Not Available");
+      expect(l10n.aboutDoctor, "About Doctor");
+      expect(l10n.readMore, "Read More");
+      expect(l10n.readLess, "Read Less");
+      expect(l10n.noDescriptionFound, "No description available.");
       // Certificate section keys
       expect(l10n.certificateWallet, 'Certificate Wallet');
       expect(l10n.medicalCertificates, 'Medical Certificates');
@@ -172,6 +183,11 @@ void main() {
         l10n.noNotificationsMatchFilter,
         "You don't have any notifications right now.",
       );
+      expect(l10n.today, "Today");
+      expect(l10n.older, "Older");
+      expect(l10n.unreadCount(0), '0 unread');
+      expect(l10n.unreadCount(1), '1 unread');
+      expect(l10n.unreadCount(3), '3 unread');
 
       // Profile section keys
       expect(l10n.notProvided, "Not Provided");
@@ -219,6 +235,10 @@ void main() {
       expect(l10n.cityLabel, 'शहर');
       expect(l10n.experienceLabel, 'अनुभव');
       expect(l10n.experienceYears('5'), '5 वर्ष');
+      expect(l10n.morning, "सुबह");
+      expect(l10n.evening, "शाम");
+      expect(l10n.licenseNum, "लाइसेंस नंबर");
+      expect(l10n.availableDays, "उपलब्ध दिन");
       expect(l10n.findDoctors, "डॉक्टर खोजें");
       expect(l10n.foundCount(0), '0 मिले');
       expect(l10n.foundCount(1), '1 मिले');
@@ -230,6 +250,14 @@ void main() {
       expect(l10n.consultation, "परामर्श");
       expect(l10n.contact, "संपर्क");
       expect(l10n.bookNow, "अभी बुक करें");
+      expect(l10n.doctorDetails, "डॉक्टर विवरण");
+      expect(l10n.available, "उपलब्ध है");
+      expect(l10n.notAvailable, "अनुपलब्ध");
+      expect(l10n.aboutDoctor, "डॉक्टर के बारे में");
+      expect(l10n.readMore, "और पढ़ें");
+      expect(l10n.readLess, "कम पढ़ें");
+      expect(l10n.noDescriptionFound, "कोई विवरण उपलब्ध नहीं है।");
+
       // Certificate section keys
       expect(l10n.certificateWallet, 'प्रमाणपत्र वॉलेट');
       expect(l10n.medicalCertificates, 'चिकित्सा प्रमाणपत्र');
@@ -267,6 +295,7 @@ void main() {
       );
       expect(l10n.language, 'भाषा');
       expect(l10n.profileSettings, 'प्रोफ़ाइल सेटिंग्स');
+
       // Services section keys
       expect(l10n.services, 'सेवाएं');
       expect(l10n.servicesTab, 'सेवाएं');
@@ -314,6 +343,11 @@ void main() {
         l10n.noNotificationsMatchFilter,
         "फ़िलहाल आपके पास कोई नोटिफ़िकेशन नहीं है।",
       );
+      expect(l10n.today, "आज");
+      expect(l10n.older, "पहले की");
+      expect(l10n.unreadCount(0), '0 नहीं पढ़े');
+      expect(l10n.unreadCount(1), '1 नहीं पढ़े');
+      expect(l10n.unreadCount(3), '3 नहीं पढ़े');
 
       // Profile section keys
       expect(l10n.notProvided, "उपलब्ध नहीं है");

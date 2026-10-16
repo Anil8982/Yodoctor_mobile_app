@@ -104,6 +104,24 @@ class AppLocalizationsHi extends AppLocalizations {
       'फ़िलहाल आपके पास कोई नोटिफ़िकेशन नहीं है।';
 
   @override
+  String get today => 'आज';
+
+  @override
+  String get older => 'पहले की';
+
+  @override
+  String unreadCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count नहीं पढ़े',
+      one: '1 नहीं पढ़े',
+      zero: '0 नहीं पढ़े',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get selectLanguage => 'भाषा चुनें';
 
   @override
@@ -173,6 +191,9 @@ class AppLocalizationsHi extends AppLocalizations {
   String get timeSlotLabel => 'समय स्लॉट';
 
   @override
+  String get timeSessionLabel => 'समय स्लॉट';
+
+  @override
   String get tokenNumberLabel => 'टोकन';
 
   @override
@@ -191,6 +212,18 @@ class AppLocalizationsHi extends AppLocalizations {
   String experienceYears(String count) {
     return '$count वर्ष';
   }
+
+  @override
+  String get morning => 'सुबह';
+
+  @override
+  String get evening => 'शाम';
+
+  @override
+  String get licenseNum => 'लाइसेंस नंबर';
+
+  @override
+  String get availableDays => 'उपलब्ध दिन';
 
   @override
   String get findDoctors => 'डॉक्टर खोजें';
@@ -227,6 +260,51 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get bookNow => 'अभी बुक करें';
+
+  @override
+  String get doctorDetails => 'डॉक्टर विवरण';
+
+  @override
+  String get available => 'उपलब्ध है';
+
+  @override
+  String get notAvailable => 'अनुपलब्ध';
+
+  @override
+  String get aboutDoctor => 'डॉक्टर के बारे में';
+
+  @override
+  String get readMore => 'और पढ़ें';
+
+  @override
+  String get readLess => 'कम पढ़ें';
+
+  @override
+  String get noDescriptionFound => 'कोई विवरण उपलब्ध नहीं है।';
+
+  @override
+  String get patientProfile => 'मरीज़ की प्रोफ़ाइल';
+
+  @override
+  String get forSelf => 'स्वयं';
+
+  @override
+  String get familyMember => 'परिवार सदस्य';
+
+  @override
+  String get confirmAppointment => 'अपॉइंटमेंट कन्फर्म करें';
+
+  @override
+  String get payableAtClinic => 'क्लिनिक में विज़िट के दौरान भुगतान करें';
+
+  @override
+  String get bookingConfirmed => 'बुकिंग कन्फर्म हुई';
+
+  @override
+  String get estimatedWaitingTime => 'अनुमानित प्रतीक्षा समय';
+
+  @override
+  String get backToHome => 'होम पर जाएँ';
 
   @override
   String get certificateWallet => 'प्रमाणपत्र वॉलेट';
@@ -478,6 +556,9 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get selectDate => 'तिथि चुनें';
+
+  @override
+  String get selectedDate => 'चुनी गई तारीख';
 
   @override
   String get requiredField => 'आवश्यक';

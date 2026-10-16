@@ -104,6 +104,24 @@ class AppLocalizationsEn extends AppLocalizations {
       'You don\'t have any notifications right now.';
 
   @override
+  String get today => 'Today';
+
+  @override
+  String get older => 'Older';
+
+  @override
+  String unreadCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count unread',
+      one: '1 unread',
+      zero: '0 unread',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get selectLanguage => 'Select Language';
 
   @override
@@ -174,6 +192,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get timeSlotLabel => 'Time Slot';
 
   @override
+  String get timeSessionLabel => 'Time Session';
+
+  @override
   String get tokenNumberLabel => 'Token';
 
   @override
@@ -192,6 +213,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String experienceYears(String count) {
     return '$count Yrs';
   }
+
+  @override
+  String get morning => 'Morning';
+
+  @override
+  String get evening => 'Evening';
+
+  @override
+  String get licenseNum => 'License No.';
+
+  @override
+  String get availableDays => 'Available Days';
 
   @override
   String get findDoctors => 'Find Doctors';
@@ -229,6 +262,51 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get bookNow => 'Book Now';
+
+  @override
+  String get doctorDetails => 'Doctor Details';
+
+  @override
+  String get available => 'Available';
+
+  @override
+  String get notAvailable => 'Not Available';
+
+  @override
+  String get aboutDoctor => 'About Doctor';
+
+  @override
+  String get readMore => 'Read More';
+
+  @override
+  String get readLess => 'Read Less';
+
+  @override
+  String get noDescriptionFound => 'No description available.';
+
+  @override
+  String get patientProfile => 'Patient Profile';
+
+  @override
+  String get forSelf => 'For Self';
+
+  @override
+  String get familyMember => 'Family Member';
+
+  @override
+  String get confirmAppointment => 'Confirm Appointment';
+
+  @override
+  String get payableAtClinic => 'Payable at clinic during visit';
+
+  @override
+  String get bookingConfirmed => 'Booking Confirmed';
+
+  @override
+  String get estimatedWaitingTime => 'Est. Wait Time';
+
+  @override
+  String get backToHome => 'Back to Home';
 
   @override
   String get certificateWallet => 'Certificate Wallet';
@@ -480,6 +558,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get selectDate => 'Select Date';
+
+  @override
+  String get selectedDate => 'Selected Date';
 
   @override
   String get requiredField => 'Required';

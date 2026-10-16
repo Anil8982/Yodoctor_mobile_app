@@ -254,6 +254,24 @@ abstract class AppLocalizations {
   /// **'You don\'t have any notifications right now.'**
   String get noNotificationsMatchFilter;
 
+  /// Shows notifications for today
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get today;
+
+  /// Shows older notifications
+  ///
+  /// In en, this message translates to:
+  /// **'Older'**
+  String get older;
+
+  /// Shows badge of unread notifications
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{0 unread} =1{1 unread} other{{count} unread}}'**
+  String unreadCount(num count);
+
   /// Modal title for language selector
   ///
   /// In en, this message translates to:
@@ -386,6 +404,12 @@ abstract class AppLocalizations {
   /// **'Time Slot'**
   String get timeSlotLabel;
 
+  /// Time session card label
+  ///
+  /// In en, this message translates to:
+  /// **'Time Session'**
+  String get timeSessionLabel;
+
   /// Token number card label
   ///
   /// In en, this message translates to:
@@ -421,6 +445,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count} Yrs'**
   String experienceYears(String count);
+
+  /// Morning slot label
+  ///
+  /// In en, this message translates to:
+  /// **'Morning'**
+  String get morning;
+
+  /// Evening slot label
+  ///
+  /// In en, this message translates to:
+  /// **'Evening'**
+  String get evening;
+
+  /// License number label
+  ///
+  /// In en, this message translates to:
+  /// **'License No.'**
+  String get licenseNum;
+
+  /// Available days label
+  ///
+  /// In en, this message translates to:
+  /// **'Available Days'**
+  String get availableDays;
 
   /// Find Doctors screen title
   ///
@@ -475,6 +523,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Book Now'**
   String get bookNow;
+
+  /// Doctor Details screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Doctor Details'**
+  String get doctorDetails;
+
+  /// Shows status of doctor availability.
+  ///
+  /// In en, this message translates to:
+  /// **'Available'**
+  String get available;
+
+  /// Shows status of doctor availability.
+  ///
+  /// In en, this message translates to:
+  /// **'Not Available'**
+  String get notAvailable;
+
+  /// Header 1 on doctor details screen
+  ///
+  /// In en, this message translates to:
+  /// **'About Doctor'**
+  String get aboutDoctor;
+
+  /// When need to read, doctor details more
+  ///
+  /// In en, this message translates to:
+  /// **'Read More'**
+  String get readMore;
+
+  /// When need to read, doctor details less
+  ///
+  /// In en, this message translates to:
+  /// **'Read Less'**
+  String get readLess;
+
+  /// When no details found for doctor
+  ///
+  /// In en, this message translates to:
+  /// **'No description available.'**
+  String get noDescriptionFound;
+
+  /// Heading 1 on book appointment screen
+  ///
+  /// In en, this message translates to:
+  /// **'Patient Profile'**
+  String get patientProfile;
+
+  /// Subtitle 1 on book appointment screen
+  ///
+  /// In en, this message translates to:
+  /// **'For Self'**
+  String get forSelf;
+
+  /// Subtitle 2 on book appointment screen
+  ///
+  /// In en, this message translates to:
+  /// **'Family Member'**
+  String get familyMember;
+
+  /// Button label to confirms the appointment
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Appointment'**
+  String get confirmAppointment;
+
+  /// Message for payable information
+  ///
+  /// In en, this message translates to:
+  /// **'Payable at clinic during visit'**
+  String get payableAtClinic;
+
+  /// Dialog title to confirms appointment
+  ///
+  /// In en, this message translates to:
+  /// **'Booking Confirmed'**
+  String get bookingConfirmed;
+
+  /// Shows waiting time for own turn
+  ///
+  /// In en, this message translates to:
+  /// **'Est. Wait Time'**
+  String get estimatedWaitingTime;
+
+  /// Button label back to home
+  ///
+  /// In en, this message translates to:
+  /// **'Back to Home'**
+  String get backToHome;
 
   /// Certificate Wallet screen title
   ///
@@ -925,6 +1063,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Select Date'**
   String get selectDate;
+
+  /// Shows Selected Date
+  ///
+  /// In en, this message translates to:
+  /// **'Selected Date'**
+  String get selectedDate;
 
   /// Required field validation message
   ///
