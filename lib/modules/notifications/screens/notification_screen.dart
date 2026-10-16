@@ -34,7 +34,9 @@ class NotificationScreen extends ConsumerWidget {
       backgroundColor: colorScheme.surface,
       appBar: AppHeader(
         title: l10n.notification,
-        subtitle: state.unreadCount > 0 ? "${state.unreadCount} unread" : null,
+        subtitle: state.unreadCount > 0
+            ? l10n.unreadCount(state.unreadCount)
+            : null,
         actions: [
           IconButton(
             icon: const Icon(Icons.done_all_rounded),
@@ -120,7 +122,7 @@ class NotificationScreen extends ConsumerWidget {
                                   children: [
                                     if (todayNotifications.isNotEmpty) ...[
                                       Text(
-                                        "Today",
+                                        l10n.today,
                                         style: theme.textTheme.labelLarge
                                             ?.copyWith(
                                               fontWeight: FontWeight.w700,
@@ -143,7 +145,7 @@ class NotificationScreen extends ConsumerWidget {
                                     ],
                                     if (olderNotifications.isNotEmpty) ...[
                                       Text(
-                                        "Older",
+                                        l10n.older,
                                         style: theme.textTheme.labelLarge
                                             ?.copyWith(
                                               fontWeight: FontWeight.w700,
