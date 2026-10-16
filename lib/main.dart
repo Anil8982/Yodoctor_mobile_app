@@ -41,9 +41,7 @@ Future<void> main() async {
 
   runApp(
     ProviderScope(
-      overrides: [
-        storageProvider.overrideWithValue(storage),
-      ],
+      overrides: [storageProvider.overrideWithValue(storage)],
       child: const YoDoctorApp(),
     ),
   );
@@ -57,13 +55,16 @@ class YoDoctorApp extends ConsumerWidget {
     final currentRole = ref.watch(appRoleProvider);
     final goRouter = ref.watch(routerProvider);
     final currentLocale = ref.watch(localeProvider);
+    final effectiveLocale = currentRole == AppRole.patient
+        ? currentLocale
+        : const Locale('en');
 
     return MaterialApp.router(
       scaffoldMessengerKey: appScaffoldMessengerKey,
       title: 'YoDoctor',
       debugShowCheckedModeBanner: false,
       routerConfig: goRouter,
-      locale: currentLocale,
+      locale: effectiveLocale,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       theme: _getThemeForRole(currentRole, Brightness.light),
