@@ -1,0 +1,1622 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
+import 'app_localizations.dart';
+
+// ignore_for_file: type=lint
+
+/// The translations for Hindi (`hi`).
+class AppLocalizationsHi extends AppLocalizations {
+  AppLocalizationsHi([String locale = 'hi']) : super(locale);
+
+  @override
+  String get dashboard => 'डैशबोर्ड';
+
+  @override
+  String get dashboardLoadError => 'डैशबोर्ड लोड त्रुटि';
+
+  @override
+  String get dashboardLoadErrorSubtitle =>
+      'सर्वर से कनेक्ट करने में असमर्थ। कृपया अपना इंटरनेट कनेक्शन जांचें।';
+
+  @override
+  String get tryAgain => 'पुनः प्रयास करें';
+
+  @override
+  String get upcomingAppointments => 'आगामी अपॉइंटमेंट्स';
+
+  @override
+  String get noAppointments => 'कोई अपॉइंटमेंट नहीं';
+
+  @override
+  String get bookAppointmentSubtitle => 'डॉक्टर के साथ अपॉइंटमेंट बुक करें';
+
+  @override
+  String get bookAppointment => 'अपॉइंटमेंट बुक करें';
+
+  @override
+  String get patientDashboard => 'मरीज़ डैशबोर्ड';
+
+  @override
+  String upcomingVisitsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count आगामी विज़िट',
+      one: '1 आगामी विज़िट',
+      zero: '0 आगामी विज़िट',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get findYour => 'ढूंढें अपना';
+
+  @override
+  String get bestDoctorNearYou => 'नज़दीकी सर्वश्रेष्ठ डॉक्टर';
+
+  @override
+  String get searchNow => 'अभी खोजें';
+
+  @override
+  String get location => 'स्थान के आधार पर';
+
+  @override
+  String get searchDoctors => 'डॉक्टर खोजें';
+
+  @override
+  String get noActiveToken => 'कोई सक्रिय टोकन नहीं';
+
+  @override
+  String get tokenAppearHere => 'आज का आपका टोकन यहाँ दिखाई देगा';
+
+  @override
+  String get tokenLabel => 'टोकन';
+
+  @override
+  String get waiting => 'प्रतीक्षारत';
+
+  @override
+  String servingToken(String token) {
+    return 'सेवारत: $token';
+  }
+
+  @override
+  String patientsAhead(String count) {
+    return '$count आगे';
+  }
+
+  @override
+  String patientLabel(String name) {
+    return 'मरीज़: $name';
+  }
+
+  @override
+  String get patientSelf => 'स्वयं';
+
+  @override
+  String get notification => 'नोटिफ़िकेशन';
+
+  @override
+  String get allCaughtUp => 'अभी कोई नया अपडेट नहीं!';
+
+  @override
+  String get noNotificationsMatchFilter =>
+      'फ़िलहाल आपके पास कोई नोटिफ़िकेशन नहीं है।';
+
+  @override
+  String get today => 'आज';
+
+  @override
+  String get older => 'पहले की';
+
+  @override
+  String unreadCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count नहीं पढ़े',
+      one: '1 नहीं पढ़े',
+      zero: '0 नहीं पढ़े',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get selectLanguage => 'भाषा चुनें';
+
+  @override
+  String get languageEnglish => 'English (अंग्रेज़ी)';
+
+  @override
+  String get languageHindi => 'हिन्दी (Hindi)';
+
+  @override
+  String get changeLanguage => 'भाषा बदलें';
+
+  @override
+  String get language => 'भाषा';
+
+  @override
+  String get chooseAppLanguage => 'ऐप की भाषा चुनें';
+
+  @override
+  String get profileSettings => 'प्रोफ़ाइल सेटिंग्स';
+
+  @override
+  String estimatedMinutes(String count) {
+    return '$count मिनट';
+  }
+
+  @override
+  String get unableToCancelAppointment => 'अपॉइंटमेंट रद्द करने में असमर्थ';
+
+  @override
+  String get appointmentCancelledSuccess => 'अपॉइंटमेंट सफलतापूर्वक रद्द की गई';
+
+  @override
+  String get cancelAppointment => 'अपॉइंटमेंट रद्द करें';
+
+  @override
+  String get cancelAppointmentConfirmation =>
+      'क्या आप वाकई इस अपॉइंटमेंट को रद्द करना चाहते हैं?\n\nयह कार्रवाई पूर्ववत नहीं की जा सकती।';
+
+  @override
+  String get keepAppointment => 'रखें';
+
+  @override
+  String get close => 'बंद करें';
+
+  @override
+  String get appointmentTitle => 'अपॉइंटमेंट';
+
+  @override
+  String get detailsTitle => 'विवरण';
+
+  @override
+  String get appointmentInformation => 'अपॉइंटमेंट जानकारी';
+
+  @override
+  String get clinicInformation => 'क्लिनिक जानकारी';
+
+  @override
+  String get clinicAddress => 'क्लिनिक का पता';
+
+  @override
+  String get patientInfoLabel => 'मरीज़';
+
+  @override
+  String get dateLabel => 'दिनांक';
+
+  @override
+  String get timeSlotLabel => 'समय स्लॉट';
+
+  @override
+  String get timeSessionLabel => 'समय स्लॉट';
+
+  @override
+  String get tokenNumberLabel => 'टोकन';
+
+  @override
+  String get clinicLabel => 'क्लिनिक';
+
+  @override
+  String get feeLabel => 'शुल्क';
+
+  @override
+  String get cityLabel => 'शहर';
+
+  @override
+  String get experienceLabel => 'अनुभव';
+
+  @override
+  String experienceYears(String count) {
+    return '$count वर्ष';
+  }
+
+  @override
+  String get morning => 'सुबह';
+
+  @override
+  String get evening => 'शाम';
+
+  @override
+  String get licenseNum => 'लाइसेंस नंबर';
+
+  @override
+  String get availableDays => 'उपलब्ध दिन';
+
+  @override
+  String get findDoctors => 'डॉक्टर खोजें';
+
+  @override
+  String foundCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count मिले',
+      one: '1 मिले',
+      zero: '0 मिले',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get featuredSpecialties => 'विशेष विशेषज्ञ';
+
+  @override
+  String get availableDoctors => 'उपलब्ध डॉक्टर';
+
+  @override
+  String get noDoctorsFound => 'कोई डॉक्टर नहीं मिला';
+
+  @override
+  String get noDoctorsMatchFilter => 'अपनी खोज या लोकेशन बदलकर देखें';
+
+  @override
+  String get consultation => 'परामर्श';
+
+  @override
+  String get contact => 'संपर्क';
+
+  @override
+  String get bookNow => 'अभी बुक करें';
+
+  @override
+  String get doctorDetails => 'डॉक्टर विवरण';
+
+  @override
+  String get available => 'उपलब्ध है';
+
+  @override
+  String get notAvailable => 'अनुपलब्ध';
+
+  @override
+  String get aboutDoctor => 'डॉक्टर के बारे में';
+
+  @override
+  String get readMore => 'और पढ़ें';
+
+  @override
+  String get readLess => 'कम पढ़ें';
+
+  @override
+  String get noDescriptionFound => 'कोई विवरण उपलब्ध नहीं है।';
+
+  @override
+  String get patientProfile => 'मरीज़ की प्रोफ़ाइल';
+
+  @override
+  String get forSelf => 'स्वयं';
+
+  @override
+  String get familyMember => 'परिवार सदस्य';
+
+  @override
+  String get confirmAppointment => 'अपॉइंटमेंट कन्फर्म करें';
+
+  @override
+  String get payableAtClinic => 'क्लिनिक में विज़िट के दौरान भुगतान करें';
+
+  @override
+  String get bookingConfirmed => 'बुकिंग कन्फर्म हुई';
+
+  @override
+  String get estimatedWaitingTime => 'अनुमानित प्रतीक्षा समय';
+
+  @override
+  String get backToHome => 'होम पर जाएँ';
+
+  @override
+  String get certificateWallet => 'प्रमाणपत्र वॉलेट';
+
+  @override
+  String get medicalCertificates => 'चिकित्सा प्रमाणपत्र';
+
+  @override
+  String get trackRequestsSubtitle =>
+      'अनुरोधों को ट्रैक करें और स्वीकृत प्रमाणपत्र डाउनलोड करें।';
+
+  @override
+  String certificateCountWithFilter(int count, String filter) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count प्रमाणपत्र | $filter',
+      one: '1 प्रमाणपत्र | $filter',
+      zero: '0 प्रमाणपत्र | $filter',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get searchByTypeOrDoctor => 'प्रकार या डॉक्टर द्वारा खोजें...';
+
+  @override
+  String get filterAll => 'सभी';
+
+  @override
+  String get filterPending => 'लंबित';
+
+  @override
+  String get filterApproved => 'स्वीकृत';
+
+  @override
+  String get filterRejected => 'अस्वीकृत';
+
+  @override
+  String get applyCertificate => 'प्रमाणपत्र आवेदन';
+
+  @override
+  String get assignedTo => 'सौंपा गया: ';
+
+  @override
+  String get viewAndDownloadCertificate => 'प्रमाणपत्र देखें और डाउनलोड करें';
+
+  @override
+  String get requestDeclinedNote =>
+      'नोट: अपर्याप्त चिकित्सा साक्ष्य के कारण डॉक्टर द्वारा अनुरोध अस्वीकार कर दिया गया।';
+
+  @override
+  String get noCertificatesFound => 'कोई प्रमाणपत्र नहीं मिला';
+
+  @override
+  String noCertificatesMatchFilter(String filter) {
+    return '\"$filter\" फ़िल्टर से कोई प्रमाणपत्र मेल नहीं खाता।';
+  }
+
+  @override
+  String get selectCertificateDoctor => 'प्रमाणपत्र डॉक्टर चुनें';
+
+  @override
+  String get noCertificateDoctorsAvailable =>
+      'इस समय कोई प्रमाणपत्र डॉक्टर उपलब्ध नहीं हैं।';
+
+  @override
+  String certificateFee(String fee) {
+    return 'प्रमाणपत्र शुल्क — ₹$fee';
+  }
+
+  @override
+  String get applyForCertificate => 'प्रमाणपत्र के लिए आवेदन करें';
+
+  @override
+  String requestingFromDoctor(String name, String specialty) {
+    return '$name से अनुरोध — $specialty';
+  }
+
+  @override
+  String get chooseCertificateTypeSubtitle =>
+      'प्रमाणपत्र का प्रकार और विवरण चुनें';
+
+  @override
+  String get stepType => 'प्रकार';
+
+  @override
+  String get stepMedicalInfo => 'चिकित्सा जानकारी';
+
+  @override
+  String get stepDocuments => 'दस्तावेज़';
+
+  @override
+  String get stepReview => 'समीक्षा';
+
+  @override
+  String get cancel => 'रद्द करें';
+
+  @override
+  String get back => 'वापस';
+
+  @override
+  String get continueButton => 'आगे बढ़ें';
+
+  @override
+  String get submitRequest => 'अनुरोध सबमिट करें';
+
+  @override
+  String get pleaseSelectCertificateType => 'कृपया प्रमाणपत्र का प्रकार चुनें';
+
+  @override
+  String get pleaseUploadRequiredFiles =>
+      'कृपया आवश्यक सत्यापन फ़ाइलें अपलोड करें।';
+
+  @override
+  String get pleaseConfirmAccuracy =>
+      'आगे बढ़ने के लिए कृपया सटीकता सत्यापन की पुष्टि करें।';
+
+  @override
+  String get certificateRequestSuccess =>
+      'भुगतान पूरा हुआ और प्रमाणपत्र अनुरोध सफलतापूर्वक सबमिट किया गया।';
+
+  @override
+  String get certificateRequestFailed =>
+      'हम आपका प्रमाणपत्र अनुरोध पूरा नहीं कर सके। कृपया कुछ देर बाद पुनः प्रयास करें।';
+
+  @override
+  String get selectCertificateType => 'प्रमाणपत्र का प्रकार चुनें';
+
+  @override
+  String get selectCertificateTypeDesc =>
+      'अपने आवेदन के लिए उपयुक्त विकल्प चुनें।';
+
+  @override
+  String get certMedicalFitness => 'मेडिकल फिटनेस';
+
+  @override
+  String get certMedicalFitnessDesc => 'रोजगार या खेल के लिए';
+
+  @override
+  String get certVaccination => 'टीकाकरण';
+
+  @override
+  String get certVaccinationDesc => 'प्रतिरक्षण रिकॉर्ड';
+
+  @override
+  String get certDisability => 'दिव्यांगता';
+
+  @override
+  String get certDisabilityDesc => 'आधिकारिक दिव्यांगता प्रमाण';
+
+  @override
+  String get certSecondOpinion => 'दूसरी राय';
+
+  @override
+  String get certSecondOpinionDesc => 'विशेषज्ञ चिकित्सा समीक्षा';
+
+  @override
+  String get certDischargeSummary => 'डिस्चार्ज सारांश';
+
+  @override
+  String get certDischargeSummaryDesc => 'अस्पताल डिस्चार्ज का सारांश';
+
+  @override
+  String get assignedDoctor => 'असाइन किए गए डॉक्टर';
+
+  @override
+  String get purposeOfCertificate => 'प्रमाणपत्र का उद्देश्य';
+
+  @override
+  String get selectPurpose => 'उद्देश्य चुनें';
+
+  @override
+  String get purposeTravel => 'यात्रा';
+
+  @override
+  String get purposeEmployment => 'रोजगार';
+
+  @override
+  String get purposeSports => 'खेल';
+
+  @override
+  String get purposeSchoolUniversity => 'स्कूल/विश्वविद्यालय';
+
+  @override
+  String get purposeInsurance => 'बीमा';
+
+  @override
+  String get purposeOther => 'अन्य';
+
+  @override
+  String get pleaseSelectPurpose => 'कृपया एक उद्देश्य चुनें';
+
+  @override
+  String get additionalNotesForDoctor => 'डॉक्टर के लिए अतिरिक्त नोट्स';
+
+  @override
+  String get additionalNotesHint => 'कोई विशेष निर्देश? (वैकल्पिक)';
+
+  @override
+  String get medicalDetails => 'चिकित्सा विवरण';
+
+  @override
+  String get medicalDetailsDesc =>
+      'अपने मेडिकल क्लीयरेंस पर प्रदर्शित करने के लिए बुनियादी बायोमेट्रिक्स प्रदान करें।';
+
+  @override
+  String get notProvided => 'उपलब्ध नहीं है';
+
+  @override
+  String get fullName => 'पूरा नाम';
+
+  @override
+  String get enterFullName => 'पूरा नाम दर्ज करें';
+
+  @override
+  String get pleaseEnterName => 'कृपया नाम दर्ज करें';
+
+  @override
+  String get nameMinCharacters => 'नाम में कम से कम 2 अक्षर होने चाहिए';
+
+  @override
+  String get onlyAlphabetsAllowed => 'केवल अक्षरों की अनुमति है';
+
+  @override
+  String get emailAddress => 'ईमेल पता';
+
+  @override
+  String get enterEmailAddress => 'ईमेल पता दर्ज करें';
+
+  @override
+  String get pleaseEnterEmailAddress => 'कृपया ईमेल पता दर्ज करें';
+
+  @override
+  String get phoneNumber => 'मोबाइल नंबर';
+
+  @override
+  String get enterPhoneNumber => 'फ़ोन नंबर दर्ज करें';
+
+  @override
+  String get pleaseEnterPhoneNumber => 'कृपया मोबाइल नंबर दर्ज करें';
+
+  @override
+  String get phoneMinDigitsAllowed => '10 अंकों का सही मोबाइल नंबर दर्ज करें';
+
+  @override
+  String get dateOfBirth => 'जन्म तिथि';
+
+  @override
+  String get selectDate => 'तारीख चुनें';
+
+  @override
+  String get selectedDate => 'चुनी गई तारीख';
+
+  @override
+  String get requiredField => 'आवश्यक';
+
+  @override
+  String get gender => 'लिंग';
+
+  @override
+  String get selectGender => 'लिंग चुनें';
+
+  @override
+  String get genderMale => 'पुरुष';
+
+  @override
+  String get genderFemale => 'महिला';
+
+  @override
+  String get genderOther => 'अन्य';
+
+  @override
+  String get bloodGroup => 'रक्त समूह';
+
+  @override
+  String get selectBloodGroup => 'रक्त समूह चुनें';
+
+  @override
+  String get height => 'ऊंचाई';
+
+  @override
+  String get heightHint => 'उदा. 170';
+
+  @override
+  String get enterValidNumber => 'एक मान्य संख्या दर्ज करें';
+
+  @override
+  String get enterValidHeight => 'मान्य ऊंचाई दर्ज करें';
+
+  @override
+  String get weight => 'वजन';
+
+  @override
+  String get weightHint => 'उदा. 65';
+
+  @override
+  String get enterValidWeight => 'मान्य वजन दर्ज करें';
+
+  @override
+  String get knownMedicalConditions => 'ज्ञात चिकित्सा स्थितियां';
+
+  @override
+  String get medicalConditionsHint => 'उदा., मधुमेह, उच्च रक्तचाप, अस्थमा';
+
+  @override
+  String get currentMedications => 'वर्तमान दवाएं';
+
+  @override
+  String get medicationsHint =>
+      'उदा., मेटफ़ॉर्मिन 500 मिग्रा, दैनिक मल्टीविटामिन';
+
+  @override
+  String get uploadSupportingFiles => 'सहायक फ़ाइलें अपलोड करें';
+
+  @override
+  String get uploadSupportingFilesDesc =>
+      'सत्यापन प्रक्रिया के लिए दस्तावेज़ प्रदान करें।';
+
+  @override
+  String get docProfilePhoto => 'प्रोफ़ाइल फ़ोटो';
+
+  @override
+  String get docProfilePhotoHint =>
+      'अपनी प्रोफ़ाइल तस्वीर अपलोड करें (jpg, png)';
+
+  @override
+  String get docGovtId => 'सरकारी पहचान पत्र';
+
+  @override
+  String get docGovtIdHint => 'आधिकारिक पहचान दस्तावेज़';
+
+  @override
+  String get docMedicalReports => 'मेडिकल रिपोर्ट';
+
+  @override
+  String get docMedicalReportsHint => 'पिछली नैदानिक ​​डेटा रिपोर्ट';
+
+  @override
+  String get docPrescription => 'डॉक्टर का पर्चा';
+
+  @override
+  String get docPrescriptionHint => 'डॉक्टर का अधिकृत पर्चा';
+
+  @override
+  String get uploadingDocument => 'दस्तावेज़ अपलोड हो रहा है...';
+
+  @override
+  String get documentUploadedSuccess => 'दस्तावेज़ सफलतापूर्वक अपलोड हो गया';
+
+  @override
+  String get deleteUploadTooltip => 'अपलोड हटाएं';
+
+  @override
+  String get clickToUpload => 'अपलोड करने के लिए क्लिक करें';
+
+  @override
+  String get documentRequired => 'यह दस्तावेज़ आवश्यक है!';
+
+  @override
+  String get reviewApplication => 'आवेदन की समीक्षा करें';
+
+  @override
+  String get reviewApplicationDesc =>
+      'मूल्यांकन चैनलों पर सबमिट करने से पहले प्रविष्टियों की सटीकता की पुष्टि करें।';
+
+  @override
+  String get certificateBaselineParameters => 'प्रमाणपत्र के बुनियादी पैरामीटर';
+
+  @override
+  String get certificateTypeLabel => 'प्रमाणपत्र का प्रकार';
+
+  @override
+  String get assignedDoctorLabel => 'असाइन किए गए मेडिकल डॉक्टर';
+
+  @override
+  String get medicalSpecialtyLabel => 'मेडिकल विशेषता';
+
+  @override
+  String get intendedPurposeLabel => 'अभीष्ट उद्देश्य';
+
+  @override
+  String get additionalNotesLabel => 'अतिरिक्त संदर्भ नोट्स';
+
+  @override
+  String get noneLabel => 'कोई नहीं';
+
+  @override
+  String get notAvailableLabel => 'लागू नहीं';
+
+  @override
+  String get patientDiagnosticInformation => 'मरीज़ की नैदानिक ​​जानकारी';
+
+  @override
+  String get fullLegalNameLabel => 'पूरा कानूनी नाम';
+
+  @override
+  String get dateOfBirthLabel => 'जन्म तिथि';
+
+  @override
+  String get biologicalGenderLabel => 'जैविक लिंग';
+
+  @override
+  String get bloodGroupStagingLabel => 'रक्त समूह';
+
+  @override
+  String get heightMetricLabel => 'ऊंचाई माप';
+
+  @override
+  String get weightMetricLabel => 'वजन माप';
+
+  @override
+  String get chronicMedicalConditionsLabel => 'पुरानी चिकित्सा स्थितियां';
+
+  @override
+  String get activePrescriptionsLabel => 'वर्तमान सक्रिय दवाएं';
+
+  @override
+  String get uploadedVerificationMaterials => 'अपलोड की गई सत्यापन सामग्री';
+
+  @override
+  String get disclaimerNotice =>
+      'इस इलेक्ट्रॉनिक अनुरोध प्रोफ़ाइल को भेजकर, आप स्पष्ट रूप से पुष्टि करते हैं कि सभी बायोमेट्रिक जानकारी सत्यापित व्यक्तिगत चिकित्सा इतिहास से मेल खाती है।';
+
+  @override
+  String get disclaimerCheckbox =>
+      'मैं कानूनी रूप से सत्यापित करता/करती हूँ कि मेरे द्वारा प्रस्तुत प्रोफ़ाइल फ़ील्ड सटीक हैं।';
+
+  @override
+  String get certificateDetails => 'प्रमाणपत्र विवरण';
+
+  @override
+  String get certificateNotFound => 'प्रमाणपत्र नहीं मिला';
+
+  @override
+  String get certificateLabel => 'प्रमाणपत्र';
+
+  @override
+  String get doctorLabel => 'डॉक्टर';
+
+  @override
+  String get purposeLabel => 'उद्देश्य';
+
+  @override
+  String get statusLabel => 'स्थिति';
+
+  @override
+  String get medicinesLabel => 'दवाएं';
+
+  @override
+  String get notesLabel => 'नोट्स';
+
+  @override
+  String get timelineLabel => 'समयरेखा';
+
+  @override
+  String get logoutButtonLabel => 'लॉग आउट';
+
+  @override
+  String get endingSessionTitle => 'सेशन समाप्त करें?';
+
+  @override
+  String get logoutContent =>
+      'क्या आप वाकई लॉग आउट करना चाहते हैं? अपने मेडिकल डैशबोर्ड का उपयोग करने के लिए आपको फिर से लॉग इन करना होगा।';
+
+  @override
+  String get logoutDrawerItem => 'लॉग आउट';
+
+  @override
+  String get myProfileDrawerItem => 'मेरी प्रोफ़ाइल';
+
+  @override
+  String get familyDrawerItem => 'परिवार';
+
+  @override
+  String get homeTab => 'होम';
+
+  @override
+  String get homeDrawerItem => 'होम';
+
+  @override
+  String get certificatesTab => 'प्रमाणपत्र';
+
+  @override
+  String get certificateDrawerItem => 'प्रमाणपत्र';
+
+  @override
+  String get appointmentsTab => 'हिस्ट्री';
+
+  @override
+  String get appointmentsDrawerItem => 'अपॉइंटमेंट्स';
+
+  @override
+  String get services => 'सेवाएं';
+
+  @override
+  String get servicesTab => 'सेवाएं';
+
+  @override
+  String get servicesHeaderTitle => 'योडॉक्टर सेवाएं';
+
+  @override
+  String get servicesHeaderSubtitle =>
+      'त्वरित चिकित्सा सेवा प्राप्त करने के लिए एक सेवा चुनें।';
+
+  @override
+  String activeServicesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count सक्रिय सेवाएं',
+      one: '1 सक्रिय सेवा',
+      zero: '0 सक्रिय सेवाएं',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get serviceMedicineDeliveryTitle => 'दवा वितरण';
+
+  @override
+  String get serviceMedicineDeliverySubtitle => 'ज़रूरी दवाएं आपके दरवाज़े पर';
+
+  @override
+  String get medicineDeliveryComingSoon => 'दवा वितरण सेवा जल्द उपलब्ध होगी';
+
+  @override
+  String get serviceLabTestTitle => 'लैब टेस्ट';
+
+  @override
+  String get serviceLabTestSubtitle => 'घर बैठे सैंपल पिकअप';
+
+  @override
+  String get serviceQrScanTokenTitle => 'QR स्कैन करें और टोकन पाएं';
+
+  @override
+  String get serviceQrScanTokenSubtitle => 'स्कैन करें और तुरंत बुक करें';
+
+  @override
+  String get serviceOnlineAppointmentTitle => 'ऑनलाइन अपॉइंटमेंट बुकिंग';
+
+  @override
+  String get serviceOnlineAppointmentSubtitle => 'कहीं से भी बुक करें';
+
+  @override
+  String get serviceMedicalCertificateTitle =>
+      'मेडिकल सर्टिफिकेट के लिए आवेदन करें';
+
+  @override
+  String get serviceMedicalCertificateSubtitle => 'घर बैठे परामर्श लें';
+
+  @override
+  String get serviceHomeNursingCareTitle => 'होम नर्सिंग केयर सेवा बुकिंग';
+
+  @override
+  String get serviceHomeNursingCareSubtitle => 'आपके घर पर देखभाल सेवा';
+
+  @override
+  String get scanDoctorQr => 'डॉक्टर QR स्कैन करें';
+
+  @override
+  String get verifying => 'सत्यापित किया जा रहा है...';
+
+  @override
+  String get alignQrCodeWithinFrame => 'QR कोड को फ्रेम के अंदर रखें';
+
+  @override
+  String get invalidQrTryAgain => 'अमान्य QR - पुनः प्रयास करें';
+
+  @override
+  String get scannerWillResumeShortly => 'स्कैनर शीघ्र पुनः शुरू होगा...';
+
+  @override
+  String get scanQrCodeTooltip => 'QR कोड स्कैन करें';
+
+  @override
+  String get invalidQrDoctorIdNotFound => 'अमान्य QR: डॉक्टर आईडी नहीं मिली।';
+
+  @override
+  String get invalidQrMalformedDoctorId => 'अमान्य QR: गलत डॉक्टर आईडी।';
+
+  @override
+  String get invalidQrStructure => 'अमान्य QR संरचना।';
+
+  @override
+  String get bookCareService => 'केयर सेवा बुक करें';
+
+  @override
+  String get bookCareServiceDrawerItem => 'केयर सेवा बुक करें';
+
+  @override
+  String get homeCareHistoryDrawerItem => 'होम केयर हिस्ट्री';
+
+  @override
+  String get homeHealthcareServices => 'गृह स्वास्थ्य सेवाएं';
+
+  @override
+  String get scheduleNurseDesc =>
+      'नर्स, गृह देखभाल, या परामर्श अपने दरवाजे पर प्राप्त करें।';
+
+  @override
+  String get personalDetails => 'व्यक्तिगत विवरण';
+
+  @override
+  String get caregiverAndUrgency => 'देखभालकर्ता और तात्कालिकता';
+
+  @override
+  String get typeOfService => 'सेवा का प्रकार';
+
+  @override
+  String get medicalCondition => 'चिकित्सा स्थिति';
+
+  @override
+  String get serviceDuration => 'सेवा अवधि';
+
+  @override
+  String get timePreference => 'समय प्राथमिकता';
+
+  @override
+  String get additionalNotes => 'अतिरिक्त नोट्स';
+
+  @override
+  String get serviceTypeGeneralNursing => 'सामान्य नर्सिंग';
+
+  @override
+  String get serviceTypeElderlyCare => 'बुजुर्गों की देखभाल';
+
+  @override
+  String get serviceTypePostSurgery => 'सर्जरी के बाद देखभाल';
+
+  @override
+  String get serviceTypeIcuNurse => 'आईसीयू नर्स';
+
+  @override
+  String get serviceTypeAttendant => 'सहायक (अटेंडेंट)';
+
+  @override
+  String get timeSlotMorning => 'सुबह (6 पूर्वाह्न - 12 अपराह्न)';
+
+  @override
+  String get timeSlotAfternoon => 'दोपहर (12 अपराह्न - 5 अपराह्न)';
+
+  @override
+  String get timeSlotEvening => 'शाम (5 अपराह्न - 9 अपराह्न)';
+
+  @override
+  String get timeSlotNight => 'रात (9 अपराह्न - 6 पूर्वाह्न)';
+
+  @override
+  String get medicalConditionHint =>
+      'चिकित्सा स्थिति, लक्षणों का वर्णन करें...';
+
+  @override
+  String get submitBookingRequest => 'बुकिंग अनुरोध सबमिट करें';
+
+  @override
+  String get bookingSubmittedSuccess => 'बुकिंग सफलतापूर्वक सबमिट की गई';
+
+  @override
+  String get bookingRequestFailed => 'बुकिंग अनुरोध विफल रहा';
+
+  @override
+  String get pleaseSelectServiceDuration => 'कृपया सेवा अवधि चुनें';
+
+  @override
+  String get pleaseSelectStartDate => 'कृपया प्रारंभ तिथि चुनें';
+
+  @override
+  String get contactNumber => 'संपर्क नंबर';
+
+  @override
+  String get patientAge => 'मरीज़ की आयु';
+
+  @override
+  String get patientGender => 'मरीज़ का लिंग';
+
+  @override
+  String get address => 'पता';
+
+  @override
+  String get enterContactNumber => 'संपर्क नंबर दर्ज करें';
+
+  @override
+  String get enterAge => 'आयु दर्ज करें';
+
+  @override
+  String get enterCompleteAddress => 'पूरा पता दर्ज करें';
+
+  @override
+  String get fullNameRequired => 'पूरा नाम आवश्यक है';
+
+  @override
+  String get enterValidName => 'एक मान्य नाम दर्ज करें';
+
+  @override
+  String get phoneRequired => 'फोन नंबर आवश्यक है';
+
+  @override
+  String get phoneInvalidPrefix => 'फोन नंबर 6, 7, 8, या 9 से शुरू होना चाहिए';
+
+  @override
+  String get ageRequired => 'आयु आवश्यक है';
+
+  @override
+  String get ageMinValidation => 'आयु 0 से अधिक होनी चाहिए';
+
+  @override
+  String get ageMaxValidation => 'आयु 120 से अधिक नहीं हो सकती';
+
+  @override
+  String get selectGenderValidation => 'लिंग चुनें';
+
+  @override
+  String get addressRequired => 'पता आवश्यक है';
+
+  @override
+  String get addressMinValidation => 'पता कम से कम 5 अक्षर का होना चाहिए';
+
+  @override
+  String get useCurrentLocation => 'वर्तमान स्थान का उपयोग करें';
+
+  @override
+  String get preferredCaregiverGender => 'देखभालकर्ता लिंग प्राथमिकता';
+
+  @override
+  String get selectPreference => 'प्राथमिकता चुनें';
+
+  @override
+  String get noPreference => 'कोई प्राथमिकता नहीं';
+
+  @override
+  String get selectGenderPreferenceValidation => 'कृपया लिंग प्राथमिकता चुनें';
+
+  @override
+  String get needEmergencyService => 'आपातकालीन सेवा आवश्यक';
+
+  @override
+  String get within2Hours => '2 घंटे के भीतर';
+
+  @override
+  String get duration1Day => '1 दिन';
+
+  @override
+  String get durationMultipleDays => 'कई दिन';
+
+  @override
+  String get durationWeekly => 'साप्ताहिक';
+
+  @override
+  String get durationMonthly => 'मासिक';
+
+  @override
+  String get numberOfDays => 'दिनों की संख्या';
+
+  @override
+  String get enterDays => 'दिन दर्ज करें';
+
+  @override
+  String get invalidDays => 'अमान्य दिन';
+
+  @override
+  String get max365Days => 'अधिकतम 365 दिन';
+
+  @override
+  String get startDate => 'प्रारंभ तिथि';
+
+  @override
+  String get homeCareHistory => 'होम केयर हिस्ट्री';
+
+  @override
+  String get noHomeCareHistoryYet => 'अभी तक कोई होम केयर हिस्ट्री नहीं';
+
+  @override
+  String get noHomeCareHistoryDesc =>
+      'विशेषज्ञों के साथ सत्र निर्धारित करने के बाद आपकी अनुरोधित सेवाएं यहां दिखाई देंगी।';
+
+  @override
+  String get emergencyBadge => 'आपातकालीन';
+
+  @override
+  String get tapForFullDetails => 'पूर्ण विवरण के लिए टैप करें';
+
+  @override
+  String get cancelBooking => 'बुकिंग रद्द करें';
+
+  @override
+  String get homeCareService => 'होम केयर सेवा';
+
+  @override
+  String yearsOld(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count वर्ष',
+      one: '1 वर्ष',
+      zero: '0 वर्ष',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String daysCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count दिन',
+      one: '1 दिन',
+      zero: '0 दिन',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get homeCareFilterAll => 'सभी';
+
+  @override
+  String get homeCareFilterPending => 'लंबित';
+
+  @override
+  String get homeCareFilterConfirmed => 'पुष्ट';
+
+  @override
+  String get homeCareFilterCompleted => 'पूर्ण';
+
+  @override
+  String get homeCareFilterCancelled => 'रद्द';
+
+  @override
+  String get bookingDetails => 'बुकिंग विवरण';
+
+  @override
+  String get patientInformation => 'मरीज़ की जानकारी';
+
+  @override
+  String get patientName => 'मरीज़ का नाम';
+
+  @override
+  String get ageGender => 'आयु / लिंग';
+
+  @override
+  String get preference => 'प्राथमिकता';
+
+  @override
+  String get serviceInformation => 'सेवा की जानकारी';
+
+  @override
+  String get serviceType => 'सेवा प्रकार';
+
+  @override
+  String get durationType => 'अवधि प्रकार';
+
+  @override
+  String get timeSlot => 'समय स्लॉट';
+
+  @override
+  String get preferredDate => 'पसंदीदा तारीख';
+
+  @override
+  String get locationAndNotes => 'स्थान और नोट्स';
+
+  @override
+  String get serviceAddress => 'सेवा का पता';
+
+  @override
+  String get standardBooking => 'मानक';
+
+  @override
+  String get failedToLoadDetails => 'विवरण लोड करने में विफल';
+
+  @override
+  String get unableToRetrieveBookingDetails =>
+      'बुकिंग विवरण लोड करने में असमर्थ। कृपया बाद में पुनः प्रयास करें।';
+
+  @override
+  String get cancelBookingConfirmation =>
+      'क्या आप वाकई इस होम केयर बुकिंग को रद्द करना चाहते हैं?';
+
+  @override
+  String get yesCancel => 'हाँ, रद्द करें';
+
+  @override
+  String get noKeep => 'नहीं';
+
+  @override
+  String get cancellingBooking => 'बुकिंग रद्द की जा रही है...';
+
+  @override
+  String get bookingCancelledSuccess => 'बुकिंग सफलतापूर्वक रद्द कर दी गई';
+
+  @override
+  String get bookNewCareService => 'नई देखभाल सेवा बुक करें';
+
+  @override
+  String get regularBooking => 'सामान्य';
+
+  @override
+  String get familyMembers => 'परिवार के सदस्य';
+
+  @override
+  String get familyHealthNetwork => 'फैमिली हेल्थ नेटवर्क';
+
+  @override
+  String get familyHealthNetworkSubtitle =>
+      'अपने लिंक किए गए परिवार के सदस्यों के मेडिकल डेटा की निगरानी और प्रबंधन करें।';
+
+  @override
+  String activeProfilesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count प्रोफ़ाइल सक्रिय',
+      one: '1 प्रोफ़ाइल सक्रिय',
+      zero: '0 प्रोफ़ाइल सक्रिय',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get addMember => 'सदस्य जोड़ें';
+
+  @override
+  String get addFamilyMember => 'परिवार का सदस्य जोड़ें';
+
+  @override
+  String get chooseMember => 'सदस्य चुनें';
+
+  @override
+  String get addNewMember => 'नया सदस्य जोड़ें';
+
+  @override
+  String get updateMember => 'सदस्य अपडेट करें';
+
+  @override
+  String get memberAddedSuccess => 'सदस्य सफलतापूर्वक जोड़ा गया।';
+
+  @override
+  String get memberUpdatedSuccess => 'सदस्य सफलतापूर्वक अपडेट किया गया।';
+
+  @override
+  String get noFamilyMembersYet => 'अभी तक कोई परिवार का सदस्य नहीं';
+
+  @override
+  String get createFamilyProfilesDesc =>
+      'अपने परिवार के सदस्यों के स्वास्थ्य रिकॉर्ड को आसानी से प्रबंधित करने के लिए प्रोफ़ाइल बनाएं।';
+
+  @override
+  String get age => 'आयु';
+
+  @override
+  String get heightCmLabel => 'ऊंचाई (सेमी)';
+
+  @override
+  String get weightKgLabel => 'वजन (किग्रा)';
+
+  @override
+  String get remove => 'हटाएं';
+
+  @override
+  String get update => 'अपडेट करें';
+
+  @override
+  String get saveChanges => 'परिवर्तन सहेजें';
+
+  @override
+  String get saveMember => 'सदस्य सहेजें';
+
+  @override
+  String get relation => 'संबंध';
+
+  @override
+  String get selectRelation => 'संबंध चुनें';
+
+  @override
+  String get relationFather => 'पिता';
+
+  @override
+  String get relationMother => 'माता';
+
+  @override
+  String get relationSpouse => 'पति/पत्नी';
+
+  @override
+  String get relationSon => 'बेटा';
+
+  @override
+  String get relationDaughter => 'बेटी';
+
+  @override
+  String get relationBrother => 'भाई';
+
+  @override
+  String get relationSister => 'बहन';
+
+  @override
+  String get relationOther => 'अन्य';
+
+  @override
+  String get pleaseEnterFullName => 'कृपया पूरा नाम दर्ज करें';
+
+  @override
+  String get nameMinLengthError => 'नाम में कम से कम 2 अक्षर होने चाहिए';
+
+  @override
+  String get pleaseSelectGender => 'कृपया लिंग चुनें';
+
+  @override
+  String get selectDateOfBirth => 'जन्म तिथि चुनें';
+
+  @override
+  String get pleaseSelectRelation => 'कृपया संबंध चुनें';
+
+  @override
+  String get heightRangeError => 'ऊंचाई 30 और 250 सेमी के बीच होनी चाहिए';
+
+  @override
+  String get weightRangeError => 'वजन 2 और 350 किग्रा के बीच होना चाहिए';
+
+  @override
+  String heightInCm(String height) {
+    return '$height सेमी';
+  }
+
+  @override
+  String weightInKg(String weight) {
+    return '$weight किग्रा';
+  }
+
+  @override
+  String get labTests => 'लैब टेस्ट';
+
+  @override
+  String get popularPackages => 'लोकप्रिय पैकेज';
+
+  @override
+  String get viewAll => 'सभी देखें';
+
+  @override
+  String get noTestsAvailableInCategory =>
+      'इस श्रेणी में कोई टेस्ट उपलब्ध नहीं है';
+
+  @override
+  String get allPackagesAndTests => 'सभी पैकेज और टेस्ट';
+
+  @override
+  String get trustedByFamilies => '50,000+ परिवारों द्वारा विश्वसनीय';
+
+  @override
+  String get bookLabTestsComfortOfHome => 'घर बैठे आसानी से लैब टेस्ट बुक करें';
+
+  @override
+  String get labHeroSubtitle =>
+      'सटीक रिपोर्ट • किफायती दरें • घर पर सैंपल कलेक्शन';
+
+  @override
+  String get lowestPrices => 'सबसे कम दरें';
+
+  @override
+  String get transparentDesc => 'पारदर्शी';
+
+  @override
+  String get homeCollectionShort => 'होम कलेक्शन';
+
+  @override
+  String get sevenDaysAWeek => 'सप्ताह के 7 दिन';
+
+  @override
+  String get accurateTitle => 'सटीक';
+
+  @override
+  String get verifiedDesc => 'सत्यापित';
+
+  @override
+  String get hundredPercentPrivate => '100% निजी';
+
+  @override
+  String get encryptedDesc => 'एन्क्रिप्टेड';
+
+  @override
+  String get notSureWhichTestToBook => 'निश्चय नहीं कि कौन सा टेस्ट बुक करें?';
+
+  @override
+  String get labSupportAdvisorsAvailable =>
+      'हमारे सलाहकार आपका मार्गदर्शन करने के लिए सप्ताह के सातों दिन उपलब्ध हैं।';
+
+  @override
+  String callSupportPhone(String phone) {
+    return 'कॉल करें $phone';
+  }
+
+  @override
+  String get packageType => 'पैकेज';
+
+  @override
+  String get essentialType => 'आवश्यक';
+
+  @override
+  String percentOff(String percent) {
+    return '$percent% छूट';
+  }
+
+  @override
+  String paramsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count पैरामीटर',
+      one: '1 पैरामीटर',
+      zero: '0 पैरामीटर',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get homeSampleCollection => 'घर पर सैंपल कलेक्शन';
+
+  @override
+  String get viewButton => 'देखें';
+
+  @override
+  String get addedButton => 'जोड़ा गया';
+
+  @override
+  String get addButton => '+ जोड़ें';
+
+  @override
+  String get testDetails => 'टेस्ट विवरण';
+
+  @override
+  String get testNotFound => 'टेस्ट नहीं मिला';
+
+  @override
+  String addedToCart(String title) {
+    return '$title कार्ट में जोड़ा गया';
+  }
+
+  @override
+  String removedFromCart(String title) {
+    return '$title कार्ट से हटाया गया';
+  }
+
+  @override
+  String parametersCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count पैरामीटर',
+      one: '1 पैरामीटर',
+      zero: '0 पैरामीटर',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String saveAmount(String amount) {
+    return '₹$amount बचाएं';
+  }
+
+  @override
+  String get nablCertifiedLabs => 'NABL प्रमाणित लैब्स';
+
+  @override
+  String get freeHomeSamplePickup => 'मुफ़्त होम सैंपल पिकअप';
+
+  @override
+  String get twentyFourHoursReport => '24 घंटे में रिपोर्ट';
+
+  @override
+  String get aboutThisTest => 'इस टेस्ट के बारे में';
+
+  @override
+  String get includes => 'शामिल है';
+
+  @override
+  String get defaultTestDescription =>
+      'यह टेस्ट समग्र स्वास्थ्य स्थिति का मूल्यांकन करने में मदद करता है और एनीमिया, संक्रमण और विभिन्न अन्य नैदानिक मापदंडों का पता लगाता है।';
+
+  @override
+  String get addToCart => 'कार्ट में जोड़ें';
+
+  @override
+  String get addAndBook => 'जोड़ें और बुक करें';
+
+  @override
+  String get myCart => 'मेरी कार्ट';
+
+  @override
+  String parametersIncluded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count पैरामीटर शामिल',
+      one: '1 पैरामीटर शामिल',
+      zero: '0 पैरामीटर शामिल',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get addMoreTests => 'और टेस्ट जोड़ें';
+
+  @override
+  String get priceSummary => 'मूल्य विवरण';
+
+  @override
+  String get totalMRP => 'कुल एमआरपी';
+
+  @override
+  String get youSave => 'आपकी बचत';
+
+  @override
+  String savingDiscountNotice(String discount) {
+    return 'शानदार डील! आप इस ऑर्डर पर $discount% बचा रहे हैं।';
+  }
+
+  @override
+  String get totalPayable => 'कुल देय राशि';
+
+  @override
+  String get proceedToBookSlot => 'स्लॉट बुक करने के लिए आगे बढ़ें';
+
+  @override
+  String get yourCartIsEmpty => 'आपकी कार्ट खाली है';
+
+  @override
+  String get cartEmptyDesc =>
+      'ऐसा लगता है कि आपने अभी तक कोई लैब टेस्ट नहीं जोड़ा है। शुरू करने के लिए हमारे पैकेज देखें।';
+
+  @override
+  String get addTestsAndPackages => 'टेस्ट और पैकेज जोड़ें';
+
+  @override
+  String get bookSlotTitle => 'स्लॉट बुक करें';
+
+  @override
+  String testsSelectedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count टेस्ट चयनित • ',
+      one: '1 टेस्ट चयनित • ',
+      zero: '0 टेस्ट चयनित • ',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get patientDetails => 'मरीज़ का विवरण';
+
+  @override
+  String get samplePickupAddress => 'सैंपल पिकअप पता';
+
+  @override
+  String get selectDateTime => 'तारीख और समय चुनें';
+
+  @override
+  String get enterYourFullName => 'अपना पूरा नाम दर्ज करें';
+
+  @override
+  String get nameMin3Characters => 'नाम कम से कम 3 अक्षरों का होना चाहिए';
+
+  @override
+  String get invalidAge => 'अमान्य आयु';
+
+  @override
+  String get ageRangeError => 'आयु 1 और 120 के बीच होनी चाहिए';
+
+  @override
+  String get enter10DigitNumber => '10 अंकों का नंबर दर्ज करें';
+
+  @override
+  String get enterValid10DigitNumber => 'मान्य 10 अंकों का नंबर दर्ज करें';
+
+  @override
+  String get useMyCurrentLocation => 'मेरे वर्तमान स्थान का उपयोग करें';
+
+  @override
+  String get fullAddress => 'पूरा पता';
+
+  @override
+  String get fullAddressHint => 'मकान/फ़्लैट नं., सड़क, इलाका, शहर';
+
+  @override
+  String get enterAddress => 'पता दर्ज करें';
+
+  @override
+  String get addressTooShort => 'पता बहुत छोटा है';
+
+  @override
+  String get todaySlotsClosedMessage =>
+      'आज के स्लॉट बंद हैं। कृपया किसी अन्य दिन का स्लॉट चुनें';
+
+  @override
+  String get morningSlot => 'सुबह का स्लॉट';
+
+  @override
+  String get afternoonSlot => 'दोपहर का स्लॉट';
+
+  @override
+  String get eveningSlot => 'शाम का स्लॉट';
+
+  @override
+  String get totalPrice => 'कुल मूल्य';
+
+  @override
+  String get selectTimeSlotValidation => 'समय स्लॉट चुनें';
+
+  @override
+  String get bookingFailed => 'बुकिंग विफल रही';
+
+  @override
+  String get confirmAndPay => 'पुष्टि करें और भुगतान करें';
+
+  @override
+  String get labTestBooking => 'लैब टेस्ट बुकिंग';
+}

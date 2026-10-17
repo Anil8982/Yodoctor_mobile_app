@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 
 import '../../../../../core/utils/app_spacing.dart';
-import '../../../../../core/widgets/gradient_background.dart';
 
 class CertificateHeader extends StatelessWidget {
   const CertificateHeader({
@@ -13,41 +13,64 @@ class CertificateHeader extends StatelessWidget {
   final int certificateCount;
   final String selectedFilter;
 
+  String _getLocalizedFilter(String filter, AppLocalizations l10n) {
+    switch (filter.toLowerCase()) {
+      case 'pending':
+        return l10n.filterPending;
+      case 'approved':
+        return l10n.filterApproved;
+      case 'rejected':
+        return l10n.filterRejected;
+      case 'all':
+      default:
+        return l10n.filterAll;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final TextTheme textTheme = Theme.of(context).textTheme;
     final double topPadding = MediaQuery.of(context).padding.top;
+    final l10n = AppLocalizations.of(context)!;
 
-    return GradientBackground(
-      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(32)),
+    return Container(
       padding: EdgeInsets.fromLTRB(
         AppSpacing.xl,
-        topPadding + 70,
+        topPadding + 60,
         AppSpacing.xl,
-        AppSpacing.xl,
+        AppSpacing.lg,
+      ),
+      decoration: BoxDecoration(
+        color: colorScheme.primary,
+        borderRadius: const BorderRadius.vertical(
+          bottom: Radius.circular(32),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           Text(
-            'Medical Certificates',
+            l10n.medicalCertificates,
             style: textTheme.headlineMedium?.copyWith(
               color: colorScheme.onPrimary,
               fontWeight: FontWeight.w800,
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 5),
           Text(
-            'Track requests and download approved certificate.',
+            l10n.trackRequestsSubtitle,
             style: textTheme.bodyMedium?.copyWith(
               color: colorScheme.onPrimary.withValues(alpha: 0.9),
             ),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 8),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 8,
+            ),
             decoration: BoxDecoration(
               color: colorScheme.onPrimary.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(12),
@@ -65,7 +88,10 @@ class CertificateHeader extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  '$certificateCount certificate | $selectedFilter',
+                  l10n.certificateCountWithFilter(
+                    certificateCount,
+                    _getLocalizedFilter(selectedFilter, l10n),
+                  ),
                   style: textTheme.bodySmall?.copyWith(
                     color: colorScheme.onPrimary,
                     fontWeight: FontWeight.w700,

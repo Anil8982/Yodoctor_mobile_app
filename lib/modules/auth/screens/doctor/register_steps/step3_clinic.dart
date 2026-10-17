@@ -1,11 +1,20 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:yodoctor/core/theme/app_theme.dart';
-import 'package:yodoctor/modules/auth/models/doctor_register_model.dart';
-import 'shared_widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/core/utils/app_field_helper.dart';
 
-class Step3Clinic extends StatefulWidget {
+import 'package:yodoctor/modules/auth/controllers/doctor_register_controller.dart';
+import 'package:yodoctor/modules/auth/models/doctor_register_model.dart';
+import 'package:yodoctor/modules/widgets/app_search_select_field.dart';
+import 'package:yodoctor/modules/widgets/app_snack_bar.dart'; // 👈 AppSnackBar Import
+import 'package:yodoctor/modules/widgets/app_text_field.dart';
+import 'package:yodoctor/modules/auth/screens/doctor/widgets/step_card.dart';
+import 'package:yodoctor/modules/auth/screens/doctor/widgets/step_title.dart';
+
+import '../widgets/nav_buttons.dart';
+
+class Step3Clinic extends ConsumerStatefulWidget {
   final DoctorFormData data;
   final VoidCallback onNext;
   final VoidCallback onBack;
@@ -18,10 +27,10 @@ class Step3Clinic extends StatefulWidget {
   });
 
   @override
-  State<Step3Clinic> createState() => _Step3ClinicState();
+  ConsumerState<Step3Clinic> createState() => _Step3ClinicState();
 }
 
-class _Step3ClinicState extends State<Step3Clinic> {
+class _Step3ClinicState extends ConsumerState<Step3Clinic> {
   final _formKey = GlobalKey<FormState>();
   final _nameCtrl = TextEditingController();
   final _cityCtrl = TextEditingController();
@@ -29,21 +38,9 @@ class _Step3ClinicState extends State<Step3Clinic> {
   final _pincodeCtrl = TextEditingController();
   final _landmarkCtrl = TextEditingController();
   final _mapsCtrl = TextEditingController();
-  String? _state;
 
-  final _states = const [
-    'Maharashtra',
-    'Delhi',
-    'Karnataka',
-    'Uttar Pradesh',
-    'Madhya Pradesh',
-    'Rajasthan',
-    'Tamil Nadu',
-    'Gujarat',
-    'West Bengal',
-    'Telangana',
-    'Andhra Pradesh',
-  ];
+  String? _selectedState;
+  bool _hasAttemptedSubmit = false;
 
   @override
   void initState() {
@@ -54,7 +51,7 @@ class _Step3ClinicState extends State<Step3Clinic> {
     _pincodeCtrl.text = widget.data.pincode;
     _landmarkCtrl.text = widget.data.landmark;
     _mapsCtrl.text = widget.data.mapsLink;
-    _state = widget.data.state.isEmpty ? null : widget.data.state;
+    _selectedState = widget.data.state.isEmpty ? null : widget.data.state;
   }
 
   @override
@@ -69,101 +66,172 @@ class _Step3ClinicState extends State<Step3Clinic> {
   }
 
   void _save() {
-    widget.data.clinicName = _nameCtrl.text;
-    widget.data.city = _cityCtrl.text;
-    widget.data.address = _addrCtrl.text;
-    widget.data.state = _state ?? '';
-    widget.data.pincode = _pincodeCtrl.text;
-    widget.data.landmark = _landmarkCtrl.text;
-    widget.data.mapsLink = _mapsCtrl.text;
+    widget.data.clinicName = _nameCtrl.text.trim();
+    widget.data.city = _cityCtrl.text.trim();
+    widget.data.address = _addrCtrl.text.trim();
+    widget.data.state = _selectedState ?? '';
+    widget.data.pincode = _pincodeCtrl.text.trim();
+    widget.data.landmark = _landmarkCtrl.text.trim();
+    widget.data.mapsLink = _mapsCtrl.text.trim();
+  }
+
+  Future<void> _handleNext() async {
+    setState(() => _hasAttemptedSubmit = true);
+
+    if (!_formKey.currentState!.validate() || _selectedState == null) {
+      AppSnackBar.show(
+        message: 'Please resolve the highlighted errors',
+        type: AppSnackBarType.warning,
+      );
+      return;
+    }
+
+    _save();
+
+    final success = await ref
+        .read(doctorRegisterControllerProvider.notifier)
+        .registerStep3(widget.data);
+
+    if (!mounted) return;
+
+    if (success) {
+      AppSnackBar.show(
+        message: 'Clinic details saved successfully!',
+        type: AppSnackBarType.success,
+      );
+      widget.onNext();
+    } else {
+      final errorMsg = ref.read(doctorRegisterControllerProvider).errorMessage;
+      AppSnackBar.show(
+        message: errorMsg ?? "Step 3 registration failed. Try again.",
+        type: AppSnackBarType.error,
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final registerState = ref.watch(doctorRegisterControllerProvider);
+
     return Form(
       key: _formKey,
+      autovalidateMode: _hasAttemptedSubmit
+          ? AutovalidateMode.onUserInteraction
+          : AutovalidateMode.disabled,
       child: StepCard(
         children: [
           StepTitle(
             icon: Icons.local_hospital_rounded,
             title: 'Clinic Details',
-            color: AppTheme.yoBlue,
+            subtitle: 'Enter clinic location and physical contact information',
+            color: colorScheme.primary,
           ),
           const SizedBox(height: 24),
-          YoField(
-            label: 'Clinic Name *',
-            hint: 'e.g. City Health Clinic',
-            icon: Icons.business_rounded,
+
+          // Clinic Name
+          AppTextField(
+            label: 'Clinic Name',
+            isRequired: true,
+            hint: 'Enter clinic or hospital name',
+            icon: Icons.business_outlined,
             controller: _nameCtrl,
-            validator: (v) => v!.isEmpty ? 'Required' : null,
+            textCapitalization: TextCapitalization.words,
+            validator: (v) =>
+                (v == null || v.trim().isEmpty) ? 'Clinic name required' : null,
           ),
           const SizedBox(height: 16),
-          YoField(
-            label: 'City *',
-            hint: 'e.g. Mumbai',
-            icon: Icons.location_city_rounded,
+
+          // City
+          AppTextField(
+            label: 'City',
+            isRequired: true,
+            hint: 'Enter city',
+            icon: Icons.location_city_outlined,
             controller: _cityCtrl,
-            validator: (v) => v!.isEmpty ? 'Required' : null,
+            textCapitalization: TextCapitalization.words,
+            validator: (v) =>
+                (v == null || v.trim().isEmpty) ? 'City required' : null,
           ),
           const SizedBox(height: 16),
-          const SectionLabel(label: 'Full Address *'),
-          const SizedBox(height: 8),
-          TextFormField(
+
+          AppTextField(
+            label: 'Full Address',
+            isRequired: true,
+            hint: 'Enter street, building, area, or locality details...',
+            icon: Icons.home_outlined,
             controller: _addrCtrl,
             maxLines: 3,
-            style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface),
-            decoration: inputDeco(context, 'Street, Area, District...', Icons.home_rounded),
-            validator: (v) => v!.isEmpty ? 'Address required' : null,
+            validator: (v) =>
+                (v == null || v.trim().isEmpty) ? 'Address required' : null,
           ),
           const SizedBox(height: 16),
-          DropdownField(
-            label: 'State *',
-            icon: Icons.map_rounded,
-            value: _state,
-            items: _states,
-            onChanged: (v) => setState(() => _state = v),
-            validator: (v) => v == null ? 'Select state' : null,
+
+          // State Search Picker
+          AppSearchSelectField(
+            label: 'State',
+            isRequired: true,
+            hint: 'Select or search state',
+            icon: Icons.map_outlined,
+            value: _selectedState,
+            items: indianStates,
+            isInvalid: _selectedState == null && _hasAttemptedSubmit,
+            errorText: 'Please select a state',
+            onChanged: (v) => setState(() => _selectedState = v),
           ),
           const SizedBox(height: 16),
-          YoField(
-            label: 'Pincode *',
-            hint: '400001',
-            icon: Icons.pin_drop_rounded,
+
+          // Pincode
+          AppTextField(
+            label: 'Pincode',
+            isRequired: true,
+            hint: 'Enter 6-digit pincode',
+            icon: Icons.pin_drop_outlined,
             controller: _pincodeCtrl,
             keyboardType: TextInputType.number,
             maxLength: 6,
-            inputFormatters:  [FilteringTextInputFormatter.digitsOnly],
-            validator: (v) => v!.length != 6 ? 'Enter valid 6-digit pincode' : null,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            validator: (v) => (v == null || v.length != 6)
+                ? 'Enter valid 6-digit pincode'
+                : null,
           ),
           const SizedBox(height: 16),
-          YoField(
+
+          // Landmark
+          AppTextField(
             label: 'Landmark (Optional)',
-            hint: 'Near XYZ Mall',
-            icon: Icons.place_rounded,
+            hint: 'Enter nearby landmark',
+            icon: Icons.place_outlined,
             controller: _landmarkCtrl,
           ),
           const SizedBox(height: 16),
-          YoField(
+
+          // Google Maps Link
+          AppTextField(
             label: 'Google Maps Link (Optional)',
-            hint: 'https://maps.google.com/...',
-            icon: Icons.location_on_rounded,
+            hint: 'Paste Google Maps location link',
+            icon: Icons.location_on_outlined,
             controller: _mapsCtrl,
+            keyboardType: TextInputType.url,
             validator: (v) {
-              if (v == null || v.isEmpty) return null;
-              if (!v.startsWith('http')) return 'Enter valid URL';
+              if (v == null || v.trim().isEmpty) return null;
+              if (!v.startsWith('http://') && !v.startsWith('https://')) {
+                return 'Enter valid URL starting with http:// or https://';
+              }
               return null;
             },
           ),
           const SizedBox(height: 20),
+
+          // Map Preview Container
           Container(
             height: 110,
             decoration: BoxDecoration(
-              color: AppTheme.yoBlueLight,
+              color: colorScheme.primary.transparency(0.06),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: AppTheme.yoBlue.transparency(0.3),
+                color: colorScheme.primary.transparency(0.25),
                 width: 1.5,
               ),
             ),
@@ -172,15 +240,16 @@ class _Step3ClinicState extends State<Step3Clinic> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
-                    Icons.map_rounded,
-                    color: AppTheme.yoBlue.transparency(0.4),
+                    Icons.map_outlined,
+                    color: colorScheme.primary.transparency(0.4),
                     size: 34,
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Map Preview will appear here',
                     style: textTheme.labelLarge?.copyWith(
-                      color: AppTheme.yoBlue.transparency(0.6),
+                      color: colorScheme.primary.transparency(0.6),
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                 ],
@@ -188,14 +257,11 @@ class _Step3ClinicState extends State<Step3Clinic> {
             ),
           ),
           const SizedBox(height: 28),
+
+          // Action Navigation
           NavButtons(
             onBack: widget.onBack,
-            onNext: () {
-              if (_formKey.currentState!.validate()) {
-                _save();
-                widget.onNext();
-              }
-            },
+            onNext: registerState.isLoading ? null : _handleNext,
           ),
         ],
       ),

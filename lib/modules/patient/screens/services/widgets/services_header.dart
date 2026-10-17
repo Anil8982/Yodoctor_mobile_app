@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-
 import '../../../../../core/utils/app_spacing.dart';
-import '../../../../../core/widgets/gradient_background.dart';
+import '../../../../../l10n/app_localizations.dart';
 
 class ServicesHeader extends StatelessWidget {
   const ServicesHeader({
@@ -16,21 +15,26 @@ class ServicesHeader extends StatelessWidget {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final TextTheme textTheme = Theme.of(context).textTheme;
     final double topPadding = MediaQuery.of(context).padding.top;
+    final l10n = AppLocalizations.of(context);
 
-    return GradientBackground(
-      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(32)),
+    return Container(
       padding: EdgeInsets.fromLTRB(
         AppSpacing.xl,
         topPadding + 70,
         AppSpacing.xl,
         AppSpacing.xl,
       ),
+      decoration: const BoxDecoration(
+        borderRadius: BorderRadius.vertical(
+          bottom: Radius.circular(32),
+        ),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           Text(
-            'YoDoctor Services',
+            l10n?.servicesHeaderTitle ?? 'YoDoctor Services',
             style: textTheme.headlineMedium?.copyWith(
               color: colorScheme.onPrimary,
               fontWeight: FontWeight.w800,
@@ -38,16 +42,18 @@ class ServicesHeader extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           Text(
-            'Select a service to get instant medical care.',
+            l10n?.servicesHeaderSubtitle ??
+                'Select a service to get instant medical care.',
             style: textTheme.bodyMedium?.copyWith(
               color: colorScheme.onPrimary.withValues(alpha: 0.9),
             ),
           ),
           const SizedBox(height: 14),
-
-          // M3 Tag/Badge for total active services
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 8,
+            ),
             decoration: BoxDecoration(
               color: colorScheme.onPrimary.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(12),
@@ -65,7 +71,8 @@ class ServicesHeader extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  '$servicesCount active services',
+                  l10n?.activeServicesCount(servicesCount) ??
+                      '$servicesCount active services',
                   style: textTheme.bodySmall?.copyWith(
                     color: colorScheme.onPrimary,
                     fontWeight: FontWeight.w700,
