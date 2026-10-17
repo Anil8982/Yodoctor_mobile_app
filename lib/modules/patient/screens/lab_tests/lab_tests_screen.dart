@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/controllers/lab_test_controller.dart';
 import 'package:yodoctor/modules/widgets/app_header.dart';
 import 'widgets/lab_hero_section.dart';
@@ -38,6 +39,7 @@ class _LabTestsScreenState extends ConsumerState<LabTestsScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = AppLocalizations.of(context);
 
     final labState = ref.watch(labProvider);
 
@@ -51,7 +53,7 @@ class _LabTestsScreenState extends ConsumerState<LabTestsScreen> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppHeader(
-        title: 'Lab Tests',
+        title: l10n?.labTests ?? 'Lab Tests',
         actions: [
           Stack(
             alignment: Alignment.center,
@@ -107,14 +109,14 @@ class _LabTestsScreenState extends ConsumerState<LabTestsScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'Popular Packages',
+                              l10n?.popularPackages ?? 'Popular Packages',
                               style: theme.textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             TextButton(
                               onPressed: null,
-                              child: const Text('View All'),
+                              child: Text(l10n?.viewAll ?? 'View All'),
                             ),
                           ],
                         ),
@@ -155,7 +157,7 @@ class _LabTestsScreenState extends ConsumerState<LabTestsScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'Popular Packages',
+                              l10n?.popularPackages ?? 'Popular Packages',
                               style: theme.textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.bold,
                               ),
@@ -164,7 +166,7 @@ class _LabTestsScreenState extends ConsumerState<LabTestsScreen> {
                               onPressed: () {
                                 context.push(AppRoutes.allLabTests);
                               },
-                              child: const Text('View All'),
+                              child: Text(l10n?.viewAll ?? 'View All'),
                             ),
                           ],
                         ),
@@ -173,9 +175,10 @@ class _LabTestsScreenState extends ConsumerState<LabTestsScreen> {
                       SizedBox(
                         height: 283,
                         child: popularTests.isEmpty
-                            ? const Center(
+                            ? Center(
                                 child: Text(
-                                  'No tests available in this category',
+                                  l10n?.noTestsAvailableInCategory ??
+                                      'No tests available in this category',
                                 ),
                               )
                             : ListView.builder(

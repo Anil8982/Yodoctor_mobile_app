@@ -542,7 +542,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get phoneNumber => 'मोबाइल नंबर';
 
   @override
-  String get enterPhoneNumber => 'मोबाइल नंबर दर्ज करें';
+  String get enterPhoneNumber => 'फ़ोन नंबर दर्ज करें';
 
   @override
   String get pleaseEnterPhoneNumber => 'कृपया मोबाइल नंबर दर्ज करें';
@@ -1112,6 +1112,7 @@ class AppLocalizationsHi extends AppLocalizations {
       locale: localeName,
       other: '$count दिन',
       one: '1 दिन',
+      zero: '0 दिन',
     );
     return '$_temp0';
   }
@@ -1330,4 +1331,292 @@ class AppLocalizationsHi extends AppLocalizations {
   String weightInKg(String weight) {
     return '$weight किग्रा';
   }
+
+  @override
+  String get labTests => 'लैब टेस्ट';
+
+  @override
+  String get popularPackages => 'लोकप्रिय पैकेज';
+
+  @override
+  String get viewAll => 'सभी देखें';
+
+  @override
+  String get noTestsAvailableInCategory =>
+      'इस श्रेणी में कोई टेस्ट उपलब्ध नहीं है';
+
+  @override
+  String get allPackagesAndTests => 'सभी पैकेज और टेस्ट';
+
+  @override
+  String get trustedByFamilies => '50,000+ परिवारों द्वारा विश्वसनीय';
+
+  @override
+  String get bookLabTestsComfortOfHome => 'घर बैठे आसानी से लैब टेस्ट बुक करें';
+
+  @override
+  String get labHeroSubtitle =>
+      'सटीक रिपोर्ट • किफायती दरें • घर पर सैंपल कलेक्शन';
+
+  @override
+  String get lowestPrices => 'सबसे कम दरें';
+
+  @override
+  String get transparentDesc => 'पारदर्शी';
+
+  @override
+  String get homeCollectionShort => 'होम कलेक्शन';
+
+  @override
+  String get sevenDaysAWeek => 'सप्ताह के 7 दिन';
+
+  @override
+  String get accurateTitle => 'सटीक';
+
+  @override
+  String get verifiedDesc => 'सत्यापित';
+
+  @override
+  String get hundredPercentPrivate => '100% निजी';
+
+  @override
+  String get encryptedDesc => 'एन्क्रिप्टेड';
+
+  @override
+  String get notSureWhichTestToBook => 'निश्चय नहीं कि कौन सा टेस्ट बुक करें?';
+
+  @override
+  String get labSupportAdvisorsAvailable =>
+      'हमारे सलाहकार आपका मार्गदर्शन करने के लिए सप्ताह के सातों दिन उपलब्ध हैं।';
+
+  @override
+  String callSupportPhone(String phone) {
+    return 'कॉल करें $phone';
+  }
+
+  @override
+  String get packageType => 'पैकेज';
+
+  @override
+  String get essentialType => 'आवश्यक';
+
+  @override
+  String percentOff(String percent) {
+    return '$percent% छूट';
+  }
+
+  @override
+  String paramsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count पैरामीटर',
+      one: '1 पैरामीटर',
+      zero: '0 पैरामीटर',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get homeSampleCollection => 'घर पर सैंपल कलेक्शन';
+
+  @override
+  String get viewButton => 'देखें';
+
+  @override
+  String get addedButton => 'जोड़ा गया';
+
+  @override
+  String get addButton => '+ जोड़ें';
+
+  @override
+  String get testDetails => 'टेस्ट विवरण';
+
+  @override
+  String get testNotFound => 'टेस्ट नहीं मिला';
+
+  @override
+  String addedToCart(String title) {
+    return '$title कार्ट में जोड़ा गया';
+  }
+
+  @override
+  String removedFromCart(String title) {
+    return '$title कार्ट से हटाया गया';
+  }
+
+  @override
+  String parametersCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count पैरामीटर',
+      one: '1 पैरामीटर',
+      zero: '0 पैरामीटर',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String saveAmount(String amount) {
+    return '₹$amount बचाएं';
+  }
+
+  @override
+  String get nablCertifiedLabs => 'NABL प्रमाणित लैब्स';
+
+  @override
+  String get freeHomeSamplePickup => 'मुफ़्त होम सैंपल पिकअप';
+
+  @override
+  String get twentyFourHoursReport => '24 घंटे में रिपोर्ट';
+
+  @override
+  String get aboutThisTest => 'इस टेस्ट के बारे में';
+
+  @override
+  String get includes => 'शामिल है';
+
+  @override
+  String get defaultTestDescription =>
+      'यह टेस्ट समग्र स्वास्थ्य स्थिति का मूल्यांकन करने में मदद करता है और एनीमिया, संक्रमण और विभिन्न अन्य नैदानिक मापदंडों का पता लगाता है।';
+
+  @override
+  String get addToCart => 'कार्ट में जोड़ें';
+
+  @override
+  String get addAndBook => 'जोड़ें और बुक करें';
+
+  @override
+  String get myCart => 'मेरी कार्ट';
+
+  @override
+  String parametersIncluded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count पैरामीटर शामिल',
+      one: '1 पैरामीटर शामिल',
+      zero: '0 पैरामीटर शामिल',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get addMoreTests => 'और टेस्ट जोड़ें';
+
+  @override
+  String get priceSummary => 'मूल्य विवरण';
+
+  @override
+  String get totalMRP => 'कुल एमआरपी';
+
+  @override
+  String get youSave => 'आपकी बचत';
+
+  @override
+  String savingDiscountNotice(String discount) {
+    return 'शानदार डील! आप इस ऑर्डर पर $discount% बचा रहे हैं।';
+  }
+
+  @override
+  String get totalPayable => 'कुल देय राशि';
+
+  @override
+  String get proceedToBookSlot => 'स्लॉट बुक करने के लिए आगे बढ़ें';
+
+  @override
+  String get yourCartIsEmpty => 'आपकी कार्ट खाली है';
+
+  @override
+  String get cartEmptyDesc =>
+      'ऐसा लगता है कि आपने अभी तक कोई लैब टेस्ट नहीं जोड़ा है। शुरू करने के लिए हमारे पैकेज देखें।';
+
+  @override
+  String get addTestsAndPackages => 'टेस्ट और पैकेज जोड़ें';
+
+  @override
+  String get bookSlotTitle => 'स्लॉट बुक करें';
+
+  @override
+  String testsSelectedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count टेस्ट चयनित • ',
+      one: '1 टेस्ट चयनित • ',
+      zero: '0 टेस्ट चयनित • ',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get patientDetails => 'मरीज़ का विवरण';
+
+  @override
+  String get samplePickupAddress => 'सैंपल पिकअप पता';
+
+  @override
+  String get selectDateTime => 'तारीख और समय चुनें';
+
+  @override
+  String get enterYourFullName => 'अपना पूरा नाम दर्ज करें';
+
+  @override
+  String get nameMin3Characters => 'नाम कम से कम 3 अक्षरों का होना चाहिए';
+
+  @override
+  String get invalidAge => 'अमान्य आयु';
+
+  @override
+  String get ageRangeError => 'आयु 1 और 120 के बीच होनी चाहिए';
+
+  @override
+  String get enter10DigitNumber => '10 अंकों का नंबर दर्ज करें';
+
+  @override
+  String get enterValid10DigitNumber => 'मान्य 10 अंकों का नंबर दर्ज करें';
+
+  @override
+  String get useMyCurrentLocation => 'मेरे वर्तमान स्थान का उपयोग करें';
+
+  @override
+  String get fullAddress => 'पूरा पता';
+
+  @override
+  String get fullAddressHint => 'मकान/फ़्लैट नं., सड़क, इलाका, शहर';
+
+  @override
+  String get enterAddress => 'पता दर्ज करें';
+
+  @override
+  String get addressTooShort => 'पता बहुत छोटा है';
+
+  @override
+  String get todaySlotsClosedMessage =>
+      'आज के स्लॉट बंद हैं। कृपया किसी अन्य दिन का स्लॉट चुनें';
+
+  @override
+  String get morningSlot => 'सुबह का स्लॉट';
+
+  @override
+  String get afternoonSlot => 'दोपहर का स्लॉट';
+
+  @override
+  String get eveningSlot => 'शाम का स्लॉट';
+
+  @override
+  String get totalPrice => 'कुल मूल्य';
+
+  @override
+  String get selectTimeSlotValidation => 'समय स्लॉट चुनें';
+
+  @override
+  String get bookingFailed => 'बुकिंग विफल रही';
+
+  @override
+  String get confirmAndPay => 'पुष्टि करें और भुगतान करें';
+
+  @override
+  String get labTestBooking => 'लैब टेस्ट बुकिंग';
 }

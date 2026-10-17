@@ -1111,6 +1111,7 @@ class AppLocalizationsEn extends AppLocalizations {
       locale: localeName,
       other: '$count Days',
       one: '1 Day',
+      zero: '0 Days',
     );
     return '$_temp0';
   }
@@ -1329,4 +1330,293 @@ class AppLocalizationsEn extends AppLocalizations {
   String weightInKg(String weight) {
     return '$weight kg';
   }
+
+  @override
+  String get labTests => 'Lab Tests';
+
+  @override
+  String get popularPackages => 'Popular Packages';
+
+  @override
+  String get viewAll => 'View All';
+
+  @override
+  String get noTestsAvailableInCategory =>
+      'No tests available in this category';
+
+  @override
+  String get allPackagesAndTests => 'All Packages & Tests';
+
+  @override
+  String get trustedByFamilies => 'Trusted by 50,000+ Families';
+
+  @override
+  String get bookLabTestsComfortOfHome =>
+      'Book Lab Tests from the Comfort of Home';
+
+  @override
+  String get labHeroSubtitle =>
+      'Accurate Reports • Affordable Prices • Home Sample Collection';
+
+  @override
+  String get lowestPrices => 'Lowest Prices';
+
+  @override
+  String get transparentDesc => 'Transparent';
+
+  @override
+  String get homeCollectionShort => 'Home Coll.';
+
+  @override
+  String get sevenDaysAWeek => '7 days/week';
+
+  @override
+  String get accurateTitle => 'Accurate';
+
+  @override
+  String get verifiedDesc => 'Verified';
+
+  @override
+  String get hundredPercentPrivate => '100% Private';
+
+  @override
+  String get encryptedDesc => 'Encrypted';
+
+  @override
+  String get notSureWhichTestToBook => 'Not sure which test to book?';
+
+  @override
+  String get labSupportAdvisorsAvailable =>
+      'Our advisors are available 7 days a week to guide you.';
+
+  @override
+  String callSupportPhone(String phone) {
+    return 'Call $phone';
+  }
+
+  @override
+  String get packageType => 'Package';
+
+  @override
+  String get essentialType => 'Essential';
+
+  @override
+  String percentOff(String percent) {
+    return '$percent% OFF';
+  }
+
+  @override
+  String paramsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Params',
+      one: '1 Param',
+      zero: '0 Params',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get homeSampleCollection => 'Home Sample Collection';
+
+  @override
+  String get viewButton => 'View';
+
+  @override
+  String get addedButton => 'Added';
+
+  @override
+  String get addButton => '+ Add';
+
+  @override
+  String get testDetails => 'Test Details';
+
+  @override
+  String get testNotFound => 'Test not found';
+
+  @override
+  String addedToCart(String title) {
+    return '$title added to cart';
+  }
+
+  @override
+  String removedFromCart(String title) {
+    return '$title removed from cart';
+  }
+
+  @override
+  String parametersCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Parameters',
+      one: '1 Parameter',
+      zero: '0 Parameters',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String saveAmount(String amount) {
+    return 'Save ₹$amount';
+  }
+
+  @override
+  String get nablCertifiedLabs => 'NABL Certified Labs';
+
+  @override
+  String get freeHomeSamplePickup => 'Free Home Sample Pickup';
+
+  @override
+  String get twentyFourHoursReport => '24 Hours Report';
+
+  @override
+  String get aboutThisTest => 'About This Test';
+
+  @override
+  String get includes => 'Includes';
+
+  @override
+  String get defaultTestDescription =>
+      'This test helps evaluate overall health status and detects a wide range of conditions, including anemia, infection, and various other clinical parameters.';
+
+  @override
+  String get addToCart => 'Add to Cart';
+
+  @override
+  String get addAndBook => 'Add & Book';
+
+  @override
+  String get myCart => 'My Cart';
+
+  @override
+  String parametersIncluded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Parameters Included',
+      one: '1 Parameter Included',
+      zero: '0 Parameters Included',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get addMoreTests => 'Add More Tests';
+
+  @override
+  String get priceSummary => 'Price Summary';
+
+  @override
+  String get totalMRP => 'Total MRP';
+
+  @override
+  String get youSave => 'You Save';
+
+  @override
+  String savingDiscountNotice(String discount) {
+    return 'Great deal! You\'re saving $discount% on this order.';
+  }
+
+  @override
+  String get totalPayable => 'Total Payable';
+
+  @override
+  String get proceedToBookSlot => 'Proceed to Book Slot';
+
+  @override
+  String get yourCartIsEmpty => 'Your cart is empty';
+
+  @override
+  String get cartEmptyDesc =>
+      'Looks like you haven\'t added any lab tests yet. Explore our packages to get started.';
+
+  @override
+  String get addTestsAndPackages => 'Add Tests & Packages';
+
+  @override
+  String get bookSlotTitle => 'Book a Slot';
+
+  @override
+  String testsSelectedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tests selected • ',
+      one: '1 test selected • ',
+      zero: '0 tests selected • ',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get patientDetails => 'Patient Details';
+
+  @override
+  String get samplePickupAddress => 'Sample Pickup Address';
+
+  @override
+  String get selectDateTime => 'Select Date & Time';
+
+  @override
+  String get enterYourFullName => 'Enter your full name';
+
+  @override
+  String get nameMin3Characters => 'Name must be at least 3 characters';
+
+  @override
+  String get invalidAge => 'Invalid age';
+
+  @override
+  String get ageRangeError => 'Age must be between 1 and 120';
+
+  @override
+  String get enter10DigitNumber => 'Enter 10-digit number';
+
+  @override
+  String get enterValid10DigitNumber => 'Enter valid 10-digit number';
+
+  @override
+  String get useMyCurrentLocation => 'Use My Current Location';
+
+  @override
+  String get fullAddress => 'Full Address';
+
+  @override
+  String get fullAddressHint => 'House/Flat No., Street, Area, City';
+
+  @override
+  String get enterAddress => 'Enter address';
+
+  @override
+  String get addressTooShort => 'Address is too short';
+
+  @override
+  String get todaySlotsClosedMessage =>
+      'Today\'s slots are closed. select other day slots';
+
+  @override
+  String get morningSlot => 'Morning Slot';
+
+  @override
+  String get afternoonSlot => 'Afternoon Slot';
+
+  @override
+  String get eveningSlot => 'Evening Slot';
+
+  @override
+  String get totalPrice => 'Total Price';
+
+  @override
+  String get selectTimeSlotValidation => 'Select a time slot';
+
+  @override
+  String get bookingFailed => 'Booking failed';
+
+  @override
+  String get confirmAndPay => 'Confirm & Pay';
+
+  @override
+  String get labTestBooking => 'Lab Test Booking';
 }

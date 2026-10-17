@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/controllers/booking_controller.dart';
 import 'package:yodoctor/modules/patient/controllers/lab_test_controller.dart';
 import 'package:yodoctor/modules/patient/models/lab/booking_state_model.dart';
@@ -37,6 +38,7 @@ class LabBookingBottomBar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = AppLocalizations.of(context);
     final isReady = state.selectedTimeSlot.isNotEmpty;
     final isProcessing = labState.isPaymentLoading;
 
@@ -60,7 +62,7 @@ class LabBookingBottomBar extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Total Price',
+                l10n?.totalPrice ?? 'Total Price',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: colorScheme.outline,
                 ),
@@ -101,11 +103,11 @@ class LabBookingBottomBar extends ConsumerWidget {
 
                   final booking = ref.read(labBookingProvider);
                   if (booking.gender.isEmpty) {
-                    onValidationChanged("Select gender");
+                    onValidationChanged(l10n?.selectGenderValidation ?? "Select gender");
                     return;
                   }
                   if (booking.selectedTimeSlot.isEmpty) {
-                    onValidationChanged("Select a time slot");
+                    onValidationChanged(l10n?.selectTimeSlotValidation ?? "Select a time slot");
                     return;
                   }
                   onValidationChanged(null);
@@ -119,7 +121,7 @@ class LabBookingBottomBar extends ConsumerWidget {
 
                   if (bookingId == null) {
                     AppSnackBar.show(
-                      message: 'Booking failed',
+                      message: l10n?.bookingFailed ?? 'Booking failed',
                       type: AppSnackBarType.error,
                     );
                     return;
@@ -145,9 +147,9 @@ class LabBookingBottomBar extends ConsumerWidget {
                     color: colorScheme.onPrimary,
                   ),
                 )
-                    : const Text(
-                  'Confirm & Pay',
-                  style: TextStyle(
+                    : Text(
+                  l10n?.confirmAndPay ?? 'Confirm & Pay',
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 15,
                   ),

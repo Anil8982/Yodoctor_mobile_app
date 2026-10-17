@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/controllers/lab_test_controller.dart';
 import 'package:yodoctor/modules/widgets/app_header.dart';
 
@@ -13,6 +14,7 @@ class LabCartScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = AppLocalizations.of(context);
 
     final labState = ref.watch(labProvider);
 
@@ -34,7 +36,7 @@ class LabCartScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppHeader(
-        title: 'My Cart',
+        title: l10n?.myCart ?? 'My Cart',
         actions: [
           if (cartItems.isNotEmpty)
             Padding(
@@ -116,7 +118,10 @@ class LabCartScreen extends ConsumerWidget {
                                               ),
                                         ),
                                         Text(
-                                          '${item.parametersCount} Parameters Included',
+                                          l10n?.parametersIncluded(
+                                                item.parametersCount,
+                                              ) ??
+                                              '${item.parametersCount} Parameters Included',
                                           style: theme.textTheme.bodySmall
                                               ?.copyWith(
                                                 color: colorScheme.outline,
@@ -194,7 +199,7 @@ class LabCartScreen extends ConsumerWidget {
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
-                                  'Add More Tests',
+                                  l10n?.addMoreTests ?? 'Add More Tests',
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     color: colorScheme.primary,
@@ -221,7 +226,7 @@ class LabCartScreen extends ConsumerWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Price Summary',
+                                l10n?.priceSummary ?? 'Price Summary',
                                 style: theme.textTheme.titleMedium?.copyWith(
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -229,14 +234,14 @@ class LabCartScreen extends ConsumerWidget {
                               const SizedBox(height: 16),
                               _buildSummaryRow(
                                 context,
-                                'Total MRP',
+                                l10n?.totalMRP ?? 'Total MRP',
                                 '₹${totalMRP.toInt()}',
                                 isBold: false,
                               ),
                               const SizedBox(height: 10),
                               _buildSummaryRow(
                                 context,
-                                'You Save',
+                                l10n?.youSave ?? 'You Save',
                                 '- ₹${totalSavings.toInt()}',
                                 isBold: false,
                                 textColor: AppTheme.green,
@@ -266,7 +271,10 @@ class LabCartScreen extends ConsumerWidget {
                                     const SizedBox(width: 8),
                                     Expanded(
                                       child: Text(
-                                        'Great deal! You\'re saving $averageDiscount% on this order.',
+                                        l10n?.savingDiscountNotice(
+                                              '$averageDiscount',
+                                            ) ??
+                                            'Great deal! You\'re saving $averageDiscount% on this order.',
                                         style: TextStyle(
                                           color: AppTheme.green,
                                           fontSize: 11,
@@ -287,7 +295,7 @@ class LabCartScreen extends ConsumerWidget {
                               const SizedBox(height: 16),
                               _buildSummaryRow(
                                 context,
-                                'Total Payable',
+                                l10n?.totalPayable ?? 'Total Payable',
                                 '₹${totalPayable.toInt()}',
                                 isBold: true,
                                 fontSize: 16,
@@ -320,7 +328,7 @@ class LabCartScreen extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Total Payable',
+                              l10n?.totalPayable ?? 'Total Payable',
                               style: theme.textTheme.bodySmall?.copyWith(
                                 color: colorScheme.outline,
                               ),
@@ -349,17 +357,18 @@ class LabCartScreen extends ConsumerWidget {
                                   borderRadius: BorderRadius.circular(16),
                                 ),
                               ),
-                              child: const Row(
+                              child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
-                                    'Proceed to Book Slot',
-                                    style: TextStyle(
+                                    l10n?.proceedToBookSlot ??
+                                        'Proceed to Book Slot',
+                                    style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  SizedBox(width: 6),
-                                  Icon(Icons.arrow_forward_rounded, size: 16),
+                                  const SizedBox(width: 6),
+                                  const Icon(Icons.arrow_forward_rounded, size: 16),
                                 ],
                               ),
                             ),
@@ -408,6 +417,7 @@ class LabCartScreen extends ConsumerWidget {
 
   Widget _buildEmptyCart(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context);
 
     return Padding(
       padding: const EdgeInsets.all(24),
@@ -429,14 +439,15 @@ class LabCartScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 24),
             Text(
-              'Your cart is empty',
+              l10n?.yourCartIsEmpty ?? 'Your cart is empty',
               style: Theme.of(
                 context,
               ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
-              'Looks like you haven\'t added any lab tests yet. Explore our packages to get started.',
+              l10n?.cartEmptyDesc ??
+                  'Looks like you haven\'t added any lab tests yet. Explore our packages to get started.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: colorScheme.outline,
@@ -450,9 +461,9 @@ class LabCartScreen extends ConsumerWidget {
               child: ElevatedButton.icon(
                 onPressed: () => context.pop(),
                 icon: const Icon(Icons.add_rounded, size: 18),
-                label: const Text(
-                  'Add Tests & Packages',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                label: Text(
+                  l10n?.addTestsAndPackages ?? 'Add Tests & Packages',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: colorScheme.primary,

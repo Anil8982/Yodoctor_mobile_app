@@ -1004,7 +1004,7 @@ abstract class AppLocalizations {
   /// **'Name should have at least 2 characters'**
   String get nameMinCharacters;
 
-  /// Validation message when non-alphabets are entered in name
+  /// Validation error for non-alphabet characters
   ///
   /// In en, this message translates to:
   /// **'Only alphabets are allowed'**
@@ -1034,7 +1034,7 @@ abstract class AppLocalizations {
   /// **'Phone Number'**
   String get phoneNumber;
 
-  /// Phone Number field hint
+  /// Validation error for empty phone
   ///
   /// In en, this message translates to:
   /// **'Enter phone number'**
@@ -1886,7 +1886,7 @@ abstract class AppLocalizations {
   /// **'Enter contact number'**
   String get enterContactNumber;
 
-  /// Patient age field hint
+  /// Validation error for empty age
   ///
   /// In en, this message translates to:
   /// **'Enter age'**
@@ -2105,7 +2105,7 @@ abstract class AppLocalizations {
   /// Number of days with days suffix
   ///
   /// In en, this message translates to:
-  /// **'{count, plural, =1{1 Day} other{{count} Days}}'**
+  /// **'{count, plural, =0{0 Days} =1{1 Day} other{{count} Days}}'**
   String daysCount(int count);
 
   /// All filter option for home care history
@@ -2503,6 +2503,474 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{weight} kg'**
   String weightInKg(String weight);
+
+  /// Lab tests screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Lab Tests'**
+  String get labTests;
+
+  /// Popular packages section title
+  ///
+  /// In en, this message translates to:
+  /// **'Popular Packages'**
+  String get popularPackages;
+
+  /// View all button text
+  ///
+  /// In en, this message translates to:
+  /// **'View All'**
+  String get viewAll;
+
+  /// Empty state when no lab tests match category
+  ///
+  /// In en, this message translates to:
+  /// **'No tests available in this category'**
+  String get noTestsAvailableInCategory;
+
+  /// All packages and tests screen title
+  ///
+  /// In en, this message translates to:
+  /// **'All Packages & Tests'**
+  String get allPackagesAndTests;
+
+  /// Badge in lab hero section
+  ///
+  /// In en, this message translates to:
+  /// **'Trusted by 50,000+ Families'**
+  String get trustedByFamilies;
+
+  /// Heading in lab hero section
+  ///
+  /// In en, this message translates to:
+  /// **'Book Lab Tests from the Comfort of Home'**
+  String get bookLabTestsComfortOfHome;
+
+  /// Subtitle in lab hero section
+  ///
+  /// In en, this message translates to:
+  /// **'Accurate Reports • Affordable Prices • Home Sample Collection'**
+  String get labHeroSubtitle;
+
+  /// Trust banner item 1 title
+  ///
+  /// In en, this message translates to:
+  /// **'Lowest Prices'**
+  String get lowestPrices;
+
+  /// Trust banner item 1 description
+  ///
+  /// In en, this message translates to:
+  /// **'Transparent'**
+  String get transparentDesc;
+
+  /// Trust banner item 2 title
+  ///
+  /// In en, this message translates to:
+  /// **'Home Coll.'**
+  String get homeCollectionShort;
+
+  /// Trust banner item 2 description
+  ///
+  /// In en, this message translates to:
+  /// **'7 days/week'**
+  String get sevenDaysAWeek;
+
+  /// Trust banner item 3 title
+  ///
+  /// In en, this message translates to:
+  /// **'Accurate'**
+  String get accurateTitle;
+
+  /// Trust banner item 3 description
+  ///
+  /// In en, this message translates to:
+  /// **'Verified'**
+  String get verifiedDesc;
+
+  /// Trust banner item 4 title
+  ///
+  /// In en, this message translates to:
+  /// **'100% Private'**
+  String get hundredPercentPrivate;
+
+  /// Trust banner item 4 description
+  ///
+  /// In en, this message translates to:
+  /// **'Encrypted'**
+  String get encryptedDesc;
+
+  /// Lab support banner heading
+  ///
+  /// In en, this message translates to:
+  /// **'Not sure which test to book?'**
+  String get notSureWhichTestToBook;
+
+  /// Lab support banner description
+  ///
+  /// In en, this message translates to:
+  /// **'Our advisors are available 7 days a week to guide you.'**
+  String get labSupportAdvisorsAvailable;
+
+  /// Call support button with phone number
+  ///
+  /// In en, this message translates to:
+  /// **'Call {phone}'**
+  String callSupportPhone(String phone);
+
+  /// Package badge label
+  ///
+  /// In en, this message translates to:
+  /// **'Package'**
+  String get packageType;
+
+  /// Essential test badge label
+  ///
+  /// In en, this message translates to:
+  /// **'Essential'**
+  String get essentialType;
+
+  /// Discount badge
+  ///
+  /// In en, this message translates to:
+  /// **'{percent}% OFF'**
+  String percentOff(String percent);
+
+  /// Number of parameters count
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{0 Params} =1{1 Param} other{{count} Params}}'**
+  String paramsCount(int count);
+
+  /// Home sample collection feature tag
+  ///
+  /// In en, this message translates to:
+  /// **'Home Sample Collection'**
+  String get homeSampleCollection;
+
+  /// View button label
+  ///
+  /// In en, this message translates to:
+  /// **'View'**
+  String get viewButton;
+
+  /// Added to cart state label
+  ///
+  /// In en, this message translates to:
+  /// **'Added'**
+  String get addedButton;
+
+  /// Add to cart button label
+  ///
+  /// In en, this message translates to:
+  /// **'+ Add'**
+  String get addButton;
+
+  /// Test details title
+  ///
+  /// In en, this message translates to:
+  /// **'Test Details'**
+  String get testDetails;
+
+  /// Error message when test is not found
+  ///
+  /// In en, this message translates to:
+  /// **'Test not found'**
+  String get testNotFound;
+
+  /// Snackbar when test is added to cart
+  ///
+  /// In en, this message translates to:
+  /// **'{title} added to cart'**
+  String addedToCart(String title);
+
+  /// Snackbar when test is removed from cart
+  ///
+  /// In en, this message translates to:
+  /// **'{title} removed from cart'**
+  String removedFromCart(String title);
+
+  /// Number of parameters in test details
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{0 Parameters} =1{1 Parameter} other{{count} Parameters}}'**
+  String parametersCount(int count);
+
+  /// Saved amount label
+  ///
+  /// In en, this message translates to:
+  /// **'Save ₹{amount}'**
+  String saveAmount(String amount);
+
+  /// NABL certified badge
+  ///
+  /// In en, this message translates to:
+  /// **'NABL Certified Labs'**
+  String get nablCertifiedLabs;
+
+  /// Free home sample pickup badge
+  ///
+  /// In en, this message translates to:
+  /// **'Free Home Sample Pickup'**
+  String get freeHomeSamplePickup;
+
+  /// 24 hours report badge
+  ///
+  /// In en, this message translates to:
+  /// **'24 Hours Report'**
+  String get twentyFourHoursReport;
+
+  /// Section header about this test
+  ///
+  /// In en, this message translates to:
+  /// **'About This Test'**
+  String get aboutThisTest;
+
+  /// Includes section header
+  ///
+  /// In en, this message translates to:
+  /// **'Includes'**
+  String get includes;
+
+  /// Fallback description for lab test
+  ///
+  /// In en, this message translates to:
+  /// **'This test helps evaluate overall health status and detects a wide range of conditions, including anemia, infection, and various other clinical parameters.'**
+  String get defaultTestDescription;
+
+  /// Add to cart button label
+  ///
+  /// In en, this message translates to:
+  /// **'Add to Cart'**
+  String get addToCart;
+
+  /// Add and book button label
+  ///
+  /// In en, this message translates to:
+  /// **'Add & Book'**
+  String get addAndBook;
+
+  /// My cart screen title
+  ///
+  /// In en, this message translates to:
+  /// **'My Cart'**
+  String get myCart;
+
+  /// Parameters included in package
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{0 Parameters Included} =1{1 Parameter Included} other{{count} Parameters Included}}'**
+  String parametersIncluded(int count);
+
+  /// Add more tests button
+  ///
+  /// In en, this message translates to:
+  /// **'Add More Tests'**
+  String get addMoreTests;
+
+  /// Price summary section title
+  ///
+  /// In en, this message translates to:
+  /// **'Price Summary'**
+  String get priceSummary;
+
+  /// Total MRP line item
+  ///
+  /// In en, this message translates to:
+  /// **'Total MRP'**
+  String get totalMRP;
+
+  /// You save line item
+  ///
+  /// In en, this message translates to:
+  /// **'You Save'**
+  String get youSave;
+
+  /// Banner showing discount savings in cart
+  ///
+  /// In en, this message translates to:
+  /// **'Great deal! You\'re saving {discount}% on this order.'**
+  String savingDiscountNotice(String discount);
+
+  /// Total payable line item
+  ///
+  /// In en, this message translates to:
+  /// **'Total Payable'**
+  String get totalPayable;
+
+  /// Proceed to book slot button
+  ///
+  /// In en, this message translates to:
+  /// **'Proceed to Book Slot'**
+  String get proceedToBookSlot;
+
+  /// Empty cart title
+  ///
+  /// In en, this message translates to:
+  /// **'Your cart is empty'**
+  String get yourCartIsEmpty;
+
+  /// Empty cart description
+  ///
+  /// In en, this message translates to:
+  /// **'Looks like you haven\'t added any lab tests yet. Explore our packages to get started.'**
+  String get cartEmptyDesc;
+
+  /// Button to add tests from empty cart
+  ///
+  /// In en, this message translates to:
+  /// **'Add Tests & Packages'**
+  String get addTestsAndPackages;
+
+  /// Book a slot screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Book a Slot'**
+  String get bookSlotTitle;
+
+  /// Number of tests selected in slot booking
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{0 tests selected • } =1{1 test selected • } other{{count} tests selected • }}'**
+  String testsSelectedCount(int count);
+
+  /// Step 1 title for patient details
+  ///
+  /// In en, this message translates to:
+  /// **'Patient Details'**
+  String get patientDetails;
+
+  /// Step 2 title for sample pickup address
+  ///
+  /// In en, this message translates to:
+  /// **'Sample Pickup Address'**
+  String get samplePickupAddress;
+
+  /// Step 3 title for date & time selection
+  ///
+  /// In en, this message translates to:
+  /// **'Select Date & Time'**
+  String get selectDateTime;
+
+  /// Validation error and hint for full name
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your full name'**
+  String get enterYourFullName;
+
+  /// Validation error for short name
+  ///
+  /// In en, this message translates to:
+  /// **'Name must be at least 3 characters'**
+  String get nameMin3Characters;
+
+  /// Validation error for invalid age
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid age'**
+  String get invalidAge;
+
+  /// Validation error for age range
+  ///
+  /// In en, this message translates to:
+  /// **'Age must be between 1 and 120'**
+  String get ageRangeError;
+
+  /// Hint for phone number
+  ///
+  /// In en, this message translates to:
+  /// **'Enter 10-digit number'**
+  String get enter10DigitNumber;
+
+  /// Validation error for invalid phone
+  ///
+  /// In en, this message translates to:
+  /// **'Enter valid 10-digit number'**
+  String get enterValid10DigitNumber;
+
+  /// Button to fetch current location
+  ///
+  /// In en, this message translates to:
+  /// **'Use My Current Location'**
+  String get useMyCurrentLocation;
+
+  /// Full address field label
+  ///
+  /// In en, this message translates to:
+  /// **'Full Address'**
+  String get fullAddress;
+
+  /// Full address field hint
+  ///
+  /// In en, this message translates to:
+  /// **'House/Flat No., Street, Area, City'**
+  String get fullAddressHint;
+
+  /// Validation error for empty address
+  ///
+  /// In en, this message translates to:
+  /// **'Enter address'**
+  String get enterAddress;
+
+  /// Validation error for short address
+  ///
+  /// In en, this message translates to:
+  /// **'Address is too short'**
+  String get addressTooShort;
+
+  /// Snackbar message when today slots are full
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s slots are closed. select other day slots'**
+  String get todaySlotsClosedMessage;
+
+  /// Morning shift header
+  ///
+  /// In en, this message translates to:
+  /// **'Morning Slot'**
+  String get morningSlot;
+
+  /// Afternoon shift header
+  ///
+  /// In en, this message translates to:
+  /// **'Afternoon Slot'**
+  String get afternoonSlot;
+
+  /// Evening shift header
+  ///
+  /// In en, this message translates to:
+  /// **'Evening Slot'**
+  String get eveningSlot;
+
+  /// Total price label
+  ///
+  /// In en, this message translates to:
+  /// **'Total Price'**
+  String get totalPrice;
+
+  /// Validation error when time slot is not selected
+  ///
+  /// In en, this message translates to:
+  /// **'Select a time slot'**
+  String get selectTimeSlotValidation;
+
+  /// Error message when booking fails
+  ///
+  /// In en, this message translates to:
+  /// **'Booking failed'**
+  String get bookingFailed;
+
+  /// Confirm and pay button
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm & Pay'**
+  String get confirmAndPay;
+
+  /// Plan name for lab test booking in payment success
+  ///
+  /// In en, this message translates to:
+  /// **'Lab Test Booking'**
+  String get labTestBooking;
 }
 
 class _AppLocalizationsDelegate

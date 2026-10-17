@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 
 class LabHeroSection extends StatelessWidget {
   final TextEditingController controller;
@@ -14,6 +15,7 @@ class LabHeroSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = AppLocalizations.of(context);
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -40,7 +42,7 @@ class LabHeroSection extends StatelessWidget {
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  'Trusted by 50,000+ Families',
+                  l10n?.trustedByFamilies ?? 'Trusted by 50,000+ Families',
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: colorScheme.primary,
                     fontWeight: FontWeight.bold,
@@ -51,7 +53,8 @@ class LabHeroSection extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'Book Lab Tests from the Comfort of Home',
+            l10n?.bookLabTestsComfortOfHome ??
+                'Book Lab Tests from the Comfort of Home',
             style: theme.textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.w900,
               color: colorScheme.onSurface,
@@ -60,7 +63,8 @@ class LabHeroSection extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Accurate Reports • Affordable Prices • Home Sample Collection',
+            l10n?.labHeroSubtitle ??
+                'Accurate Reports • Affordable Prices • Home Sample Collection',
             style: theme.textTheme.bodySmall?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),

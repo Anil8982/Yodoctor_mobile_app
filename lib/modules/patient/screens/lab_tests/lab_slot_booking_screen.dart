@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/controllers/booking_controller.dart';
 import 'package:yodoctor/modules/patient/controllers/lab_test_controller.dart';
 import 'package:yodoctor/modules/widgets/app_header.dart';
@@ -45,11 +46,12 @@ class _LabSlotBookingScreenState extends ConsumerState<LabSlotBookingScreen> {
         if (context.canPop()) context.pop();
 
         if (next.paymentError == null && next.lastBookingId != null) {
+          final l10n = AppLocalizations.of(context);
           context.push(
             AppRoutes.paymentSuccess,
             extra: {
               "paymentId": next.lastOrderId ?? '',
-              "planName": 'Lab Test Booking',
+              "planName": l10n?.labTestBooking ?? 'Lab Test Booking',
               "nextRoute": AppRoutes.dashboard,
             },
           );
@@ -77,6 +79,7 @@ class _LabSlotBookingScreenState extends ConsumerState<LabSlotBookingScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = AppLocalizations.of(context);
     final bookingState = ref.watch(labBookingProvider);
     final labState = ref.watch(labProvider);
     final cartItems = labState.cart;
@@ -87,7 +90,7 @@ class _LabSlotBookingScreenState extends ConsumerState<LabSlotBookingScreen> {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppHeader(title: 'Book a Slot'),
+      appBar: AppHeader(title: l10n?.bookSlotTitle ?? 'Book a Slot'),
       body: SafeArea(
         child: Form(
           key: _formKey,
@@ -108,7 +111,8 @@ class _LabSlotBookingScreenState extends ConsumerState<LabSlotBookingScreen> {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      '${cartItems.length} tests selected • ',
+                      l10n?.testsSelectedCount(cartItems.length) ??
+                          '${cartItems.length} tests selected • ',
                       style: theme.textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w500,
                       ),
@@ -132,7 +136,7 @@ class _LabSlotBookingScreenState extends ConsumerState<LabSlotBookingScreen> {
                     children: [
                       LabBookingStepContainer(
                         step: 1,
-                        title: 'Patient Details',
+                        title: l10n?.patientDetails ?? 'Patient Details',
                         child: LabBookingPatientFields(
                           nameController: _nameController,
                           ageController: _ageController,
@@ -144,7 +148,8 @@ class _LabSlotBookingScreenState extends ConsumerState<LabSlotBookingScreen> {
                       const SizedBox(height: 20),
                       LabBookingStepContainer(
                         step: 2,
-                        title: 'Sample Pickup Address',
+                        title: l10n?.samplePickupAddress ??
+                            'Sample Pickup Address',
                         child: LabBookingAddressFields(
                           addressController: _addressController,
                           hasSubmitted: _hasSubmitted,
@@ -153,7 +158,7 @@ class _LabSlotBookingScreenState extends ConsumerState<LabSlotBookingScreen> {
                       const SizedBox(height: 20),
                       LabBookingStepContainer(
                         step: 3,
-                        title: 'Select Date & Time',
+                        title: l10n?.selectDateTime ?? 'Select Date & Time',
                         child: LabBookingDateTime(state: bookingState),
                       ),
                     ],

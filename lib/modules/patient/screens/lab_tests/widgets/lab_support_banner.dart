@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 
 class LabSupportBanner extends StatelessWidget {
   const LabSupportBanner({super.key});
@@ -7,6 +8,7 @@ class LabSupportBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = AppLocalizations.of(context);
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -18,7 +20,7 @@ class LabSupportBanner extends StatelessWidget {
       child: Column(
         children: [
           Text(
-            'Not sure which test to book?',
+            l10n?.notSureWhichTestToBook ?? 'Not sure which test to book?',
             style: theme.textTheme.titleMedium?.copyWith(
               color: colorScheme.onPrimary,
               fontWeight: FontWeight.bold,
@@ -26,7 +28,8 @@ class LabSupportBanner extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            'Our advisors are available 7 days a week to guide you.',
+            l10n?.labSupportAdvisorsAvailable ??
+                'Our advisors are available 7 days a week to guide you.',
             textAlign: TextAlign.center,
             style: theme.textTheme.bodySmall?.copyWith(
               color: colorScheme.onPrimary.withValues(alpha: 0.8),
@@ -42,9 +45,10 @@ class LabSupportBanner extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             ),
             icon: const Icon(Icons.call_rounded, size: 18),
-            label: const Text(
-              'Call +91 92772 07339',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            label: Text(
+              l10n?.callSupportPhone('+91 92772 07339') ??
+                  'Call +91 92772 07339',
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
         ],

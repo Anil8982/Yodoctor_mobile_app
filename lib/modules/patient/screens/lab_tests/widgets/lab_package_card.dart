@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/models/lab/lab_test_model.dart';
 
 class LabPackageCard extends StatelessWidget {
@@ -20,6 +21,7 @@ class LabPackageCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = AppLocalizations.of(context);
 
     return Container(
       width: 195,
@@ -71,7 +73,9 @@ class LabPackageCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
-                    package.type.toLowerCase() == 'package' ? 'Package' : 'Essential',
+                    package.type.toLowerCase() == 'package'
+                        ? (l10n?.packageType ?? 'Package')
+                        : (l10n?.essentialType ?? 'Essential'),
                     style: theme.textTheme.labelSmall?.copyWith(
                       fontSize: 8,
                       fontWeight: FontWeight.bold,
@@ -93,7 +97,8 @@ class LabPackageCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(100),
                   ),
                   child: Text(
-                    '${package.discountPercentage}% OFF',
+                    l10n?.percentOff('${package.discountPercentage}') ??
+                        '${package.discountPercentage}% OFF',
                     style: TextStyle(
                       fontSize: 9,
                       fontWeight: FontWeight.bold,
@@ -151,7 +156,7 @@ class LabPackageCard extends StatelessWidget {
                       const SizedBox(width: 4),
                       Flexible(
                         child: Text(
-                          '${package.parametersCount} Params • ${package.reportDuration}',
+                          '${l10n?.paramsCount(package.parametersCount) ?? '${package.parametersCount} Params'} • ${package.reportDuration}',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: theme.textTheme.bodySmall?.copyWith(
@@ -174,7 +179,8 @@ class LabPackageCard extends StatelessWidget {
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
-                            'Home Sample Collection',
+                            l10n?.homeSampleCollection ??
+                                'Home Sample Collection',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: theme.textTheme.bodySmall?.copyWith(
@@ -228,7 +234,7 @@ class LabPackageCard extends StatelessWidget {
                               padding: EdgeInsets.zero,
                             ),
                             child: Text(
-                              'View',
+                              l10n?.viewButton ?? 'View',
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
@@ -255,7 +261,9 @@ class LabPackageCard extends StatelessWidget {
                               padding: EdgeInsets.zero,
                             ),
                             child: Text(
-                              isInCart ? 'Added' : '+ Add',
+                              isInCart
+                                  ? (l10n?.addedButton ?? 'Added')
+                                  : (l10n?.addButton ?? '+ Add'),
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,

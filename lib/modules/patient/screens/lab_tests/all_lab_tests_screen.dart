@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/controllers/lab_test_controller.dart';
 import 'package:yodoctor/modules/widgets/app_header.dart';
 import 'widgets/lab_package_card.dart';
@@ -13,6 +14,7 @@ class AllLabTestsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = AppLocalizations.of(context);
 
     final labState = ref.watch(labProvider);
 
@@ -25,7 +27,7 @@ class AllLabTestsScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppHeader(
-        title: 'All Packages & Tests',
+        title: l10n?.allPackagesAndTests ?? 'All Packages & Tests',
         actions: [
           Stack(
             alignment: Alignment.center,
@@ -70,8 +72,11 @@ class AllLabTestsScreen extends ConsumerWidget {
           const SizedBox(height: 12),
           Expanded(
             child: filteredPackages.isEmpty
-                ? const Center(
-                    child: Text('No tests available in this category'),
+                ? Center(
+                    child: Text(
+                      l10n?.noTestsAvailableInCategory ??
+                          'No tests available in this category',
+                    ),
                   )
                 : GridView.builder(
                     padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),

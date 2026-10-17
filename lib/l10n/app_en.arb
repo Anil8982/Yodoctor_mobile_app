@@ -1443,7 +1443,7 @@
       }
     }
   },
-  "daysCount": "{count, plural, =1{1 Day} other{{count} Days}}",
+  "daysCount": "{count, plural, =0{0 Days} =1{1 Day} other{{count} Days}}",
   "@daysCount": {
     "description": "Number of days with days suffix",
     "placeholders": {
@@ -1762,5 +1762,389 @@
         "example": "65"
       }
     }
+  },
+  "labTests": "Lab Tests",
+  "@labTests": {
+    "description": "Lab tests screen title"
+  },
+  "popularPackages": "Popular Packages",
+  "@popularPackages": {
+    "description": "Popular packages section title"
+  },
+  "viewAll": "View All",
+  "@viewAll": {
+    "description": "View all button text"
+  },
+  "noTestsAvailableInCategory": "No tests available in this category",
+  "@noTestsAvailableInCategory": {
+    "description": "Empty state when no lab tests match category"
+  },
+  "allPackagesAndTests": "All Packages & Tests",
+  "@allPackagesAndTests": {
+    "description": "All packages and tests screen title"
+  },
+  "trustedByFamilies": "Trusted by 50,000+ Families",
+  "@trustedByFamilies": {
+    "description": "Badge in lab hero section"
+  },
+  "bookLabTestsComfortOfHome": "Book Lab Tests from the Comfort of Home",
+  "@bookLabTestsComfortOfHome": {
+    "description": "Heading in lab hero section"
+  },
+  "labHeroSubtitle": "Accurate Reports • Affordable Prices • Home Sample Collection",
+  "@labHeroSubtitle": {
+    "description": "Subtitle in lab hero section"
+  },
+  "lowestPrices": "Lowest Prices",
+  "@lowestPrices": {
+    "description": "Trust banner item 1 title"
+  },
+  "transparentDesc": "Transparent",
+  "@transparentDesc": {
+    "description": "Trust banner item 1 description"
+  },
+  "homeCollectionShort": "Home Coll.",
+  "@homeCollectionShort": {
+    "description": "Trust banner item 2 title"
+  },
+  "sevenDaysAWeek": "7 days/week",
+  "@sevenDaysAWeek": {
+    "description": "Trust banner item 2 description"
+  },
+  "accurateTitle": "Accurate",
+  "@accurateTitle": {
+    "description": "Trust banner item 3 title"
+  },
+  "verifiedDesc": "Verified",
+  "@verifiedDesc": {
+    "description": "Trust banner item 3 description"
+  },
+  "hundredPercentPrivate": "100% Private",
+  "@hundredPercentPrivate": {
+    "description": "Trust banner item 4 title"
+  },
+  "encryptedDesc": "Encrypted",
+  "@encryptedDesc": {
+    "description": "Trust banner item 4 description"
+  },
+  "notSureWhichTestToBook": "Not sure which test to book?",
+  "@notSureWhichTestToBook": {
+    "description": "Lab support banner heading"
+  },
+  "labSupportAdvisorsAvailable": "Our advisors are available 7 days a week to guide you.",
+  "@labSupportAdvisorsAvailable": {
+    "description": "Lab support banner description"
+  },
+  "callSupportPhone": "Call {phone}",
+  "@callSupportPhone": {
+    "description": "Call support button with phone number",
+    "placeholders": {
+      "phone": {
+        "type": "String",
+        "example": "+91 92772 07339"
+      }
+    }
+  },
+  "packageType": "Package",
+  "@packageType": {
+    "description": "Package badge label"
+  },
+  "essentialType": "Essential",
+  "@essentialType": {
+    "description": "Essential test badge label"
+  },
+  "percentOff": "{percent}% OFF",
+  "@percentOff": {
+    "description": "Discount badge",
+    "placeholders": {
+      "percent": {
+        "type": "String",
+        "example": "20"
+      }
+    }
+  },
+  "paramsCount": "{count, plural, =0{0 Params} =1{1 Param} other{{count} Params}}",
+  "@paramsCount": {
+    "description": "Number of parameters count",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "60"
+      }
+    }
+  },
+  "homeSampleCollection": "Home Sample Collection",
+  "@homeSampleCollection": {
+    "description": "Home sample collection feature tag"
+  },
+  "viewButton": "View",
+  "@viewButton": {
+    "description": "View button label"
+  },
+  "addedButton": "Added",
+  "@addedButton": {
+    "description": "Added to cart state label"
+  },
+  "addButton": "+ Add",
+  "@addButton": {
+    "description": "Add to cart button label"
+  },
+  "testDetails": "Test Details",
+  "@testDetails": {
+    "description": "Test details title"
+  },
+  "testNotFound": "Test not found",
+  "@testNotFound": {
+    "description": "Error message when test is not found"
+  },
+  "addedToCart": "{title} added to cart",
+  "@addedToCart": {
+    "description": "Snackbar when test is added to cart",
+    "placeholders": {
+      "title": {
+        "type": "String",
+        "example": "Complete Blood Count"
+      }
+    }
+  },
+  "removedFromCart": "{title} removed from cart",
+  "@removedFromCart": {
+    "description": "Snackbar when test is removed from cart",
+    "placeholders": {
+      "title": {
+        "type": "String",
+        "example": "Complete Blood Count"
+      }
+    }
+  },
+  "parametersCount": "{count, plural, =0{0 Parameters} =1{1 Parameter} other{{count} Parameters}}",
+  "@parametersCount": {
+    "description": "Number of parameters in test details",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "60"
+      }
+    }
+  },
+  "saveAmount": "Save ₹{amount}",
+  "@saveAmount": {
+    "description": "Saved amount label",
+    "placeholders": {
+      "amount": {
+        "type": "String",
+        "example": "200"
+      }
+    }
+  },
+  "nablCertifiedLabs": "NABL Certified Labs",
+  "@nablCertifiedLabs": {
+    "description": "NABL certified badge"
+  },
+  "freeHomeSamplePickup": "Free Home Sample Pickup",
+  "@freeHomeSamplePickup": {
+    "description": "Free home sample pickup badge"
+  },
+  "twentyFourHoursReport": "24 Hours Report",
+  "@twentyFourHoursReport": {
+    "description": "24 hours report badge"
+  },
+  "aboutThisTest": "About This Test",
+  "@aboutThisTest": {
+    "description": "Section header about this test"
+  },
+  "includes": "Includes",
+  "@includes": {
+    "description": "Includes section header"
+  },
+  "defaultTestDescription": "This test helps evaluate overall health status and detects a wide range of conditions, including anemia, infection, and various other clinical parameters.",
+  "@defaultTestDescription": {
+    "description": "Fallback description for lab test"
+  },
+  "addToCart": "Add to Cart",
+  "@addToCart": {
+    "description": "Add to cart button label"
+  },
+  "addAndBook": "Add & Book",
+  "@addAndBook": {
+    "description": "Add and book button label"
+  },
+  "myCart": "My Cart",
+  "@myCart": {
+    "description": "My cart screen title"
+  },
+  "parametersIncluded": "{count, plural, =0{0 Parameters Included} =1{1 Parameter Included} other{{count} Parameters Included}}",
+  "@parametersIncluded": {
+    "description": "Parameters included in package",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "50"
+      }
+    }
+  },
+  "addMoreTests": "Add More Tests",
+  "@addMoreTests": {
+    "description": "Add more tests button"
+  },
+  "priceSummary": "Price Summary",
+  "@priceSummary": {
+    "description": "Price summary section title"
+  },
+  "totalMRP": "Total MRP",
+  "@totalMRP": {
+    "description": "Total MRP line item"
+  },
+  "youSave": "You Save",
+  "@youSave": {
+    "description": "You save line item"
+  },
+  "savingDiscountNotice": "Great deal! You're saving {discount}% on this order.",
+  "@savingDiscountNotice": {
+    "description": "Banner showing discount savings in cart",
+    "placeholders": {
+      "discount": {
+        "type": "String",
+        "example": "25"
+      }
+    }
+  },
+  "totalPayable": "Total Payable",
+  "@totalPayable": {
+    "description": "Total payable line item"
+  },
+  "proceedToBookSlot": "Proceed to Book Slot",
+  "@proceedToBookSlot": {
+    "description": "Proceed to book slot button"
+  },
+  "yourCartIsEmpty": "Your cart is empty",
+  "@yourCartIsEmpty": {
+    "description": "Empty cart title"
+  },
+  "cartEmptyDesc": "Looks like you haven't added any lab tests yet. Explore our packages to get started.",
+  "@cartEmptyDesc": {
+    "description": "Empty cart description"
+  },
+  "addTestsAndPackages": "Add Tests & Packages",
+  "@addTestsAndPackages": {
+    "description": "Button to add tests from empty cart"
+  },
+  "bookSlotTitle": "Book a Slot",
+  "@bookSlotTitle": {
+    "description": "Book a slot screen title"
+  },
+  "testsSelectedCount": "{count, plural, =0{0 tests selected • } =1{1 test selected • } other{{count} tests selected • }}",
+  "@testsSelectedCount": {
+    "description": "Number of tests selected in slot booking",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "patientDetails": "Patient Details",
+  "@patientDetails": {
+    "description": "Step 1 title for patient details"
+  },
+  "samplePickupAddress": "Sample Pickup Address",
+  "@samplePickupAddress": {
+    "description": "Step 2 title for sample pickup address"
+  },
+  "selectDateTime": "Select Date & Time",
+  "@selectDateTime": {
+    "description": "Step 3 title for date & time selection"
+  },
+  "enterYourFullName": "Enter your full name",
+  "@enterYourFullName": {
+    "description": "Validation error and hint for full name"
+  },
+  "onlyAlphabetsAllowed": "Only alphabets are allowed",
+  "@onlyAlphabetsAllowed": {
+    "description": "Validation error for non-alphabet characters"
+  },
+  "nameMin3Characters": "Name must be at least 3 characters",
+  "@nameMin3Characters": {
+    "description": "Validation error for short name"
+  },
+  "enterAge": "Enter age",
+  "@enterAge": {
+    "description": "Validation error for empty age"
+  },
+  "invalidAge": "Invalid age",
+  "@invalidAge": {
+    "description": "Validation error for invalid age"
+  },
+  "ageRangeError": "Age must be between 1 and 120",
+  "@ageRangeError": {
+    "description": "Validation error for age range"
+  },
+  "enter10DigitNumber": "Enter 10-digit number",
+  "@enter10DigitNumber": {
+    "description": "Hint for phone number"
+  },
+  "enterPhoneNumber": "Enter phone number",
+  "@enterPhoneNumber": {
+    "description": "Validation error for empty phone"
+  },
+  "enterValid10DigitNumber": "Enter valid 10-digit number",
+  "@enterValid10DigitNumber": {
+    "description": "Validation error for invalid phone"
+  },
+  "useMyCurrentLocation": "Use My Current Location",
+  "@useMyCurrentLocation": {
+    "description": "Button to fetch current location"
+  },
+  "fullAddress": "Full Address",
+  "@fullAddress": {
+    "description": "Full address field label"
+  },
+  "fullAddressHint": "House/Flat No., Street, Area, City",
+  "@fullAddressHint": {
+    "description": "Full address field hint"
+  },
+  "enterAddress": "Enter address",
+  "@enterAddress": {
+    "description": "Validation error for empty address"
+  },
+  "addressTooShort": "Address is too short",
+  "@addressTooShort": {
+    "description": "Validation error for short address"
+  },
+  "todaySlotsClosedMessage": "Today's slots are closed. select other day slots",
+  "@todaySlotsClosedMessage": {
+    "description": "Snackbar message when today slots are full"
+  },
+  "morningSlot": "Morning Slot",
+  "@morningSlot": {
+    "description": "Morning shift header"
+  },
+  "afternoonSlot": "Afternoon Slot",
+  "@afternoonSlot": {
+    "description": "Afternoon shift header"
+  },
+  "eveningSlot": "Evening Slot",
+  "@eveningSlot": {
+    "description": "Evening shift header"
+  },
+  "totalPrice": "Total Price",
+  "@totalPrice": {
+    "description": "Total price label"
+  },
+  "selectTimeSlotValidation": "Select a time slot",
+  "@selectTimeSlotValidation": {
+    "description": "Validation error when time slot is not selected"
+  },
+  "bookingFailed": "Booking failed",
+  "@bookingFailed": {
+    "description": "Error message when booking fails"
+  },
+  "confirmAndPay": "Confirm & Pay",
+  "@confirmAndPay": {
+    "description": "Confirm and pay button"
+  },
+  "labTestBooking": "Lab Test Booking",
+  "@labTestBooking": {
+    "description": "Plan name for lab test booking in payment success"
   }
 }
