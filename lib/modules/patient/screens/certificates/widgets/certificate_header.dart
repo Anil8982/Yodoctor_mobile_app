@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 
-import '../../../../../core/utils/app_spacing.dart';
-import '../../../../../core/widgets/gradient_background.dart';
 
 class CertificateHeader extends StatelessWidget {
   const CertificateHeader({
@@ -13,66 +12,108 @@ class CertificateHeader extends StatelessWidget {
   final int certificateCount;
   final String selectedFilter;
 
+  Color _getStatusDotColor(String filter, ColorScheme colorScheme) {
+    switch (filter.trim().toLowerCase()) {
+      case 'approved':
+        return const Color(0xFF4ADE80);
+      case 'pending':
+        return const Color(0xFFFBBF24);
+      case 'rejected':
+        return const Color(0xFFF87171);
+      case 'all':
+      default:
+        return colorScheme.onPrimary;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final TextTheme textTheme = Theme.of(context).textTheme;
-    final double topPadding = MediaQuery.of(context).padding.top;
+    final l10n = AppLocalizations.of(context)!;
+    final dotColor = _getStatusDotColor(selectedFilter, colorScheme);
 
-    return GradientBackground(
-      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(32)),
-      padding: EdgeInsets.fromLTRB(
-        AppSpacing.xl,
-        topPadding + 70,
-        AppSpacing.xl,
-        AppSpacing.xl,
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+      decoration: BoxDecoration(
+        color: colorScheme.primary,
+        borderRadius: const BorderRadius.vertical(
+          bottom: Radius.circular(24),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
-          Text(
-            'Medical Certificates',
-            style: textTheme.headlineMedium?.copyWith(
-              color: colorScheme.onPrimary,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            'Track requests and download approved certificate.',
-            style: textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onPrimary.withValues(alpha: 0.9),
-            ),
-          ),
-          const SizedBox(height: 14),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: colorScheme.onPrimary.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: colorScheme.onPrimary.withValues(alpha: 0.12),
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Icon(
-                  Icons.workspace_premium_rounded,
-                  color: colorScheme.onPrimary,
-                  size: 16,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  '$certificateCount certificate | $selectedFilter',
-                  style: textTheme.bodySmall?.copyWith(
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: Text(
+                  l10n.medicalCertificates,
+                  style: textTheme.titleLarge?.copyWith(
                     color: colorScheme.onPrimary,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 19,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 9,
+                  vertical: 3.5,
+                ),
+                decoration: BoxDecoration(
+                  color: colorScheme.onPrimary.withValues(alpha: 0.16),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: colorScheme.onPrimary.withValues(alpha: 0.15),
                   ),
                 ),
-              ],
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Container(
+                      width: 7,
+                      height: 7,
+                      decoration: BoxDecoration(
+                        color: dotColor,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: dotColor.withValues(alpha: 0.45),
+                            blurRadius: 3,
+                            spreadRadius: 0.5,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      l10n.certificateCountText(certificateCount),
+                      style: textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onPrimary,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 11.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 2),
+          Text(
+            l10n.trackRequestsSubtitle,
+            style: textTheme.bodySmall?.copyWith(
+              color: colorScheme.onPrimary.withValues(alpha: 0.85),
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),

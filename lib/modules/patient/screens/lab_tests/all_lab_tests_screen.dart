@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
-import 'package:yodoctor/core/utils/dummy_data.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/controllers/lab_test_controller.dart';
-import 'widgets/lab_categories_list.dart';
+import 'package:yodoctor/modules/widgets/app_header.dart';
 import 'widgets/lab_package_card.dart';
 
 class AllLabTestsScreen extends ConsumerWidget {
@@ -14,17 +14,20 @@ class AllLabTestsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = AppLocalizations.of(context);
 
-    final selectedCategory = ref.watch(labCategoryProvider);
-    final filteredPackages = ref.watch(filteredLabPackagesProvider);
-    final cartItems = ref.watch(labCartProvider);
+    final labState = ref.watch(labProvider);
+
+    final notifier = ref.read(labProvider.notifier);
+
+    final filteredPackages = notifier.filteredPackages;
+    // final popularTests = labState.popularTests;
+    final cartItems = labState.cart;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppBar(
-        scrolledUnderElevation: 0,
-        title: const Text('All Packages & Tests', style: TextStyle(fontWeight: FontWeight.bold)),
-        centerTitle: true,
+      appBar: AppHeader(
+        title: l10n?.allPackagesAndTests ?? 'All Packages & Tests',
         actions: [
           Stack(
             alignment: Alignment.center,
@@ -42,7 +45,11 @@ class AllLabTestsScreen extends ConsumerWidget {
                     backgroundColor: colorScheme.error,
                     child: Text(
                       '${cartItems.length}',
-                      style: TextStyle(fontSize: 10, color: colorScheme.onError, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: colorScheme.onError,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
@@ -55,43 +62,53 @@ class AllLabTestsScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const SizedBox(height: 8),
-          LabCategoriesList(
-            categories: DummyData.labCategories,
-            selectedCategoryId: selectedCategory,
-            onCategorySelected: (catId) {
-              ref.read(labCategoryProvider.notifier).selectCategory(catId);
-            },
-          ),
+          // LabCategoriesList(
+          //   categories: labState.categories,
+          //   selectedCategoryId: selectedCategory,
+          //   onCategorySelected: (catId) {
+          //     notifier.selectCategory(catId);
+          //   },
+          // ),
           const SizedBox(height: 12),
           Expanded(
             child: filteredPackages.isEmpty
-                ? const Center(child: Text('No tests available in this category'))
+                ? Center(
+                    child: Text(
+                      l10n?.noTestsAvailableInCategory ??
+                          'No tests available in this category',
+                    ),
+                  )
                 : GridView.builder(
-              padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
-              physics: const BouncingScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-                childAspectRatio: 0.61,
-              ),
-              itemCount: filteredPackages.length,
-              itemBuilder: (context, index) {
-                final package = filteredPackages[index];
-                final isInCart = cartItems.any((item) => item.id == package.id);
+                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
+                    physics: const BouncingScrollPhysics(),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                          childAspectRatio: 0.61,
+                        ),
+                    itemCount: filteredPackages.length,
+                    itemBuilder: (context, index) {
+                      final package = filteredPackages[index];
+                      final isInCart = cartItems.any(
+                        (item) => item.id == package.id,
+                      );
 
-                return LabPackageCard(
-                  package: package,
-                  isInCart: isInCart,
-                  onAddToCart: () {
-                    ref.read(labCartProvider.notifier).toggleCartItem(package);
-                  },
-                  onViewDetails: () {
-                    context.push(AppRoutes.labTestDetails, extra: package);
-                  },
-                );
-              },
-            ),
+                      return LabPackageCard(
+                        package: package,
+                        isInCart: isInCart,
+                        onAddToCart: () {
+                          notifier.toggleCartItem(package);
+                        },
+                        onViewDetails: () {
+                          context.push(
+                            '${AppRoutes.labTestDetails}/${package.id}',
+                          );
+                        },
+                      );
+                    },
+                  ),
           ),
         ],
       ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
 
 class ProfileInputField extends StatelessWidget {
@@ -10,6 +11,9 @@ class ProfileInputField extends StatelessWidget {
     required this.icon,
     this.maxLines = 1,
     this.keyboardType = TextInputType.text,
+    this.inputFormatters,
+    this.validator,
+    this.enabled = true,
   });
 
   final TextEditingController controller;
@@ -18,6 +22,9 @@ class ProfileInputField extends StatelessWidget {
   final IconData icon;
   final int maxLines;
   final TextInputType keyboardType;
+  final List<TextInputFormatter>? inputFormatters;
+  final String? Function(String?)? validator;
+  final bool enabled;
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +46,12 @@ class ProfileInputField extends StatelessWidget {
           controller: controller,
           maxLines: maxLines,
           keyboardType: keyboardType,
-          style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700),
+          inputFormatters: inputFormatters,
+          validator: validator,
+          enabled: enabled,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            fontWeight: FontWeight.w700,
+          ),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: theme.textTheme.bodyMedium?.copyWith(
@@ -49,8 +61,14 @@ class ProfileInputField extends StatelessWidget {
             filled: true,
             fillColor: colorScheme.surfaceContainerHigh,
             contentPadding: const EdgeInsets.all(AppSpacing.md),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
-            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide.none,
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide.none,
+            ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide(color: colorScheme.primary, width: 1.5),
