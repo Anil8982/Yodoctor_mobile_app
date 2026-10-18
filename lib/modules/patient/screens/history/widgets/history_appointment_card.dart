@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/widgets/status_chip.dart';
 import '../../../models/history/appointment_history_model.dart';
 
@@ -124,6 +125,7 @@ class HistoryAppointmentCard extends StatelessWidget {
       TextTheme textTheme,
       ColorScheme colorScheme,
       ) {
+    final l10n = AppLocalizations.of(context);
     return Row(
       children: <Widget>[
         CircleAvatar(
@@ -165,7 +167,8 @@ class HistoryAppointmentCard extends StatelessWidget {
               ),
               const SizedBox(height: 2),
               Text(
-                'Patient: ${appointment.patientName}',
+                l10n?.patientLabel(appointment.patientName) ??
+                    'Patient: ${appointment.patientName}',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: textTheme.bodySmall?.copyWith(
@@ -230,6 +233,7 @@ class HistoryAppointmentCard extends StatelessWidget {
       TextTheme textTheme,
       ColorScheme colorScheme,
       ) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
@@ -237,7 +241,8 @@ class HistoryAppointmentCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
-        'Token #${appointment.tokenNumber}',
+        l10n?.tokenNumberWithHash('${appointment.tokenNumber}') ??
+            'Token #${appointment.tokenNumber}',
         style: textTheme.labelLarge?.copyWith(
           color: colorScheme.primary,
           fontWeight: FontWeight.w800,
@@ -247,6 +252,7 @@ class HistoryAppointmentCard extends StatelessWidget {
   }
 
   Widget _buildViewDetailsButton(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return OutlinedButton(
       onPressed: onViewDetails,
       style: OutlinedButton.styleFrom(
@@ -254,9 +260,9 @@ class HistoryAppointmentCard extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         visualDensity: VisualDensity.compact,
       ),
-      child: const Text(
-        'View Details',
-        style: TextStyle(fontWeight: FontWeight.w700),
+      child: Text(
+        l10n?.viewDetails ?? 'View Details',
+        style: const TextStyle(fontWeight: FontWeight.w700),
       ),
     );
   }

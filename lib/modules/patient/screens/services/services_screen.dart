@@ -33,7 +33,7 @@ class _ServicesScreenState extends ConsumerState<ServicesScreen> {
           return <Widget>[
             CustomSliverAppBar(
               titleText: l10n?.servicesTab ?? 'Services',
-              expandedHeight: 220,
+              expandedHeight: CustomSliverAppBar.defaultExpandedHeight,
               background: ServicesHeader(
                 servicesCount: medicalServicesList.length,
               ),

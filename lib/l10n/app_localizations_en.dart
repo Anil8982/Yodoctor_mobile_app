@@ -331,6 +331,18 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String certificateCountText(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count certificates',
+      one: '1 certificate',
+      zero: '0 certificates',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get searchByTypeOrDoctor => 'Search by type or doctor...';
 
   @override
@@ -1619,4 +1631,93 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get labTestBooking => 'Lab Test Booking';
+
+  @override
+  String get myAppointmentsTitle => 'My Appointments';
+
+  @override
+  String get trackConsultationsSubtitle =>
+      'Track completed consultations and rate doctors.';
+
+  @override
+  String appointmentCountText(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count appointments',
+      one: '1 appointment',
+      zero: '0 appointments',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String ratedDoctorSuccess(String doctorName, int rating) {
+    return 'Thanks! You rated $doctorName $rating stars.';
+  }
+
+  @override
+  String get loadingAppointments => 'Loading appointments...';
+
+  @override
+  String get noAppointmentHistory => 'No appointment history available';
+
+  @override
+  String get bookedAppointmentsAppearHere =>
+      'Booked appointments will appear here.';
+
+  @override
+  String tokenNumberWithHash(String token) {
+    return 'Token #$token';
+  }
+
+  @override
+  String get viewDetails => 'View Details';
+
+  @override
+  String get tableHeaderDoctor => 'DOCTOR & SPECIALIZATION';
+
+  @override
+  String get tableHeaderDateShift => 'DATE & SHIFT';
+
+  @override
+  String get tableHeaderToken => 'TOKEN';
+
+  @override
+  String get tableHeaderStatus => 'STATUS';
+
+  @override
+  String get tableHeaderActions => 'ACTIONS';
+
+  @override
+  String tokenWithNumber(String token) {
+    return 'Token $token';
+  }
+
+  @override
+  String get viewPrescription => 'View Prescription';
+
+  @override
+  String get tapToViewPrescription => 'Tap to view consultation files';
+
+  @override
+  String get rateYourExperience => 'Rate your experience';
+
+  @override
+  String get shareYourThoughts => 'Share your thoughts';
+
+  @override
+  String get reviewSubmittedSuccess => 'Review submitted successfully!';
+
+  @override
+  String get saveFeedback => 'Save Feedback';
+
+  @override
+  String get maybeLater => 'Maybe Later';
+
+  @override
+  String get prescriptionTitle => 'Prescription';
+
+  @override
+  String get instructionsLabel => 'Instructions';
 }

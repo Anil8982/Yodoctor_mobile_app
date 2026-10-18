@@ -19,6 +19,7 @@ class MedicalService {
   final IconData icon;
   final Color baseColor;
   final bool isQrScanner;
+  final String imagePath;
 
   const MedicalService({
     required this.type,
@@ -28,6 +29,7 @@ class MedicalService {
     required this.icon,
     required this.baseColor,
     this.isQrScanner = false,
+    required this.imagePath,
   });
 
   String getLocalizedTitle(AppLocalizations? l10n) {
@@ -75,6 +77,7 @@ final List<MedicalService> medicalServicesList = [
     route: '#',
     icon: Icons.delivery_dining_rounded,
     baseColor: Color(0xFFFFB03A),
+    imagePath: 'assets/images/services/medicine_delivery_3d.webp',
   ),
   const MedicalService(
     type: MedicalServiceType.labTest,
@@ -83,6 +86,7 @@ final List<MedicalService> medicalServicesList = [
     route: AppRoutes.labTest,
     icon: Icons.science_rounded,
     baseColor: Color(0xFF42A5F5),
+    imagePath: 'assets/images/services/lab_test_3d.webp',
   ),
   const MedicalService(
     type: MedicalServiceType.qrScanToken,
@@ -92,6 +96,7 @@ final List<MedicalService> medicalServicesList = [
     icon: Icons.qr_code_scanner_rounded,
     baseColor: Color(0xFF26C6DA),
     isQrScanner: true,
+    imagePath: 'assets/images/services/qr_appointment_3d.webp',
   ),
   const MedicalService(
     type: MedicalServiceType.onlineAppointment,
@@ -100,6 +105,7 @@ final List<MedicalService> medicalServicesList = [
     route: AppRoutes.search,
     icon: Icons.calendar_month_rounded,
     baseColor: Color(0xFF7E57C2),
+    imagePath: 'assets/images/services/online_appointment_3d.webp',
   ),
   const MedicalService(
     type: MedicalServiceType.medicalCertificate,
@@ -108,6 +114,7 @@ final List<MedicalService> medicalServicesList = [
     route: AppRoutes.doctorSelection,
     icon: Icons.description_rounded,
     baseColor: Color(0xFFEC407A),
+    imagePath: 'assets/images/services/medical_certificate_3d.webp',
   ),
   const MedicalService(
     type: MedicalServiceType.homeNursingCare,
@@ -116,5 +123,6 @@ final List<MedicalService> medicalServicesList = [
     route: AppRoutes.homeServiceBooking,
     icon: Icons.home_repair_service_rounded,
     baseColor: Color(0xFF66BB6A),
+    imagePath: 'assets/images/services/home_nursing_3d.webp',
   ),
 ];

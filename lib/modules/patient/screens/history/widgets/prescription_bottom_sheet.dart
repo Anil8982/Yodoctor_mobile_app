@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 
 class PrescriptionBottomSheet extends StatelessWidget {
   final Map<String, dynamic> prescription;
@@ -20,6 +21,7 @@ class PrescriptionBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
@@ -80,7 +82,7 @@ class PrescriptionBottomSheet extends StatelessWidget {
                   ),
                   const SizedBox(width: 14),
                   Text(
-                    "Prescription",
+                    l10n?.prescriptionTitle ?? "Prescription",
                     style: textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -114,7 +116,7 @@ class PrescriptionBottomSheet extends StatelessWidget {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          "Medicines",
+                          l10n?.medicinesLabel ?? "Medicines",
                           style: textTheme.titleSmall?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: colorScheme.primary,
@@ -159,7 +161,7 @@ class PrescriptionBottomSheet extends StatelessWidget {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          "Instructions",
+                          l10n?.instructionsLabel ?? "Instructions",
                           style: textTheme.titleSmall?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: colorScheme.secondary,
@@ -192,9 +194,9 @@ class PrescriptionBottomSheet extends StatelessWidget {
                     ),
                     elevation: 0,
                   ),
-                  child: const Text(
-                    "Close",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                  child: Text(
+                    l10n?.close ?? "Close",
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                   ),
                 ),
               ),

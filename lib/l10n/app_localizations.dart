@@ -638,6 +638,12 @@ abstract class AppLocalizations {
   /// **'{count, plural, =0{0 certificates | {filter}} =1{1 certificate | {filter}} other{{count} certificates | {filter}}}'**
   String certificateCountWithFilter(int count, String filter);
 
+  /// Certificate count badge text without filter
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{0 certificates} =1{1 certificate} other{{count} certificates}}'**
+  String certificateCountText(int count);
+
   /// Search input placeholder in certificate wallet
   ///
   /// In en, this message translates to:
@@ -2971,6 +2977,150 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Lab Test Booking'**
   String get labTestBooking;
+
+  /// Title in appointment history header
+  ///
+  /// In en, this message translates to:
+  /// **'My Appointments'**
+  String get myAppointmentsTitle;
+
+  /// Subtitle in appointment history header
+  ///
+  /// In en, this message translates to:
+  /// **'Track completed consultations and rate doctors.'**
+  String get trackConsultationsSubtitle;
+
+  /// Badge showing appointment count in history header
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{0 appointments} =1{1 appointment} other{{count} appointments}}'**
+  String appointmentCountText(int count);
+
+  /// Snackbar message after rating a doctor
+  ///
+  /// In en, this message translates to:
+  /// **'Thanks! You rated {doctorName} {rating} stars.'**
+  String ratedDoctorSuccess(String doctorName, int rating);
+
+  /// Loading message in appointment history
+  ///
+  /// In en, this message translates to:
+  /// **'Loading appointments...'**
+  String get loadingAppointments;
+
+  /// Title for empty appointment history
+  ///
+  /// In en, this message translates to:
+  /// **'No appointment history available'**
+  String get noAppointmentHistory;
+
+  /// Subtitle for empty appointment history
+  ///
+  /// In en, this message translates to:
+  /// **'Booked appointments will appear here.'**
+  String get bookedAppointmentsAppearHere;
+
+  /// Token number chip label in history card
+  ///
+  /// In en, this message translates to:
+  /// **'Token #{token}'**
+  String tokenNumberWithHash(String token);
+
+  /// Button to view appointment details
+  ///
+  /// In en, this message translates to:
+  /// **'View Details'**
+  String get viewDetails;
+
+  /// Table column header for doctor and specialization
+  ///
+  /// In en, this message translates to:
+  /// **'DOCTOR & SPECIALIZATION'**
+  String get tableHeaderDoctor;
+
+  /// Table column header for date and shift
+  ///
+  /// In en, this message translates to:
+  /// **'DATE & SHIFT'**
+  String get tableHeaderDateShift;
+
+  /// Table column header for token
+  ///
+  /// In en, this message translates to:
+  /// **'TOKEN'**
+  String get tableHeaderToken;
+
+  /// Table column header for status
+  ///
+  /// In en, this message translates to:
+  /// **'STATUS'**
+  String get tableHeaderStatus;
+
+  /// Table column header for actions
+  ///
+  /// In en, this message translates to:
+  /// **'ACTIONS'**
+  String get tableHeaderActions;
+
+  /// Token badge in appointment details sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Token {token}'**
+  String tokenWithNumber(String token);
+
+  /// Button/banner to view prescription
+  ///
+  /// In en, this message translates to:
+  /// **'View Prescription'**
+  String get viewPrescription;
+
+  /// Subtitle under view prescription
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to view consultation files'**
+  String get tapToViewPrescription;
+
+  /// Heading for doctor rating section
+  ///
+  /// In en, this message translates to:
+  /// **'Rate your experience'**
+  String get rateYourExperience;
+
+  /// Label and hint for feedback field
+  ///
+  /// In en, this message translates to:
+  /// **'Share your thoughts'**
+  String get shareYourThoughts;
+
+  /// Snackbar when review is submitted successfully
+  ///
+  /// In en, this message translates to:
+  /// **'Review submitted successfully!'**
+  String get reviewSubmittedSuccess;
+
+  /// Button label to save feedback
+  ///
+  /// In en, this message translates to:
+  /// **'Save Feedback'**
+  String get saveFeedback;
+
+  /// Button label to dismiss feedback sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Maybe Later'**
+  String get maybeLater;
+
+  /// Header title for prescription bottom sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Prescription'**
+  String get prescriptionTitle;
+
+  /// Label for instructions card in prescription bottom sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Instructions'**
+  String get instructionsLabel;
 }
 
 class _AppLocalizationsDelegate

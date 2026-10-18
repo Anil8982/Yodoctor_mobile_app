@@ -7,12 +7,14 @@ import 'package:yodoctor/core/routes/app_routes.dart';
 class CustomSliverAppBar extends StatefulWidget {
   const CustomSliverAppBar({
     super.key,
-    required this.expandedHeight,
+    this.expandedHeight = defaultExpandedHeight,
     required this.background,
     this.titleText,
     this.onNotificationTap,
     this.actions,
   });
+
+  static const double defaultExpandedHeight = 125.0;
 
   final double expandedHeight;
   final Widget background;

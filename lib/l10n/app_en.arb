@@ -412,6 +412,16 @@
       }
     }
   },
+  "certificateCountText": "{count, plural, =0{0 certificates} =1{1 certificate} other{{count} certificates}}",
+  "@certificateCountText": {
+    "description": "Certificate count badge text without filter",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
   "searchByTypeOrDoctor": "Search by type or doctor...",
   "@searchByTypeOrDoctor": {
     "description": "Search input placeholder in certificate wallet"
@@ -2146,5 +2156,129 @@
   "labTestBooking": "Lab Test Booking",
   "@labTestBooking": {
     "description": "Plan name for lab test booking in payment success"
+  },
+  "myAppointmentsTitle": "My Appointments",
+  "@myAppointmentsTitle": {
+    "description": "Title in appointment history header"
+  },
+  "trackConsultationsSubtitle": "Track completed consultations and rate doctors.",
+  "@trackConsultationsSubtitle": {
+    "description": "Subtitle in appointment history header"
+  },
+  "appointmentCountText": "{count, plural, =0{0 appointments} =1{1 appointment} other{{count} appointments}}",
+  "@appointmentCountText": {
+    "description": "Badge showing appointment count in history header",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "ratedDoctorSuccess": "Thanks! You rated {doctorName} {rating} stars.",
+  "@ratedDoctorSuccess": {
+    "description": "Snackbar message after rating a doctor",
+    "placeholders": {
+      "doctorName": {
+        "type": "String",
+        "example": "Dr. Sharma"
+      },
+      "rating": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "loadingAppointments": "Loading appointments...",
+  "@loadingAppointments": {
+    "description": "Loading message in appointment history"
+  },
+  "noAppointmentHistory": "No appointment history available",
+  "@noAppointmentHistory": {
+    "description": "Title for empty appointment history"
+  },
+  "bookedAppointmentsAppearHere": "Booked appointments will appear here.",
+  "@bookedAppointmentsAppearHere": {
+    "description": "Subtitle for empty appointment history"
+  },
+  "tokenNumberWithHash": "Token #{token}",
+  "@tokenNumberWithHash": {
+    "description": "Token number chip label in history card",
+    "placeholders": {
+      "token": {
+        "type": "String",
+        "example": "12"
+      }
+    }
+  },
+  "viewDetails": "View Details",
+  "@viewDetails": {
+    "description": "Button to view appointment details"
+  },
+  "tableHeaderDoctor": "DOCTOR & SPECIALIZATION",
+  "@tableHeaderDoctor": {
+    "description": "Table column header for doctor and specialization"
+  },
+  "tableHeaderDateShift": "DATE & SHIFT",
+  "@tableHeaderDateShift": {
+    "description": "Table column header for date and shift"
+  },
+  "tableHeaderToken": "TOKEN",
+  "@tableHeaderToken": {
+    "description": "Table column header for token"
+  },
+  "tableHeaderStatus": "STATUS",
+  "@tableHeaderStatus": {
+    "description": "Table column header for status"
+  },
+  "tableHeaderActions": "ACTIONS",
+  "@tableHeaderActions": {
+    "description": "Table column header for actions"
+  },
+  "tokenWithNumber": "Token {token}",
+  "@tokenWithNumber": {
+    "description": "Token badge in appointment details sheet",
+    "placeholders": {
+      "token": {
+        "type": "String",
+        "example": "12"
+      }
+    }
+  },
+  "viewPrescription": "View Prescription",
+  "@viewPrescription": {
+    "description": "Button/banner to view prescription"
+  },
+  "tapToViewPrescription": "Tap to view consultation files",
+  "@tapToViewPrescription": {
+    "description": "Subtitle under view prescription"
+  },
+  "rateYourExperience": "Rate your experience",
+  "@rateYourExperience": {
+    "description": "Heading for doctor rating section"
+  },
+  "shareYourThoughts": "Share your thoughts",
+  "@shareYourThoughts": {
+    "description": "Label and hint for feedback field"
+  },
+  "reviewSubmittedSuccess": "Review submitted successfully!",
+  "@reviewSubmittedSuccess": {
+    "description": "Snackbar when review is submitted successfully"
+  },
+  "saveFeedback": "Save Feedback",
+  "@saveFeedback": {
+    "description": "Button label to save feedback"
+  },
+  "maybeLater": "Maybe Later",
+  "@maybeLater": {
+    "description": "Button label to dismiss feedback sheet"
+  },
+  "prescriptionTitle": "Prescription",
+  "@prescriptionTitle": {
+    "description": "Header title for prescription bottom sheet"
+  },
+  "instructionsLabel": "Instructions",
+  "@instructionsLabel": {
+    "description": "Label for instructions card in prescription bottom sheet"
   }
 }
