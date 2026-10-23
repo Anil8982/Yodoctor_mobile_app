@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/controllers/home_service_controller.dart';
 import 'package:yodoctor/modules/widgets/app_header.dart';
 import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
@@ -89,10 +90,43 @@ class _HomeServiceBookingScreenState
     super.dispose();
   }
 
+  String _getServiceTitle(AppLocalizations? l10n, String type) {
+    switch (type) {
+      case 'General Nursing':
+        return l10n?.serviceTypeGeneralNursing ?? 'General Nursing';
+      case 'Elderly Care':
+        return l10n?.serviceTypeElderlyCare ?? 'Elderly Care';
+      case 'Post Surgery':
+        return l10n?.serviceTypePostSurgery ?? 'Post Surgery';
+      case 'ICU Nurse':
+        return l10n?.serviceTypeIcuNurse ?? 'ICU Nurse';
+      case 'Attendant':
+        return l10n?.serviceTypeAttendant ?? 'Attendant';
+      default:
+        return type;
+    }
+  }
+
+  String _getTimeSlotLabel(AppLocalizations? l10n, String slot) {
+    switch (slot) {
+      case 'Morning (6am - 12pm)':
+        return l10n?.timeSlotMorning ?? 'Morning (6am - 12pm)';
+      case 'Afternoon (12pm - 5pm)':
+        return l10n?.timeSlotAfternoon ?? 'Afternoon (12pm - 5pm)';
+      case 'Evening (5pm - 9pm)':
+        return l10n?.timeSlotEvening ?? 'Evening (5pm - 9pm)';
+      case 'Night (9pm - 6am)':
+        return l10n?.timeSlotNight ?? 'Night (9pm - 6am)';
+      default:
+        return slot;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = AppLocalizations.of(context);
 
     // 🎯 Watching clean wrapper state instead of raw model instance
     final bookingState = ref.watch(homeServiceBookingProvider);
@@ -100,7 +134,7 @@ class _HomeServiceBookingScreenState
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppHeader(title: 'Book a Care Service'),
+      appBar: AppHeader(title: l10n?.bookCareService ?? 'Book a Care Service'),
       body: SafeArea(
         child: Form(
           key: _formKey,
@@ -118,7 +152,7 @@ class _HomeServiceBookingScreenState
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'HOME HEALTHCARE SERVICES',
+                            l10n?.homeHealthcareServices ?? 'HOME HEALTHCARE SERVICES',
                             style: theme.textTheme.labelMedium?.copyWith(
                               color: colorScheme.primary,
                               fontWeight: FontWeight.w700,
@@ -127,7 +161,8 @@ class _HomeServiceBookingScreenState
                           ),
                           const SizedBox(height: 6),
                           Text(
-                            'Schedule a nurse, home care, or consultation at your doorstep.',
+                            l10n?.scheduleNurseDesc ??
+                                'Schedule a nurse, home care, or consultation at your doorstep.',
                             style: theme.textTheme.bodyLarge?.copyWith(
                               color: colorScheme.onSurface,
                             ),
@@ -140,7 +175,7 @@ class _HomeServiceBookingScreenState
 
                     _buildCardSection(
                       context,
-                      title: 'Personal Details',
+                      title: l10n?.personalDetails ?? 'Personal Details',
                       icon: Icons.person_outline_rounded,
                       child: BookingPersonalDetails(
                         bookingState: currentModel,
@@ -154,14 +189,14 @@ class _HomeServiceBookingScreenState
                     const SizedBox(height: 16),
                     _buildCardSection(
                       context,
-                      title: 'Caregiver & Urgency',
+                      title: l10n?.caregiverAndUrgency ?? 'Caregiver & Urgency',
                       icon: Icons.assignment_ind_outlined,
                       child: BookingUrgencySection(bookingState: currentModel),
                     ),
                     const SizedBox(height: 16),
                     _buildCardSection(
                       context,
-                      title: 'Type of Service',
+                      title: l10n?.typeOfService ?? 'Type of Service',
                       icon: Icons.medical_services_outlined,
                       child: GridView.count(
                         shrinkWrap: true,
@@ -176,30 +211,35 @@ class _HomeServiceBookingScreenState
                             'General Nursing',
                             Icons.local_hospital_rounded,
                             currentModel,
+                            l10n,
                           ),
                           _buildServiceTile(
                             context,
                             'Elderly Care',
                             Icons.elderly_rounded,
                             currentModel,
+                            l10n,
                           ),
                           _buildServiceTile(
                             context,
                             'Post Surgery',
                             Icons.wheelchair_pickup_rounded,
                             currentModel,
+                            l10n,
                           ),
                           _buildServiceTile(
                             context,
                             'ICU Nurse',
                             Icons.masks_rounded,
                             currentModel,
+                            l10n,
                           ),
                           _buildServiceTile(
                             context,
                             'Attendant',
                             Icons.hail_rounded,
                             currentModel,
+                            l10n,
                           ),
                         ],
                       ),
@@ -207,12 +247,13 @@ class _HomeServiceBookingScreenState
                     const SizedBox(height: 16),
                     _buildCardSection(
                       context,
-                      title: 'Medical Condition',
+                      title: l10n?.medicalCondition ?? 'Medical Condition',
                       icon: Icons.health_and_safety_outlined,
                       child: AppTextField(
                         controller: _conditionController,
-                        label: 'Medical Condition',
-                        hint: 'Describe medical condition, symptoms...',
+                        label: l10n?.medicalCondition ?? 'Medical Condition',
+                        hint: l10n?.medicalConditionHint ??
+                            'Describe medical condition, symptoms...',
                         icon: Icons.description_rounded,
                         maxLines: 3,
                         minLines: 1,
@@ -225,7 +266,7 @@ class _HomeServiceBookingScreenState
                     const SizedBox(height: 16),
                     _buildCardSection(
                       context,
-                      title: 'Service Duration',
+                      title: l10n?.serviceDuration ?? 'Service Duration',
                       icon: Icons.av_timer_rounded,
                       child: BookingServiceDuration(
                         bookingState: currentModel,
@@ -236,7 +277,7 @@ class _HomeServiceBookingScreenState
                     const SizedBox(height: 16),
                     _buildCardSection(
                       context,
-                      title: 'Time Preference',
+                      title: l10n?.timePreference ?? 'Time Preference',
                       icon: Icons.access_time_rounded,
                       child: Wrap(
                         spacing: 8,
@@ -247,24 +288,28 @@ class _HomeServiceBookingScreenState
                             'Morning (6am - 12pm)',
                             Icons.wb_sunny_rounded,
                             currentModel,
+                            l10n,
                           ),
                           _buildTimeChip(
                             context,
                             'Afternoon (12pm - 5pm)',
                             Icons.sunny,
                             currentModel,
+                            l10n,
                           ),
                           _buildTimeChip(
                             context,
                             'Evening (5pm - 9pm)',
                             Icons.wb_twilight_rounded,
                             currentModel,
+                            l10n,
                           ),
                           _buildTimeChip(
                             context,
                             'Night (9pm - 6am)',
                             Icons.dark_mode_rounded,
                             currentModel,
+                            l10n,
                           ),
                         ],
                       ),
@@ -272,13 +317,14 @@ class _HomeServiceBookingScreenState
                     const SizedBox(height: 16),
                     _buildCardSection(
                       context,
-                      title: 'Additional Notes',
+                      title: l10n?.additionalNotes ?? 'Additional Notes',
                       icon: Icons.note_alt_outlined,
                       child: AppTextField(
                         controller: _notesController,
-                        label: 'Additional Notes',
+                        label: l10n?.additionalNotes ?? 'Additional Notes',
                         isOptional: true,
-                        hint: 'Any special instructions? (Optional)',
+                        hint: l10n?.additionalNotesHint ??
+                            'Any special instructions? (Optional)',
                         icon: Icons.edit_note_rounded,
                         maxLines: 2,
                         minLines: 1,
@@ -340,7 +386,8 @@ class _HomeServiceBookingScreenState
 
                             if (success) {
                               AppSnackBar.show(
-                                message: 'Booking submitted successfully',
+                                message: l10n?.bookingSubmittedSuccess ??
+                                    'Booking submitted successfully',
                                 type: AppSnackBarType.success,
                               );
 
@@ -355,15 +402,16 @@ class _HomeServiceBookingScreenState
                               AppSnackBar.show(
                                 message:
                                     currentContextState.errorMessage ??
-                                    "Booking request failed",
+                                    (l10n?.bookingRequestFailed ??
+                                        "Booking request failed"),
                                 type: AppSnackBarType.error,
                               );
                             }
                           },
                     icon: const Icon(Icons.send_rounded, size: 16),
-                    label: const Text(
-                      'Submit Booking Request',
-                      style: TextStyle(
+                    label: Text(
+                      l10n?.submitBookingRequest ?? 'Submit Booking Request',
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 15,
                       ),
@@ -433,6 +481,7 @@ class _HomeServiceBookingScreenState
     String title,
     IconData icon,
     HomeServiceBookingModel state,
+    AppLocalizations? l10n,
   ) {
     final colorScheme = Theme.of(context).colorScheme;
     final isSel = state.selectedServiceType == title;
@@ -464,7 +513,7 @@ class _HomeServiceBookingScreenState
             const SizedBox(width: 10),
             Expanded(
               child: Text(
-                title,
+                _getServiceTitle(l10n, title),
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
@@ -483,6 +532,7 @@ class _HomeServiceBookingScreenState
     String label,
     IconData icon,
     HomeServiceBookingModel state,
+    AppLocalizations? l10n,
   ) {
     final colorScheme = Theme.of(context).colorScheme;
     final isSel = state.timePreference == label;
@@ -530,7 +580,7 @@ class _HomeServiceBookingScreenState
               ),
               const SizedBox(width: 6),
               Text(
-                label,
+                _getTimeSlotLabel(l10n, label),
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,

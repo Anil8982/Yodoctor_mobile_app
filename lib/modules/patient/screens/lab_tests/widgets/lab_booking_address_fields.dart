@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/controllers/booking_controller.dart';
 import 'package:yodoctor/modules/widgets/app_text_field.dart';
 
@@ -16,6 +17,7 @@ class LabBookingAddressFields extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context);
     final autovalidateMode = hasSubmitted
         ? AutovalidateMode.onUserInteraction
         : AutovalidateMode.disabled;
@@ -45,7 +47,7 @@ class LabBookingAddressFields extends ConsumerWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  'Use My Current Location',
+                  l10n?.useMyCurrentLocation ?? 'Use My Current Location',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: colorScheme.primary,
@@ -58,9 +60,9 @@ class LabBookingAddressFields extends ConsumerWidget {
         ),
         const SizedBox(height: 12),
         AppTextField(
-          label: 'Full Address',
+          label: l10n?.fullAddress ?? 'Full Address',
           isRequired: true,
-          hint: 'House/Flat No., Street, Area, City',
+          hint: l10n?.fullAddressHint ?? 'House/Flat No., Street, Area, City',
           icon: Icons.home_rounded,
           controller: addressController,
           maxLines: 3,
@@ -68,8 +70,12 @@ class LabBookingAddressFields extends ConsumerWidget {
           maxLength: 500,
           autovalidateMode: autovalidateMode,
           validator: (value) {
-            if (value == null || value.trim().isEmpty) return 'Enter address';
-            if (value.trim().length < 10) return 'Address is too short';
+            if (value == null || value.trim().isEmpty) {
+              return l10n?.enterAddress ?? 'Enter address';
+            }
+            if (value.trim().length < 10) {
+              return l10n?.addressTooShort ?? 'Address is too short';
+            }
             return null;
           },
         ),

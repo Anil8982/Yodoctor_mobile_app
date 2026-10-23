@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/utils/app_field_helper.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/models/home_care/home_service_booking_model.dart';
 import 'package:yodoctor/modules/patient/controllers/home_service_controller.dart';
 import 'package:yodoctor/modules/widgets/app_dropdown_field.dart';
@@ -27,6 +28,7 @@ class BookingPersonalDetails extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final autovalidateMode = hasSubmitted
         ? AutovalidateMode.onUserInteraction
         : AutovalidateMode.disabled;
@@ -36,9 +38,9 @@ class BookingPersonalDetails extends ConsumerWidget {
       children: [
         AppTextField(
           controller: nameController,
-          label: 'Full Name',
+          label: l10n?.fullName ?? 'Full Name',
           isRequired: true,
-          hint: 'Enter full name',
+          hint: l10n?.enterFullName ?? 'Enter full name',
           icon: Icons.person_rounded,
           autovalidateMode: autovalidateMode,
           inputFormatters: [
@@ -48,14 +50,14 @@ class BookingPersonalDetails extends ConsumerWidget {
           onChanged: (val) => notifier.updateField(fullName: val),
           validator: (value) {
             if (value == null || value.trim().isEmpty) {
-              return 'Full name required';
+              return l10n?.fullNameRequired ?? 'Full name required';
             }
             final cleanedValue = value.trim().replaceAll(RegExp(r'\s+'), ' ');
             if (cleanedValue.length < 2) {
-              return "Enter a valid name";
+              return l10n?.enterValidName ?? "Enter a valid name";
             }
             if (!RegExp(r'^[A-Za-z. ]+$').hasMatch(cleanedValue)) {
-              return 'Only alphabets are allowed';
+              return l10n?.onlyAlphabetsAllowed ?? 'Only alphabets are allowed';
             }
             return null;
           },
@@ -63,9 +65,9 @@ class BookingPersonalDetails extends ConsumerWidget {
         const SizedBox(height: 12),
         AppTextField(
           controller: phoneController,
-          label: 'Contact Number',
+          label: l10n?.contactNumber ?? 'Contact Number',
           isRequired: true,
-          hint: 'Enter contact number',
+          hint: l10n?.enterContactNumber ?? 'Enter contact number',
           icon: Icons.phone_android_rounded,
           keyboardType: TextInputType.phone,
           autovalidateMode: autovalidateMode,
@@ -76,10 +78,11 @@ class BookingPersonalDetails extends ConsumerWidget {
           ],
           validator: (value) {
             if (value == null || value.trim().isEmpty) {
-              return 'Phone number is required';
+              return l10n?.phoneRequired ?? 'Phone number is required';
             }
             if (!RegExp(r'^[6-9]').hasMatch(value.trim())) {
-              return 'Phone no. must start with 6, 7, 8, or 9';
+              return l10n?.phoneInvalidPrefix ??
+                  'Phone no. must start with 6, 7, 8, or 9';
             }
             return null;
           },
@@ -87,9 +90,9 @@ class BookingPersonalDetails extends ConsumerWidget {
         const SizedBox(height: 12),
         AppTextField(
           controller: ageController,
-          label: 'Patient Age',
+          label: l10n?.patientAge ?? 'Patient Age',
           isRequired: true,
-          hint: 'Enter age',
+          hint: l10n?.enterAge ?? 'Enter age',
           icon: Icons.calendar_today_rounded,
           keyboardType: TextInputType.number,
           autovalidateMode: autovalidateMode,
@@ -100,29 +103,29 @@ class BookingPersonalDetails extends ConsumerWidget {
           ],
           validator: (value) {
             if (value == null || value.trim().isEmpty) {
-              return 'Age is required';
+              return l10n?.ageRequired ?? 'Age is required';
             }
 
             final age = int.tryParse(value.trim());
 
             if (age == null) {
-              return 'Enter a valid number';
+              return l10n?.enterValidNumber ?? 'Enter a valid number';
             }
             if (age <= 0) {
-              return 'Age must be greater than 0';
+              return l10n?.ageMinValidation ?? 'Age must be greater than 0';
             }
             if (age > 120) {
-              return 'Age cannot be more than 120';
+              return l10n?.ageMaxValidation ?? 'Age cannot be more than 120';
             }
             return null;
           },
         ),
 
         const SizedBox(height: 12),
-        AppDropdownField(
-          label: 'Patient Gender',
+        AppDropdownField<String>(
+          label: l10n?.patientGender ?? 'Patient Gender',
           isRequired: true,
-          hint: 'Select Gender',
+          hint: l10n?.selectGender ?? 'Select Gender',
           icon: Icons.wc_rounded,
           autovalidateMode: autovalidateMode,
           value:
@@ -131,10 +134,22 @@ class BookingPersonalDetails extends ConsumerWidget {
               ? null
               : bookingState.patientGender,
           items: const ['Male', 'Female', 'Other'],
+          itemLabelBuilder: (val) {
+            switch (val) {
+              case 'Male':
+                return l10n?.genderMale ?? 'Male';
+              case 'Female':
+                return l10n?.genderFemale ?? 'Female';
+              case 'Other':
+                return l10n?.genderOther ?? 'Other';
+              default:
+                return val;
+            }
+          },
           onChanged: (val) => notifier.updateField(patientGender: val),
           validator: (value) {
             if (value == null || value.trim().isEmpty) {
-              return 'Select gender';
+              return l10n?.selectGenderValidation ?? 'Select gender';
             }
             return null;
           },
@@ -142,9 +157,9 @@ class BookingPersonalDetails extends ConsumerWidget {
         const SizedBox(height: 12),
         AppTextField(
           controller: addressController,
-          label: 'Address',
+          label: l10n?.address ?? 'Address',
           isRequired: true,
-          hint: 'Enter complete address',
+          hint: l10n?.enterCompleteAddress ?? 'Enter complete address',
           icon: Icons.location_on_rounded,
           maxLines: 2,
           minLines: 1,
@@ -153,10 +168,11 @@ class BookingPersonalDetails extends ConsumerWidget {
           onChanged: (val) => notifier.updateField(address: val),
           validator: (value) {
             if (value == null || value.trim().isEmpty) {
-              return 'Address is required';
+              return l10n?.addressRequired ?? 'Address is required';
             }
             if (value.trim().length < 5) {
-              return 'Address at least 5 characters';
+              return l10n?.addressMinValidation ??
+                  'Address at least 5 characters';
             }
             return null;
           },
@@ -171,7 +187,7 @@ class BookingPersonalDetails extends ConsumerWidget {
               notifier.fetchCurrentLocation(addressController);
             },
             icon: const Icon(Icons.my_location),
-            label: const Text("Use Current Location"),
+            label: Text(l10n?.useCurrentLocation ?? "Use Current Location"),
           ),
         ),
       ],

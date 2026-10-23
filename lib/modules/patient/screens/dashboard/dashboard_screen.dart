@@ -59,7 +59,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             return [
               CustomSliverAppBar(
                 titleText: l10n.dashboard,
-                expandedHeight: 190.0,
+                expandedHeight: CustomSliverAppBar.defaultExpandedHeight,
                 background: const PatientHeader(dashboard: null),
               ),
             ];
@@ -133,7 +133,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           return [
             CustomSliverAppBar(
               titleText: l10n.dashboard,
-              expandedHeight: 190.0,
+              expandedHeight: CustomSliverAppBar.defaultExpandedHeight,
               background: PatientHeader(dashboard: data),
             ),
           ];

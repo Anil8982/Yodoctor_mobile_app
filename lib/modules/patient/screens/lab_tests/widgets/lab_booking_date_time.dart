@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/controllers/booking_controller.dart';
 import 'package:yodoctor/modules/patient/models/lab/booking_state_model.dart';
 import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
@@ -44,6 +46,7 @@ class LabBookingDateTime extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (DateUtils.isSameDay(state.selectedDate, DateTime.now())) {
         if (!_isAnySlotAvailableForToday()) {
@@ -52,7 +55,8 @@ class LabBookingDateTime extends ConsumerWidget {
           ref.read(labBookingProvider.notifier).selectDate(tomorrow);
 
           AppSnackBar.show(
-            message: "Today's slots are closed. select other day slots",
+            message: l10n?.todaySlotsClosedMessage ??
+                "Today's slots are closed. select other day slots",
             type: AppSnackBarType.info,
           );
         }
@@ -71,6 +75,7 @@ class LabBookingDateTime extends ConsumerWidget {
 
   Widget _buildDateGrid(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context);
     final List<DateTime> dates = List.generate(
       6,
       (index) => DateTime.now().add(Duration(days: index)),
@@ -119,7 +124,9 @@ class LabBookingDateTime extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      isToday ? 'TODAY' : _getWeekdayName(date.weekday),
+                      isToday
+                          ? (l10n?.today.toUpperCase() ?? 'TODAY')
+                          : _getWeekdayName(date, context),
                       style: TextStyle(
                         fontSize: 9,
                         fontWeight: FontWeight.bold,
@@ -171,37 +178,53 @@ class LabBookingDateTime extends ConsumerWidget {
   }
 
   Widget _buildTimeSlotsSection(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildShiftGroup(context, ref, 'Morning Slot', [
-          '6:30 AM',
-          '7:00 AM',
-          '7:30 AM',
-          '8:00 AM',
-          '8:30 AM',
-          '9:00 AM',
-          '9:30 AM',
-          '10:00 AM',
-        ]),
+        _buildShiftGroup(
+          context,
+          ref,
+          l10n?.morningSlot ?? 'Morning Slot',
+          [
+            '6:30 AM',
+            '7:00 AM',
+            '7:30 AM',
+            '8:00 AM',
+            '8:30 AM',
+            '9:00 AM',
+            '9:30 AM',
+            '10:00 AM',
+          ],
+        ),
         const SizedBox(height: 16),
-        _buildShiftGroup(context, ref, 'Afternoon Slot', [
-          '12:00 PM',
-          '12:30 PM',
-          '1:00 PM',
-          '1:30 PM',
-          '2:00 PM',
-          '2:30 PM',
-        ]),
+        _buildShiftGroup(
+          context,
+          ref,
+          l10n?.afternoonSlot ?? 'Afternoon Slot',
+          [
+            '12:00 PM',
+            '12:30 PM',
+            '1:00 PM',
+            '1:30 PM',
+            '2:00 PM',
+            '2:30 PM',
+          ],
+        ),
         const SizedBox(height: 16),
-        _buildShiftGroup(context, ref, 'Evening Slot', [
-          '5:30 PM',
-          '6:00 PM',
-          '6:30 PM',
-          '7:00 PM',
-          '7:30 PM',
-          '8:00 PM',
-        ]),
+        _buildShiftGroup(
+          context,
+          ref,
+          l10n?.eveningSlot ?? 'Evening Slot',
+          [
+            '5:30 PM',
+            '6:00 PM',
+            '6:30 PM',
+            '7:00 PM',
+            '7:30 PM',
+            '8:00 PM',
+          ],
+        ),
       ],
     );
   }
@@ -286,8 +309,13 @@ class LabBookingDateTime extends ConsumerWidget {
     );
   }
 
-  String _getWeekdayName(int weekday) {
-    const names = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
-    return names[weekday - 1];
+  String _getWeekdayName(DateTime date, BuildContext context) {
+    try {
+      final locale = Localizations.localeOf(context).toString();
+      return DateFormat.E(locale).format(date).toUpperCase();
+    } catch (_) {
+      const names = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
+      return names[date.weekday - 1];
+    }
   }
 }

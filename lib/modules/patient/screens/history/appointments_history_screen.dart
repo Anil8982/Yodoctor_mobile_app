@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 import '../../../../core/utils/responsive.dart';
 import '../../controllers/appointment_history_controller.dart';
@@ -35,6 +36,7 @@ class _AppointmentsHistoryScreenState
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final historyState = ref.watch(appointmentHistoryControllerProvider);
     final notifier = ref.read(appointmentHistoryControllerProvider.notifier);
 
@@ -48,8 +50,8 @@ class _AppointmentsHistoryScreenState
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return <Widget>[
             CustomSliverAppBar(
-              titleText: 'History',
-              expandedHeight: 220,
+              titleText: l10n?.myAppointmentsTitle ?? 'My Appointments',
+              expandedHeight: CustomSliverAppBar.defaultExpandedHeight,
               background: HistoryHeader(
                 appointmentCount: historyState.appointments.length,
               ),
@@ -142,7 +144,10 @@ class _AppointmentsHistoryScreenState
                                                 }
 
                                                 AppSnackBar.show(
-                                                  message:
+                                                  message: l10n?.ratedDoctorSuccess(
+                                                        appointment.doctorName,
+                                                        rating,
+                                                      ) ??
                                                       'Thanks! You rated ${appointment.doctorName} $rating stars.',
                                                   type: AppSnackBarType.success,
                                                 );
@@ -190,6 +195,7 @@ class _AppointmentsHistoryScreenState
 
   Widget _buildLoadingState() {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context);
 
     return Center(
       child: Column(
@@ -205,7 +211,7 @@ class _AppointmentsHistoryScreenState
           ),
           const SizedBox(height: 16),
           Text(
-            'Loading appointments...',
+            l10n?.loadingAppointments ?? 'Loading appointments...',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),
@@ -218,6 +224,7 @@ class _AppointmentsHistoryScreenState
   Widget _buildEmptyState(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final TextTheme textTheme = Theme.of(context).textTheme;
+    final l10n = AppLocalizations.of(context);
 
     return Center(
       child: Column(
@@ -234,7 +241,7 @@ class _AppointmentsHistoryScreenState
           ),
           const SizedBox(height: 16),
           Text(
-            'No appointment history available',
+            l10n?.noAppointmentHistory ?? 'No appointment history available',
             style: textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
               color: colorScheme.onSurface,
@@ -242,7 +249,8 @@ class _AppointmentsHistoryScreenState
           ),
           const SizedBox(height: 4),
           Text(
-            'Booked appointments will appear here.',
+            l10n?.bookedAppointmentsAppearHere ??
+                'Booked appointments will appear here.',
             style: textTheme.bodyMedium?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),

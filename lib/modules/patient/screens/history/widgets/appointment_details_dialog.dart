@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/widgets/app_text_field.dart';
 import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 import '../../../models/history/appointment_history_model.dart';
@@ -66,6 +67,7 @@ class _AppointmentDetailsSheetState extends State<_AppointmentDetailsSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
@@ -179,7 +181,8 @@ class _AppointmentDetailsSheetState extends State<_AppointmentDetailsSheet> {
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: Text(
-                                  'Token ${widget.appointment.tokenNumber}',
+                                  l10n?.tokenWithNumber('${widget.appointment.tokenNumber}') ??
+                                      'Token ${widget.appointment.tokenNumber}',
                                   style: textTheme.labelSmall?.copyWith(
                                     color: colorScheme.primary,
                                     fontWeight: FontWeight.bold,
@@ -230,7 +233,7 @@ class _AppointmentDetailsSheetState extends State<_AppointmentDetailsSheet> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "View Prescription",
+                                l10n?.viewPrescription ?? "View Prescription",
                                 style: textTheme.bodyMedium?.copyWith(
                                   fontWeight: FontWeight.bold,
                                   color: colorScheme.onSurface,
@@ -238,7 +241,8 @@ class _AppointmentDetailsSheetState extends State<_AppointmentDetailsSheet> {
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                "Tap to view consultation files",
+                                l10n?.tapToViewPrescription ??
+                                    "Tap to view consultation files",
                                 style: textTheme.bodySmall?.copyWith(
                                   color: colorScheme.onSurfaceVariant,
                                 ),
@@ -264,7 +268,7 @@ class _AppointmentDetailsSheetState extends State<_AppointmentDetailsSheet> {
               // Rating Title
               Center(
                 child: Text(
-                  "Rate your experience",
+                  l10n?.rateYourExperience ?? "Rate your experience",
                   style: textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -299,8 +303,8 @@ class _AppointmentDetailsSheetState extends State<_AppointmentDetailsSheet> {
               // Feedback Text Field
               AppTextField(
                 controller: _feedbackController,
-                label: "Share your thoughts",
-                hint: 'Share your thoughts',
+                label: l10n?.shareYourThoughts ?? "Share your thoughts",
+                hint: l10n?.shareYourThoughts ?? 'Share your thoughts',
                 icon: Icons.rate_review_outlined,
                 maxLines: 5,
                 minLines: 1,
@@ -325,7 +329,8 @@ class _AppointmentDetailsSheetState extends State<_AppointmentDetailsSheet> {
                             if (mounted) {
                               nav.pop();
                               AppSnackBar.show(
-                                message: "Review submitted successfully!",
+                                message: l10n?.reviewSubmittedSuccess ??
+                                    "Review submitted successfully!",
                                 type: AppSnackBarType.success,
                               );
                             }
@@ -360,17 +365,17 @@ class _AppointmentDetailsSheetState extends State<_AppointmentDetailsSheet> {
                               color: colorScheme.onPrimary,
                             ),
                           )
-                        : const Row(
+                        : Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(
+                              const Icon(
                                 Icons.check_circle_outline_rounded,
                                 size: 20,
                               ),
-                              SizedBox(width: 8),
+                              const SizedBox(width: 8),
                               Text(
-                                'Save Feedback',
-                                style: TextStyle(
+                                l10n?.saveFeedback ?? 'Save Feedback',
+                                style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 15,
                                 ),
@@ -394,7 +399,7 @@ class _AppointmentDetailsSheetState extends State<_AppointmentDetailsSheet> {
                     ),
                   ),
                   child: Text(
-                    'Maybe Later',
+                    l10n?.maybeLater ?? 'Maybe Later',
                     style: TextStyle(
                       color: colorScheme.onSurfaceVariant,
                       fontWeight: FontWeight.bold,

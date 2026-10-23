@@ -93,7 +93,7 @@ class _CertificateWalletScreenState
                   return <Widget>[
                     CustomSliverAppBar(
                       titleText: l10n.certificateWallet,
-                      expandedHeight: 220,
+                      expandedHeight: CustomSliverAppBar.defaultExpandedHeight,
                       background: CertificateHeader(
                         certificateCount: filteredCertificates.length,
                         selectedFilter: formState.selectedFilter,

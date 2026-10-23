@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 
 class HomeCareHistoryEmpty extends StatelessWidget {
   final VoidCallback onBookNew;
@@ -12,6 +13,7 @@ class HomeCareHistoryEmpty extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = AppLocalizations.of(context);
 
     return Center(
       child: Padding(
@@ -69,7 +71,7 @@ class HomeCareHistoryEmpty extends StatelessWidget {
 
             // Title
             Text(
-              'No Home Care History Yet',
+              l10n?.noHomeCareHistoryYet ?? 'No Home Care History Yet',
               textAlign: TextAlign.center,
               style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w800,
@@ -82,7 +84,8 @@ class HomeCareHistoryEmpty extends StatelessWidget {
 
             // Subtitle
             Text(
-              'Your requested home care services will appear here once you schedule a session with our specialists.',
+              l10n?.noHomeCareHistoryDesc ??
+                  'Your requested home care services will appear here once you schedule a session with our specialists.',
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,
@@ -98,7 +101,7 @@ class HomeCareHistoryEmpty extends StatelessWidget {
               onPressed: onBookNew,
               icon: const Icon(Icons.add_rounded, size: 20),
               label: Text(
-                'Book Care Service',
+                l10n?.bookCareServiceDrawerItem ?? 'Book Care Service',
                 style: theme.textTheme.labelLarge?.copyWith(
                   color: colorScheme.onPrimary,
                   fontWeight: FontWeight.w700,

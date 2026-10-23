@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../../../core/utils/app_spacing.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../models/dashboard/dashboard_model.dart';
 
@@ -13,74 +12,84 @@ class PatientHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final topPadding = MediaQuery.of(context).padding.top;
     final l10n = AppLocalizations.of(context)!;
 
     final String safePatientName = dashboard?.patientName ?? 'YoDoctor';
 
     return Container(
-      padding: EdgeInsets.fromLTRB(
-        AppSpacing.xl,
-        topPadding + 50,
-        AppSpacing.xl,
-        AppSpacing.xl,
-      ),
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
       decoration: BoxDecoration(
         color: colorScheme.primary,
         borderRadius: const BorderRadius.vertical(
-          bottom: Radius.circular(32),
+          bottom: Radius.circular(24),
         ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          const SizedBox(height: 10),
-          Text(
-            safePatientName,
-            style: theme.textTheme.headlineMedium?.copyWith(
-              color: colorScheme.onPrimary,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.md),
-          if (dashboard != null)
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 8,
-              ),
-              decoration: BoxDecoration(
-                color: colorScheme.onPrimary.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.calendar_today_rounded,
-                    size: 14,
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  safePatientName,
+                  style: theme.textTheme.titleLarge?.copyWith(
                     color: colorScheme.onPrimary,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 19,
                   ),
-                  const SizedBox(width: 8),
-                  Text(
-                    l10n.upcomingVisitsCount(dashboard!.upcomingCount),
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onPrimary,
-                      fontWeight: FontWeight.w700,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              if (dashboard != null) ...[
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 9,
+                    vertical: 3.5,
+                  ),
+                  decoration: BoxDecoration(
+                    color: colorScheme.onPrimary.withValues(alpha: 0.16),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: colorScheme.onPrimary.withValues(alpha: 0.15),
                     ),
                   ),
-                ],
-              ),
-            )
-          else
-            Text(
-              l10n.patientDashboard,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onPrimary.withValues(alpha: 0.8),
-                fontWeight: FontWeight.w600,
-              ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.calendar_today_rounded,
+                        size: 13,
+                        color: colorScheme.onPrimary,
+                      ),
+                      const SizedBox(width: 5),
+                      Text(
+                        l10n.upcomingVisitsCount(dashboard!.upcomingCount),
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onPrimary,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 11.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ],
+          ),
+          const SizedBox(height: 2),
+          Text(
+            l10n.patientDashboard,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: colorScheme.onPrimary.withValues(alpha: 0.85),
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
         ],
       ),
     );

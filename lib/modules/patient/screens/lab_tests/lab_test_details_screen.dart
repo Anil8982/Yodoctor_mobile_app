@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/controllers/lab_test_controller.dart';
 import 'package:yodoctor/modules/patient/models/lab/lab_test_model.dart';
 import 'package:yodoctor/modules/widgets/app_header.dart';
@@ -28,17 +29,20 @@ class _LabTestDetailsScreenState extends ConsumerState<LabTestDetailsScreen> {
   }
 
   void _handleCartToggle(LabPackage labPackage, bool isInCart) {
+    final l10n = AppLocalizations.of(context);
     ref.read(labProvider.notifier).toggleCartItem(labPackage);
     setState(() {});
 
     if (isInCart) {
       AppSnackBar.show(
-        message: '${labPackage.title} removed from cart',
+        message: l10n?.removedFromCart(labPackage.title) ??
+            '${labPackage.title} removed from cart',
         type: AppSnackBarType.info,
       );
     } else {
       AppSnackBar.show(
-        message: '${labPackage.title} added to cart',
+        message: l10n?.addedToCart(labPackage.title) ??
+            '${labPackage.title} added to cart',
         type: AppSnackBarType.success,
       );
     }
@@ -48,6 +52,7 @@ class _LabTestDetailsScreenState extends ConsumerState<LabTestDetailsScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = AppLocalizations.of(context);
 
     final state = ref.watch(labProvider);
     final isLoading = state.isLoading;
@@ -55,7 +60,7 @@ class _LabTestDetailsScreenState extends ConsumerState<LabTestDetailsScreen> {
     if (isLoading) {
       return Scaffold(
         backgroundColor: theme.scaffoldBackgroundColor,
-        appBar: const AppHeader(title: 'Loading...'),
+        appBar: AppHeader(title: l10n?.testDetails ?? 'Test Details'),
         body: const SingleChildScrollView(
           physics: AlwaysScrollableScrollPhysics(
             parent: ClampingScrollPhysics(),
@@ -71,7 +76,7 @@ class _LabTestDetailsScreenState extends ConsumerState<LabTestDetailsScreen> {
     if (test == null) {
       return Scaffold(
         backgroundColor: theme.scaffoldBackgroundColor,
-        appBar: const AppHeader(title: 'Test Details'),
+        appBar: AppHeader(title: l10n?.testDetails ?? 'Test Details'),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -83,7 +88,7 @@ class _LabTestDetailsScreenState extends ConsumerState<LabTestDetailsScreen> {
               ),
               const SizedBox(height: 12),
               Text(
-                state.errorMessage ?? "Test not found",
+                state.errorMessage ?? (l10n?.testNotFound ?? "Test not found"),
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),
@@ -93,7 +98,7 @@ class _LabTestDetailsScreenState extends ConsumerState<LabTestDetailsScreen> {
                 onPressed: () {
                   ref.read(labProvider.notifier).loadTestDetails(widget.testId);
                 },
-                child: const Text('Retry'),
+                child: Text(l10n?.tryAgain ?? 'Retry'),
               ),
             ],
           ),
@@ -165,8 +170,8 @@ class _LabTestDetailsScreenState extends ConsumerState<LabTestDetailsScreen> {
                               ),
                               child: Text(
                                 test.type == 'fullbody'
-                                    ? 'Package'
-                                    : 'Essential',
+                                    ? (l10n?.packageType ?? 'Package')
+                                    : (l10n?.essentialType ?? 'Essential'),
                                 style: const TextStyle(
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,
@@ -217,7 +222,10 @@ class _LabTestDetailsScreenState extends ConsumerState<LabTestDetailsScreen> {
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Text(
-                                      "${(((test.price - test.offerPrice) / test.price) * 100).round()}% OFF",
+                                      l10n?.percentOff(
+                                            '${(((test.price - test.offerPrice) / test.price) * 100).round()}',
+                                          ) ??
+                                          "${(((test.price - test.offerPrice) / test.price) * 100).round()}% OFF",
                                       style: TextStyle(
                                         color: AppTheme.white,
                                         fontSize: 11,
@@ -242,7 +250,10 @@ class _LabTestDetailsScreenState extends ConsumerState<LabTestDetailsScreen> {
                                   _buildSmallTag(
                                     context,
                                     Icons.analytics_outlined,
-                                    '${test.includes.length} Parameters',
+                                    l10n?.parametersCount(
+                                          test.includes.length,
+                                        ) ??
+                                        '${test.includes.length} Parameters',
                                   ),
                                   _buildSmallTag(
                                     context,
@@ -283,7 +294,10 @@ class _LabTestDetailsScreenState extends ConsumerState<LabTestDetailsScreen> {
                                   ),
                                   const SizedBox(width: 10),
                                   Text(
-                                    'Save ₹${(test.price - test.offerPrice).toInt()}',
+                                    l10n?.saveAmount(
+                                          '${(test.price - test.offerPrice).toInt()}',
+                                        ) ??
+                                        'Save ₹${(test.price - test.offerPrice).toInt()}',
                                     style: TextStyle(
                                       color: AppTheme.green,
                                       fontWeight: FontWeight.bold,
@@ -306,17 +320,18 @@ class _LabTestDetailsScreenState extends ConsumerState<LabTestDetailsScreen> {
                           _buildVerificationPill(
                             context,
                             Icons.gavel_rounded,
-                            'NABL Certified Labs',
+                            l10n?.nablCertifiedLabs ?? 'NABL Certified Labs',
                           ),
                           _buildVerificationPill(
                             context,
                             Icons.home_work_rounded,
-                            'Free Home Sample Pickup',
+                            l10n?.freeHomeSamplePickup ??
+                                'Free Home Sample Pickup',
                           ),
                           _buildVerificationPill(
                             context,
                             Icons.timer_outlined,
-                            '24 Hours Report',
+                            l10n?.twentyFourHoursReport ?? '24 Hours Report',
                           ),
                         ],
                       ),
@@ -327,7 +342,7 @@ class _LabTestDetailsScreenState extends ConsumerState<LabTestDetailsScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'About This Test',
+                            l10n?.aboutThisTest ?? 'About This Test',
                             style: theme.textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
@@ -337,7 +352,7 @@ class _LabTestDetailsScreenState extends ConsumerState<LabTestDetailsScreen> {
                             children: [
                               const SizedBox(height: 20),
                               Text(
-                                "Includes",
+                                l10n?.includes ?? "Includes",
                                 style: theme.textTheme.titleMedium?.copyWith(
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -357,7 +372,8 @@ class _LabTestDetailsScreenState extends ConsumerState<LabTestDetailsScreen> {
                           ),
                           const SizedBox(height: 6),
                           Text(
-                            'This test helps evaluate overall health status and detects a wide range of conditions, including anemia, infection, and various other clinical parameters.',
+                            l10n?.defaultTestDescription ??
+                                'This test helps evaluate overall health status and detects a wide range of conditions, including anemia, infection, and various other clinical parameters.',
                             style: theme.textTheme.bodyMedium?.copyWith(
                               color: colorScheme.onSurfaceVariant,
                               height: 1.4,
@@ -412,7 +428,9 @@ class _LabTestDetailsScreenState extends ConsumerState<LabTestDetailsScreen> {
                               : colorScheme.primary,
                         ),
                         label: Text(
-                          isInCart ? 'Remove' : 'Add to Cart',
+                          isInCart
+                              ? (l10n?.remove ?? 'Remove')
+                              : (l10n?.addToCart ?? 'Add to Cart'),
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: isInCart
@@ -442,7 +460,9 @@ class _LabTestDetailsScreenState extends ConsumerState<LabTestDetailsScreen> {
                           ),
                         ),
                         child: Text(
-                          isInCart ? 'Book Now' : 'Add & Book',
+                          isInCart
+                              ? (l10n?.bookNow ?? 'Book Now')
+                              : (l10n?.addAndBook ?? 'Add & Book'),
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),

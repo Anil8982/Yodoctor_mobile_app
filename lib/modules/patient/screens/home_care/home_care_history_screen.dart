@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/controllers/home_care_history_controller.dart';
 import 'package:yodoctor/modules/patient/screens/home_care/widgets/cancel_booking_dialog.dart';
 import 'package:yodoctor/modules/widgets/app_header.dart';
@@ -38,6 +39,7 @@ class _HomeCareHistoryScreenState extends ConsumerState<HomeCareHistoryScreen> {
     final state = ref.watch(homeCareHistoryProvider);
     final notifier = ref.read(homeCareHistoryProvider.notifier);
     final filteredBookings = notifier.filteredBookings;
+    final l10n = AppLocalizations.of(context);
 
     ref.listen(homeCareHistoryProvider, (previous, next) {
       if (next.errorMessage != null &&
@@ -52,7 +54,7 @@ class _HomeCareHistoryScreenState extends ConsumerState<HomeCareHistoryScreen> {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: const AppHeader(title: 'Home Care History'),
+      appBar: AppHeader(title: l10n?.homeCareHistory ?? 'Home Care History'),
       body: SafeArea(
         child: Column(
           children: [
@@ -134,9 +136,10 @@ class _HomeCareHistoryScreenState extends ConsumerState<HomeCareHistoryScreen> {
                 context.push(AppRoutes.homeServiceBooking);
               },
               icon: const Icon(Icons.add_rounded, size: 20),
-              label: const Text(
-                'Book New Care Service',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+              label: Text(
+                l10n?.bookNewCareService ?? 'Book New Care Service',
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: colorScheme.primary,

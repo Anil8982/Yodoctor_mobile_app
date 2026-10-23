@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 
-import '../../../../../core/utils/app_spacing.dart';
 
 class HistoryHeader extends StatelessWidget {
   const HistoryHeader({super.key, required this.appointmentCount});
@@ -9,72 +9,83 @@ class HistoryHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final TextTheme textTheme = Theme.of(context).textTheme;
-    final double topPadding = MediaQuery.of(context).padding.top;
 
     return Container(
-      padding: EdgeInsets.fromLTRB(
-        AppSpacing.xl,
-        topPadding + 60,
-        AppSpacing.xl,
-        AppSpacing.lg,
-      ),
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
       decoration: BoxDecoration(
         color: colorScheme.primary,
         borderRadius: const BorderRadius.vertical(
-          bottom: Radius.circular(32),
+          bottom: Radius.circular(24),
         ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
-          Text(
-            'My Appointments',
-            style: textTheme.headlineMedium?.copyWith(
-              color: colorScheme.onPrimary,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: 5),
-          Text(
-            'Track completed consultations and rate doctors.',
-            style: textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onPrimary.withValues(alpha: 0.9),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 8,
-            ),
-            decoration: BoxDecoration(
-              color: colorScheme.onPrimary.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: colorScheme.onPrimary.withValues(alpha: 0.12),
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Icon(
-                  Icons.calendar_month_rounded,
-                  color: colorScheme.onPrimary,
-                  size: 16,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  '$appointmentCount appointments',
-                  style: textTheme.bodySmall?.copyWith(
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: Text(
+                  l10n?.myAppointmentsTitle ?? 'My Appointments',
+                  style: textTheme.titleLarge?.copyWith(
                     color: colorScheme.onPrimary,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 19,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 9,
+                  vertical: 3.5,
+                ),
+                decoration: BoxDecoration(
+                  color: colorScheme.onPrimary.withValues(alpha: 0.16),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: colorScheme.onPrimary.withValues(alpha: 0.15),
                   ),
                 ),
-              ],
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Icon(
+                      Icons.calendar_month_rounded,
+                      color: colorScheme.onPrimary,
+                      size: 13,
+                    ),
+                    const SizedBox(width: 5),
+                    Text(
+                      l10n?.appointmentCountText(appointmentCount) ??
+                          '$appointmentCount appointments',
+                      style: textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onPrimary,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 11.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 2),
+          Text(
+            l10n?.trackConsultationsSubtitle ??
+                'Track completed consultations and rate doctors.',
+            style: textTheme.bodySmall?.copyWith(
+              color: colorScheme.onPrimary.withValues(alpha: 0.85),
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),

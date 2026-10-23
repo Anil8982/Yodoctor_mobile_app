@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/models/family/family_member_model.dart';
 import 'member_info_tag.dart';
 
@@ -15,10 +16,50 @@ class FamilyMemberCard extends StatelessWidget {
   final VoidCallback? onDelete;
   final VoidCallback? onEdit;
 
+  String _getRelationLabel(AppLocalizations? l10n, String relation) {
+    switch (relation.toUpperCase()) {
+      case 'FATHER':
+        return l10n?.relationFather ?? 'Father';
+      case 'MOTHER':
+        return l10n?.relationMother ?? 'Mother';
+      case 'SPOUSE':
+        return l10n?.relationSpouse ?? 'Spouse';
+      case 'SON':
+        return l10n?.relationSon ?? 'Son';
+      case 'DAUGHTER':
+        return l10n?.relationDaughter ?? 'Daughter';
+      case 'BROTHER':
+        return l10n?.relationBrother ?? 'Brother';
+      case 'SISTER':
+        return l10n?.relationSister ?? 'Sister';
+      case 'OTHER':
+        return l10n?.relationOther ?? 'Other';
+      default:
+        return relation;
+    }
+  }
+
+  String _getGenderLabel(AppLocalizations? l10n, String gender) {
+    switch (gender.toUpperCase()) {
+      case 'MALE':
+        return l10n?.genderMale ?? 'Male';
+      case 'FEMALE':
+        return l10n?.genderFemale ?? 'Female';
+      case 'OTHER':
+        return l10n?.genderOther ?? 'Other';
+      default:
+        return gender;
+    }
+  }
+
+  String _formatNumber(double val) =>
+      val % 1 == 0 ? val.toInt().toString() : val.toString();
+
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final TextTheme textTheme = Theme.of(context).textTheme;
+    final l10n = AppLocalizations.of(context);
 
     return Card(
       elevation: 0,
@@ -75,7 +116,7 @@ class FamilyMemberCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      member.relation,
+                      _getRelationLabel(l10n, member.relation),
                       style: textTheme.labelSmall?.copyWith(
                         color: colorScheme.onSecondaryContainer,
                         fontWeight: FontWeight.w800,
@@ -89,10 +130,13 @@ class FamilyMemberCard extends StatelessWidget {
                 spacing: 8,
                 runSpacing: 8,
                 children: <Widget>[
-                  MemberInfoTag(icon: Icons.face_rounded, value: member.gender),
+                  MemberInfoTag(
+                    icon: Icons.face_rounded,
+                    value: _getGenderLabel(l10n, member.gender),
+                  ),
                   MemberInfoTag(
                     icon: Icons.cake_rounded,
-                    value: "${member.age} Years",
+                    value: l10n?.yearsOld(member.age) ?? "${member.age} Years",
                   ),
                   MemberInfoTag(
                     icon: Icons.bloodtype_rounded,
@@ -120,6 +164,7 @@ class FamilyMemberCard extends StatelessWidget {
         final TextTheme textTheme = Theme.of(modalContext).textTheme;
         final double screenWidth = MediaQuery.sizeOf(modalContext).width;
         final double itemWidth = (screenWidth - 52) / 2;
+        final l10n = AppLocalizations.of(modalContext);
 
         return Container(
           decoration: BoxDecoration(
@@ -166,7 +211,7 @@ class FamilyMemberCard extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            member.relation,
+                            _getRelationLabel(l10n, member.relation),
                             style: textTheme.titleMedium?.copyWith(
                               color: colorScheme.primary,
                               fontWeight: FontWeight.w600,
@@ -188,21 +233,21 @@ class FamilyMemberCard extends StatelessWidget {
                     _buildInfoBox(
                       modalContext,
                       Icons.face_rounded,
-                      'Gender',
-                      member.gender,
+                      l10n?.gender ?? 'Gender',
+                      _getGenderLabel(l10n, member.gender),
                       itemWidth,
                     ),
                     _buildInfoBox(
                       modalContext,
                       Icons.cake_rounded,
-                      'Age',
-                      "${member.age} Years",
+                      l10n?.age ?? 'Age',
+                      l10n?.yearsOld(member.age) ?? "${member.age} Years",
                       itemWidth,
                     ),
                     _buildInfoBox(
                       modalContext,
                       Icons.bloodtype_rounded,
-                      'Blood Group',
+                      l10n?.bloodGroup ?? 'Blood Group',
                       member.bloodGroup,
                       itemWidth,
                       isError: true,
@@ -210,21 +255,23 @@ class FamilyMemberCard extends StatelessWidget {
                     _buildInfoBox(
                       modalContext,
                       Icons.height_rounded,
-                      'Height',
-                      "${member.heightCm} cm",
+                      l10n?.height ?? 'Height',
+                      l10n?.heightInCm(_formatNumber(member.heightCm)) ??
+                          "${_formatNumber(member.heightCm)} cm",
                       itemWidth,
                     ),
                     _buildInfoBox(
                       modalContext,
                       Icons.monitor_weight_outlined,
-                      'Weight',
-                      "${member.weightKg} kg",
+                      l10n?.weight ?? 'Weight',
+                      l10n?.weightInKg(_formatNumber(member.weightKg)) ??
+                          "${_formatNumber(member.weightKg)} kg",
                       itemWidth,
                     ),
                     _buildInfoBox(
                       modalContext,
                       Icons.calendar_month_rounded,
-                      'Date of Birth',
+                      l10n?.dateOfBirth ?? 'Date of Birth',
                       DateFormat(
                         'dd MMM yyyy',
                       ).format(DateTime.parse(member.dob)),
@@ -247,7 +294,7 @@ class FamilyMemberCard extends StatelessWidget {
                                 onDelete?.call();
                               },
                         icon: const Icon(Icons.delete_outline_rounded),
-                        label: const Text('Remove'),
+                        label: Text(l10n?.remove ?? 'Remove'),
                         style: FilledButton.styleFrom(
                           backgroundColor: colorScheme.errorContainer,
                           foregroundColor: colorScheme.onErrorContainer,
@@ -271,7 +318,7 @@ class FamilyMemberCard extends StatelessWidget {
                                 onEdit?.call();
                               },
                         icon: const Icon(Icons.edit_rounded),
-                        label: const Text('Update'),
+                        label: Text(l10n?.update ?? 'Update'),
                         style: FilledButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(

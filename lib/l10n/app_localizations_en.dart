@@ -331,6 +331,18 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String certificateCountText(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count certificates',
+      one: '1 certificate',
+      zero: '0 certificates',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get searchByTypeOrDoctor => 'Search by type or doctor...';
 
   @override
@@ -504,8 +516,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get additionalNotesForDoctor => 'Additional Notes For Doctor';
 
   @override
-  String get additionalNotesHint =>
-      'Describe specific conditions or background details contextually...';
+  String get additionalNotesHint => 'Any special instructions? (Optional)';
 
   @override
   String get medicalDetails => 'Medical Details';
@@ -590,22 +601,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get height => 'Height';
 
   @override
-  String get heightHint => 'e.g. 175';
+  String get heightHint => 'e.g. 170';
 
   @override
   String get enterValidNumber => 'Enter a valid number';
 
   @override
-  String get enterValidHeight => 'Enter a valid height (1 - 300 cm)';
+  String get enterValidHeight => 'Enter a valid height';
 
   @override
   String get weight => 'Weight';
 
   @override
-  String get weightHint => 'e.g. 70';
+  String get weightHint => 'e.g. 65';
 
   @override
-  String get enterValidWeight => 'Enter a valid weight (1 - 500 kg)';
+  String get enterValidWeight => 'Enter a valid weight';
 
   @override
   String get knownMedicalConditions => 'Known Medical Conditions';
@@ -888,4 +899,825 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get invalidQrStructure => 'Invalid QR structure.';
+
+  @override
+  String get bookCareService => 'Book a Care Service';
+
+  @override
+  String get bookCareServiceDrawerItem => 'Book Care Service';
+
+  @override
+  String get homeCareHistoryDrawerItem => 'Home Care History';
+
+  @override
+  String get homeHealthcareServices => 'HOME HEALTHCARE SERVICES';
+
+  @override
+  String get scheduleNurseDesc =>
+      'Schedule a nurse, home care, or consultation at your doorstep.';
+
+  @override
+  String get personalDetails => 'Personal Details';
+
+  @override
+  String get caregiverAndUrgency => 'Caregiver & Urgency';
+
+  @override
+  String get typeOfService => 'Type of Service';
+
+  @override
+  String get medicalCondition => 'Medical Condition';
+
+  @override
+  String get serviceDuration => 'Service Duration';
+
+  @override
+  String get timePreference => 'Time Preference';
+
+  @override
+  String get additionalNotes => 'Additional Notes';
+
+  @override
+  String get serviceTypeGeneralNursing => 'General Nursing';
+
+  @override
+  String get serviceTypeElderlyCare => 'Elderly Care';
+
+  @override
+  String get serviceTypePostSurgery => 'Post Surgery';
+
+  @override
+  String get serviceTypeIcuNurse => 'ICU Nurse';
+
+  @override
+  String get serviceTypeAttendant => 'Attendant';
+
+  @override
+  String get timeSlotMorning => 'Morning (6am - 12pm)';
+
+  @override
+  String get timeSlotAfternoon => 'Afternoon (12pm - 5pm)';
+
+  @override
+  String get timeSlotEvening => 'Evening (5pm - 9pm)';
+
+  @override
+  String get timeSlotNight => 'Night (9pm - 6am)';
+
+  @override
+  String get medicalConditionHint => 'Describe medical condition, symptoms...';
+
+  @override
+  String get submitBookingRequest => 'Submit Booking Request';
+
+  @override
+  String get bookingSubmittedSuccess => 'Booking submitted successfully';
+
+  @override
+  String get bookingRequestFailed => 'Booking request failed';
+
+  @override
+  String get pleaseSelectServiceDuration => 'Please select service duration';
+
+  @override
+  String get pleaseSelectStartDate => 'Please select start date';
+
+  @override
+  String get contactNumber => 'Contact Number';
+
+  @override
+  String get patientAge => 'Patient Age';
+
+  @override
+  String get patientGender => 'Patient Gender';
+
+  @override
+  String get address => 'Address';
+
+  @override
+  String get enterContactNumber => 'Enter contact number';
+
+  @override
+  String get enterAge => 'Enter age';
+
+  @override
+  String get enterCompleteAddress => 'Enter complete address';
+
+  @override
+  String get fullNameRequired => 'Full name required';
+
+  @override
+  String get enterValidName => 'Enter a valid name';
+
+  @override
+  String get phoneRequired => 'Phone number is required';
+
+  @override
+  String get phoneInvalidPrefix => 'Phone no. must start with 6, 7, 8, or 9';
+
+  @override
+  String get ageRequired => 'Age is required';
+
+  @override
+  String get ageMinValidation => 'Age must be greater than 0';
+
+  @override
+  String get ageMaxValidation => 'Age cannot be more than 120';
+
+  @override
+  String get selectGenderValidation => 'Select gender';
+
+  @override
+  String get addressRequired => 'Address is required';
+
+  @override
+  String get addressMinValidation => 'Address at least 5 characters';
+
+  @override
+  String get useCurrentLocation => 'Use Current Location';
+
+  @override
+  String get preferredCaregiverGender => 'Preferred Caregiver Gender';
+
+  @override
+  String get selectPreference => 'Select Preference';
+
+  @override
+  String get noPreference => 'No Preference';
+
+  @override
+  String get selectGenderPreferenceValidation =>
+      'Please select gender preference';
+
+  @override
+  String get needEmergencyService => 'Need Emergency Service';
+
+  @override
+  String get within2Hours => 'Within 2 hours';
+
+  @override
+  String get duration1Day => '1 Day';
+
+  @override
+  String get durationMultipleDays => 'Multiple Days';
+
+  @override
+  String get durationWeekly => 'Weekly';
+
+  @override
+  String get durationMonthly => 'Monthly';
+
+  @override
+  String get numberOfDays => 'Number of Days';
+
+  @override
+  String get enterDays => 'Enter days';
+
+  @override
+  String get invalidDays => 'Invalid days';
+
+  @override
+  String get max365Days => 'Max 365 days';
+
+  @override
+  String get startDate => 'Start Date';
+
+  @override
+  String get homeCareHistory => 'Home Care History';
+
+  @override
+  String get noHomeCareHistoryYet => 'No Home Care History Yet';
+
+  @override
+  String get noHomeCareHistoryDesc =>
+      'Your requested home care services will appear here once you schedule a session with our specialists.';
+
+  @override
+  String get emergencyBadge => 'Emergency';
+
+  @override
+  String get tapForFullDetails => 'Tap for full details';
+
+  @override
+  String get cancelBooking => 'Cancel Booking';
+
+  @override
+  String get homeCareService => 'Home Care Service';
+
+  @override
+  String yearsOld(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Years',
+      one: '1 Year',
+      zero: '0 Years',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String daysCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Days',
+      one: '1 Day',
+      zero: '0 Days',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get homeCareFilterAll => 'ALL';
+
+  @override
+  String get homeCareFilterPending => 'PENDING';
+
+  @override
+  String get homeCareFilterConfirmed => 'CONFIRMED';
+
+  @override
+  String get homeCareFilterCompleted => 'COMPLETED';
+
+  @override
+  String get homeCareFilterCancelled => 'CANCELLED';
+
+  @override
+  String get bookingDetails => 'Booking Details';
+
+  @override
+  String get patientInformation => 'Patient Information';
+
+  @override
+  String get patientName => 'Patient Name';
+
+  @override
+  String get ageGender => 'Age / Gender';
+
+  @override
+  String get preference => 'Preference';
+
+  @override
+  String get serviceInformation => 'Service Information';
+
+  @override
+  String get serviceType => 'Service Type';
+
+  @override
+  String get durationType => 'Duration Type';
+
+  @override
+  String get timeSlot => 'Time Slot';
+
+  @override
+  String get preferredDate => 'Preferred Date';
+
+  @override
+  String get locationAndNotes => 'Location & Notes';
+
+  @override
+  String get serviceAddress => 'Service Address';
+
+  @override
+  String get standardBooking => 'Standard';
+
+  @override
+  String get failedToLoadDetails => 'Failed to Load Details';
+
+  @override
+  String get unableToRetrieveBookingDetails =>
+      'Unable to retrieve complete booking details. Please try again later.';
+
+  @override
+  String get cancelBookingConfirmation =>
+      'Are you sure you want to cancel this home care booking?';
+
+  @override
+  String get yesCancel => 'Yes, Cancel';
+
+  @override
+  String get noKeep => 'No';
+
+  @override
+  String get cancellingBooking => 'Cancelling booking...';
+
+  @override
+  String get bookingCancelledSuccess => 'Booking cancelled successfully';
+
+  @override
+  String get bookNewCareService => 'Book New Care Service';
+
+  @override
+  String get regularBooking => 'Regular';
+
+  @override
+  String get familyMembers => 'Family Members';
+
+  @override
+  String get familyHealthNetwork => 'Family Health Network';
+
+  @override
+  String get familyHealthNetworkSubtitle =>
+      'Monitor and manage medical data for your linked family profiles.';
+
+  @override
+  String activeProfilesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count profiles active',
+      one: '1 profile active',
+      zero: '0 profiles active',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get addMember => 'Add Member';
+
+  @override
+  String get addFamilyMember => 'Add Family Member';
+
+  @override
+  String get chooseMember => 'Choose Member';
+
+  @override
+  String get addNewMember => 'Add New Member';
+
+  @override
+  String get updateMember => 'Update Member';
+
+  @override
+  String get memberAddedSuccess => 'Member added successfully.';
+
+  @override
+  String get memberUpdatedSuccess => 'Member updated successfully.';
+
+  @override
+  String get noFamilyMembersYet => 'No family members yet';
+
+  @override
+  String get createFamilyProfilesDesc =>
+      'Create profiles for your family members to manage their health records easily.';
+
+  @override
+  String get age => 'Age';
+
+  @override
+  String get heightCmLabel => 'Height (cm)';
+
+  @override
+  String get weightKgLabel => 'Weight (kg)';
+
+  @override
+  String get remove => 'Remove';
+
+  @override
+  String get update => 'Update';
+
+  @override
+  String get saveChanges => 'Save Changes';
+
+  @override
+  String get saveMember => 'Save Member';
+
+  @override
+  String get relation => 'Relation';
+
+  @override
+  String get selectRelation => 'Select Relation';
+
+  @override
+  String get relationFather => 'Father';
+
+  @override
+  String get relationMother => 'Mother';
+
+  @override
+  String get relationSpouse => 'Spouse';
+
+  @override
+  String get relationSon => 'Son';
+
+  @override
+  String get relationDaughter => 'Daughter';
+
+  @override
+  String get relationBrother => 'Brother';
+
+  @override
+  String get relationSister => 'Sister';
+
+  @override
+  String get relationOther => 'Other';
+
+  @override
+  String get pleaseEnterFullName => 'Please enter full name';
+
+  @override
+  String get nameMinLengthError => 'Name should have at least 2 characters';
+
+  @override
+  String get pleaseSelectGender => 'Please select gender';
+
+  @override
+  String get selectDateOfBirth => 'Select date of birth';
+
+  @override
+  String get pleaseSelectRelation => 'Please select relation';
+
+  @override
+  String get heightRangeError => 'Height should be between 30 and 250 cm';
+
+  @override
+  String get weightRangeError => 'Weight should be between 2 and 350 kg';
+
+  @override
+  String heightInCm(String height) {
+    return '$height cm';
+  }
+
+  @override
+  String weightInKg(String weight) {
+    return '$weight kg';
+  }
+
+  @override
+  String get labTests => 'Lab Tests';
+
+  @override
+  String get popularPackages => 'Popular Packages';
+
+  @override
+  String get viewAll => 'View All';
+
+  @override
+  String get noTestsAvailableInCategory =>
+      'No tests available in this category';
+
+  @override
+  String get allPackagesAndTests => 'All Packages & Tests';
+
+  @override
+  String get trustedByFamilies => 'Trusted by 50,000+ Families';
+
+  @override
+  String get bookLabTestsComfortOfHome =>
+      'Book Lab Tests from the Comfort of Home';
+
+  @override
+  String get labHeroSubtitle =>
+      'Accurate Reports • Affordable Prices • Home Sample Collection';
+
+  @override
+  String get lowestPrices => 'Lowest Prices';
+
+  @override
+  String get transparentDesc => 'Transparent';
+
+  @override
+  String get homeCollectionShort => 'Home Coll.';
+
+  @override
+  String get sevenDaysAWeek => '7 days/week';
+
+  @override
+  String get accurateTitle => 'Accurate';
+
+  @override
+  String get verifiedDesc => 'Verified';
+
+  @override
+  String get hundredPercentPrivate => '100% Private';
+
+  @override
+  String get encryptedDesc => 'Encrypted';
+
+  @override
+  String get notSureWhichTestToBook => 'Not sure which test to book?';
+
+  @override
+  String get labSupportAdvisorsAvailable =>
+      'Our advisors are available 7 days a week to guide you.';
+
+  @override
+  String callSupportPhone(String phone) {
+    return 'Call $phone';
+  }
+
+  @override
+  String get packageType => 'Package';
+
+  @override
+  String get essentialType => 'Essential';
+
+  @override
+  String percentOff(String percent) {
+    return '$percent% OFF';
+  }
+
+  @override
+  String paramsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Params',
+      one: '1 Param',
+      zero: '0 Params',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get homeSampleCollection => 'Home Sample Collection';
+
+  @override
+  String get viewButton => 'View';
+
+  @override
+  String get addedButton => 'Added';
+
+  @override
+  String get addButton => '+ Add';
+
+  @override
+  String get testDetails => 'Test Details';
+
+  @override
+  String get testNotFound => 'Test not found';
+
+  @override
+  String addedToCart(String title) {
+    return '$title added to cart';
+  }
+
+  @override
+  String removedFromCart(String title) {
+    return '$title removed from cart';
+  }
+
+  @override
+  String parametersCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Parameters',
+      one: '1 Parameter',
+      zero: '0 Parameters',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String saveAmount(String amount) {
+    return 'Save ₹$amount';
+  }
+
+  @override
+  String get nablCertifiedLabs => 'NABL Certified Labs';
+
+  @override
+  String get freeHomeSamplePickup => 'Free Home Sample Pickup';
+
+  @override
+  String get twentyFourHoursReport => '24 Hours Report';
+
+  @override
+  String get aboutThisTest => 'About This Test';
+
+  @override
+  String get includes => 'Includes';
+
+  @override
+  String get defaultTestDescription =>
+      'This test helps evaluate overall health status and detects a wide range of conditions, including anemia, infection, and various other clinical parameters.';
+
+  @override
+  String get addToCart => 'Add to Cart';
+
+  @override
+  String get addAndBook => 'Add & Book';
+
+  @override
+  String get myCart => 'My Cart';
+
+  @override
+  String parametersIncluded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Parameters Included',
+      one: '1 Parameter Included',
+      zero: '0 Parameters Included',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get addMoreTests => 'Add More Tests';
+
+  @override
+  String get priceSummary => 'Price Summary';
+
+  @override
+  String get totalMRP => 'Total MRP';
+
+  @override
+  String get youSave => 'You Save';
+
+  @override
+  String savingDiscountNotice(String discount) {
+    return 'Great deal! You\'re saving $discount% on this order.';
+  }
+
+  @override
+  String get totalPayable => 'Total Payable';
+
+  @override
+  String get proceedToBookSlot => 'Proceed to Book Slot';
+
+  @override
+  String get yourCartIsEmpty => 'Your cart is empty';
+
+  @override
+  String get cartEmptyDesc =>
+      'Looks like you haven\'t added any lab tests yet. Explore our packages to get started.';
+
+  @override
+  String get addTestsAndPackages => 'Add Tests & Packages';
+
+  @override
+  String get bookSlotTitle => 'Book a Slot';
+
+  @override
+  String testsSelectedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tests selected • ',
+      one: '1 test selected • ',
+      zero: '0 tests selected • ',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get patientDetails => 'Patient Details';
+
+  @override
+  String get samplePickupAddress => 'Sample Pickup Address';
+
+  @override
+  String get selectDateTime => 'Select Date & Time';
+
+  @override
+  String get enterYourFullName => 'Enter your full name';
+
+  @override
+  String get nameMin3Characters => 'Name must be at least 3 characters';
+
+  @override
+  String get invalidAge => 'Invalid age';
+
+  @override
+  String get ageRangeError => 'Age must be between 1 and 120';
+
+  @override
+  String get enter10DigitNumber => 'Enter 10-digit number';
+
+  @override
+  String get enterValid10DigitNumber => 'Enter valid 10-digit number';
+
+  @override
+  String get useMyCurrentLocation => 'Use My Current Location';
+
+  @override
+  String get fullAddress => 'Full Address';
+
+  @override
+  String get fullAddressHint => 'House/Flat No., Street, Area, City';
+
+  @override
+  String get enterAddress => 'Enter address';
+
+  @override
+  String get addressTooShort => 'Address is too short';
+
+  @override
+  String get todaySlotsClosedMessage =>
+      'Today\'s slots are closed. select other day slots';
+
+  @override
+  String get morningSlot => 'Morning Slot';
+
+  @override
+  String get afternoonSlot => 'Afternoon Slot';
+
+  @override
+  String get eveningSlot => 'Evening Slot';
+
+  @override
+  String get totalPrice => 'Total Price';
+
+  @override
+  String get selectTimeSlotValidation => 'Select a time slot';
+
+  @override
+  String get bookingFailed => 'Booking failed';
+
+  @override
+  String get confirmAndPay => 'Confirm & Pay';
+
+  @override
+  String get labTestBooking => 'Lab Test Booking';
+
+  @override
+  String get myAppointmentsTitle => 'My Appointments';
+
+  @override
+  String get trackConsultationsSubtitle =>
+      'Track completed consultations and rate doctors.';
+
+  @override
+  String appointmentCountText(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count appointments',
+      one: '1 appointment',
+      zero: '0 appointments',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String ratedDoctorSuccess(String doctorName, int rating) {
+    return 'Thanks! You rated $doctorName $rating stars.';
+  }
+
+  @override
+  String get loadingAppointments => 'Loading appointments...';
+
+  @override
+  String get noAppointmentHistory => 'No appointment history available';
+
+  @override
+  String get bookedAppointmentsAppearHere =>
+      'Booked appointments will appear here.';
+
+  @override
+  String tokenNumberWithHash(String token) {
+    return 'Token #$token';
+  }
+
+  @override
+  String get viewDetails => 'View Details';
+
+  @override
+  String get tableHeaderDoctor => 'DOCTOR & SPECIALIZATION';
+
+  @override
+  String get tableHeaderDateShift => 'DATE & SHIFT';
+
+  @override
+  String get tableHeaderToken => 'TOKEN';
+
+  @override
+  String get tableHeaderStatus => 'STATUS';
+
+  @override
+  String get tableHeaderActions => 'ACTIONS';
+
+  @override
+  String tokenWithNumber(String token) {
+    return 'Token $token';
+  }
+
+  @override
+  String get viewPrescription => 'View Prescription';
+
+  @override
+  String get tapToViewPrescription => 'Tap to view consultation files';
+
+  @override
+  String get rateYourExperience => 'Rate your experience';
+
+  @override
+  String get shareYourThoughts => 'Share your thoughts';
+
+  @override
+  String get reviewSubmittedSuccess => 'Review submitted successfully!';
+
+  @override
+  String get saveFeedback => 'Save Feedback';
+
+  @override
+  String get maybeLater => 'Maybe Later';
+
+  @override
+  String get prescriptionTitle => 'Prescription';
+
+  @override
+  String get instructionsLabel => 'Instructions';
 }

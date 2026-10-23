@@ -1,16 +1,93 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/controllers/home_care_history_controller.dart';
 import 'package:yodoctor/modules/widgets/status_chip.dart';
 
 class HomeCareBookingDetails extends ConsumerWidget {
   const HomeCareBookingDetails({super.key});
 
+  String _getServiceTitle(AppLocalizations? l10n, String type) {
+    switch (type) {
+      case 'General Nursing':
+        return l10n?.serviceTypeGeneralNursing ?? 'General Nursing';
+      case 'Elderly Care':
+        return l10n?.serviceTypeElderlyCare ?? 'Elderly Care';
+      case 'Post Surgery':
+        return l10n?.serviceTypePostSurgery ?? 'Post Surgery';
+      case 'ICU Nurse':
+        return l10n?.serviceTypeIcuNurse ?? 'ICU Nurse';
+      case 'Attendant':
+        return l10n?.serviceTypeAttendant ?? 'Attendant';
+      default:
+        return type.isNotEmpty
+            ? type
+            : (l10n?.homeCareService ?? 'Home Care Service');
+    }
+  }
+
+  String _getGenderLabel(AppLocalizations? l10n, String gender) {
+    switch (gender.toLowerCase()) {
+      case 'male':
+        return l10n?.genderMale ?? 'Male';
+      case 'female':
+        return l10n?.genderFemale ?? 'Female';
+      case 'other':
+        return l10n?.genderOther ?? 'Other';
+      default:
+        return gender;
+    }
+  }
+
+  String _getGenderPreferenceLabel(AppLocalizations? l10n, String pref) {
+    switch (pref.toLowerCase()) {
+      case 'male':
+        return l10n?.genderMale ?? 'Male';
+      case 'female':
+        return l10n?.genderFemale ?? 'Female';
+      case 'no preference':
+        return l10n?.noPreference ?? 'No Preference';
+      default:
+        return pref;
+    }
+  }
+
+  String _getDurationLabel(AppLocalizations? l10n, String type) {
+    switch (type) {
+      case '1 Day':
+        return l10n?.duration1Day ?? '1 Day';
+      case 'Multiple Days':
+        return l10n?.durationMultipleDays ?? 'Multiple Days';
+      case 'Weekly':
+        return l10n?.durationWeekly ?? 'Weekly';
+      case 'Monthly':
+        return l10n?.durationMonthly ?? 'Monthly';
+      default:
+        return type;
+    }
+  }
+
+  String _getTimeSlotLabel(AppLocalizations? l10n, String slot) {
+    switch (slot) {
+      case 'Morning (6am - 12pm)':
+        return l10n?.timeSlotMorning ?? 'Morning (6am - 12pm)';
+      case 'Afternoon (12pm - 5pm)':
+        return l10n?.timeSlotAfternoon ?? 'Afternoon (12pm - 5pm)';
+      case 'Evening (5pm - 9pm)':
+        return l10n?.timeSlotEvening ?? 'Evening (5pm - 9pm)';
+      case 'Night (9pm - 6am)':
+        return l10n?.timeSlotNight ?? 'Night (9pm - 6am)';
+      default:
+        return slot;
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = AppLocalizations.of(context);
     final state = ref.watch(homeCareHistoryProvider);
     final booking = state.selectedBooking;
 
@@ -33,7 +110,7 @@ class HomeCareBookingDetails extends ConsumerWidget {
                       ),
                     )
                   : booking == null
-                  ? _buildErrorState(context)
+                  ? _buildErrorState(context, l10n)
                   : ListView(
                       padding: const EdgeInsets.fromLTRB(20, 104, 20, 36),
                       children: [
@@ -50,6 +127,7 @@ class HomeCareBookingDetails extends ConsumerWidget {
                                     child: _buildEmergencyChip(
                                       context,
                                       booking.emergencyBooking,
+                                      l10n,
                                     ),
                                   ),
                                 ),
@@ -63,33 +141,36 @@ class HomeCareBookingDetails extends ConsumerWidget {
                         // Section: Patient Information
                         _buildSectionContainer(
                           context,
-                          title: 'Patient Information',
+                          title: l10n?.patientInformation ?? 'Patient Information',
                           icon: Icons.person_rounded,
                           children: [
                             _buildDetailTile(
                               context,
-                              'Patient Name',
+                              l10n?.patientName ?? 'Patient Name',
                               booking.fullName,
                               isBold: true,
                             ),
                             _buildDivider(context),
                             _buildDetailTile(
                               context,
-                              'Age / Gender',
-                              '${booking.patientAge} Years / ${booking.patientGender}',
+                              l10n?.ageGender ?? 'Age / Gender',
+                              '${l10n?.yearsOld(booking.patientAge) ?? '${booking.patientAge} Years'} / ${_getGenderLabel(l10n, booking.patientGender)}',
                             ),
                             if (booking.genderPreference.trim().isNotEmpty) ...[
                               _buildDivider(context),
                               _buildDetailTile(
                                 context,
-                                'Preference',
-                                booking.genderPreference,
+                                l10n?.preference ?? 'Preference',
+                                _getGenderPreferenceLabel(
+                                  l10n,
+                                  booking.genderPreference,
+                                ),
                               ),
                             ],
                             _buildDivider(context),
                             _buildDetailTile(
                               context,
-                              'Contact',
+                              l10n?.contact ?? 'Contact',
                               booking.contactNumber,
                             ),
                           ],
@@ -100,14 +181,14 @@ class HomeCareBookingDetails extends ConsumerWidget {
                         // Section: Service Information
                         _buildSectionContainer(
                           context,
-                          title: 'Service Information',
+                          title: l10n?.serviceInformation ?? 'Service Information',
                           icon: Icons.assignment_rounded,
                           children: [
                             if (booking.serviceType.trim().isNotEmpty) ...[
                               _buildDetailTile(
                                 context,
-                                'Service Type',
-                                booking.serviceType,
+                                l10n?.serviceType ?? 'Service Type',
+                                _getServiceTitle(l10n, booking.serviceType),
                               ),
                             ],
                             if (booking.medicalCondition.trim().isNotEmpty) ...[
@@ -115,15 +196,15 @@ class HomeCareBookingDetails extends ConsumerWidget {
                                 _buildDivider(context),
                               _buildDetailTile(
                                 context,
-                                'Medical Condition',
+                                l10n?.medicalCondition ?? 'Medical Condition',
                                 booking.medicalCondition,
                               ),
                             ],
                             _buildDivider(context),
                             _buildDetailTile(
                               context,
-                              'Duration Type',
-                              booking.durationType,
+                              l10n?.durationType ?? 'Duration Type',
+                              _getDurationLabel(l10n, booking.durationType),
                             ),
                             if (booking.durationType.toLowerCase().contains(
                               'multiple',
@@ -131,23 +212,26 @@ class HomeCareBookingDetails extends ConsumerWidget {
                               _buildDivider(context),
                               _buildDetailTile(
                                 context,
-                                'Number Of Days',
-                                '${booking.numberOfDays} Days',
+                                l10n?.numberOfDays ?? 'Number Of Days',
+                                l10n?.daysCount(
+                                      booking.numberOfDays,
+                                    ) ??
+                                    '${booking.numberOfDays} Days',
                               ),
                             ],
                             if (booking.timeSlot.trim().isNotEmpty) ...[
                               _buildDivider(context),
                               _buildDetailTile(
                                 context,
-                                'Time Slot',
-                                booking.timeSlot,
+                                l10n?.timeSlot ?? 'Time Slot',
+                                _getTimeSlotLabel(l10n, booking.timeSlot),
                               ),
                             ],
                             if (booking.preferredDate != null) ...[
                               _buildDivider(context),
                               _buildDetailTile(
                                 context,
-                                'Preferred Date',
+                                l10n?.preferredDate ?? 'Preferred Date',
                                 _formatDate(booking.preferredDate!),
                               ),
                             ],
@@ -159,12 +243,12 @@ class HomeCareBookingDetails extends ConsumerWidget {
                         // Section: Location & Notes
                         _buildSectionContainer(
                           context,
-                          title: 'Location & Notes',
+                          title: l10n?.locationAndNotes ?? 'Location & Notes',
                           icon: Icons.place_rounded,
                           children: [
                             _buildDetailTile(
                               context,
-                              'Service Address',
+                              l10n?.serviceAddress ?? 'Service Address',
                               booking.address,
                               isFullWidth: true,
                             ),
@@ -172,7 +256,7 @@ class HomeCareBookingDetails extends ConsumerWidget {
                               _buildDivider(context),
                               _buildDetailTile(
                                 context,
-                                'Additional Notes',
+                                l10n?.additionalNotes ?? 'Additional Notes',
                                 booking.notes,
                                 isFullWidth: true,
                               ),
@@ -240,7 +324,7 @@ class HomeCareBookingDetails extends ConsumerWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'Booking Details',
+                                      l10n?.bookingDetails ?? 'Booking Details',
                                       style: theme.textTheme.titleMedium
                                           ?.copyWith(
                                             fontWeight: FontWeight.w700,
@@ -249,7 +333,9 @@ class HomeCareBookingDetails extends ConsumerWidget {
                                     ),
                                     const SizedBox(height: 2),
                                     Text(
-                                      booking?.bookingId ?? 'Home Care Service',
+                                      booking?.bookingId ??
+                                          (l10n?.homeCareService ??
+                                              'Home Care Service'),
                                       style: theme.textTheme.bodySmall
                                           ?.copyWith(
                                             color: colorScheme.onSurfaceVariant,
@@ -268,7 +354,7 @@ class HomeCareBookingDetails extends ConsumerWidget {
                                       .withValues(alpha: 0.5),
                                   foregroundColor: colorScheme.onSurfaceVariant,
                                 ),
-                                tooltip: 'Close',
+                                tooltip: l10n?.close ?? 'Close',
                               ),
                             ],
                           ),
@@ -366,7 +452,11 @@ class HomeCareBookingDetails extends ConsumerWidget {
     return StatusChip(status: normalizedStatus);
   }
 
-  Widget _buildEmergencyChip(BuildContext context, bool isEmergency) {
+  Widget _buildEmergencyChip(
+    BuildContext context,
+    bool isEmergency,
+    AppLocalizations? l10n,
+  ) {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
@@ -388,7 +478,9 @@ class HomeCareBookingDetails extends ConsumerWidget {
           const SizedBox(width: 6),
           Flexible(
             child: Text(
-              isEmergency ? 'Emergency' : 'Regular',
+              isEmergency
+                  ? (l10n?.emergencyBadge ?? 'Emergency')
+                  : (l10n?.regularBooking ?? 'Regular'),
               overflow: TextOverflow.ellipsis,
               style: Theme.of(context).textTheme.labelMedium?.copyWith(
                 fontWeight: FontWeight.w600,
@@ -474,7 +566,7 @@ class HomeCareBookingDetails extends ConsumerWidget {
     );
   }
 
-  Widget _buildErrorState(BuildContext context) {
+  Widget _buildErrorState(BuildContext context, AppLocalizations? l10n) {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Center(
@@ -490,7 +582,7 @@ class HomeCareBookingDetails extends ConsumerWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              'Failed to load booking details',
+              l10n?.failedToLoadDetails ?? 'Failed to load booking details',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,

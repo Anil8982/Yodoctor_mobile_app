@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/app_constants.dart';
 import 'package:yodoctor/core/utils/app_field_helper.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/controllers/booking_controller.dart';
 import 'package:yodoctor/modules/patient/models/lab/booking_state_model.dart';
 import 'package:yodoctor/modules/widgets/app_dropdown_field.dart';
@@ -24,8 +25,22 @@ class LabBookingPatientFields extends ConsumerWidget {
     this.hasSubmitted = false,
   });
 
+  String _getGenderLabel(AppLocalizations? l10n, String gender) {
+    switch (gender.toLowerCase()) {
+      case 'male':
+        return l10n?.genderMale ?? 'Male';
+      case 'female':
+        return l10n?.genderFemale ?? 'Female';
+      case 'other':
+        return l10n?.genderOther ?? 'Other';
+      default:
+        return gender;
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final autovalidateMode = hasSubmitted
         ? AutovalidateMode.onUserInteraction
         : AutovalidateMode.disabled;
@@ -33,9 +48,9 @@ class LabBookingPatientFields extends ConsumerWidget {
     return Column(
       children: [
         AppTextField(
-          label: 'Full Name',
+          label: l10n?.fullName ?? 'Full Name',
           isRequired: true,
-          hint: 'Enter your full name',
+          hint: l10n?.enterYourFullName ?? 'Enter your full name',
           maxLength: 50,
           icon: Icons.person_outline_rounded,
           controller: nameController,
@@ -44,22 +59,22 @@ class LabBookingPatientFields extends ConsumerWidget {
           inputFormatters: [SingleSpaceFormatter()],
           validator: (value) {
             if (value == null || value.trim().isEmpty) {
-              return 'Enter your full name';
+              return l10n?.enterYourFullName ?? 'Enter your full name';
             }
             if (!RegExp(r'^[a-zA-Z ]+$').hasMatch(value.trim())) {
-              return 'Only alphabets are allowed';
+              return l10n?.onlyAlphabetsAllowed ?? 'Only alphabets are allowed';
             }
             if (value.trim().length < 3) {
-              return 'Name must be at least 3 characters';
+              return l10n?.nameMin3Characters ?? 'Name must be at least 3 characters';
             }
             return null;
           },
         ),
         const SizedBox(height: 12),
         AppTextField(
-          label: 'Age',
+          label: l10n?.age ?? 'Age',
           isRequired: true,
-          hint: 'Age',
+          hint: l10n?.age ?? 'Age',
           icon: Icons.calendar_today_outlined,
           controller: ageController,
           autovalidateMode: autovalidateMode,
@@ -67,20 +82,22 @@ class LabBookingPatientFields extends ConsumerWidget {
           maxLength: 3,
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           validator: (value) {
-            if (value == null || value.trim().isEmpty) return 'Enter age';
+            if (value == null || value.trim().isEmpty) {
+              return l10n?.enterAge ?? 'Enter age';
+            }
             final age = int.tryParse(value);
-            if (age == null) return 'Invalid age';
+            if (age == null) return l10n?.invalidAge ?? 'Invalid age';
             if (age < 1 || age > 120) {
-              return 'Age must be between 1 and 120';
+              return l10n?.ageRangeError ?? 'Age must be between 1 and 120';
             }
             return null;
           },
         ),
         const SizedBox(height: 12),
         AppTextField(
-          label: 'Phone Number',
+          label: l10n?.phoneNumber ?? 'Phone Number',
           isRequired: true,
-          hint: 'Enter 10-digit number',
+          hint: l10n?.enter10DigitNumber ?? 'Enter 10-digit number',
           icon: Icons.phone_android_rounded,
           controller: phoneController,
           autovalidateMode: autovalidateMode,
@@ -92,22 +109,23 @@ class LabBookingPatientFields extends ConsumerWidget {
           ],
           validator: (value) {
             if (value == null || value.trim().isEmpty) {
-              return 'Enter phone number';
+              return l10n?.enterPhoneNumber ?? 'Enter phone number';
             }
             if (!RegExp(r'^[6-9]\d{9}$').hasMatch(value)) {
-              return 'Enter valid 10-digit number';
+              return l10n?.enterValid10DigitNumber ?? 'Enter valid 10-digit number';
             }
             return null;
           },
         ),
         const SizedBox(height: 14),
         AppDropdownField<String>(
-          label: 'Gender',
+          label: l10n?.gender ?? 'Gender',
           isRequired: true,
-          hint: 'Select Gender',
+          hint: l10n?.selectGender ?? 'Select Gender',
           icon: Icons.people_alt_outlined,
           value: state.gender.isNotEmpty ? state.gender : null,
           items: AppConstants.genderOptions,
+          itemLabelBuilder: (g) => _getGenderLabel(l10n, g),
           autovalidateMode: autovalidateMode,
           onChanged: (value) => ref
               .read(labBookingProvider.notifier)

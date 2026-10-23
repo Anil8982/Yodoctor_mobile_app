@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 
 class LabTrustSection extends StatelessWidget {
   const LabTrustSection({super.key});
@@ -8,12 +9,29 @@ class LabTrustSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = AppLocalizations.of(context);
 
     final List<Map<String, dynamic>> items = [
-      {'icon': Icons.gavel_rounded, 'title': 'Lowest Prices', 'desc': 'Transparent'},
-      {'icon': Icons.home_max_rounded, 'title': 'Home Coll.', 'desc': '7 days/week'},
-      {'icon': Icons.assignment_turned_in_rounded, 'title': 'Accurate', 'desc': 'Verified'},
-      {'icon': Icons.lock_outline_rounded, 'title': '100% Private', 'desc': 'Encrypted'},
+      {
+        'icon': Icons.gavel_rounded,
+        'title': l10n?.lowestPrices ?? 'Lowest Prices',
+        'desc': l10n?.transparentDesc ?? 'Transparent',
+      },
+      {
+        'icon': Icons.home_max_rounded,
+        'title': l10n?.homeCollectionShort ?? 'Home Coll.',
+        'desc': l10n?.sevenDaysAWeek ?? '7 days/week',
+      },
+      {
+        'icon': Icons.assignment_turned_in_rounded,
+        'title': l10n?.accurateTitle ?? 'Accurate',
+        'desc': l10n?.verifiedDesc ?? 'Verified',
+      },
+      {
+        'icon': Icons.lock_outline_rounded,
+        'title': l10n?.hundredPercentPrivate ?? '100% Private',
+        'desc': l10n?.encryptedDesc ?? 'Encrypted',
+      },
     ];
 
     return SizedBox(
