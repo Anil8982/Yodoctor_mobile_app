@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:yodoctor/core/profile_image/profile_image_controller.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 
-class CustomSliverAppBar extends StatefulWidget {
+class CustomSliverAppBar extends ConsumerStatefulWidget {
   const CustomSliverAppBar({
     super.key,
     this.expandedHeight = defaultExpandedHeight,
@@ -23,10 +25,10 @@ class CustomSliverAppBar extends StatefulWidget {
   final List<Widget>? actions;
 
   @override
-  State<CustomSliverAppBar> createState() => _CustomSliverAppBarState();
+  ConsumerState<CustomSliverAppBar> createState() => _CustomSliverAppBarState();
 }
 
-class _CustomSliverAppBarState extends State<CustomSliverAppBar> {
+class _CustomSliverAppBarState extends ConsumerState<CustomSliverAppBar> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -70,15 +72,15 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar> {
                     opacity: titleOpacity,
                     child: showTitle
                         ? Text(
-                      widget.titleText!,
-                      style: TextStyle(
-                        color: colorScheme.onPrimary,
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    )
+                            widget.titleText!,
+                            style: TextStyle(
+                              color: colorScheme.onPrimary,
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          )
                         : const SizedBox.shrink(),
                   ),
                 ),
@@ -86,25 +88,27 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar> {
                 const Spacer(),
               ],
 
-              if (titleOpacity < 0.5 || widget.titleText == null) const Spacer(),
+              if (titleOpacity < 0.5 || widget.titleText == null)
+                const Spacer(),
 
               if (widget.actions != null) ...[
                 ...widget.actions!,
                 const SizedBox(width: 8),
               ],
 
-              // 2. Notification Button
+              // 2. Notification Button (old position preserved)
               _buildActionButton(
                 icon: Icons.notifications_outlined,
                 colorScheme: colorScheme,
-                onTap: widget.onNotificationTap ??
-                        () {
+                onTap:
+                    widget.onNotificationTap ??
+                    () {
                       context.push(AppRoutes.notifications);
                     },
               ),
               const SizedBox(width: 12),
 
-              // 3. Global Profile Avatar
+              // 3. Global Profile Avatar with actual image & fallback icon
               _buildProfileAvatar(context, colorScheme),
             ],
           ),
@@ -140,6 +144,8 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar> {
   }
 
   Widget _buildProfileAvatar(BuildContext context, ColorScheme colorScheme) {
+    final imageState = ref.watch(profileImageController);
+
     return InkWell(
       onTap: () => context.push(AppRoutes.profile),
       borderRadius: BorderRadius.circular(20),
@@ -154,13 +160,38 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar> {
         child: CircleAvatar(
           radius: 18,
           backgroundColor: colorScheme.onPrimary.withValues(alpha: 0.2),
-          child: Icon(
-            Icons.person_rounded,
-            color: colorScheme.onPrimary,
-            size: 20,
+          child: ClipOval(
+            child: imageState.when(
+              data: (imageUrl) {
+                if (imageUrl != null && imageUrl.isNotEmpty) {
+                  return Image.network(
+                    imageUrl,
+                    width: 36,
+                    height: 36,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) =>
+                        _buildDefaultProfileIcon(colorScheme),
+                  );
+                }
+                return _buildDefaultProfileIcon(colorScheme);
+              },
+              loading: () => SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: colorScheme.onPrimary,
+                ),
+              ),
+              error: (_, _) => _buildDefaultProfileIcon(colorScheme),
+            ),
           ),
         ),
       ),
     );
+  }
+
+  Widget _buildDefaultProfileIcon(ColorScheme colorScheme) {
+    return Icon(Icons.person_rounded, color: colorScheme.onPrimary, size: 20);
   }
 }

@@ -1,6 +1,4 @@
-import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
-import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/l10n/app_localizations.dart';
 import '../../../models/dashboard/today_token_model.dart';
 
@@ -30,71 +28,65 @@ class TokenCard extends StatelessWidget {
     AppLocalizations l10n,
   ) {
     return Container(
-      height: 110,
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest.transparency(0.3),
-        borderRadius: BorderRadius.circular(24),
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: colorScheme.outlineVariant.transparency(0.3),
+          color: colorScheme.outlineVariant.withValues(alpha: 0.4),
           width: 1,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: colorScheme.shadow.withValues(
+              alpha: isDark ? 0.2 : 0.04,
+            ),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Row(
         children: [
-          // Animated pulse icon for empty state
-          TweenAnimationBuilder<double>(
-            tween: Tween(begin: 0.8, end: 1.0),
-            duration: const Duration(seconds: 2),
-            builder: (context, value, child) {
-              return Transform.scale(
-                scale: value,
-                child: Container(
-                  width: 56,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        colorScheme.secondary.transparency(0.15),
-                        colorScheme.secondary.transparency(0.05),
-                      ],
-                    ),
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: colorScheme.secondary.transparency(0.2),
-                      width: 1,
-                    ),
-                  ),
-                  child: Icon(
-                    Icons.confirmation_number_outlined,
-                    color: colorScheme.secondary.transparency(0.7),
-                    size: 26,
-                  ),
-                ),
-              );
-            },
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: colorScheme.primaryContainer.withValues(alpha: 0.4),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: colorScheme.primary.withValues(alpha: 0.15),
+                width: 1,
+              ),
+            ),
+            child: Icon(
+              Icons.confirmation_number_outlined,
+              color: colorScheme.primary,
+              size: 24,
+            ),
           ),
-          const SizedBox(width: 20),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
                   l10n.noActiveToken,
-                  style: theme.textTheme.titleMedium?.copyWith(
+                  style: theme.textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w800,
-                    letterSpacing: -0.5,
+                    fontSize: 15,
+                    letterSpacing: -0.3,
                     color: colorScheme.onSurface,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 3),
                 Text(
                   l10n.tokenAppearHere,
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant.transparency(0.8),
+                    color: colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
+                    fontSize: 12,
                     height: 1.3,
                   ),
                 ),
@@ -112,211 +104,238 @@ class TokenCard extends StatelessWidget {
     bool isDark,
     AppLocalizations l10n,
   ) {
+    final String clinicText =
+        (token!.clinicName != null && token!.clinicName!.isNotEmpty)
+            ? token!.clinicName!
+            : (token!.type.isNotEmpty ? token!.type : l10n.tokenLabel);
+
     return Container(
-      height: 130,
-      decoration: BoxDecoration(
-        color: colorScheme.secondaryContainer.blendWith(colorScheme.surface),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: colorScheme.secondary.transparency(0.15),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: isDark
-                ? AppTheme.black.transparency(0.3)
-                : colorScheme.secondary.transparency(0.08),
-            blurRadius: 24,
-            offset: const Offset(0, 8),
-            spreadRadius: -2,
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
-        child: Material(
-          color: AppTheme.transparent,
-          child: InkWell(
-            onTap: () {},
-            splashColor: colorScheme.secondary.transparency(0.05),
-            highlightColor: colorScheme.secondary.transparency(0.02),
-            child: Row(
-              children: [
-                _buildTokenNumberBox(theme, colorScheme, l10n),
-
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 18,
-                      vertical: 16,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Clinic name with status badge
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                token!.clinicName ?? token!.type,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: theme.textTheme.titleSmall?.copyWith(
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: -0.3,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            _buildStatusBadge(theme, colorScheme, l10n),
-                          ],
-                        ),
-
-                        const SizedBox(height: 6),
-
-                        // Now serving info
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.play_circle_filled_rounded,
-                              size: 13,
-                              color: colorScheme.tertiary,
-                            ),
-                            const SizedBox(width: 4),
-                            Expanded(
-                              child: Text(
-                                l10n.servingToken(
-                                  token!.nowServing?.toString() ?? "--",
-                                ),
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: colorScheme.onSurfaceVariant,
-                                  fontWeight: FontWeight.w600,
-                                  letterSpacing: -0.1,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        const Spacer(),
-
-                        // Progress indicator
-                        if (token!.patientsAhead != null)
-                          _buildProgressBar(theme, colorScheme),
-
-                        const SizedBox(height: 8),
-
-                        // Bottom stats
-                        Row(
-                          children: [
-                            _buildStatItem(
-                              icon: Icons.people_alt_rounded,
-                              label: l10n.patientsAhead(
-                                token!.patientsAhead?.toString() ?? "--",
-                              ),
-                              color: colorScheme.secondary,
-                              theme: theme,
-                            ),
-                            const SizedBox(width: 16),
-                            _buildStatItem(
-                              icon: Icons.timer_outlined,
-                              label: _formatEstimatedTime(
-                                token!.estimatedTime,
-                                l10n,
-                              ),
-                              color: colorScheme.onSurfaceVariant,
-                              theme: theme,
-                            ),
-                            const Spacer(),
-                            // Subtle refresh hint
-                            Icon(
-                              Icons.refresh_rounded,
-                              size: 12,
-                              color: colorScheme.onSurfaceVariant.transparency(
-                                0.3,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTokenNumberBox(
-    ThemeData theme,
-    ColorScheme colorScheme,
-    AppLocalizations l10n,
-  ) {
-    return Container(
-      width: 95,
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            colorScheme.secondary.transparency(0.8),
-            colorScheme.secondary.transparency(0.4),
+            colorScheme.primary,
+            colorScheme.primary.withValues(alpha: 0.85),
           ],
         ),
-        border: Border(
-          right: BorderSide(
-            color: colorScheme.secondary.transparency(0.15),
-            width: 1,
-          ),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: colorScheme.onPrimary.withValues(alpha: 0.18),
+          width: 1,
         ),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.confirmation_number_rounded,
-                size: 12,
-                color: colorScheme.onSecondary,
-              ),
-              const SizedBox(width: 4),
-              Text(
-                l10n.tokenLabel,
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: colorScheme.onSecondary,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 1.5,
-                  fontSize: 10,
-                ),
-              ),
-            ],
+        boxShadow: [
+          BoxShadow(
+            color: colorScheme.primary.withValues(
+              alpha: isDark ? 0.35 : 0.22,
+            ),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
           ),
-          const SizedBox(height: 6),
-          Text(
-            token!.token.toString(),
-            style: theme.textTheme.headlineLarge?.copyWith(
-              color: colorScheme.onSecondary,
-              fontWeight: FontWeight.bold,
-              height: 1,
-              letterSpacing: -1,
-              shadows: [
-                Shadow(
-                  color: colorScheme.secondary.transparency(0.2),
-                  offset: const Offset(0, 2),
-                  blurRadius: 4,
+        ],
+      ),
+      child: Stack(
+        children: [
+          // Subtle decorative ambient circle using Material 3 onPrimary
+          Positioned(
+            right: -25,
+            top: -25,
+            child: Container(
+              width: 110,
+              height: 110,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: colorScheme.onPrimary.withValues(alpha: 0.08),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Top row: Clinic name + Status Badge
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.local_hospital_rounded,
+                            size: 15,
+                            color: colorScheme.onPrimary.withValues(alpha: 0.9),
+                          ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              clinicText,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: theme.textTheme.titleSmall?.copyWith(
+                                color: colorScheme.onPrimary,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: -0.2,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    _buildStatusBadge(theme, colorScheme, l10n),
+                  ],
                 ),
+                const SizedBox(height: 14),
+
+                // Middle: Token Number & Queue Info
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Token Number Box
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: colorScheme.onPrimary.withValues(alpha: 0.16),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: colorScheme.onPrimary.withValues(alpha: 0.25),
+                          width: 1,
+                        ),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            l10n.tokenLabel.toUpperCase(),
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: colorScheme.onPrimary.withValues(alpha: 0.8),
+                              fontWeight: FontWeight.w800,
+                              fontSize: 9.5,
+                              letterSpacing: 1.2,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            token!.token.toString(),
+                            style: theme.textTheme.headlineMedium?.copyWith(
+                              color: colorScheme.onPrimary,
+                              fontWeight: FontWeight.w900,
+                              fontSize: 26,
+                              height: 1.1,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+
+                    // Queue Position & Serving info
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (token!.nowServing != null) ...[
+                            Row(
+                              children: [
+                                Container(
+                                  width: 6,
+                                  height: 6,
+                                  decoration: BoxDecoration(
+                                    color: colorScheme.onPrimary,
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                Expanded(
+                                  child: Text(
+                                    l10n.servingToken(
+                                      token!.nowServing.toString(),
+                                    ),
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      color: colorScheme.onPrimary.withValues(alpha: 0.95),
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 13,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                          ],
+                          Row(
+                            children: [
+                              if (token!.patientsAhead != null) ...[
+                                _buildStatPill(
+                                  icon: Icons.people_outline_rounded,
+                                  label: l10n.patientsAhead(
+                                    token!.patientsAhead.toString(),
+                                  ),
+                                  colorScheme: colorScheme,
+                                ),
+                                const SizedBox(width: 10),
+                              ],
+                              if (token!.estimatedTime != null &&
+                                  token!.estimatedTime!.isNotEmpty) ...[
+                                _buildStatPill(
+                                  icon: Icons.access_time_rounded,
+                                  label: _formatEstimatedTime(
+                                    token!.estimatedTime,
+                                    l10n,
+                                  ),
+                                  colorScheme: colorScheme,
+                                ),
+                              ],
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+
+                // Bottom: Progress Bar
+                if (token!.patientsAhead != null) ...[
+                  const SizedBox(height: 12),
+                  _buildProgressBar(colorScheme),
+                ],
               ],
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildStatPill({
+    required IconData icon,
+    required String label,
+    required ColorScheme colorScheme,
+  }) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(
+          icon,
+          size: 13,
+          color: colorScheme.onPrimary.withValues(alpha: 0.8),
+        ),
+        const SizedBox(width: 4),
+        Text(
+          label,
+          style: TextStyle(
+            color: colorScheme.onPrimary,
+            fontWeight: FontWeight.w600,
+            fontSize: 11.5,
+          ),
+        ),
+      ],
     );
   }
 
@@ -326,23 +345,23 @@ class TokenCard extends StatelessWidget {
     AppLocalizations l10n,
   ) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
       decoration: BoxDecoration(
-        color: colorScheme.tertiaryContainer.transparency(0.6),
+        color: colorScheme.onPrimary.withValues(alpha: 0.18),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: colorScheme.tertiary.transparency(0.2),
-          width: 0.5,
+          color: colorScheme.onPrimary.withValues(alpha: 0.25),
+          width: 0.8,
         ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 5,
-            height: 5,
+            width: 6,
+            height: 6,
             decoration: BoxDecoration(
-              color: colorScheme.tertiary,
+              color: colorScheme.onPrimary,
               shape: BoxShape.circle,
             ),
           ),
@@ -350,10 +369,10 @@ class TokenCard extends StatelessWidget {
           Text(
             l10n.waiting,
             style: theme.textTheme.labelSmall?.copyWith(
-              color: colorScheme.onTertiaryContainer,
-              fontWeight: FontWeight.w800,
-              fontSize: 10,
-              letterSpacing: 0.5,
+              color: colorScheme.onPrimary,
+              fontWeight: FontWeight.w700,
+              fontSize: 10.5,
+              letterSpacing: 0.3,
             ),
           ),
         ],
@@ -361,9 +380,8 @@ class TokenCard extends StatelessWidget {
     );
   }
 
-  Widget _buildProgressBar(ThemeData theme, ColorScheme colorScheme) {
-    // Calculate progress if we have both token and now serving
-    double progress = 0.3; // Default
+  Widget _buildProgressBar(ColorScheme colorScheme) {
+    double progress = 0.3;
     final serving = int.tryParse(token!.nowServing?.toString() ?? '');
     final currentToken = int.tryParse(token!.token.toString());
 
@@ -376,46 +394,14 @@ class TokenCard extends StatelessWidget {
       }
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(2),
-          child: LinearProgressIndicator(
-            value: progress,
-            minHeight: 2.5,
-            backgroundColor: colorScheme.surfaceContainerHighest.transparency(
-              0.4,
-            ),
-            valueColor: AlwaysStoppedAnimation<Color>(
-              colorScheme.secondary.transparency(0.6),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildStatItem({
-    required IconData icon,
-    required String label,
-    required Color color,
-    required ThemeData theme,
-  }) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, size: 14, color: color.transparency(0.8)),
-        const SizedBox(width: 5),
-        Text(
-          label,
-          style: theme.textTheme.bodySmall?.copyWith(
-            fontWeight: FontWeight.w700,
-            color: color.transparency(0.9),
-            letterSpacing: -0.2,
-          ),
-        ),
-      ],
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(4),
+      child: LinearProgressIndicator(
+        value: progress,
+        minHeight: 4,
+        backgroundColor: colorScheme.onPrimary.withValues(alpha: 0.22),
+        valueColor: AlwaysStoppedAnimation<Color>(colorScheme.onPrimary),
+      ),
     );
   }
 
