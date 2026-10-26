@@ -2,8 +2,10 @@ import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:yodoctor/core/providers/storage_provider.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
+import 'package:yodoctor/modules/auth/controllers/doctor_status_controller.dart';
 import 'package:yodoctor/modules/doctor/screens/subscription/widgets/my_subscription_shimmer.dart';
 import 'package:yodoctor/modules/widgets/app_header.dart';
 import '../../controllers/subscription_controller.dart';
@@ -47,12 +49,19 @@ class _MySubscriptionScreenState extends ConsumerState<MySubscriptionScreen> {
             break;
 
           case PaymentFlowState.success:
+            final docStatus = ref.read(doctorStatusProvider).status ??
+                ref.read(storageProvider).getStatus();
+            final isApproved = docStatus == 'APPROVED';
+            final nextRoute = isApproved
+                ? AppRoutes.doctorDashboard
+                : AppRoutes.waitingApproval;
+
             context.go(
               AppRoutes.paymentSuccess,
               extra: {
                 "paymentId": next.paymentId ?? '',
                 "planName": next.planName ?? next.currentPlan?.title,
-                "nextRoute": AppRoutes.doctorDashboard,
+                "nextRoute": nextRoute,
               },
             );
             break;

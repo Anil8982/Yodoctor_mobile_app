@@ -21,12 +21,9 @@ class SubscriptionPricingCard extends ConsumerWidget {
     final colorScheme = theme.colorScheme;
     final isDarkMode = theme.brightness == Brightness.dark;
 
-    final isFree = plan.currentPrice == 0;
-    final isTrial = plan.category.toLowerCase() == 'trial' ||
-        plan.durationText.toLowerCase().contains('trial') ||
-        plan.title.toLowerCase().contains('trial');
-
-    final showGst = !isFree && !isTrial;
+    final isFree = plan.isFree;
+    final isTrial = plan.isTrial;
+    final showGst = plan.hasGst;
 
     final activeColor = colorScheme.primary;
     final headerTextColor = colorScheme.onPrimary;
@@ -121,6 +118,19 @@ class SubscriptionPricingCard extends ConsumerWidget {
                     isFree,
                     showGst,
                   ),
+                  if (showGst) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      'Total: ₹${plan.totalWithTax.toStringAsFixed(2)} (Base ₹${plan.currentPrice.toInt()} + 18% GST ₹${plan.gstAmount.toStringAsFixed(2)})',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: isSelected
+                            ? activeColor
+                            : colorScheme.onSurfaceVariant,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 11.5,
+                      ),
+                    ),
+                  ],
                   if (plan.originalPrice > plan.currentPrice) ...[
                     const SizedBox(height: 6),
                     _buildOriginalPrice(theme, colorScheme),
@@ -478,11 +488,20 @@ class SubscriptionPricingCard extends ConsumerWidget {
       bool isFree,
       bool isTrial,
       ) {
+    final showGst = plan.hasGst;
+    final totalPayable = plan.totalWithTax;
+
     final buttonText = plan.buttonText.isNotEmpty
         ? plan.buttonText
         : (isFree || isTrial)
         ? 'Start Trial'
-        : (isSelected ? 'Selected Plan' : 'Choose Plan');
+        : (isSelected
+            ? (showGst
+                ? 'Selected • Pay ₹${totalPayable.toStringAsFixed(2)}'
+                : 'Selected Plan')
+            : (showGst
+                ? 'Choose Plan (₹${totalPayable.toStringAsFixed(2)})'
+                : 'Choose Plan'));
 
     return SizedBox(
       height: 44,

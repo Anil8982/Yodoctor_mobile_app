@@ -4,29 +4,46 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
 import 'package:yodoctor/core/providers/storage_provider.dart';
+import 'package:yodoctor/modules/doctor/models/subscription/subscription_model.dart';
 import 'package:yodoctor/modules/doctor/repositories/subscription_repository.dart';
 
 class SubscriptionStatusState {
   final bool hasSubscription;
+  final bool isActive;
+  final String? status;
+  final SubscriptionPlan? subscriptionPlan;
   final bool isLoading;
   final bool isResolved;
   final String? errorMessage;
 
   const SubscriptionStatusState({
     this.hasSubscription = false,
+    this.isActive = false,
+    this.status,
+    this.subscriptionPlan,
     this.isLoading = false,
     this.isResolved = false,
     this.errorMessage,
   });
 
+  bool get isPaymentPending => !isActive && (status == 'pending' || (hasSubscription && !isActive));
+  bool get hasActiveSubscription => hasSubscription && isActive;
+
   SubscriptionStatusState copyWith({
     bool? hasSubscription,
+    bool? isActive,
+    String? status,
+    SubscriptionPlan? subscriptionPlan,
+    bool clearSubscriptionPlan = false,
     bool? isLoading,
     bool? isResolved,
     String? errorMessage,
   }) {
     return SubscriptionStatusState(
       hasSubscription: hasSubscription ?? this.hasSubscription,
+      isActive: isActive ?? this.isActive,
+      status: status ?? this.status,
+      subscriptionPlan: clearSubscriptionPlan ? null : (subscriptionPlan ?? this.subscriptionPlan),
       isLoading: isLoading ?? this.isLoading,
       isResolved: isResolved ?? this.isResolved,
       errorMessage: errorMessage,
@@ -57,6 +74,8 @@ class SubscriptionStatusNotifier extends Notifier<SubscriptionStatusState> {
 
     return SubscriptionStatusState(
       hasSubscription: cachedSub,
+      isActive: cachedSub,
+      status: cachedSub ? 'active' : null,
       isResolved: cachedSub,
     );
   }
@@ -90,18 +109,30 @@ class SubscriptionStatusNotifier extends Notifier<SubscriptionStatusState> {
       if (statusCode >= 200 && statusCode < 300) {
         final data = response.data;
         final hasSub = data["data"]?["hasSubscription"] ?? false;
+        final isActive = data["data"]?["isActive"] ?? false;
+        final rawSubscription = data["data"]?["subscription"];
+        SubscriptionPlan? plan;
+        if (rawSubscription is Map && rawSubscription.isNotEmpty) {
+          plan = SubscriptionPlan.fromJson(Map<String, dynamic>.from(rawSubscription));
+        }
+        final subStatus = (plan?.status ?? data["data"]?["subscription"]?["status"])?.toString().toLowerCase();
+        final isConfirmedActive = (isActive == true) || (subStatus == 'active');
 
-        await storage.saveActiveSubscription(hasSub);
+        // Only save true in Hive if the subscription is confirmed ACTIVE (paid)
+        await storage.saveActiveSubscription(isConfirmedActive);
 
         AppLogger.success(
           'Active subscription fetched & cached: '
-              'hasSubscription=$hasSub',
+              'hasSubscription=$hasSub, isActive=$isConfirmedActive, status=$subStatus, plan=${plan?.title} (${plan?.amount})',
           tag: LogTags.doctor,
           subTag: _subTag,
         );
 
         state = SubscriptionStatusState(
           hasSubscription: hasSub,
+          isActive: isConfirmedActive,
+          status: subStatus,
+          subscriptionPlan: plan,
           isLoading: false,
           isResolved: true,
         );
@@ -111,6 +142,8 @@ class SubscriptionStatusNotifier extends Notifier<SubscriptionStatusState> {
 
         state = SubscriptionStatusState(
           hasSubscription: cachedSub,
+          isActive: cachedSub,
+          status: cachedSub ? 'active' : null,
           isLoading: false,
           isResolved: true,
           errorMessage:

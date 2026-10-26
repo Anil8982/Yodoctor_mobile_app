@@ -631,6 +631,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:yodoctor/core/providers/storage_provider.dart';
 import 'package:yodoctor/modules/doctor/controllers/subscription_status_controller.dart';
 import 'package:yodoctor/modules/payment/controllers/razorpay_controller.dart';
 import 'package:yodoctor/modules/doctor/models/subscription/available_plan_model.dart';
@@ -854,7 +855,11 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
 
       final subStatus = ref.read(subscriptionStatusProvider);
 
-      if (!subStatus.hasSubscription) {
+      if (subStatus.subscriptionPlan != null && state.currentPlan == null) {
+        state = state.copyWith(currentPlan: subStatus.subscriptionPlan);
+      }
+
+      if (!subStatus.hasSubscription && subStatus.subscriptionPlan == null) {
         AppLogger.info(
           'No active subscription (from cache), skipping duplicate API call',
           tag: LogTags.doctor,
@@ -886,9 +891,17 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
         final rawSubscription =
             subRes.data?["subscription"] ?? subRes.data?["data"]?["subscription"];
         if (rawSubscription is Map && rawSubscription.isNotEmpty) {
-          currentPlan = SubscriptionPlan.fromJson(
-            Map<String, dynamic>.from(rawSubscription),
-          );
+          final subMap = Map<String, dynamic>.from(rawSubscription);
+          final dataMap = subRes.data?["data"] is Map ? subRes.data["data"] : subRes.data;
+          if (dataMap is Map) {
+            if (dataMap['scheduled_plan_name'] != null && subMap['scheduled_plan_name'] == null) {
+              subMap['scheduled_plan_name'] = dataMap['scheduled_plan_name'];
+            }
+            if (dataMap['scheduled_plan_amount'] != null && subMap['scheduled_plan_amount'] == null) {
+              subMap['scheduled_plan_amount'] = dataMap['scheduled_plan_amount'];
+            }
+          }
+          currentPlan = SubscriptionPlan.fromJson(subMap);
         }
 
         final billingHistory =
@@ -989,8 +1002,16 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
   void toggleDuration(bool isYearly) =>
       state = state.copyWith(isYearly: isYearly, clearSelectedPlan: true);
 
-  void selectNewPlan(AvailablePlan plan) =>
-      state = state.copyWith(selectedNewPlan: plan);
+  void selectNewPlan(AvailablePlan plan) {
+    final isYearly = plan.months >= 12 ||
+        plan.title.toLowerCase().contains('year') ||
+        plan.durationText.toLowerCase().contains('year') ||
+        plan.slug.toLowerCase().contains('12-month');
+    state = state.copyWith(
+      selectedNewPlan: plan,
+      isYearly: _isTrialPlan(plan) ? state.isYearly : isYearly,
+    );
+  }
 
   void showUpgradePlans() => state = state.copyWith(showPlans: true);
 
@@ -1002,28 +1023,39 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
   }
 
   List<AvailablePlan> getAvailablePlans() {
-    // Trial plans live under the "trial" category; paid plans under
-    // "subscription" (with a monthly / yearly cycle, if provided).
     final targetCycle = state.isYearly ? "yearly" : "monthly";
-    return state.allPlans.where((p) {
+
+    final filtered = state.allPlans.where((p) {
       final category = p.category.toLowerCase();
 
       // Always surface trial plans (₹1 first offer) regardless of cycle.
       if (category == 'trial') return true;
 
-      if (p.category.isNotEmpty) {
+      // If category is explicitly 'monthly' or 'yearly', match target cycle.
+      if (category == 'monthly' || category == 'yearly') {
         return category == targetCycle;
       }
 
-      final d = p.durationText.toLowerCase(), t = p.title.toLowerCase();
-      return targetCycle == "yearly"
-          ? d.contains("year") || d.contains("yr") || t.contains("year")
-          : d.contains("month") ||
-          d.contains("mo") ||
-          d.contains("trial") ||
-          t.contains("month") ||
-          t.contains("trial");
+      // If category is "subscription" or generic, classify based on duration / months:
+      final d = p.durationText.toLowerCase();
+      final t = p.title.toLowerCase();
+      final slug = p.slug.toLowerCase();
+      final isYearlyPlan = p.months >= 12 ||
+          d.contains("year") ||
+          d.contains("yr") ||
+          t.contains("year") ||
+          slug.contains("12-month") ||
+          slug.contains("year");
+
+      return targetCycle == "yearly" ? isYearlyPlan : !isYearlyPlan;
     }).toList();
+
+    // If filtering produced no paid plans or empty, fallback to showing all plans
+    if (filtered.isEmpty || (filtered.length == 1 && _isTrialPlan(filtered.first))) {
+      return state.allPlans;
+    }
+
+    return filtered;
   }
 
   Future<void> refreshData() async => await loadSubscriptionDetails();
@@ -1038,12 +1070,15 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
   /// The backend decides whether a `createSubscription` call is treated as a
   /// new subscription or an upgrade, so no `isUpgrade` flag is sent.
   Future<bool> upgradePlan() async {
-    if (state.selectedNewPlan == null || state.isLoading) return false;
+    if (state.selectedNewPlan == null) return false;
 
     // Guard against double-taps creating duplicate Razorpay orders.
     if (_isCreatingSubscription) return false;
 
+    // Only block if the doctor already has an ACTIVE subscription to this exact plan.
+    // If the plan is PENDING, allow them to complete payment.
     if (state.currentPlan != null &&
+        state.currentPlan!.isActive &&
         state.currentPlan!.planId == state.selectedNewPlan!.id &&
         !_isTrialPlan(state.selectedNewPlan!)) {
       state = state.copyWith(
@@ -1106,10 +1141,13 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
 
     try {
       final repository = ref.read(subscriptionRepositoryProvider);
+      final isUpgrade = state.currentPlan != null && state.currentPlan!.isActive;
 
       final response = await repository.createSubscription(
         planId: state.selectedNewPlan!.id,
-        billing: state.isYearly ? "yearly" : "monthly",
+        billing: "monthly",
+        isUpgrade: isUpgrade,
+        isDoctorRegistration: false,
       );
 
       if ((response.statusCode ?? 0) >= 200 &&
@@ -1452,6 +1490,13 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
       paymentId: paymentId,
       planName: verifiedPlanName,
     );
+
+    // Update active subscription cache and notify status provider immediately
+    try {
+      final storage = ref.read(storageProvider);
+      await storage.saveActiveSubscription(true);
+      await ref.read(subscriptionStatusProvider.notifier).checkActiveSubscription();
+    } catch (_) {}
 
     // Refresh current subscription. Failure here must not flip payment state.
     try {

@@ -7,6 +7,7 @@ import 'package:yodoctor/core/providers/otp_cooldown_provider.dart';
 import 'package:yodoctor/core/providers/storage_provider.dart';
 import 'package:yodoctor/core/session/app_session_controller.dart';
 import 'package:yodoctor/core/utils/app_error_utils.dart';
+import 'package:yodoctor/modules/auth/controllers/doctor_status_controller.dart';
 import 'package:yodoctor/modules/auth/repositories/doctor_auth_repository.dart';
 
 final doctorLoginControllerProvider =
@@ -103,6 +104,7 @@ class DoctorLoginController extends AsyncNotifier<Map<String, dynamic>?> {
             await repository.saveUserRole('doctor');
             if (status != null) {
               await repository.saveStatus(status.toString());
+              ref.read(doctorStatusProvider.notifier).setStatus(status.toString());
             }
 
             final storage = ref.read(storageProvider);
@@ -326,6 +328,7 @@ class DoctorLoginController extends AsyncNotifier<Map<String, dynamic>?> {
             await repository.saveUserRole('doctor');
             if (status != null) {
               await repository.saveStatus(status.toString());
+              ref.read(doctorStatusProvider.notifier).setStatus(status.toString());
             }
 
             final storage = ref.read(storageProvider);

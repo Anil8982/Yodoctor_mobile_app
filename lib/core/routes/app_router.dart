@@ -139,11 +139,6 @@ final routerProvider = Provider<GoRouter>((ref) {
         path == AppRoutes.splash;
   }
 
-  // Helper: detect doctor protected routes
-  bool isDoctorProtectedRoute(String path) {
-    return path == '/doctor' || path.startsWith('/doctor/');
-  }
-
   final router = GoRouter(
     navigatorKey: AppRouter.rootNavigatorKey,
 
@@ -214,8 +209,8 @@ final routerProvider = Provider<GoRouter>((ref) {
         'TOKEN=${token != null ? 'YES' : 'NO'} | '
         'ROLE=$role | '
         'AUTH_TYPE=${authType?.name ?? 'null'} | '
-        'DOC_STATUS=${ref.read(doctorStatusProvider).status} | '
-        'DOC_RESOLVED=${ref.read(doctorStatusProvider).isResolved} | '
+        'DOC_STATUS=${ref.read(doctorStatusProvider).status ?? storage.getStatus()} | '
+        'DOC_RESOLVED=${ref.read(doctorStatusProvider).isResolved || (storage.getStatus()?.isNotEmpty ?? false)} | '
         'SUB_RESOLVED=${subState.isResolved} | '
         'HAS_SUB=${subState.hasSubscription} | '
         'PATH=$matchedPath',
@@ -264,66 +259,61 @@ final routerProvider = Provider<GoRouter>((ref) {
       // ---- Doctor ----
       if (role == 'doctor') {
         final doctorState = ref.read(doctorStatusProvider);
-        // final subState = ref.read(subscriptionStatusProvider); // ✅ Direct read for Notifier
 
-        // 1. While verification not resolved, stay on splash
-        if (!doctorState.isResolved) {
-          if (matchedPath != AppRoutes.splash) {
-            return AppRoutes.splash;
+        // 0. Allow payment flow result screens without interference
+        if (matchedPath == AppRoutes.paymentSuccess ||
+            matchedPath == AppRoutes.paymentProcessing ||
+            matchedPath == AppRoutes.paymentFailure) {
+          return null;
+        }
+
+        // 1. While on splash and verification not resolved, stay on splash
+        if (matchedPath == AppRoutes.splash && !doctorState.isResolved) {
+          return null;
+        }
+
+        // 2. Doctor has NO confirmed active subscription -> must complete payment first
+        if (!subState.hasActiveSubscription) {
+          if (matchedPath != AppRoutes.doctorSubscriptionVerification) {
+            AppLogger.debug(
+              'Router: doctor has no active subscription (payment pending or unsubscribed) -> subscription verification page',
+              tag: LogTags.auth,
+              subTag: 'Router',
+            );
+            return AppRoutes.doctorSubscriptionVerification;
           }
           return null;
         }
 
-        // 2. If not approved, redirect to waiting approval
-        if (doctorState.status != 'APPROVED') {
-          if (isDoctorProtectedRoute(matchedPath) ||
-              matchedPath != AppRoutes.waitingApproval) {
+        // 3. Doctor has active subscription, but is NOT approved -> waiting approval
+        final effectiveDoctorStatus = doctorState.status ?? storage.getStatus();
+        if (effectiveDoctorStatus != 'APPROVED') {
+          if (matchedPath != AppRoutes.waitingApproval) {
+            AppLogger.debug(
+              'Router: doctor subscribed but status=$effectiveDoctorStatus -> waiting approval',
+              tag: LogTags.auth,
+              subTag: 'Router',
+            );
             return AppRoutes.waitingApproval;
           }
           return null;
         }
 
-        // 3. If subscription not yet resolved → Verification Page
-        if (!subState.isResolved) {
-          if (matchedPath != AppRoutes.doctorSubscriptionVerification) {
-            AppLogger.debug(
-              'Router: subscription status unresolved → verification page',
-              tag: LogTags.auth,
-              subTag: 'Router',
-            );
-            return AppRoutes.doctorSubscriptionVerification;
-          }
-          return null;
-        }
-
-        // 4. If approved but NO active subscription → Verification Page with plans
-        if (!subState.hasSubscription) {
-          if (matchedPath != AppRoutes.doctorSubscriptionVerification) {
-            AppLogger.debug(
-              'Router: doctor approved but no subscription → verification page',
-              tag: LogTags.auth,
-              subTag: 'Router',
-            );
-            return AppRoutes.doctorSubscriptionVerification;
-          }
-          return null;
-        }
-
-        // 5. APPROVED + HAS SUBSCRIPTION:
+        // 4. APPROVED + HAS SUBSCRIPTION:
         // Redirect from splash/auth/waiting/verification pages to dashboard
         if (matchedPath == AppRoutes.splash ||
             isAuthScreen(matchedPath) ||
             matchedPath == AppRoutes.waitingApproval ||
             matchedPath == AppRoutes.doctorSubscriptionVerification) {
           AppLogger.debug(
-            'Router: doctor has active subscription → redirecting to dashboard',
+            'Router: doctor approved and subscribed -> redirecting to dashboard',
             tag: LogTags.auth,
             subTag: 'Router',
           );
           return AppRoutes.doctorDashboard;
         }
 
-        return null; // Allow subscribed doctor to access all routes including MySubscriptionScreen
+        return null; // Allow subscribed & approved doctor to access all routes
       }
       return null; // Fallback
     },
@@ -469,8 +459,13 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.patientCertificateDetail,
-        builder: (context, state) => const PatientCertificateDetailScreen(),
-      ),
+        builder: (context, state) {
+          final certId = state.extra as int;
+
+          return PatientCertificateDetailScreen(
+            certificateId: certId,
+          );
+        },      ),
       GoRoute(
         parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.family,

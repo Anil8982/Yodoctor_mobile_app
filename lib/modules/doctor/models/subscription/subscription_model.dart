@@ -8,6 +8,8 @@ class SubscriptionPlan {
   final bool isActive;
   final UpcomingPlan? upcomingPlan;
   final double amount;
+  final double? baseAmount;
+  final double? gstAmount;
   final String currency;
   final String? rzpSubscriptionId;
   final DateTime? currentPeriodStart;
@@ -26,6 +28,8 @@ class SubscriptionPlan {
     this.isActive = false,
     this.upcomingPlan,
     this.amount = 0,
+    this.baseAmount,
+    this.gstAmount,
     this.currency = 'INR',
     this.rzpSubscriptionId,
     this.currentPeriodStart,
@@ -35,8 +39,30 @@ class SubscriptionPlan {
     this.scheduledActivationDate,
   });
 
+  bool get isPending => status.toLowerCase() == 'pending';
+
   factory SubscriptionPlan.fromJson(Map<String, dynamic> json) {
     final statusVal = json['status'] ?? 'inactive';
+    final upgradeStatus = json['upgrade_status'];
+    final isUpgradeScheduled = upgradeStatus == 'scheduled' || json['scheduled_plan_name'] != null;
+
+    UpcomingPlan? upcoming;
+    if (json['upcomingPlan'] != null) {
+      upcoming = UpcomingPlan.fromJson(json['upcomingPlan']);
+    } else if (isUpgradeScheduled) {
+      final title = json['scheduled_plan_name'] ?? json['scheduled_plan_id'] ?? 'Upcoming Plan';
+      DateTime? startDate;
+      if (json['scheduled_activation_date'] != null) {
+        startDate = DateTime.tryParse(json['scheduled_activation_date']);
+      } else if (json['current_period_end'] != null) {
+        startDate = DateTime.tryParse(json['current_period_end']);
+      }
+      upcoming = UpcomingPlan(
+        title: title.toString(),
+        startDate: startDate ?? DateTime.now(),
+      );
+    }
+
     return SubscriptionPlan(
       id: json['id'] ?? '',
       planId: json['plan_id'] ?? '',
@@ -44,20 +70,22 @@ class SubscriptionPlan {
       type: json['billing_cycle'] ?? json['type'] ?? 'monthly',
       status: statusVal,
       nextBillingDate: json['next_billing_date'] != null
-          ? DateTime.parse(json['next_billing_date'])
-          : DateTime.now(),
+          ? (DateTime.tryParse(json['next_billing_date']) ?? DateTime.now())
+          : (json['current_period_end'] != null
+              ? (DateTime.tryParse(json['current_period_end']) ?? DateTime.now())
+              : DateTime.now()),
       isActive: statusVal.toLowerCase() == 'active',
-      upcomingPlan: json['upcomingPlan'] != null
-          ? UpcomingPlan.fromJson(json['upcomingPlan'])
-          : null,
-      amount: double.tryParse((json['amount'] ?? 0).toString()) ?? 0.0,
+      upcomingPlan: upcoming,
+      amount: double.tryParse((json['total_amount'] ?? json['amount'] ?? 0).toString()) ?? 0.0,
+      baseAmount: json['base_amount'] != null ? double.tryParse(json['base_amount'].toString()) : null,
+      gstAmount: json['gst_amount'] != null ? double.tryParse(json['gst_amount'].toString()) : null,
       currency: json['currency'] ?? 'INR',
       rzpSubscriptionId: json['rzp_subscription_id'],
-      currentPeriodStart: json['current_period_start'] != null ? DateTime.parse(json['current_period_start']) : null,
-      currentPeriodEnd: json['current_period_end'] != null ? DateTime.parse(json['current_period_end']) : null,
+      currentPeriodStart: json['current_period_start'] != null ? DateTime.tryParse(json['current_period_start']) : null,
+      currentPeriodEnd: json['current_period_end'] != null ? DateTime.tryParse(json['current_period_end']) : null,
       lastPaymentId: json['last_payment_id'],
-      upgradeStatus: json['upgrade_status'],
-      scheduledActivationDate: json['scheduled_activation_date'] != null ? DateTime.parse(json['scheduled_activation_date']) : null,
+      upgradeStatus: upgradeStatus,
+      scheduledActivationDate: json['scheduled_activation_date'] != null ? DateTime.tryParse(json['scheduled_activation_date']) : null,
     );
   }
 }

@@ -250,6 +250,8 @@ class AvailablePlansSection extends ConsumerWidget {
       ) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final showGst = plan.hasGst;
+    final totalPayable = plan.totalWithTax;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
@@ -273,12 +275,22 @@ class AvailablePlansSection extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '₹${plan.currentPrice.toInt()}',
+                    showGst
+                        ? '₹${totalPayable.toStringAsFixed(2)}'
+                        : '₹${plan.currentPrice.toInt()}',
                     style: theme.textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w900,
                       color: colorScheme.primary,
                     ),
                   ),
+                  if (showGst)
+                    Text(
+                      'Incl. 18% GST',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                        fontSize: 10,
+                      ),
+                    ),
                   GestureDetector(
                     onTap: () => _showSummaryBottomSheet(context, ref, plan),
                     child: Text(
@@ -309,9 +321,11 @@ class AvailablePlansSection extends ConsumerWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: const Text(
-                    'Pay Now',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  child: Text(
+                    showGst
+                        ? 'Pay ₹${totalPayable.toStringAsFixed(0)}'
+                        : 'Pay Now',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
@@ -331,11 +345,12 @@ class AvailablePlansSection extends ConsumerWidget {
     final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
 
-    final isFree = plan.currentPrice == 0;
-    final isTrial = plan.category.toLowerCase() == 'trial' ||
-        plan.durationText.toLowerCase().contains('trial') ||
-        plan.title.toLowerCase().contains('trial');
-    final showGst = !isFree && !isTrial;
+    final isFree = plan.isFree;
+    final isTrial = plan.isTrial;
+    final showGst = plan.hasGst;
+    final baseAmount = plan.currentPrice;
+    final gstAmount = plan.gstAmount;
+    final totalPayable = plan.totalWithTax;
 
     showModalBottomSheet(
       context: context,
@@ -457,7 +472,7 @@ class AvailablePlansSection extends ConsumerWidget {
                         child: Column(
                           children: [
                             Text(
-                              'Total Amount',
+                              showGst ? 'Total Payable (Incl. 18% GST)' : 'Total Amount',
                               style: theme.textTheme.labelMedium?.copyWith(
                                 color: colorScheme.onSurfaceVariant,
                                 letterSpacing: 0.5,
@@ -479,38 +494,27 @@ class AvailablePlansSection extends ConsumerWidget {
                                   ),
                                 ),
                                 Text(
-                                  '${plan.currentPrice.toInt()}',
+                                  showGst
+                                      ? totalPayable.toStringAsFixed(2)
+                                      : (isFree ? '0' : '${plan.currentPrice.toInt()}'),
                                   style: theme.textTheme.displaySmall?.copyWith(
                                     fontWeight: FontWeight.w900,
                                     color: colorScheme.primary,
                                     letterSpacing: -1,
                                   ),
                                 ),
-                                if (showGst) ...[
-                                  const SizedBox(width: 6),
-                                  Container(
-                                    margin: const EdgeInsets.only(top: 8),
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 6,
-                                      vertical: 2,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: colorScheme.primary.transparency(0.15),
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                    child: Text(
-                                      '+ GST',
-                                      style: theme.textTheme.labelSmall?.copyWith(
-                                        color: colorScheme.primary,
-                                        fontWeight: FontWeight.w800,
-                                        fontSize: 10,
-                                        letterSpacing: 0.3,
-                                      ),
-                                    ),
-                                  ),
-                                ],
                               ],
                             ),
+                            if (showGst) ...[
+                              const SizedBox(height: 4),
+                              Text(
+                                '(Base: ₹${baseAmount.toStringAsFixed(2)} + 18% GST: ₹${gstAmount.toStringAsFixed(2)})',
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: colorScheme.onSurfaceVariant,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
                             if (plan.originalPrice > plan.currentPrice) ...[
                               const SizedBox(height: 4),
                               Row(
@@ -580,12 +584,13 @@ class AvailablePlansSection extends ConsumerWidget {
                         label: 'Billing Cycle',
                         value: plan.durationText,
                       ),
-                      _buildBreakdownTile(
-                        context,
-                        icon: Icons.local_offer_rounded,
-                        label: 'Original Price',
-                        value: '₹${plan.originalPrice.toInt()}',
-                      ),
+                      if (plan.originalPrice > plan.currentPrice)
+                        _buildBreakdownTile(
+                          context,
+                          icon: Icons.local_offer_rounded,
+                          label: 'Original Price',
+                          value: '₹${plan.originalPrice.toInt()}',
+                        ),
                       if (plan.discountPercentage.isNotEmpty)
                         _buildBreakdownTile(
                           context,
@@ -594,11 +599,27 @@ class AvailablePlansSection extends ConsumerWidget {
                           value: plan.discountPercentage,
                           valueColor: AppTheme.green,
                         ),
+                      if (showGst) ...[
+                        _buildBreakdownTile(
+                          context,
+                          icon: Icons.receipt_long_rounded,
+                          label: 'Base Price',
+                          value: '₹${baseAmount.toStringAsFixed(2)}',
+                        ),
+                        _buildBreakdownTile(
+                          context,
+                          icon: Icons.account_balance_rounded,
+                          label: 'GST (18%)',
+                          value: '₹${gstAmount.toStringAsFixed(2)}',
+                        ),
+                      ],
                       _buildBreakdownTile(
                         context,
-                        icon: Icons.tag_rounded,
-                        label: 'You Pay',
-                        value: '₹${plan.currentPrice.toInt()}',
+                        icon: Icons.payments_rounded,
+                        label: 'Total Payable',
+                        value: showGst
+                            ? '₹${totalPayable.toStringAsFixed(2)}'
+                            : (isFree ? '₹0' : '₹${plan.currentPrice.toInt()}'),
                         isHighlighted: true,
                       ),
 
@@ -710,7 +731,11 @@ class AvailablePlansSection extends ConsumerWidget {
                           },
                           icon: const Icon(Icons.lock_rounded, size: 18),
                           label: Text(
-                            'Pay ₹${plan.currentPrice.toInt()}',
+                            isFree || isTrial
+                                ? (plan.buttonText.isNotEmpty
+                                    ? plan.buttonText
+                                    : 'Start Trial')
+                                : 'Pay ₹${totalPayable.toStringAsFixed(2)}',
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 16,

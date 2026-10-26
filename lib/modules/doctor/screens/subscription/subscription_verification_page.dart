@@ -1,28 +1,95 @@
 import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/providers/app_role_provider.dart';
+import 'package:yodoctor/core/providers/storage_provider.dart';
+import 'package:yodoctor/core/routes/app_routes.dart';
+import 'package:yodoctor/modules/auth/controllers/doctor_status_controller.dart';
 import 'package:yodoctor/modules/doctor/controllers/subscription_status_controller.dart';
+import 'package:yodoctor/modules/doctor/models/subscription/available_plan_model.dart';
 import 'package:yodoctor/modules/widgets/app_header.dart';
+import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 import 'package:yodoctor/modules/widgets/logout_dialog.dart';
 import '../../controllers/subscription_controller.dart';
+import '../../models/subscription/subscription_model.dart';
 import 'widgets/available_plans_section.dart';
 import 'widgets/billing_history_section.dart';
 import 'widgets/subscription_plan_card.dart';
 import 'widgets/subscription_verification_shimmer.dart';
 
-class SubscriptionVerificationPage extends ConsumerWidget {
+class SubscriptionVerificationPage extends ConsumerStatefulWidget {
   const SubscriptionVerificationPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SubscriptionVerificationPage> createState() =>
+      _SubscriptionVerificationPageState();
+}
+
+class _SubscriptionVerificationPageState
+    extends ConsumerState<SubscriptionVerificationPage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(subscriptionStatusProvider.notifier).checkActiveSubscription();
+      ref.read(doctorSubscriptionProvider.notifier).loadSubscriptionDetails();
+      ref.read(doctorSubscriptionProvider.notifier).loadPlans();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(doctorSubscriptionProvider);
     final subStatus = ref.watch(subscriptionStatusProvider);
     final colorScheme = Theme.of(context).colorScheme;
     final theme = Theme.of(context);
 
+    final SubscriptionPlan? effectivePlan =
+        state.currentPlan ?? subStatus.subscriptionPlan;
     final bool hasActivePlan =
-        state.currentPlan != null && state.currentPlan!.isActive;
+        effectivePlan != null && effectivePlan.isActive;
+
+    ref.listen(doctorSubscriptionProvider, (previous, next) {
+      if (next.errorMessage != null &&
+          next.errorMessage != previous?.errorMessage &&
+          next.errorMessage!.isNotEmpty) {
+        AppSnackBar.show(
+          message: next.errorMessage!,
+          type: AppSnackBarType.error,
+        );
+      }
+
+      if (previous?.paymentFlow != next.paymentFlow) {
+        switch (next.paymentFlow) {
+          case PaymentFlowState.processing:
+            context.push(AppRoutes.paymentProcessing);
+            break;
+
+          case PaymentFlowState.success:
+            final docStatus = ref.read(doctorStatusProvider).status ??
+                ref.read(storageProvider).getStatus();
+            final isApproved = docStatus == 'APPROVED';
+            final nextRoute = isApproved
+                ? AppRoutes.doctorDashboard
+                : AppRoutes.waitingApproval;
+
+            context.go(
+              AppRoutes.paymentSuccess,
+              extra: {
+                "paymentId": next.paymentId ?? '',
+                "planName": next.planName ?? next.currentPlan?.title,
+                "nextRoute": nextRoute,
+              },
+            );
+            break;
+
+          case PaymentFlowState.failed:
+          case PaymentFlowState.idle:
+            break;
+        }
+      }
+    });
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -78,9 +145,17 @@ class SubscriptionVerificationPage extends ConsumerWidget {
           ? const SubscriptionVerificationShimmer()
           : RefreshIndicator(
               onRefresh: () async {
-                await ref
-                    .read(subscriptionStatusProvider.notifier)
-                    .checkActiveSubscription();
+                await Future.wait([
+                  ref
+                      .read(subscriptionStatusProvider.notifier)
+                      .checkActiveSubscription(),
+                  ref
+                      .read(doctorSubscriptionProvider.notifier)
+                      .loadSubscriptionDetails(),
+                  ref
+                      .read(doctorSubscriptionProvider.notifier)
+                      .loadPlans(),
+                ]);
               },
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(
@@ -93,7 +168,12 @@ class SubscriptionVerificationPage extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildVerificationBanner(subStatus, colorScheme, theme),
+                        _buildVerificationBanner(
+                          subStatus,
+                          state,
+                          colorScheme,
+                          theme,
+                        ),
                         if (state.isLoading) ...[
                           const SizedBox(height: 8),
                           LinearProgressIndicator(
@@ -105,9 +185,71 @@ class SubscriptionVerificationPage extends ConsumerWidget {
                         _buildHeaderSection(theme, colorScheme),
                         const SizedBox(height: 24),
                         SubscriptionPlanCard(
-                          plan: hasActivePlan ? state.currentPlan : null,
-                          onUpgradePressed: () =>
-                              _showPlansBottomSheet(context, ref),
+                          plan: hasActivePlan
+                              ? effectivePlan
+                              : (effectivePlan?.isPending == true
+                                  ? effectivePlan
+                                  : null),
+                          onUpgradePressed: () async {
+                            if (effectivePlan?.isPending == true) {
+                              if (state.allPlans.isEmpty) {
+                                await ref
+                                    .read(doctorSubscriptionProvider.notifier)
+                                    .loadPlans();
+                              }
+                              final currentPlans = ref.read(doctorSubscriptionProvider).allPlans;
+                              var matching = currentPlans
+                                  .where((p) => p.id == effectivePlan?.planId)
+                                  .firstOrNull;
+                              matching ??= currentPlans
+                                  .where((p) =>
+                                      p.slug == effectivePlan?.planId ||
+                                      (effectivePlan != null &&
+                                          effectivePlan.title.toLowerCase().contains(p.title.toLowerCase())))
+                                  .firstOrNull;
+                              if (matching == null && effectivePlan != null) {
+                                matching = AvailablePlan(
+                                  id: effectivePlan.planId.isNotEmpty ? effectivePlan.planId : 'plan_3_month',
+                                  title: effectivePlan.title.isNotEmpty ? effectivePlan.title : '3 Month Plan',
+                                  name: effectivePlan.title.isNotEmpty ? effectivePlan.title : '3 Month Plan',
+                                  slug: effectivePlan.planId.isNotEmpty ? effectivePlan.planId : '3-month',
+                                  description: 'Full Premium Access',
+                                  icon: '💳',
+                                  category: 'subscription',
+                                  months: 3,
+                                  originalPrice: effectivePlan.amount,
+                                  currentPrice: effectivePlan.amount,
+                                  totalPrice: effectivePlan.amount,
+                                  monthlyPrice: effectivePlan.amount,
+                                  currency: effectivePlan.currency,
+                                  freeText: '',
+                                  subtitle: '',
+                                  durationText: effectivePlan.type,
+                                  buttonText: 'Complete Payment',
+                                  discountPercentage: '',
+                                  gradient: '',
+                                  circleColor: '',
+                                  recommended: false,
+                                  isBestValue: false,
+                                  features: const [],
+                                );
+                              }
+                              if (matching != null) {
+                                ref
+                                    .read(doctorSubscriptionProvider.notifier)
+                                    .selectNewPlan(matching);
+                                final success = await ref
+                                    .read(doctorSubscriptionProvider.notifier)
+                                    .upgradePlan();
+                                if (success) return;
+                              }
+                            }
+                            if (!context.mounted) return;
+                            _showPlansBottomSheet(context, ref);
+                          },
+                          onChangePlanPressed: () {
+                            _showPlansBottomSheet(context, ref);
+                          },
                         ),
                         const SizedBox(height: 24),
                         _buildFeaturesSection(theme, colorScheme),
@@ -139,30 +281,67 @@ class SubscriptionVerificationPage extends ConsumerWidget {
 
   Widget _buildVerificationBanner(
     SubscriptionStatusState subStatus,
+    DoctorSubscriptionState state,
     ColorScheme colorScheme,
     ThemeData theme,
   ) {
+    final effectivePlan = state.currentPlan ?? subStatus.subscriptionPlan;
+    final isPending = subStatus.isPaymentPending ||
+        (effectivePlan != null && effectivePlan.isPending);
+    final isActive = subStatus.hasActiveSubscription ||
+        (effectivePlan != null && effectivePlan.isActive);
+
+    final Color cardColor = subStatus.isLoading
+        ? colorScheme.primaryContainer
+        : isPending
+        ? const Color(0xFFFFF3E0)
+        : isActive
+        ? colorScheme.tertiaryContainer
+        : colorScheme.errorContainer;
+
+    final IconData icon = subStatus.isLoading
+        ? Icons.hourglass_top_rounded
+        : isPending
+        ? Icons.pending_actions_rounded
+        : isActive
+        ? Icons.check_circle_rounded
+        : Icons.warning_rounded;
+
+    final Color iconColor = subStatus.isLoading
+        ? colorScheme.onPrimaryContainer
+        : isPending
+        ? const Color(0xFFE65100)
+        : isActive
+        ? colorScheme.onTertiaryContainer
+        : colorScheme.onErrorContainer;
+
+    final String title = subStatus.isLoading
+        ? 'Verifying subscription...'
+        : isPending
+        ? 'Payment Pending'
+        : isActive
+        ? 'Subscription Active!'
+        : 'No Active Subscription';
+
+    final String subtitle = subStatus.isLoading
+        ? 'Please wait while we check your subscription status'
+        : isPending
+        ? (effectivePlan != null && effectivePlan.title.isNotEmpty
+            ? 'Your payment for ${effectivePlan.title} is incomplete. Complete payment now to activate your account.'
+            : 'Your payment is incomplete. Please complete payment to submit your application for review.')
+        : isActive
+        ? 'Your subscription is active and verified.'
+        : 'Choose a plan below to activate your account';
+
     return Card(
-      color: subStatus.isLoading
-          ? colorScheme.primaryContainer
-          : subStatus.hasSubscription
-          ? colorScheme.tertiaryContainer
-          : colorScheme.errorContainer,
+      color: cardColor,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
             Icon(
-              subStatus.isLoading
-                  ? Icons.hourglass_top_rounded
-                  : subStatus.hasSubscription
-                  ? Icons.check_circle_rounded
-                  : Icons.warning_rounded,
-              color: subStatus.isLoading
-                  ? colorScheme.onPrimaryContainer
-                  : subStatus.hasSubscription
-                  ? colorScheme.onTertiaryContainer
-                  : colorScheme.onErrorContainer,
+              icon,
+              color: iconColor,
               size: 28,
             ),
             const SizedBox(width: 12),
@@ -171,33 +350,18 @@ class SubscriptionVerificationPage extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    subStatus.isLoading
-                        ? 'Verifying subscription...'
-                        : subStatus.hasSubscription
-                        ? 'Subscription Active!'
-                        : 'No Active Subscription',
+                    title,
                     style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: subStatus.isLoading
-                          ? colorScheme.onPrimaryContainer
-                          : subStatus.hasSubscription
-                          ? colorScheme.onTertiaryContainer
-                          : colorScheme.onErrorContainer,
+                      color: iconColor,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    subStatus.isLoading
-                        ? 'Please wait while we check your subscription status'
-                        : subStatus.hasSubscription
-                        ? 'Redirecting to dashboard...'
-                        : 'Choose a plan below to activate your account',
+                    subtitle,
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: subStatus.isLoading
-                          ? colorScheme.onPrimaryContainer.transparency(0.8)
-                          : subStatus.hasSubscription
-                          ? colorScheme.onTertiaryContainer.transparency(0.8)
-                          : colorScheme.onErrorContainer.transparency(0.8),
+                      color: iconColor.transparency(0.85),
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],
@@ -363,7 +527,7 @@ class SubscriptionVerificationPage extends ConsumerWidget {
         ),
         const SizedBox(height: 12),
         SizedBox(
-          height: 200,
+          height: 220,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             physics: const BouncingScrollPhysics(),
@@ -372,9 +536,11 @@ class SubscriptionVerificationPage extends ConsumerWidget {
             itemBuilder: (context, index) {
               final plan = state.allPlans[index];
               final isSelected = state.selectedNewPlan?.id == plan.id;
+              final showGst = plan.hasGst;
+              final totalPayable = plan.totalWithTax;
 
               return SizedBox(
-                width: 200,
+                width: 210,
                 child: Card(
                   color: isSelected
                       ? colorScheme.primaryContainer
@@ -402,12 +568,22 @@ class SubscriptionVerificationPage extends ConsumerWidget {
                         ),
                         const Spacer(),
                         Text(
-                          '₹${plan.currentPrice.toStringAsFixed(0)}',
-                          style: theme.textTheme.headlineSmall?.copyWith(
+                          showGst
+                              ? '₹${totalPayable.toStringAsFixed(2)}'
+                              : '₹${plan.currentPrice.toStringAsFixed(0)}',
+                          style: theme.textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: colorScheme.primary,
                           ),
                         ),
+                        if (showGst)
+                          Text(
+                            '(Base ₹${plan.currentPrice.toInt()} + 18% GST)',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                              fontSize: 10,
+                            ),
+                          ),
                         const SizedBox(height: 8),
                         SizedBox(
                           width: double.infinity,
@@ -427,7 +603,13 @@ class SubscriptionVerificationPage extends ConsumerWidget {
                                   ? colorScheme.onPrimary
                                   : colorScheme.onPrimaryContainer,
                             ),
-                            child: Text(isSelected ? 'Selected' : 'Choose'),
+                            child: Text(
+                              isSelected
+                                  ? (showGst
+                                      ? 'Selected (₹${totalPayable.toStringAsFixed(0)})'
+                                      : 'Selected')
+                                  : 'Choose',
+                            ),
                           ),
                         ),
                       ],
@@ -451,9 +633,17 @@ class SubscriptionVerificationPage extends ConsumerWidget {
       width: double.infinity,
       child: OutlinedButton.icon(
         onPressed: () async {
-          await ref
-              .read(subscriptionStatusProvider.notifier)
-              .checkActiveSubscription();
+          await Future.wait([
+            ref
+                .read(subscriptionStatusProvider.notifier)
+                .checkActiveSubscription(),
+            ref
+                .read(doctorSubscriptionProvider.notifier)
+                .loadSubscriptionDetails(),
+            ref
+                .read(doctorSubscriptionProvider.notifier)
+                .loadPlans(),
+          ]);
         },
         icon: const Icon(Icons.refresh_rounded, size: 18),
         label: const Text('Check Status Again'),

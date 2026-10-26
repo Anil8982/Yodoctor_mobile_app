@@ -4,8 +4,24 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:yodoctor/core/providers/app_role_provider.dart';
+import 'package:yodoctor/core/providers/storage_provider.dart';
 import 'package:yodoctor/modules/auth/repositories/doctor_auth_repository.dart';
 import '../models/doctor_register_model.dart';
+
+class DoctorRegisterSubmitResult {
+  final bool success;
+  final String? redirect;
+  final String? message;
+  final String? error;
+
+  const DoctorRegisterSubmitResult({
+    required this.success,
+    this.redirect,
+    this.message,
+    this.error,
+  });
+}
 
 class DoctorRegisterState {
   final bool isLoading;
@@ -223,27 +239,111 @@ class DoctorRegisterNotifier extends Notifier<DoctorRegisterState> {
     }
   }
 
-  Future<bool> submitRegistration(DoctorFormData data) async {
+  Future<DoctorRegisterSubmitResult> submitRegistration(DoctorFormData data) async {
+    // 1. Double tap prevention
+    if (state.isLoading) {
+      AppLogger.warning('Submission already in progress, ignoring duplicate tap', tag: LogTags.auth, subTag: _subTag);
+      return const DoctorRegisterSubmitResult(
+        success: false,
+        error: "Submission in progress. Please wait.",
+      );
+    }
+
     state = state.copyWith(isLoading: true, clearError: true);
     AppLogger.info('Executing final registration sequence submission...', tag: LogTags.auth, subTag: _subTag);
 
     try {
       final repository = ref.read(doctorAuthRepositoryProvider);
       final res = await repository.submitRegistration(data: data);
-      state = state.copyWith(isLoading: false);
 
       final status = res.statusCode ?? 0;
-      final success = status >= 200 && status < 300;
-      if (success) {
-        AppLogger.success('Doctor application final packet registration completed successfully', tag: LogTags.auth, subTag: _subTag);
-      } else {
-        AppLogger.warning('Final registration deployment bundle dropped by server. Status: $status', tag: LogTags.auth, subTag: _subTag);
+      final rawData = res.data;
+
+      bool isSuccess = false;
+      String? redirect;
+      String? message;
+      String? token;
+
+      if (rawData is Map<String, dynamic>) {
+        isSuccess = rawData['success'] == true;
+        redirect = rawData['redirect']?.toString() ?? rawData['data']?['redirect']?.toString();
+        message = rawData['message']?.toString() ?? rawData['data']?['message']?.toString();
+        token = rawData['token']?.toString() ?? rawData['data']?['token']?.toString();
+      } else if (status >= 200 && status < 300) {
+        isSuccess = true;
       }
-      return success;
-    } catch (e, st) {
-      state = state.copyWith(isLoading: false, errorMessage: "Final submission sequence faulted");
+
+      if (isSuccess) {
+        AppLogger.success(
+          'Doctor declaration submitted successfully. redirect=$redirect, message=$message',
+          tag: LogTags.auth,
+          subTag: _subTag,
+        );
+
+        // Preserve session context: save token if provided, or promote existing registration token
+        final effectiveToken = (token != null && token.isNotEmpty)
+            ? token
+            : await repository.getRegistrationToken();
+
+        if (effectiveToken != null && effectiveToken.isNotEmpty) {
+          await repository.saveSessionToken(effectiveToken);
+          await repository.saveRegistrationToken(effectiveToken);
+        }
+
+        // Establish Doctor authentication context so subsequent subscription & verification APIs succeed
+        await repository.saveUserRole('doctor');
+        await repository.saveStatus('PENDING');
+
+        final storage = ref.read(storageProvider);
+        await storage.saveActiveSubscription(false);
+
+        ref.read(appRoleProvider.notifier).setRole(AppRole.doctor);
+
+        state = state.copyWith(isLoading: false);
+
+        return DoctorRegisterSubmitResult(
+          success: true,
+          redirect: redirect,
+          message: message,
+        );
+      } else {
+        final serverError = message ?? "Declaration submission was rejected by the server.";
+        AppLogger.warning('Declaration rejected. Status: $status, Message: $serverError', tag: LogTags.auth, subTag: _subTag);
+        state = state.copyWith(isLoading: false, errorMessage: serverError);
+        return DoctorRegisterSubmitResult(
+          success: false,
+          redirect: redirect,
+          message: message,
+          error: serverError,
+        );
+      }
+    } on DioException catch (e, st) {
+      String errorMessage = "Failed to submit declaration. Please try again.";
+      if (e.response?.data is Map<String, dynamic>) {
+        final data = e.response!.data as Map<String, dynamic>;
+        errorMessage = data['message']?.toString() ?? errorMessage;
+      } else if (e.type == DioExceptionType.connectionTimeout ||
+          e.type == DioExceptionType.receiveTimeout ||
+          e.type == DioExceptionType.sendTimeout) {
+        errorMessage = "Connection timeout. Please check your network and try again.";
+      } else if (e.type == DioExceptionType.connectionError) {
+        errorMessage = "Network connection failed. Please verify your internet connection.";
+      }
+
+      state = state.copyWith(isLoading: false, errorMessage: errorMessage);
       AppLogger.exception(e, st, tag: LogTags.auth, subTag: _subTag);
-      return false;
+      return DoctorRegisterSubmitResult(
+        success: false,
+        error: errorMessage,
+      );
+    } catch (e, st) {
+      const errorMessage = "An unexpected error occurred during submission.";
+      state = state.copyWith(isLoading: false, errorMessage: errorMessage);
+      AppLogger.exception(e, st, tag: LogTags.auth, subTag: _subTag);
+      return const DoctorRegisterSubmitResult(
+        success: false,
+        error: errorMessage,
+      );
     }
   }
 

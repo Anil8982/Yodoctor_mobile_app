@@ -27,11 +27,12 @@ class AuthInterceptor extends Interceptor {
 
     final isRegistrationApi =
         path.contains('/doctor/register') ||
-            path.contains('/doctor/registration');
+        path.contains('/doctor/registration') ||
+        path.contains('/registration');
 
     final token = isRegistrationApi
-        ? _storage.getRegistrationToken()
-        : _storage.getToken();
+        ? (_storage.getRegistrationToken() ?? _storage.getToken())
+        : (_storage.getToken() ?? _storage.getRegistrationToken());
 
     AppLogger.info(
       'Intercepting outgoing HTTP request: [${options.method}] -> ${options.uri}',
@@ -65,7 +66,9 @@ class AuthInterceptor extends Interceptor {
         path.contains('/auth/verify-reset') ||
         path.contains('/auth/reset-password') ||
         path.contains('/patient/register') ||
-        path.contains('/doctor/register');
+        path.contains('/doctor/register') ||
+        path.contains('/doctor/registration') ||
+        path.contains('/registration');
 
     if (isPublicAuthEndpoint) {
       return handler.next(err);

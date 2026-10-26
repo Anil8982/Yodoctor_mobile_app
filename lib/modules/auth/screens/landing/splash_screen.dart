@@ -121,11 +121,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
     if (token != null && token.isNotEmpty && role == 'doctor') {
       await ref.read(doctorStatusProvider.notifier).initialize();
-      final doctorState = ref.read(doctorStatusProvider);
-
-      if (doctorState.status == 'APPROVED') {
-        await ref.read(subscriptionStatusProvider.notifier).checkActiveSubscription();
-      }
+      await ref.read(subscriptionStatusProvider.notifier).checkActiveSubscription();
     }
 
     // Ensure smooth entrance experience before transition (minimum 1.2s viewing window)

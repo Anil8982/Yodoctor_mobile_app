@@ -98,27 +98,38 @@ class _DoctorRegisterScreenState extends ConsumerState<DoctorRegisterScreen>
   }
 
   Future<void> _handleSubmit() async {
-    final notifier = ref.read(doctorRegisterControllerProvider.notifier);
+    final registerState = ref.read(doctorRegisterControllerProvider);
+    if (registerState.isLoading) return;
 
-    final success = await notifier.submitRegistration(_formData);
+    final notifier = ref.read(doctorRegisterControllerProvider.notifier);
+    final result = await notifier.submitRegistration(_formData);
 
     if (!mounted) return;
 
-    if (!success) {
-      final errorMessage =
+    if (!result.success) {
+      final errorMessage = result.error ??
+          result.message ??
           ref.read(doctorRegisterControllerProvider).errorMessage ??
-          "Registration Failed";
+          "Registration submission failed";
       AppSnackBar.show(message: errorMessage, type: AppSnackBarType.error);
       return;
     }
 
-    await notifier.logoutRegistration();
+    final redirect = result.redirect?.toLowerCase().trim();
 
-    if (!mounted) return;
-
-    _formData.reset();
-
-    context.go(AppRoutes.waitingApproval);
+    if (redirect == 'payment') {
+      _formData.reset();
+      context.go(AppRoutes.doctorSubscriptionVerification);
+    } else if (redirect == 'waiting-approval' || redirect == 'waiting_approval') {
+      _formData.reset();
+      context.go(AppRoutes.waitingApproval);
+    } else {
+      AppSnackBar.show(
+        message: result.message ??
+            "Declaration submitted, but next step was not specified.",
+        type: AppSnackBarType.warning,
+      );
+    }
   }
 
   @override
@@ -129,43 +140,47 @@ class _DoctorRegisterScreenState extends ConsumerState<DoctorRegisterScreen>
     // Watch registration state context for overlay loading hooks if required
     final registerState = ref.watch(doctorRegisterControllerProvider);
 
-    return Scaffold(
-      backgroundColor: colorScheme.surfaceContainer,
-      body: FadeTransition(
-        opacity: _fadeAnim,
-        child: Stack(
-          children: [
-            Column(
-              children: [
-                Hero(
-                  tag: 'docAppBar',
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: colorScheme.primary,
-                      borderRadius: const BorderRadius.only(
-                        bottomLeft: Radius.circular(28),
-                        bottomRight: Radius.circular(28),
+    return PopScope(
+      canPop: !registerState.isLoading,
+      child: Scaffold(
+        backgroundColor: colorScheme.surfaceContainer,
+        body: FadeTransition(
+          opacity: _fadeAnim,
+          child: Stack(
+            children: [
+              Column(
+                children: [
+                  Hero(
+                    tag: 'docAppBar',
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: colorScheme.primary,
+                        borderRadius: const BorderRadius.only(
+                          bottomLeft: Radius.circular(28),
+                          bottomRight: Radius.circular(28),
+                        ),
                       ),
-                    ),
-                    child: SafeArea(
-                      bottom: false,
-                      child: Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 24,
-                              vertical: 16,
-                            ),
-                            child: Row(
-                              children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    if (_currentStep == 0) {
-                                      context.pop();
-                                    } else {
-                                      _prevStep();
-                                    }
-                                  },
+                      child: SafeArea(
+                        bottom: false,
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                                vertical: 16,
+                              ),
+                              child: Row(
+                                children: [
+                                  GestureDetector(
+                                    onTap: registerState.isLoading
+                                        ? null
+                                        : () {
+                                            if (_currentStep == 0) {
+                                              context.pop();
+                                            } else {
+                                              _prevStep();
+                                            }
+                                          },
                                   child: Container(
                                     width: 40,
                                     height: 40,
@@ -412,7 +427,8 @@ class _DoctorRegisterScreenState extends ConsumerState<DoctorRegisterScreen>
           ],
         ),
       ),
-    );
+    ),
+  );
   }
 
   Widget _scrollable(Widget child) => SingleChildScrollView(

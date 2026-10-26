@@ -1,10 +1,14 @@
 import 'package:chroma_kit/chroma_kit.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/constants/app_constants.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:yodoctor/core/routes/app_routes.dart';
+import 'package:yodoctor/modules/app_config/controllers/app_config_controller.dart';
 import 'package:yodoctor/modules/auth/controllers/patient_register_controller.dart';
 import 'package:yodoctor/modules/auth/widgets/auth_widgets.dart';
 import 'package:yodoctor/modules/auth/widgets/otp_bottom_sheet.dart';
@@ -638,8 +642,8 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                               ),
                               const SizedBox(width: 10),
                               Expanded(
-                                child: RichText(
-                                  text: TextSpan(
+                                child: Text.rich(
+                                  TextSpan(
                                     style: textTheme.labelMedium?.copyWith(
                                       color: colorScheme.onSurfaceVariant,
                                     ),
@@ -650,7 +654,27 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                                         style: textTheme.labelMedium?.copyWith(
                                           color: colorScheme.primary,
                                           fontWeight: FontWeight.w600,
+                                          decoration: TextDecoration.underline,
+                                          decorationColor: colorScheme.primary.transparency(0.5),
                                         ),
+                                        recognizer: TapGestureRecognizer()
+                                          ..onTap = () {
+                                            final appConfig = ref.read(appConfigProvider).config;
+                                            final url = appConfig?.legalAndSupport.termsServiceUrl ?? '';
+                                            if (url.isNotEmpty) {
+                                              context.push(
+                                                AppRoutes.webViewPage(
+                                                  title: 'Terms of Service',
+                                                  url: url,
+                                                ),
+                                              );
+                                            } else {
+                                              AppSnackBar.show(
+                                                message: 'Terms of Service link is not available',
+                                                type: AppSnackBarType.warning,
+                                              );
+                                            }
+                                          },
                                       ),
                                       const TextSpan(text: ' and '),
                                       TextSpan(
@@ -658,7 +682,27 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                                         style: textTheme.labelMedium?.copyWith(
                                           color: colorScheme.primary,
                                           fontWeight: FontWeight.w600,
+                                          decoration: TextDecoration.underline,
+                                          decorationColor: colorScheme.primary.transparency(0.5),
                                         ),
+                                        recognizer: TapGestureRecognizer()
+                                          ..onTap = () {
+                                            final appConfig = ref.read(appConfigProvider).config;
+                                            final url = appConfig?.legalAndSupport.privacyPolicyUrl ?? '';
+                                            if (url.isNotEmpty) {
+                                              context.push(
+                                                AppRoutes.webViewPage(
+                                                  title: 'Privacy Policy',
+                                                  url: url,
+                                                ),
+                                              );
+                                            } else {
+                                              AppSnackBar.show(
+                                                message: 'Privacy Policy link is not available',
+                                                type: AppSnackBarType.warning,
+                                              );
+                                            }
+                                          },
                                       ),
                                     ],
                                   ),

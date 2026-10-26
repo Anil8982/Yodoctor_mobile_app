@@ -1,8 +1,11 @@
 import 'package:chroma_kit/chroma_kit.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
-
+import 'package:yodoctor/modules/app_config/controllers/app_config_controller.dart';
 import 'package:yodoctor/modules/auth/controllers/doctor_register_controller.dart';
 import 'package:yodoctor/modules/auth/models/doctor_register_model.dart';
 import 'package:yodoctor/modules/auth/screens/doctor/widgets/step_card.dart';
@@ -108,6 +111,118 @@ class _Step7DeclarationState extends ConsumerState<Step7Declaration> {
     }
   }
 
+  late final TapGestureRecognizer _privacyRecognizer;
+  late final TapGestureRecognizer _termsRecognizer;
+
+  @override
+  void initState() {
+    super.initState();
+    _privacyRecognizer = TapGestureRecognizer()..onTap = _openPrivacyPolicy;
+    _termsRecognizer = TapGestureRecognizer()..onTap = _openTermsOfService;
+  }
+
+  @override
+  void dispose() {
+    _privacyRecognizer.dispose();
+    _termsRecognizer.dispose();
+    super.dispose();
+  }
+
+  void _openPrivacyPolicy() {
+    final appConfig = ref.read(appConfigProvider).config;
+    final url = appConfig?.legalAndSupport.privacyPolicyUrl ?? '';
+    _openLegalUrl(title: 'Privacy Policy', url: url);
+  }
+
+  void _openTermsOfService() {
+    final appConfig = ref.read(appConfigProvider).config;
+    final url = appConfig?.legalAndSupport.termsServiceUrl ?? '';
+    _openLegalUrl(title: 'Terms of Service', url: url);
+  }
+
+  void _openLegalUrl({required String title, required String url}) {
+    if (url.isNotEmpty) {
+      context.push(
+        AppRoutes.webViewPage(
+          title: title,
+          url: url,
+        ),
+      );
+    } else {
+      AppSnackBar.show(
+        message: '$title link is not available',
+        type: AppSnackBarType.warning,
+      );
+    }
+  }
+
+  Widget _buildDeclarationContent({
+    required String key,
+    required String text,
+    required bool checked,
+    required ColorScheme colorScheme,
+    required TextTheme textTheme,
+  }) {
+    final baseStyle = textTheme.bodyMedium?.copyWith(
+      height: 1.45,
+      fontWeight: checked ? FontWeight.w600 : FontWeight.normal,
+      color: checked ? colorScheme.onSurface : colorScheme.onSurfaceVariant,
+    );
+
+    final linkStyle = baseStyle?.copyWith(
+      color: colorScheme.primary,
+      fontWeight: FontWeight.w700,
+      decoration: TextDecoration.underline,
+      decorationColor: colorScheme.primary.transparency(0.5),
+    );
+
+    if (key == 'privacy') {
+      const prefix =
+          'I consent to the processing and secure storage of my personal data as per ';
+      const linkText = 'Privacy Policy';
+      const suffix = '.';
+
+      return Text.rich(
+        TextSpan(
+          style: baseStyle,
+          children: [
+            const TextSpan(text: prefix),
+            TextSpan(
+              text: linkText,
+              style: linkStyle,
+              recognizer: _privacyRecognizer,
+            ),
+            const TextSpan(text: suffix),
+          ],
+        ),
+      );
+    } else if (key == 'terms') {
+      const prefix = "I agree to the platform's ";
+      const linkText = 'Terms of Service';
+      const suffix = ', Cancellation, and Refund policies.';
+
+      return Text.rich(
+        TextSpan(
+          style: baseStyle,
+          children: [
+            const TextSpan(text: prefix),
+            TextSpan(
+              text: linkText,
+              style: linkStyle,
+              recognizer: _termsRecognizer,
+            ),
+            const TextSpan(text: suffix),
+          ],
+        ),
+      );
+    }
+
+    return Text(
+      text,
+      style: baseStyle,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -186,17 +301,12 @@ class _Step7DeclarationState extends ConsumerState<Step7Declaration> {
                       ),
                       const SizedBox(width: 14),
                       Expanded(
-                        child: Text(
-                          decl['text']!,
-                          style: textTheme.bodyMedium?.copyWith(
-                            height: 1.45,
-                            fontWeight: checked
-                                ? FontWeight.w600
-                                : FontWeight.normal,
-                            color: checked
-                                ? colorScheme.onSurface
-                                : colorScheme.onSurfaceVariant,
-                          ),
+                        child: _buildDeclarationContent(
+                          key: key,
+                          text: decl['text']!,
+                          checked: checked,
+                          colorScheme: colorScheme,
+                          textTheme: textTheme,
                         ),
                       ),
                     ],

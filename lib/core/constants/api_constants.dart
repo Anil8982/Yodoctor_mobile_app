@@ -41,7 +41,7 @@ class ApiConstants {
   static const doctorRegisterStep4 = '/doctor/registration/step-4';
   static const doctorRegisterStep5 = '/doctor/registration/step-5';
   static const doctorRegisterStep6 = '/doctor/registration/step-6';
-  static const doctorRegisterSubmit = '/doctor/registration/submit';
+  static const doctorRegisterSubmit = '/registration/submit';
 
   static const doctorVerificationStatus = '/doctor/verification-status';
 

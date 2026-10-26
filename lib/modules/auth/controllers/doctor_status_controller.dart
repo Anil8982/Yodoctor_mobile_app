@@ -69,7 +69,24 @@ class DoctorStatusNotifier extends Notifier<DoctorStatusState> {
       _stopRetry();
     });
 
+    final cachedStatus = ref.read(storageProvider).getStatus();
+    if (cachedStatus != null && cachedStatus.isNotEmpty) {
+      return DoctorStatusState(
+        status: cachedStatus,
+        isResolved: true,
+        isUsingCache: true,
+      );
+    }
+
     return const DoctorStatusState();
+  }
+
+  void setStatus(String newStatus) {
+    state = state.copyWith(
+      status: newStatus,
+      isResolved: true,
+      isUsingCache: false,
+    );
   }
 
   // Called once from SplashScreen for logged-in doctors

@@ -209,12 +209,16 @@ class SubscriptionRepository {
   Future<Response> createSubscription({
     required String planId,
     String billing = 'monthly',
+    bool isUpgrade = false,
+    bool isDoctorRegistration = false,
   }) {
     return _dio.post(
       ApiConstants.createSubscription,
       data: {
         'planId': planId,
         'billing': billing,
+        'isUpgrade': isUpgrade,
+        'isDoctorRegistration': isDoctorRegistration,
       },
     );
   }

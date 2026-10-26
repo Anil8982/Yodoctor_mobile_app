@@ -223,36 +223,40 @@ class _CertificateWalletScreenState
                 },
             body: filteredCertificates.isEmpty
                 ? _buildEmptyState(context, formState.selectedFilter)
-                : RefreshIndicator(
-                    onRefresh: notifier.loadMyRequests,
-                    child: CustomScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(
-                        parent: BouncingScrollPhysics(),
-                      ),
-                      slivers: <Widget>[
-                        SliverPadding(
-                          padding: EdgeInsets.fromLTRB(
-                            horizontalPadding,
-                            12,
-                            horizontalPadding,
-                            110,
+                : Column(
+                  children: [
+                    RefreshIndicator(
+                        onRefresh: notifier.loadMyRequests,
+                        child: CustomScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(
+                            parent: BouncingScrollPhysics(),
                           ),
-                          sliver: SliverList(
-                            delegate: SliverChildBuilderDelegate((
-                              context,
-                              index,
-                            ) {
-                              final cert = filteredCertificates[index];
-                              return Padding(
-                                padding: const EdgeInsets.only(bottom: 12.0),
-                                child: _buildCertificateCard(context, cert),
-                              );
-                            }, childCount: filteredCertificates.length),
-                          ),
+                          slivers: <Widget>[
+                            SliverPadding(
+                              padding: EdgeInsets.fromLTRB(
+                                horizontalPadding,
+                                12,
+                                horizontalPadding,
+                                110,
+                              ),
+                              sliver: SliverList(
+                                delegate: SliverChildBuilderDelegate((
+                                  context,
+                                  index,
+                                ) {
+                                  final cert = filteredCertificates[index];
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 12.0),
+                                    child: _buildCertificateCard(context, cert),
+                                  );
+                                }, childCount: filteredCertificates.length),
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
+                      ),
+                  ],
+                ),
           ),
           Positioned(
             right: 16,

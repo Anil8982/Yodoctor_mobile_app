@@ -84,6 +84,7 @@ class CertificateFormState {
     Map<String, String?>? uploadedDocs,
     Map<String, double?>? uploadProgress,
     PatientCertificateDetailModel? selectedCertificate,
+    bool clearSelectedCertificate = false,
     List<PatientDoctorModel>? doctors,
     List<PatientCertificateTimelineModel>? timeline,
   }) {
@@ -103,7 +104,10 @@ class CertificateFormState {
       showValidationError: showValidationError ?? this.showValidationError,
       uploadedDocs: uploadedDocs ?? this.uploadedDocs,
       uploadProgress: uploadProgress ?? this.uploadProgress,
-      selectedCertificate: selectedCertificate ?? this.selectedCertificate,
+
+      selectedCertificate: clearSelectedCertificate
+          ? null
+          : (selectedCertificate ?? this.selectedCertificate),
       timeline: timeline ?? this.timeline,
     );
   }
@@ -138,7 +142,12 @@ class CertificateNotifier extends Notifier<CertificateFormState> {
   }
 
   Future<void> loadCertificateDetail(int id) async {
-    state = state.copyWith(isLoading: true);
+    state = state.copyWith(
+      isLoading: true,
+      clearSelectedCertificate: true,
+      timeline: const [],
+    );
+
     try {
       final repo = ref.read(patientCertificateRepositoryProvider);
       final response = await repo.getRequestDetail(id);
@@ -156,7 +165,11 @@ class CertificateNotifier extends Notifier<CertificateFormState> {
         isLoading: false,
       );
     } catch (e, st) {
-      state = state.copyWith(isLoading: false);
+      state = state.copyWith(
+        isLoading: false,
+        clearSelectedCertificate: true,
+        timeline: const [],
+      );
       AppLogger.exception(
         e,
         st,
@@ -166,6 +179,7 @@ class CertificateNotifier extends Notifier<CertificateFormState> {
       );
     }
   }
+
 
   Future<void> loadDoctors() async {
     // Set explicit loading flag for doctors to prevent empty-state flashing

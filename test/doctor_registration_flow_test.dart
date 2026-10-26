@@ -7,6 +7,7 @@ import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/core/storage/storage_service.dart';
 import 'package:yodoctor/modules/auth/controllers/doctor_register_controller.dart';
 import 'package:yodoctor/modules/auth/models/doctor_register_model.dart';
+import 'package:yodoctor/modules/doctor/controllers/subscription_status_controller.dart';
 import 'package:yodoctor/modules/doctor/models/subscription/available_plan_model.dart';
 import 'package:yodoctor/modules/doctor/models/subscription/subscription_model.dart';
 
@@ -66,11 +67,11 @@ class FakeStorageService extends StorageService {
 final testRefProvider = Provider<Ref>((ref) => ref);
 
 String resolveDoctorRoute({
-  required bool hasSubscription,
+  required bool hasActiveSubscription,
   required bool isApproved,
   required String currentPath,
 }) {
-  if (!hasSubscription) {
+  if (!hasActiveSubscription) {
     if (currentPath != AppRoutes.doctorSubscriptionVerification) {
       return AppRoutes.doctorSubscriptionVerification;
     }
@@ -206,7 +207,7 @@ void main() {
   group('4. Doctor Registration -> Payment -> Verification Business Routing Logic', () {
     test('doctor without active subscription must be directed to subscription verification page', () {
       final intendedRoute = resolveDoctorRoute(
-        hasSubscription: false,
+        hasActiveSubscription: false,
         isApproved: false,
         currentPath: AppRoutes.doctorDashboard,
       );
@@ -214,9 +215,28 @@ void main() {
       expect(intendedRoute, AppRoutes.doctorSubscriptionVerification);
     });
 
+    test('doctor with pending payment (hasSubscription true, isActive false) stays on subscription page', () {
+      const state = SubscriptionStatusState(
+        hasSubscription: true,
+        isActive: false,
+        status: 'pending',
+      );
+
+      expect(state.hasActiveSubscription, false);
+      expect(state.isPaymentPending, true);
+
+      final intendedRoute = resolveDoctorRoute(
+        hasActiveSubscription: state.hasActiveSubscription,
+        isApproved: false,
+        currentPath: AppRoutes.doctorSubscriptionVerification,
+      );
+
+      expect(intendedRoute, AppRoutes.doctorSubscriptionVerification);
+    });
+
     test('doctor with confirmed subscription and pending approval must be directed to waiting approval', () {
       final intendedRoute = resolveDoctorRoute(
-        hasSubscription: true,
+        hasActiveSubscription: true,
         isApproved: false,
         currentPath: AppRoutes.doctorDashboard,
       );
@@ -226,7 +246,7 @@ void main() {
 
     test('doctor with confirmed subscription and approved status is directed to dashboard', () {
       final intendedRoute = resolveDoctorRoute(
-        hasSubscription: true,
+        hasActiveSubscription: true,
         isApproved: true,
         currentPath: AppRoutes.waitingApproval,
       );
@@ -417,6 +437,83 @@ void main() {
       expect(plan.upcomingPlan!.title, '6 Month Plan');
       expect(plan.upcomingPlan!.startDate.year, 2026);
       expect(plan.upcomingPlan!.startDate.month, 12);
+    });
+  });
+
+  group('7. Pending Payment State and SubscriptionPlan Model Integrity', () {
+    test('SubscriptionStatusState flags isPaymentPending when subscription exists but isActive is false', () {
+      const state = SubscriptionStatusState(
+        hasSubscription: true,
+        isActive: false,
+        status: 'pending',
+      );
+
+      expect(state.hasActiveSubscription, false);
+      expect(state.isPaymentPending, true);
+    });
+
+    test('SubscriptionStatusState flags hasActiveSubscription when subscription is active', () {
+      const state = SubscriptionStatusState(
+        hasSubscription: true,
+        isActive: true,
+        status: 'active',
+      );
+
+      expect(state.hasActiveSubscription, true);
+      expect(state.isPaymentPending, false);
+    });
+
+    test('SubscriptionPlan parses pending status, amounts, and tax breakdown correctly', () {
+      final json = {
+        "id": "sub_local_pending",
+        "plan_id": "plan_3_month",
+        "plan_name": "3 Month Plan",
+        "status": "pending",
+        "billing_period": "monthly",
+        "amount": 2828,
+        "base_amount": "2397.00",
+        "gst_amount": "431.46",
+        "total_amount": "2828.46",
+        "rzp_subscription_id": "sub_TpV9hxUZQxUIpG",
+      };
+
+      final plan = SubscriptionPlan.fromJson(json);
+      expect(plan.isPending, true);
+      expect(plan.isActive, false);
+      expect(plan.status, 'pending');
+      expect(plan.title, '3 Month Plan');
+      expect(plan.amount, 2828.46);
+      expect(plan.baseAmount, 2397.0);
+      expect(plan.gstAmount, 431.46);
+      expect(plan.rzpSubscriptionId, 'sub_TpV9hxUZQxUIpG');
+    });
+
+    test('SubscriptionStatusState holds subscriptionPlan and reflects pending state', () {
+      final plan = SubscriptionPlan(
+        id: 'sub_test',
+        planId: 'plan_3_month',
+        title: '3 Month Plan',
+        type: 'monthly',
+        status: 'pending',
+        amount: 2828.46,
+        baseAmount: 2397.0,
+        gstAmount: 431.46,
+        nextBillingDate: DateTime.now(),
+        isActive: false,
+      );
+
+      final state = SubscriptionStatusState(
+        hasSubscription: true,
+        isActive: false,
+        status: 'pending',
+        subscriptionPlan: plan,
+      );
+
+      expect(state.hasActiveSubscription, false);
+      expect(state.isPaymentPending, true);
+      expect(state.subscriptionPlan, isNotNull);
+      expect(state.subscriptionPlan!.title, '3 Month Plan');
+      expect(state.subscriptionPlan!.amount, 2828.46);
     });
   });
 }

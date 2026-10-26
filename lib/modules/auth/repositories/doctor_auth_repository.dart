@@ -311,8 +311,13 @@ class DoctorAuthRepository {
       "terms": data.declTerms,
     };
 
+    AppLogger.info('Submitting final declaration payload to ${ApiConstants.doctorRegisterSubmit}', tag: LogTags.auth, subTag: _subTag);
+    AppLogger.json(payload, tag: LogTags.auth, subTag: '$_subTag/DeclarationPayload');
+
     try {
-      return await _dio.patch(ApiConstants.doctorRegisterSubmit, data: payload);
+      final response = await _dio.patch(ApiConstants.doctorRegisterSubmit, data: payload);
+      AppLogger.success('Final declaration submitted successfully. Status: ${response.statusCode}', tag: LogTags.auth, subTag: _subTag);
+      return response;
     } catch (e, st) {
       AppLogger.error('Final registration submission execution loss', tag: LogTags.auth, subTag: _subTag, error: e, stackTrace: st);
       rethrow;
@@ -325,6 +330,10 @@ class DoctorAuthRepository {
 
   Future<String?> getSessionToken() async {
     return _storage.getToken();
+  }
+
+  Future<String?> getRegistrationToken() async {
+    return _storage.getRegistrationToken();
   }
 
   Future<void> saveSessionToken(String token) async {

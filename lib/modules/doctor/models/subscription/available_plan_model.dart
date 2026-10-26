@@ -125,4 +125,14 @@ class AvailablePlan {
       isBestValue: json['recommended'] ?? false,
     );
   }
+
+  bool get isFree => currentPrice == 0;
+  bool get isTrial =>
+      category.toLowerCase() == 'trial' ||
+      durationText.toLowerCase().contains('trial') ||
+      title.toLowerCase().contains('trial');
+  bool get hasGst => !isFree && !isTrial;
+  double get gstRate => hasGst ? 18.0 : 0.0;
+  double get gstAmount => hasGst ? (currentPrice * 0.18) : 0.0;
+  double get totalWithTax => hasGst ? (currentPrice + gstAmount) : currentPrice;
 }
