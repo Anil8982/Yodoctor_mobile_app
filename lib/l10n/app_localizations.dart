@@ -3121,6 +3121,294 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Instructions'**
   String get instructionsLabel;
+
+  /// Title for clinical services section
+  ///
+  /// In en, this message translates to:
+  /// **'Doctor & Clinic Visits'**
+  String get clinicalCareSectionTitle;
+
+  /// Subtitle for clinical services section
+  ///
+  /// In en, this message translates to:
+  /// **'Consult verified doctors and get instant tokens'**
+  String get clinicalCareSectionSubtitle;
+
+  /// Title for doorstep services section
+  ///
+  /// In en, this message translates to:
+  /// **'Doorstep Healthcare'**
+  String get doorstepCareSectionTitle;
+
+  /// Subtitle for doorstep services section
+  ///
+  /// In en, this message translates to:
+  /// **'Diagnostic lab tests and pharmacy delivery'**
+  String get doorstepCareSectionSubtitle;
+
+  /// Title for activity and history section
+  ///
+  /// In en, this message translates to:
+  /// **'My Bookings & History'**
+  String get myActivitySectionTitle;
+
+  /// Subtitle for activity and history section
+  ///
+  /// In en, this message translates to:
+  /// **'Track past and upcoming appointments and care visits'**
+  String get myActivitySectionSubtitle;
+
+  /// Title for doctor visits history card
+  ///
+  /// In en, this message translates to:
+  /// **'Doctor Visits'**
+  String get doctorVisitsHistoryTitle;
+
+  /// Subtitle for doctor visits history card
+  ///
+  /// In en, this message translates to:
+  /// **'Clinic & video history'**
+  String get doctorVisitsHistorySubtitle;
+
+  /// Title for home care orders history card
+  ///
+  /// In en, this message translates to:
+  /// **'Home Care'**
+  String get homeCareOrdersTitle;
+
+  /// Subtitle for home care orders history card
+  ///
+  /// In en, this message translates to:
+  /// **'Nursing care orders'**
+  String get homeCareOrdersSubtitle;
+
+  /// Badge for appointments history
+  ///
+  /// In en, this message translates to:
+  /// **'Appointments'**
+  String get appointmentsBadge;
+
+  /// Badge for care visits history
+  ///
+  /// In en, this message translates to:
+  /// **'Care Visits'**
+  String get careVisitsBadge;
+
+  /// Action label to view history
+  ///
+  /// In en, this message translates to:
+  /// **'View History'**
+  String get viewHistoryAction;
+
+  /// Title for assistance card
+  ///
+  /// In en, this message translates to:
+  /// **'Need Help with a Booking?'**
+  String get needHelpBookingTitle;
+
+  /// Subtitle for assistance card
+  ///
+  /// In en, this message translates to:
+  /// **'Track past requests or contact patient support'**
+  String get needHelpBookingSubtitle;
+
+  /// Button label for patient assistance
+  ///
+  /// In en, this message translates to:
+  /// **'Contact Support'**
+  String get contactSupportBtn;
+
+  /// Badge for upcoming services
+  ///
+  /// In en, this message translates to:
+  /// **'SOON'**
+  String get comingSoonBadge;
+
+  /// Action label for booking a service
+  ///
+  /// In en, this message translates to:
+  /// **'Book Now'**
+  String get bookNowAction;
+
+  /// Action label for scanning QR code
+  ///
+  /// In en, this message translates to:
+  /// **'Scan QR'**
+  String get scanQrAction;
+
+  /// Action label for applying
+  ///
+  /// In en, this message translates to:
+  /// **'Apply Now'**
+  String get applyNowAction;
+
+  /// Section header for health and family
+  ///
+  /// In en, this message translates to:
+  /// **'HEALTH & RECORDS'**
+  String get healthAndFamilySection;
+
+  /// Section header for app preferences
+  ///
+  /// In en, this message translates to:
+  /// **'APP PREFERENCES'**
+  String get appPreferencesSection;
+
+  /// Section header for help and legal
+  ///
+  /// In en, this message translates to:
+  /// **'HELP & SUPPORT'**
+  String get helpAndLegalSection;
+
+  /// Section header for account actions
+  ///
+  /// In en, this message translates to:
+  /// **'ACCOUNT ACTIONS'**
+  String get accountSection;
+
+  /// Delete account button label
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Account'**
+  String get deleteAccount;
+
+  /// Delete account description
+  ///
+  /// In en, this message translates to:
+  /// **'Permanently delete account and health data'**
+  String get deleteAccountDesc;
+
+  /// Notifications title
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications & Alerts'**
+  String get notificationsTitle;
+
+  /// Notifications description
+  ///
+  /// In en, this message translates to:
+  /// **'Reminders and appointment alerts'**
+  String get notificationsDesc;
+
+  /// Dark mode title
+  ///
+  /// In en, this message translates to:
+  /// **'Dark Mode'**
+  String get darkModeTitle;
+
+  /// Help and support title
+  ///
+  /// In en, this message translates to:
+  /// **'Help & Support'**
+  String get helpSupportTitle;
+
+  /// Help and support description
+  ///
+  /// In en, this message translates to:
+  /// **'24/7 Patient assistance & FAQs'**
+  String get helpSupportDesc;
+
+  /// Privacy policy and terms title
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy & Terms'**
+  String get privacyTermsTitle;
+
+  /// Privacy policy description
+  ///
+  /// In en, this message translates to:
+  /// **'Data protection and terms of use'**
+  String get privacyTermsDesc;
+
+  /// Edit profile button label
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Profile'**
+  String get editProfileBtn;
+
+  /// Section header for healthcare records in profile
+  ///
+  /// In en, this message translates to:
+  /// **'MY HEALTHCARE'**
+  String get myHealthcareSection;
+
+  /// Appointments history title in profile
+  ///
+  /// In en, this message translates to:
+  /// **'Appointments History'**
+  String get appointmentsHistory;
+
+  /// Appointments history subtitle in profile
+  ///
+  /// In en, this message translates to:
+  /// **'Past, ongoing & scheduled appointments'**
+  String get appointmentsHistorySubtitle;
+
+  /// Certificate wallet subtitle in profile
+  ///
+  /// In en, this message translates to:
+  /// **'View, verify & download medical certificates'**
+  String get certificateWalletSubtitle;
+
+  /// Personal details subtitle in profile
+  ///
+  /// In en, this message translates to:
+  /// **'View and update your personal info'**
+  String get personalDetailsSubtitle;
+
+  /// Privacy policy title
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get privacyPolicyOnlyTitle;
+
+  /// Privacy policy subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'How we protect your medical data'**
+  String get privacyPolicySubtitle;
+
+  /// Terms of service title
+  ///
+  /// In en, this message translates to:
+  /// **'Terms of Service'**
+  String get termsOfServiceTitle;
+
+  /// Terms of service subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Terms and conditions of use'**
+  String get termsOfServiceSubtitle;
+
+  /// Section header for support and legal policies in profile
+  ///
+  /// In en, this message translates to:
+  /// **'SUPPORT & LEGAL'**
+  String get supportAndLegalSection;
+
+  /// Section header for account and family in profile
+  ///
+  /// In en, this message translates to:
+  /// **'ACCOUNT & FAMILY'**
+  String get accountAndFamilySection;
+
+  /// Logout subtitle in profile
+  ///
+  /// In en, this message translates to:
+  /// **'Sign out of your YoDoctor account'**
+  String get logoutAccountSubtitle;
+
+  /// Tag on featured home care banner
+  ///
+  /// In en, this message translates to:
+  /// **'DOORSTEP MEDICAL CARE'**
+  String get doorstepCareBannerTag;
+
+  /// Subtitle for family members tile in profile
+  ///
+  /// In en, this message translates to:
+  /// **'Add & manage dependents'**
+  String get familyMembersSubtitle;
 }
 
 class _AppLocalizationsDelegate

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/controllers/home_service_controller.dart';
-import 'package:yodoctor/modules/widgets/app_header.dart';
+import '../../widgets/patient_app_bar.dart';
 import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 import 'package:yodoctor/modules/widgets/app_text_field.dart';
 import '../../models/home_care/home_service_booking_model.dart';
@@ -134,7 +134,10 @@ class _HomeServiceBookingScreenState
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppHeader(title: l10n?.bookCareService ?? 'Book a Care Service'),
+      appBar: PatientAppBar(
+        titleText: l10n?.bookCareService ?? 'Book Care Service',
+        subtitleText: 'Doorstep Nursing & Healthcare',
+      ),
       body: SafeArea(
         child: Form(
           key: _formKey,

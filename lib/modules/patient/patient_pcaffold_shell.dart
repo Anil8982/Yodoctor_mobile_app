@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:yodoctor/l10n/app_localizations.dart';
 
 import 'widgets/patient_bottom_nav.dart';
-import 'widgets/patient_drawer.dart';
 import 'widgets/qr_scanner.dart';
 
 class PatientScaffoldShell extends ConsumerWidget {
@@ -22,15 +20,16 @@ class PatientScaffoldShell extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final l10n = AppLocalizations.of(context);
     final bool isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
+      extendBody: true, // Content flows behind the floating glass nav bar
       resizeToAvoidBottomInset: false,
-      drawer: PatientDrawer(),
       body: navigationShell,
-      bottomNavigationBar: PatientBottomNav(
+      bottomNavigationBar: isKeyboardVisible
+          ? null
+          : PatientBottomNav(
         currentIndex: navigationShell.currentIndex,
         onTap: (index) {
           navigationShell.goBranch(
@@ -38,17 +37,8 @@ class PatientScaffoldShell extends ConsumerWidget {
             initialLocation: index == navigationShell.currentIndex,
           );
         },
+        onCenterButtonTap: () => _openQRScanner(context),
       ),
-      floatingActionButton: isKeyboardVisible
-          ? null
-          : FloatingActionButton(
-        heroTag: 'patient_bottom_nav_fab',
-        tooltip: l10n?.scanQrCodeTooltip ?? 'Scan QR Code',
-        onPressed: () => _openQRScanner(context),
-        elevation: 4,
-        child: const Icon(Icons.qr_code_scanner_rounded),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }

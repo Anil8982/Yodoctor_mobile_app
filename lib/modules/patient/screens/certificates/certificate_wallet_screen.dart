@@ -8,8 +8,8 @@ import 'package:yodoctor/modules/widgets/status_chip.dart';
 import '../../../../core/routes/app_routes.dart';
 import '../../../../core/utils/responsive.dart';
 import '../../controllers/certificate_request.dart';
-import '../../widgets/custom_sliver_app_bar.dart';
-import 'widgets/certificate_header.dart';
+import '../../widgets/patient_app_bar.dart';
+import '../../widgets/patient_bottom_nav.dart';
 import '../../../patient/models/certificate/patient_certificate_request_model.dart';
 import 'package:yodoctor/l10n/app_localizations.dart';
 
@@ -82,185 +82,155 @@ class _CertificateWalletScreenState
 
     final filteredCertificates = notifier.getFilteredCertificates();
 
-    return ColoredBox(
-      color: theme.scaffoldBackgroundColor,
-      child: Stack(
+    return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
+      appBar: PatientAppBar(
+        titleText: l10n.certificateWallet,
+        subtitleText: 'Verified Medical Documents',
+      ),
+      body: Stack(
         children: [
-          NestedScrollView(
-            physics: const ClampingScrollPhysics(),
-            headerSliverBuilder:
-                (BuildContext context, bool innerBoxIsScrolled) {
-                  return <Widget>[
-                    CustomSliverAppBar(
-                      titleText: l10n.certificateWallet,
-                      expandedHeight: CustomSliverAppBar.defaultExpandedHeight,
-                      background: CertificateHeader(
-                        certificateCount: filteredCertificates.length,
-                        selectedFilter: formState.selectedFilter,
-                      ),
-                    ),
-                    SliverAppBar(
-                      leading: const SizedBox.shrink(),
-                      leadingWidth: 0,
-                      automaticallyImplyLeading: false,
-                      backgroundColor: colorScheme.surface,
-                      pinned: false,
-                      floating: true,
-                      snap: true,
-                      scrolledUnderElevation: 0,
-                      elevation: 0,
-                      toolbarHeight: 120,
-                      titleSpacing: 0,
-                      title: Container(
-                        color: colorScheme.surface,
-                        padding: EdgeInsets.symmetric(
-                          horizontal: horizontalPadding,
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            ValueListenableBuilder<TextEditingValue>(
-                              valueListenable: _searchController,
-                              builder: (context, value, child) {
-                                return TextField(
-                                  controller: _searchController,
-                                  onChanged: notifier.setSearchQuery,
-                                  style: theme.textTheme.bodyMedium,
-                                  decoration: InputDecoration(
-                                    hintText: l10n.searchByTypeOrDoctor,
-                                    prefixIcon: const Icon(
-                                      Icons.search_rounded,
-                                      size: 22,
-                                    ),
-                                    suffixIcon: value.text.isNotEmpty
-                                        ? IconButton(
-                                            icon: const Icon(
-                                              Icons.clear_rounded,
-                                              size: 20,
-                                            ),
-                                            onPressed: () {
-                                              _searchController.clear();
-                                              notifier.setSearchQuery('');
-                                            },
-                                          )
-                                        : null,
-                                    filled: true,
-                                    fillColor:
-                                        theme.colorScheme.surfaceContainer,
-                                    contentPadding: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                      vertical: 14,
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(14),
-                                      borderSide: BorderSide(
-                                        color: theme.colorScheme.outlineVariant
-                                            .transparency(0.35),
-                                        width: 1.0,
-                                      ),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(14),
-                                      borderSide: BorderSide(
-                                        color: theme.colorScheme.primary,
-                                        width: 2.0,
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
+          Column(
+            children: [
+              Container(
+                color: theme.scaffoldBackgroundColor,
+                padding: EdgeInsets.symmetric(
+                  horizontal: horizontalPadding,
+                  vertical: 8,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ValueListenableBuilder<TextEditingValue>(
+                      valueListenable: _searchController,
+                      builder: (context, value, child) {
+                        return TextField(
+                          controller: _searchController,
+                          onChanged: notifier.setSearchQuery,
+                          style: theme.textTheme.bodyMedium,
+                          decoration: InputDecoration(
+                            hintText: l10n.searchByTypeOrDoctor,
+                            prefixIcon: const Icon(
+                              Icons.search_rounded,
+                              size: 22,
                             ),
-                            const SizedBox(height: 12),
-                            SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              physics: const BouncingScrollPhysics(),
-                              child: Row(
-                                children:
-                                    [
-                                      'All',
-                                      'Pending',
-                                      'Approved',
-                                      'Rejected',
-                                    ].map((filter) {
-                                      final isSelected =
-                                          formState.selectedFilter == filter;
-                                      return Padding(
-                                        padding: const EdgeInsets.only(
-                                          right: 8.0,
-                                        ),
-                                        child: FilterChip(
-                                          label: Text(
-                                            _getLocalizedFilter(filter, l10n),
-                                          ),
-                                          selected: isSelected,
-                                          onSelected: (_) =>
-                                              notifier.setFilter(filter),
-                                          selectedColor:
-                                              colorScheme.primaryContainer,
-                                          labelStyle: TextStyle(
-                                            color: isSelected
-                                                ? colorScheme.onPrimaryContainer
-                                                : colorScheme.onSurface,
-                                            fontWeight: isSelected
-                                                ? FontWeight.bold
-                                                : FontWeight.normal,
-                                          ),
-                                          showCheckmark: false,
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 6,
-                                            vertical: 4,
-                                          ),
-                                        ),
-                                      );
-                                    }).toList(),
+                            suffixIcon: value.text.isNotEmpty
+                                ? IconButton(
+                                    icon: const Icon(
+                                      Icons.clear_rounded,
+                                      size: 20,
+                                    ),
+                                    onPressed: () {
+                                      _searchController.clear();
+                                      notifier.setSearchQuery('');
+                                    },
+                                  )
+                                : null,
+                            filled: true,
+                            fillColor:
+                                theme.colorScheme.surfaceContainer,
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 14,
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14),
+                              borderSide: BorderSide(
+                                color: theme.colorScheme.outlineVariant
+                                    .transparency(0.35),
+                                width: 1.0,
                               ),
                             ),
-                          ],
-                        ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14),
+                              borderSide: BorderSide(
+                                color: theme.colorScheme.primary,
+                                width: 2.0,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      physics: const BouncingScrollPhysics(),
+                      child: Row(
+                        children:
+                            [
+                              'All',
+                              'Pending',
+                              'Approved',
+                              'Rejected',
+                            ].map((filter) {
+                              final isSelected =
+                                  formState.selectedFilter == filter;
+                              return Padding(
+                                padding: const EdgeInsets.only(
+                                  right: 8.0,
+                                ),
+                                child: FilterChip(
+                                  label: Text(
+                                    _getLocalizedFilter(filter, l10n),
+                                  ),
+                                  selected: isSelected,
+                                  onSelected: (_) =>
+                                      notifier.setFilter(filter),
+                                  selectedColor:
+                                      colorScheme.primaryContainer,
+                                  labelStyle: TextStyle(
+                                    color: isSelected
+                                        ? colorScheme.onPrimaryContainer
+                                        : colorScheme.onSurface,
+                                    fontWeight: isSelected
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                  ),
+                                  showCheckmark: false,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                    vertical: 4,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
                       ),
                     ),
-                  ];
-                },
-            body: filteredCertificates.isEmpty
-                ? _buildEmptyState(context, formState.selectedFilter)
-                : Column(
-                  children: [
-                    RefreshIndicator(
+                  ],
+                ),
+              ),
+              Expanded(
+                child: filteredCertificates.isEmpty
+                    ? _buildEmptyState(context, formState.selectedFilter)
+                    : RefreshIndicator(
                         onRefresh: notifier.loadMyRequests,
-                        child: CustomScrollView(
+                        child: ListView.builder(
                           physics: const AlwaysScrollableScrollPhysics(
                             parent: BouncingScrollPhysics(),
                           ),
-                          slivers: <Widget>[
-                            SliverPadding(
-                              padding: EdgeInsets.fromLTRB(
-                                horizontalPadding,
-                                12,
-                                horizontalPadding,
-                                110,
-                              ),
-                              sliver: SliverList(
-                                delegate: SliverChildBuilderDelegate((
-                                  context,
-                                  index,
-                                ) {
-                                  final cert = filteredCertificates[index];
-                                  return Padding(
-                                    padding: const EdgeInsets.only(bottom: 12.0),
-                                    child: _buildCertificateCard(context, cert),
-                                  );
-                                }, childCount: filteredCertificates.length),
-                              ),
-                            ),
-                          ],
+                          padding: EdgeInsets.fromLTRB(
+                            horizontalPadding,
+                            12,
+                            horizontalPadding,
+                            PatientBottomNav.floatingNavPadding(context),
+                          ),
+                          itemCount: filteredCertificates.length,
+                          itemBuilder: (context, index) {
+                            final cert = filteredCertificates[index];
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 12.0),
+                              child: _buildCertificateCard(context, cert),
+                            );
+                          },
                         ),
                       ),
-                  ],
-                ),
+              ),
+            ],
           ),
           Positioned(
             right: 16,
-            bottom: 25,
+            bottom: PatientBottomNav.totalBarHeight(context) + 12,
             child: FloatingActionButton.extended(
               heroTag: 'apply_certificate',
               onPressed: () {

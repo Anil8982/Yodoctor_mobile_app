@@ -29,19 +29,18 @@ class ProfileActionBar extends ConsumerWidget {
     final notifier = ref.read(profileControllerProvider.notifier);
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        border: Border(
-          top: BorderSide(
-            color: colorScheme.outlineVariant.withValues(alpha: 0.3),
-          ),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: colorScheme.outlineVariant.withValues(alpha: 0.3),
         ),
         boxShadow: [
           BoxShadow(
-            color: colorScheme.shadow.withValues(alpha: 0.05),
+            color: colorScheme.shadow.withValues(alpha: 0.04),
             blurRadius: 10,
-            offset: const Offset(0, -4),
+            offset: const Offset(0, 4),
           ),
         ],
       ),

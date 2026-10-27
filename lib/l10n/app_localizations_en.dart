@@ -1720,4 +1720,154 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get instructionsLabel => 'Instructions';
+
+  @override
+  String get clinicalCareSectionTitle => 'Doctor & Clinic Visits';
+
+  @override
+  String get clinicalCareSectionSubtitle =>
+      'Consult verified doctors and get instant tokens';
+
+  @override
+  String get doorstepCareSectionTitle => 'Doorstep Healthcare';
+
+  @override
+  String get doorstepCareSectionSubtitle =>
+      'Diagnostic lab tests and pharmacy delivery';
+
+  @override
+  String get myActivitySectionTitle => 'My Bookings & History';
+
+  @override
+  String get myActivitySectionSubtitle =>
+      'Track past and upcoming appointments and care visits';
+
+  @override
+  String get doctorVisitsHistoryTitle => 'Doctor Visits';
+
+  @override
+  String get doctorVisitsHistorySubtitle => 'Clinic & video history';
+
+  @override
+  String get homeCareOrdersTitle => 'Home Care';
+
+  @override
+  String get homeCareOrdersSubtitle => 'Nursing care orders';
+
+  @override
+  String get appointmentsBadge => 'Appointments';
+
+  @override
+  String get careVisitsBadge => 'Care Visits';
+
+  @override
+  String get viewHistoryAction => 'View History';
+
+  @override
+  String get needHelpBookingTitle => 'Need Help with a Booking?';
+
+  @override
+  String get needHelpBookingSubtitle =>
+      'Track past requests or contact patient support';
+
+  @override
+  String get contactSupportBtn => 'Contact Support';
+
+  @override
+  String get comingSoonBadge => 'SOON';
+
+  @override
+  String get bookNowAction => 'Book Now';
+
+  @override
+  String get scanQrAction => 'Scan QR';
+
+  @override
+  String get applyNowAction => 'Apply Now';
+
+  @override
+  String get healthAndFamilySection => 'HEALTH & RECORDS';
+
+  @override
+  String get appPreferencesSection => 'APP PREFERENCES';
+
+  @override
+  String get helpAndLegalSection => 'HELP & SUPPORT';
+
+  @override
+  String get accountSection => 'ACCOUNT ACTIONS';
+
+  @override
+  String get deleteAccount => 'Delete Account';
+
+  @override
+  String get deleteAccountDesc => 'Permanently delete account and health data';
+
+  @override
+  String get notificationsTitle => 'Notifications & Alerts';
+
+  @override
+  String get notificationsDesc => 'Reminders and appointment alerts';
+
+  @override
+  String get darkModeTitle => 'Dark Mode';
+
+  @override
+  String get helpSupportTitle => 'Help & Support';
+
+  @override
+  String get helpSupportDesc => '24/7 Patient assistance & FAQs';
+
+  @override
+  String get privacyTermsTitle => 'Privacy Policy & Terms';
+
+  @override
+  String get privacyTermsDesc => 'Data protection and terms of use';
+
+  @override
+  String get editProfileBtn => 'Edit Profile';
+
+  @override
+  String get myHealthcareSection => 'MY HEALTHCARE';
+
+  @override
+  String get appointmentsHistory => 'Appointments History';
+
+  @override
+  String get appointmentsHistorySubtitle =>
+      'Past, ongoing & scheduled appointments';
+
+  @override
+  String get certificateWalletSubtitle =>
+      'View, verify & download medical certificates';
+
+  @override
+  String get personalDetailsSubtitle => 'View and update your personal info';
+
+  @override
+  String get privacyPolicyOnlyTitle => 'Privacy Policy';
+
+  @override
+  String get privacyPolicySubtitle => 'How we protect your medical data';
+
+  @override
+  String get termsOfServiceTitle => 'Terms of Service';
+
+  @override
+  String get termsOfServiceSubtitle => 'Terms and conditions of use';
+
+  @override
+  String get supportAndLegalSection => 'SUPPORT & LEGAL';
+
+  @override
+  String get accountAndFamilySection => 'ACCOUNT & FAMILY';
+
+  @override
+  String get logoutAccountSubtitle => 'Sign out of your YoDoctor account';
+
+  @override
+  String get doorstepCareBannerTag => 'DOORSTEP MEDICAL CARE';
+
+  @override
+  String get familyMembersSubtitle => 'Add & manage dependents';
 }

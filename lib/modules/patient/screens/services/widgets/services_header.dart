@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../../core/routes/app_routes.dart';
 import '../../../../../l10n/app_localizations.dart';
 
 class ServicesHeader extends StatelessWidget {
@@ -41,37 +43,40 @@ class ServicesHeader extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 9,
-                  vertical: 3.5,
-                ),
-                decoration: BoxDecoration(
-                  color: colorScheme.onPrimary.withValues(alpha: 0.16),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: colorScheme.onPrimary.withValues(alpha: 0.15),
+              InkWell(
+                onTap: () => context.push(AppRoutes.homeCareHistory),
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4.5,
                   ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Icon(
-                      Icons.medical_services_rounded,
-                      color: colorScheme.onPrimary,
-                      size: 13,
+                  decoration: BoxDecoration(
+                    color: colorScheme.onPrimary.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: colorScheme.onPrimary.withValues(alpha: 0.28),
                     ),
-                    const SizedBox(width: 5),
-                    Text(
-                      l10n?.activeServicesCount(servicesCount) ??
-                          '$servicesCount active services',
-                      style: textTheme.bodySmall?.copyWith(
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Icon(
+                        Icons.history_rounded,
                         color: colorScheme.onPrimary,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 11.5,
+                        size: 14,
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 5),
+                      Text(
+                        'My Bookings',
+                        style: textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onPrimary,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 11.5,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/l10n/app_localizations.dart';
-import 'package:yodoctor/modules/widgets/app_header.dart';
+import '../../widgets/patient_app_bar.dart';
 import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 
 import '../../../../core/routes/app_routes.dart';
@@ -31,7 +31,10 @@ class _FamilyMembersScreenState extends ConsumerState<FamilyMembersScreen> {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppHeader(title: l10n?.familyMembers ?? 'Family Members'),
+      appBar: PatientAppBar(
+        titleText: l10n?.familyMembers ?? 'Family Members',
+        subtitleText: '${familyState.members.length} Linked Members',
+      ),
       body: familyState.members.isEmpty
           ? Column(
               children: [

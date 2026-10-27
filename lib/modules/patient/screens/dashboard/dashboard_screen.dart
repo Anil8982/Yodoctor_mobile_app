@@ -1,10 +1,9 @@
-import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
-import 'package:yodoctor/modules/patient/screens/dashboard/widgets/patient_header.dart';
-import 'package:yodoctor/modules/patient/widgets/custom_sliver_app_bar.dart';
+import 'package:yodoctor/modules/patient/widgets/patient_app_bar.dart';
+import 'package:yodoctor/modules/patient/widgets/patient_bottom_nav.dart';
 
 import '../../../../core/utils/app_spacing.dart';
 import '../../../../core/utils/responsive.dart';
@@ -52,19 +51,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     }
 
     if (data == null) {
-      return Container(
-        color: theme.scaffoldBackgroundColor,
-        child: NestedScrollView(
-          headerSliverBuilder: (context, innerBoxIsScrolled) {
-            return [
-              CustomSliverAppBar(
-                titleText: l10n.dashboard,
-                expandedHeight: CustomSliverAppBar.defaultExpandedHeight,
-                background: const PatientHeader(dashboard: null),
-              ),
-            ];
-          },
-          body: Center(
+      return Scaffold(
+        backgroundColor: theme.scaffoldBackgroundColor,
+        appBar: const PatientAppBar(isDashboard: true),
+        body: Center(
             child: Padding(
               padding: const EdgeInsets.all(AppSpacing.xl),
               child: Column(
@@ -119,68 +109,56 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               ),
             ),
           ),
-        ),
       );
     }
 
     final bool mobile = Responsive.isMobile(context);
     final double horizontal = Responsive.horizontalPadding(context);
 
-    return Container(
-      color: theme.scaffoldBackgroundColor,
-      child: NestedScrollView(
-        headerSliverBuilder: (context, innerBoxIsScrolled) {
-          return [
-            CustomSliverAppBar(
-              titleText: l10n.dashboard,
-              expandedHeight: CustomSliverAppBar.defaultExpandedHeight,
-              background: PatientHeader(dashboard: data),
-            ),
-          ];
-        },
-        body: RefreshIndicator(
-          onRefresh: () => ref
-              .read(patientDashboardControllerProvider.notifier)
-              .loadDashboard(),
-          color: colorScheme.primary,
-          backgroundColor: colorScheme.surface,
-          child: CustomScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            slivers: [
-              SliverPadding(
-                padding: EdgeInsets.fromLTRB(
-                  horizontal,
-                  AppSpacing.lg,
-                  horizontal,
-                  85,
-                ),
-                sliver: SliverList(
-                  delegate: SliverChildListDelegate([
-                    TokenCard(token: data.todayToken),
-                    const SizedBox(height: AppSpacing.lg),
+    return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
+      appBar: const PatientAppBar(isDashboard: true),
+      body: RefreshIndicator(
+        onRefresh: () => ref
+            .read(patientDashboardControllerProvider.notifier)
+            .loadDashboard(),
+        color: colorScheme.primary,
+        backgroundColor: colorScheme.surface,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(
+            parent: BouncingScrollPhysics(),
+          ),
+          padding: EdgeInsets.fromLTRB(
+            horizontal,
+            AppSpacing.lg,
+            horizontal,
+            PatientBottomNav.floatingNavPadding(context),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              TokenCard(token: data.todayToken),
+              const SizedBox(height: AppSpacing.lg),
 
-                    SearchDoctorCard(isSearch: data.todayToken == null),
-                    const SizedBox(height: AppSpacing.lg),
+              SearchDoctorCard(isSearch: data.todayToken == null),
+              const SizedBox(height: AppSpacing.lg),
 
-                    const CertificateBanner(),
-                    const SizedBox(height: AppSpacing.xl),
+              const CertificateBanner(),
+              const SizedBox(height: AppSpacing.xl),
 
-                    _buildSectionHeader(
-                      context,
-                      colorScheme,
-                      l10n.upcomingAppointments,
-                      onSeeAll: () => context.go(AppRoutes.history),
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                    if (loading)
-                      LinearProgressIndicator(
-                        color: colorScheme.primary,
-                        backgroundColor: colorScheme.primaryContainer,
-                      ),
-                    _buildAppointmentsContent(data, mobile),
-                  ]),
-                ),
+              _buildSectionHeader(
+                context,
+                colorScheme,
+                l10n.upcomingAppointments,
+                onSeeAll: () => context.push(AppRoutes.history),
               ),
+              const SizedBox(height: AppSpacing.md),
+              if (loading)
+                LinearProgressIndicator(
+                  color: colorScheme.primary,
+                  backgroundColor: colorScheme.primaryContainer,
+                ),
+              _buildAppointmentsContent(data, mobile),
             ],
           ),
         ),

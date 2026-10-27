@@ -1,4 +1,3 @@
-import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -8,7 +7,7 @@ import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/controllers/book_appointment_controller.dart';
 import 'package:yodoctor/modules/patient/controllers/family_controller.dart';
 import 'package:yodoctor/modules/patient/screens/appointments/widgets/appointment_queue_dialog.dart';
-import 'package:yodoctor/modules/widgets/app_header.dart';
+import '../../widgets/patient_app_bar.dart';
 import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 import '../../../../core/routes/app_routes.dart';
 import '../../models/search/doctor_detail_model.dart';
@@ -108,19 +107,9 @@ class BookAppointmentScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(kToolbarHeight),
-        child: Container(
-          decoration: BoxDecoration(
-            border: Border(
-              bottom: BorderSide(
-                color: colorScheme.outline.transparency(0.4),
-                width: 1.0,
-              ),
-            ),
-          ),
-          child: AppHeader(title: l10n.bookAppointment),
-        ),
+      appBar: PatientAppBar(
+        titleText: l10n.bookAppointment,
+        subtitleText: 'Doctor Consultation Slot',
       ),
       body: SafeArea(
         child: Column(

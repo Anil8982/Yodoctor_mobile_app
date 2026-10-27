@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/l10n/app_localizations.dart';
-import 'package:yodoctor/modules/widgets/app_header.dart';
+import '../../widgets/patient_app_bar.dart';
 import 'package:yodoctor/modules/widgets/status_chip.dart';
 
 import '../../controllers/certificate_request.dart';
@@ -78,7 +78,10 @@ class _PatientCertificateDetailScreenState
     if (state.isLoading) {
       return Scaffold(
         backgroundColor: theme.scaffoldBackgroundColor,
-        appBar: AppHeader(title: l10n.certificateDetails),
+        appBar: PatientAppBar(
+          titleText: l10n.certificateDetails,
+          subtitleText: 'Verified Medical Record',
+        ),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
@@ -86,7 +89,10 @@ class _PatientCertificateDetailScreenState
     if (cert == null) {
       return Scaffold(
         backgroundColor: theme.scaffoldBackgroundColor,
-        appBar: AppHeader(title: l10n.certificateDetails),
+        appBar: PatientAppBar(
+          titleText: l10n.certificateDetails,
+          subtitleText: 'Verified Medical Record',
+        ),
         body: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -121,7 +127,10 @@ class _PatientCertificateDetailScreenState
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppHeader(title: l10n.certificateDetails),
+      appBar: PatientAppBar(
+        titleText: l10n.certificateDetails,
+        subtitleText: 'Verified Medical Record',
+      ),
       body: SafeArea(
         child: ListView(
           physics: const BouncingScrollPhysics(),

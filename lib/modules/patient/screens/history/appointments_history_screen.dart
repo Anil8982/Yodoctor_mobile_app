@@ -4,10 +4,9 @@ import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 import '../../../../core/utils/responsive.dart';
 import '../../controllers/appointment_history_controller.dart';
-import '../../widgets/custom_sliver_app_bar.dart';
+import '../../widgets/patient_app_bar.dart';
 import 'widgets/appointment_details_dialog.dart';
 import 'widgets/history_appointment_card.dart';
-import 'widgets/history_header.dart';
 import 'widgets/history_table_header.dart';
 import 'widgets/prescription_bottom_sheet.dart';
 
@@ -43,29 +42,19 @@ class _AppointmentsHistoryScreenState
     final double horizontal = Responsive.horizontalPadding(context);
     final bool isWideScreen = MediaQuery.sizeOf(context).width >= 980;
 
-    return Container(
-      color: theme.scaffoldBackgroundColor,
-      child: NestedScrollView(
-        physics: const ClampingScrollPhysics(),
-        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-          return <Widget>[
-            CustomSliverAppBar(
-              titleText: l10n?.myAppointmentsTitle ?? 'My Appointments',
-              expandedHeight: CustomSliverAppBar.defaultExpandedHeight,
-              background: HistoryHeader(
-                appointmentCount: historyState.appointments.length,
-              ),
-            ),
-            if (historyState.isLoading)
-              SliverToBoxAdapter(
-                child: Container(
-                  color: theme.scaffoldBackgroundColor,
-                  child: const LinearProgressIndicator(minHeight: 3),
-                ),
-              ),
-          ];
-        },
-        body: historyState.appointments.isEmpty && !historyState.isLoading
+    return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
+      appBar: PatientAppBar(
+        titleText: l10n?.myAppointmentsTitle ?? 'My Appointments',
+        subtitleText: 'Past & Upcoming Consultations',
+        bottom: historyState.isLoading
+            ? const PreferredSize(
+                preferredSize: Size.fromHeight(3),
+                child: LinearProgressIndicator(minHeight: 3),
+              )
+            : null,
+      ),
+      body: historyState.appointments.isEmpty && !historyState.isLoading
             ? _buildEmptyState(context)
             : RefreshIndicator(
                 onRefresh: notifier.refresh,
@@ -189,7 +178,6 @@ class _AppointmentsHistoryScreenState
                   ],
                 ),
               ),
-      ),
     );
   }
 

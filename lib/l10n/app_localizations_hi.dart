@@ -1718,4 +1718,156 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get instructionsLabel => 'ज़रूरी निर्देश';
+
+  @override
+  String get clinicalCareSectionTitle => 'डॉक्टर व क्लिनिक सेवाएं';
+
+  @override
+  String get clinicalCareSectionSubtitle =>
+      'विशेषज्ञ डॉक्टरों से परामर्श और तुरंत टोकन पाएं';
+
+  @override
+  String get doorstepCareSectionTitle => 'घर बैठे स्वास्थ्य सेवाएं';
+
+  @override
+  String get doorstepCareSectionSubtitle => 'लैब टेस्ट और घर पर दवाइयां';
+
+  @override
+  String get myActivitySectionTitle => 'मेरी गतिविधि और इतिहास';
+
+  @override
+  String get myActivitySectionSubtitle =>
+      'अपनी सभी नियुक्तियों और देखभाल सेवाओं की स्थिति देखें';
+
+  @override
+  String get doctorVisitsHistoryTitle => 'डॉक्टर अपॉइंटमेंट्स';
+
+  @override
+  String get doctorVisitsHistorySubtitle => 'क्लिनिक व वीडियो हिस्ट्री';
+
+  @override
+  String get homeCareOrdersTitle => 'होम केयर';
+
+  @override
+  String get homeCareOrdersSubtitle => 'नर्सिंग व देखभाल सेवाएं';
+
+  @override
+  String get appointmentsBadge => 'अपॉइंटमेंट्स';
+
+  @override
+  String get careVisitsBadge => 'केयर विज़िट्स';
+
+  @override
+  String get viewHistoryAction => 'इतिहास देखें';
+
+  @override
+  String get needHelpBookingTitle => 'बुकिंग में सहायता चाहिए?';
+
+  @override
+  String get needHelpBookingSubtitle =>
+      'सहायता टीम से संपर्क करें या ऑर्डर ट्रैक करें';
+
+  @override
+  String get contactSupportBtn => 'संपर्क करें';
+
+  @override
+  String get comingSoonBadge => 'जल्द';
+
+  @override
+  String get bookNowAction => 'बुक करें';
+
+  @override
+  String get scanQrAction => 'स्कैन करें';
+
+  @override
+  String get applyNowAction => 'आवेदन करें';
+
+  @override
+  String get healthAndFamilySection => 'स्वास्थ्य और रिकॉर्ड्स';
+
+  @override
+  String get appPreferencesSection => 'ऐप सेटिंग्स';
+
+  @override
+  String get helpAndLegalSection => 'मदद और सपोर्ट';
+
+  @override
+  String get accountSection => 'खाता नियंत्रण';
+
+  @override
+  String get deleteAccount => 'खाता हटाएं';
+
+  @override
+  String get deleteAccountDesc =>
+      'अपना खाता और स्वास्थ्य डेटा हमेशा के लिए हटाएं';
+
+  @override
+  String get notificationsTitle => 'सूचनाएं और अलर्ट्स';
+
+  @override
+  String get notificationsDesc => 'अपॉइंटमेंट रिमाइंडर और अपडेट्स';
+
+  @override
+  String get darkModeTitle => 'डार्क मोड';
+
+  @override
+  String get helpSupportTitle => 'मदद और सहायता';
+
+  @override
+  String get helpSupportDesc => '२४/७ मरीज सहायता और अक्सर पूछे जाने वाले सवाल';
+
+  @override
+  String get privacyTermsTitle => 'गोपनीयता नीति और शर्तें';
+
+  @override
+  String get privacyTermsDesc => 'डेटा सुरक्षा और उपयोग के नियम';
+
+  @override
+  String get editProfileBtn => 'प्रोफाइल बदलें';
+
+  @override
+  String get myHealthcareSection => 'मेरी स्वास्थ्य सेवाएं';
+
+  @override
+  String get appointmentsHistory => 'अपॉइंटमेंट इतिहास';
+
+  @override
+  String get appointmentsHistorySubtitle =>
+      'पिछली, वर्तमान और आगामी अपॉइंटमेंट्स';
+
+  @override
+  String get certificateWalletSubtitle =>
+      'मेडिकल सर्टिफिकेट देखें, सत्यापित करें और डाउनलोड करें';
+
+  @override
+  String get personalDetailsSubtitle =>
+      'अपनी व्यक्तिगत जानकारी देखें और अपडेट करें';
+
+  @override
+  String get privacyPolicyOnlyTitle => 'गोपनीयता नीति';
+
+  @override
+  String get privacyPolicySubtitle =>
+      'हम आपके मेडिकल डेटा की सुरक्षा कैसे करते हैं';
+
+  @override
+  String get termsOfServiceTitle => 'सेवा की शर्तें';
+
+  @override
+  String get termsOfServiceSubtitle => 'उपयोग के नियम और शर्तें';
+
+  @override
+  String get supportAndLegalSection => 'सहायता और नीतियां';
+
+  @override
+  String get accountAndFamilySection => 'खाता और परिवार';
+
+  @override
+  String get logoutAccountSubtitle => 'अपने YoDoctor खाते से लॉग आउट करें';
+
+  @override
+  String get doorstepCareBannerTag => 'घर पर स्वास्थ्य सेवा';
+
+  @override
+  String get familyMembersSubtitle => 'आश्रितों को जोड़ें और प्रबंधित करें';
 }

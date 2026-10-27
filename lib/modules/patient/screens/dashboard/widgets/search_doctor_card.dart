@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
-import 'package:yodoctor/core/utils/app_spacing.dart';
-import 'package:yodoctor/core/utils/responsive.dart';
 import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/controllers/patient_search_controller.dart';
 
@@ -75,11 +73,9 @@ class _SearchDoctorCardState extends ConsumerState<SearchDoctorCard> {
     final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context)!;
-    final isMobile = Responsive.isMobile(context);
 
     final searchState = ref.watch(patientSearchControllerProvider);
     final specialties = searchState.specialties;
-    final displayedSpecialties = specialties.take(8).toList();
 
     final locationText = searchState.locationQuery.isNotEmpty
         ? searchState.locationQuery
@@ -89,19 +85,7 @@ class _SearchDoctorCardState extends ConsumerState<SearchDoctorCard> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        // 1. Section Title
-        Text(
-          l10n.findDoctors,
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w800,
-            fontSize: 18,
-            letterSpacing: -0.4,
-            color: colorScheme.onSurface,
-          ),
-        ),
-        const SizedBox(height: AppSpacing.md),
-
-        // 2. Responsive Search Bar
+        // 1. Search Bar
         Material(
           color: Colors.transparent,
           child: InkWell(
@@ -177,125 +161,179 @@ class _SearchDoctorCardState extends ConsumerState<SearchDoctorCard> {
           ),
         ),
 
-        // 3. Specialties Grid (Gap reduced with EdgeInsets.zero & compact SizedBox)
-        if (displayedSpecialties.isNotEmpty) ...[
-          const SizedBox(height: 10),
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            padding: EdgeInsets.zero,
-            itemCount: displayedSpecialties.length,
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: isMobile ? 4 : 8,
-              crossAxisSpacing: 8,
-              mainAxisSpacing: 10,
-              childAspectRatio: 0.78,
+        const SizedBox(height: 16),
+
+        // 2. Section Header: Specializations + See All
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              l10n.featuredSpecialties,
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w800,
+                fontSize: 16,
+                letterSpacing: -0.3,
+                color: colorScheme.onSurface,
+              ),
             ),
-            itemBuilder: (context, index) {
-              final specialty = displayedSpecialties[index];
-              return _buildSpecialtyTile(
-                context: context,
-                specialty: specialty,
-                icon: _getSpecialtyIcon(specialty),
-                colorScheme: colorScheme,
-                theme: theme,
-              );
-            },
+            InkWell(
+              onTap: _onSearchTap,
+              borderRadius: BorderRadius.circular(8),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      l10n.viewAll,
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: colorScheme.primary,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 12.5,
+                      ),
+                    ),
+                    const SizedBox(width: 2),
+                    Icon(
+                      Icons.chevron_right_rounded,
+                      size: 16,
+                      color: colorScheme.primary,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+
+        // 3. Specialties Single Line Horizontal Scroll
+        if (specialties.isNotEmpty) ...[
+          SizedBox(
+            height: 92,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              itemCount: specialties.length,
+              separatorBuilder: (context, index) => const SizedBox(width: 12),
+              itemBuilder: (context, index) {
+                final specialty = specialties[index];
+                return _buildSpecialtyItem(
+                  context: context,
+                  specialty: specialty,
+                  icon: _getSpecialtyIcon(specialty),
+                  colorScheme: colorScheme,
+                  theme: theme,
+                );
+              },
+            ),
           ),
         ] else if (searchState.isLoading) ...[
-          const SizedBox(height: 10),
-          _buildSpecialtiesShimmer(isMobile, colorScheme),
+          _buildSpecialtiesShimmer(colorScheme),
         ],
       ],
     );
   }
 
-  Widget _buildSpecialtyTile({
+  Widget _buildSpecialtyItem({
     required BuildContext context,
     required String specialty,
     required IconData icon,
     required ColorScheme colorScheme,
     required ThemeData theme,
   }) {
-    return InkWell(
-      onTap: () => _onSpecialtyTap(specialty),
-      borderRadius: BorderRadius.circular(16),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 52,
-            height: 52,
-            decoration: BoxDecoration(
-              color: colorScheme.primaryContainer.withValues(alpha: 0.35),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: colorScheme.primary.withValues(alpha: 0.12),
-                width: 1,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => _onSpecialtyTap(specialty),
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          width: 72,
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 52,
+                height: 52,
+                decoration: BoxDecoration(
+                  color: colorScheme.primaryContainer.withValues(alpha: 0.35),
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(
+                    color: colorScheme.primary.withValues(alpha: 0.15),
+                    width: 1.1,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: colorScheme.primary.withValues(alpha: 0.05),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  icon,
+                  color: colorScheme.primary,
+                  size: 24,
+                ),
               ),
-            ),
-            child: Icon(
-              icon,
-              color: colorScheme.primary,
-              size: 24,
-            ),
+              const SizedBox(height: 6),
+              Text(
+                specialty,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 11,
+                  color: colorScheme.onSurface,
+                  letterSpacing: -0.2,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+              ),
+            ],
           ),
-          const SizedBox(height: 6),
-          Text(
-            specialty,
-            style: theme.textTheme.labelSmall?.copyWith(
-              fontWeight: FontWeight.w600,
-              fontSize: 11,
-              color: colorScheme.onSurface,
-              letterSpacing: -0.2,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.center,
-          ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildSpecialtiesShimmer(bool isMobile, ColorScheme colorScheme) {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      padding: EdgeInsets.zero,
-      itemCount: 8,
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: isMobile ? 4 : 8,
-        crossAxisSpacing: 8,
-        mainAxisSpacing: 10,
-        childAspectRatio: 0.78,
+  Widget _buildSpecialtiesShimmer(ColorScheme colorScheme) {
+    return SizedBox(
+      height: 92,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: 6,
+        separatorBuilder: (context, index) => const SizedBox(width: 12),
+        itemBuilder: (context, index) {
+          return SizedBox(
+            width: 72,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 52,
+                  height: 52,
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Container(
+                  width: 48,
+                  height: 10,
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
       ),
-      itemBuilder: (context, index) {
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 52,
-              height: 52,
-              decoration: BoxDecoration(
-                color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
-                borderRadius: BorderRadius.circular(16),
-              ),
-            ),
-            const SizedBox(height: 6),
-            Container(
-              width: 44,
-              height: 10,
-              decoration: BoxDecoration(
-                color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
-                borderRadius: BorderRadius.circular(5),
-              ),
-            ),
-          ],
-        );
-      },
     );
   }
 }

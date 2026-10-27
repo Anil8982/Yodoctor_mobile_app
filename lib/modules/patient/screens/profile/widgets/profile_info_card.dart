@@ -1,12 +1,11 @@
-import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:yodoctor/l10n/app_localizations.dart';
-
+import 'package:yodoctor/modules/widgets/app_date_picker_field.dart';
+import 'package:yodoctor/modules/widgets/app_dropdown_field.dart';
+import 'package:yodoctor/modules/widgets/app_text_field.dart';
 import '../../../controllers/profile_controller.dart';
-import 'profile_date_picker_field.dart';
-import 'profile_dropdown_field.dart';
-import 'profile_text_field.dart';
 
 class ProfileInfoCard extends StatelessWidget {
   final ProfileController controller;
@@ -23,126 +22,147 @@ class ProfileInfoCard extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final l10n = AppLocalizations.of(context)!;
 
-    Widget buildDivider() => Divider(
-      indent: 60,
-      endIndent: 20,
-      thickness: 0.8,
-      height: 1,
-      color: colorScheme.outlineVariant.transparency(0.4),
-    );
+    DateTime? selectedDob;
+    if (controller.dobController.text.isNotEmpty) {
+      selectedDob = DateTime.tryParse(controller.dobController.text);
+    }
 
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(28),
-        side: BorderSide(color: colorScheme.outlineVariant.transparency(0.4)),
-      ),
-      color: colorScheme.surface,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
-        child: Column(
-          children: [
-            ProfileTextField(
-              label: l10n.fullName,
-              icon: Icons.person_rounded,
-              hintText: l10n.enterFullName,
-              controller: controller.nameController,
-              isEditing: isEditing,
-              validator: (value) {
-                if (!isEditing) return null;
-
-                if (value == null || value.trim().isEmpty) {
-                  return "l10n.pleaseEnterName";
-                }
-
-                final cleanedValue = value.trim().replaceAll(
-                  RegExp(r'\s+'),
-                  ' ',
-                );
-
-                if (cleanedValue.length < 2) {
-                  return l10n.nameMinCharacters;
-                }
-
-                if (!RegExp(
-                  r'^[A-Za-z]+(?: [A-Za-z]+)*$',
-                ).hasMatch(cleanedValue)) {
-                  return l10n.onlyAlphabetsAllowed;
-                }
-
-                return null;
-              },
-            ),
-
-            buildDivider(),
-
-            ProfileTextField(
-              label: l10n.emailAddress,
-              icon: Icons.alternate_email_rounded,
-              hintText: l10n.enterEmailAddress,
-              controller: controller.emailController,
-              isEditing: false,
-            ),
-
-            buildDivider(),
-
-            ProfileTextField(
-              label: l10n.phoneNumber,
-              icon: Icons.phone_android_rounded,
-              hintText: l10n.enterPhoneNumber,
-              controller: controller.mobileController,
-              isEditing: isEditing && controller.canEditMobile,
-              inputFormatters: [
-                FilteringTextInputFormatter.digitsOnly,
-                LengthLimitingTextInputFormatter(10),
-              ],
-
-              validator: (value) {
-                if (!isEditing || !controller.canEditMobile) {
-                  return null;
-                }
-
-                if (value == null || value.trim().isEmpty) {
-                  return l10n.pleaseEnterPhoneNumber;
-                }
-
-                if (!RegExp(r'^[6-9]\d{9}$').hasMatch(value.trim())) {
-                  return l10n.phoneMinDigitsAllowed;
-                }
-
-                return null;
-              },
-            ),
-
-            buildDivider(),
-
-            ProfileDropdownField(
-              label: l10n.gender,
-              icon: Icons.wc_rounded,
-              value: controller.genderController.text.toUpperCase(),
-              items: const ["MALE", "FEMALE", "OTHER"],
-              isEditing: isEditing,
-              onChanged: (val) {
-                if (val != null) {
-                  controller.genderController.text = val;
-                }
-              },
-            ),
-
-            buildDivider(),
-
-            ProfileDatePickerField(
-              label: l10n.dateOfBirth,
-              icon: Icons.cake_rounded,
-              value: controller.formatDob(
-                controller.dobController.text,
-                context,
-              ),
-              isEditing: isEditing,
-              onTap: () => controller.pickDateOfBirth(context),
-            ),
-          ],
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: colorScheme.outlineVariant.withValues(alpha: 0.35),
+          width: 1.1,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: colorScheme.shadow.withValues(alpha: 0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Section Subtitle
+          Row(
+            children: [
+              Icon(Icons.edit_note_rounded, size: 20, color: colorScheme.primary),
+              const SizedBox(width: 8),
+              Text(
+                'PERSONAL INFORMATION',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                  color: colorScheme.primary,
+                  letterSpacing: 0.6,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 18),
+
+          // 1. Full Name (Required) using AppTextField
+          AppTextField(
+            label: l10n.fullName,
+            isRequired: true,
+            hint: l10n.enterFullName,
+            icon: Icons.person_rounded,
+            controller: controller.nameController,
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return l10n.pleaseEnterName;
+              }
+              final cleaned = value.trim().replaceAll(RegExp(r'\s+'), ' ');
+              if (cleaned.length < 2) return l10n.nameMinCharacters;
+              if (!RegExp(r'^[A-Za-z]+(?: [A-Za-z]+)*$').hasMatch(cleaned)) {
+                return l10n.onlyAlphabetsAllowed;
+              }
+              return null;
+            },
+          ),
+          const SizedBox(height: 16),
+
+          // 2. Email Address (Non-editable with Lock icon) using AppTextField
+          AppTextField(
+            label: l10n.emailAddress,
+            hint: l10n.enterEmailAddress,
+            icon: Icons.alternate_email_rounded,
+            controller: controller.emailController,
+            readOnly: true,
+            enabled: false,
+            suffixIcon: Icon(
+              Icons.lock_outline_rounded,
+              size: 18,
+              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.65),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // 3. Mobile Number (Optional) using AppTextField
+          AppTextField(
+            label: l10n.phoneNumber,
+            isOptional: true,
+            hint: l10n.enterPhoneNumber,
+            icon: Icons.phone_android_rounded,
+            controller: controller.mobileController,
+            readOnly: !controller.canEditMobile,
+            keyboardType: TextInputType.phone,
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+              LengthLimitingTextInputFormatter(10),
+            ],
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return null; // OPTIONAL
+              }
+              if (!RegExp(r'^[6-9]\d{9}$').hasMatch(value.trim())) {
+                return l10n.phoneMinDigitsAllowed;
+              }
+              return null;
+            },
+          ),
+          const SizedBox(height: 16),
+
+          // 4. Gender Dropdown using AppDropdownField
+          AppDropdownField<String>(
+            label: l10n.gender,
+            icon: Icons.wc_rounded,
+            hint: l10n.selectGender,
+            value: const ['MALE', 'FEMALE', 'OTHER']
+                    .contains(controller.genderController.text.toUpperCase())
+                ? controller.genderController.text.toUpperCase()
+                : null,
+            items: const ['MALE', 'FEMALE', 'OTHER'],
+            itemLabelBuilder: (item) => item,
+            onChanged: (val) {
+              if (val != null) {
+                controller.genderController.text = val;
+              }
+            },
+          ),
+          const SizedBox(height: 16),
+
+          // 5. Date of Birth Picker using AppDatePickerField
+          AppDatePickerField(
+            label: l10n.dateOfBirth,
+            hint: l10n.selectDateOfBirth,
+            icon: Icons.cake_rounded,
+            value: selectedDob,
+            firstDate: DateTime(1900),
+            lastDate: DateTime.now().subtract(const Duration(days: 1)),
+            onChanged: (date) {
+              if (date != null) {
+                controller.dobController.text = DateFormat('yyyy-MM-dd').format(date);
+              } else {
+                controller.dobController.clear();
+              }
+            },
+          ),
+        ],
       ),
     );
   }

@@ -8,7 +8,7 @@ import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/widgets/app_date_picker_field.dart';
 import 'package:yodoctor/modules/widgets/app_dropdown_field.dart';
 import 'package:yodoctor/modules/widgets/app_text_field.dart';
-import 'package:yodoctor/modules/widgets/app_header.dart';
+import '../../widgets/patient_app_bar.dart';
 
 import '../../../widgets/app_button.dart';
 import '../../controllers/family_controller.dart';
@@ -173,10 +173,11 @@ class _AddFamilyMemberScreenState extends ConsumerState<AddFamilyMemberScreen> {
     final l10n = AppLocalizations.of(context);
 
     return Scaffold(
-      appBar: AppHeader(
-        title: _isEditing
+      appBar: PatientAppBar(
+        titleText: _isEditing
             ? (l10n?.updateMember ?? 'Update Member')
             : (l10n?.addNewMember ?? 'Add New Member'),
+        subtitleText: 'Enter Member & Health Details',
       ),
       backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(

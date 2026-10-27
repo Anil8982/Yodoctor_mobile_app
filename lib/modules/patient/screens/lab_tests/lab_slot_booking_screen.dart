@@ -6,7 +6,7 @@ import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/controllers/booking_controller.dart';
 import 'package:yodoctor/modules/patient/controllers/lab_test_controller.dart';
-import 'package:yodoctor/modules/widgets/app_header.dart';
+import '../../widgets/patient_app_bar.dart';
 import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 import 'widgets/lab_booking_step_container.dart';
 import 'widgets/lab_booking_patient_fields.dart';
@@ -90,7 +90,10 @@ class _LabSlotBookingScreenState extends ConsumerState<LabSlotBookingScreen> {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppHeader(title: l10n?.bookSlotTitle ?? 'Book a Slot'),
+      appBar: PatientAppBar(
+        titleText: l10n?.bookSlotTitle ?? 'Book Slot',
+        subtitleText: 'Select Date & Address',
+      ),
       body: SafeArea(
         child: Form(
           key: _formKey,

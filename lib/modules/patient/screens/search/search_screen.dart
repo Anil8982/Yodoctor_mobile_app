@@ -3,7 +3,6 @@ import 'package:chroma_kit/chroma_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/models/search/doctor_search_model.dart';
 import 'package:yodoctor/modules/patient/screens/search/widgets/find_doctors_shimmer.dart';
@@ -19,7 +18,8 @@ import '../../controllers/patient_search_controller.dart';
 import '../../models/search/search_params.dart';
 
 import 'widgets/doctor_card.dart';
-import 'widgets/hero_section.dart';
+import '../../widgets/patient_app_bar.dart';
+import 'widgets/doctor_search_widget.dart';
 import 'widgets/auto_hide_specialty_filter.dart';
 
 class SearchScreen extends ConsumerStatefulWidget {
@@ -157,37 +157,28 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
+      appBar: PatientAppBar(
+        titleText: l10n.findDoctors,
+        subtitleText: '${listingState.doctors.length} Doctors Available',
+      ),
       body: Stack(
         children: [
           CustomScrollView(
             controller: _scrollController,
             slivers: [
               // --- Redesigned App Bar / Hero Section ---
-              SliverAppBar(
-                expandedHeight: 240,
-                pinned: true,
-                stretch: true,
-                elevation: 0,
-                backgroundColor: colorScheme.primary,
-                iconTheme: IconThemeData(color: AppTheme.white),
-                title: Text(
-                  l10n.findDoctors,
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    color: colorScheme.onPrimary,
-                    fontWeight: FontWeight.bold,
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.md,
+                    12,
+                    AppSpacing.md,
+                    4,
                   ),
-                ),
-                actions: [
-                  _buildResultCounter(
-                    listingState.doctors.length,
-                    colorScheme,
-                    l10n,
+                  child: DoctorSearchWidget(
+                    isHero: true,
+                    onSearchOverride: _triggerSearch,
                   ),
-                  const SizedBox(width: AppSpacing.md),
-                ],
-                flexibleSpace: FlexibleSpaceBar(
-                  stretchModes: const [StretchMode.zoomBackground],
-                  background: HeroSection(onSearch: _triggerSearch),
                 ),
               ),
 
@@ -331,29 +322,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     );
   }
 
-  Widget _buildResultCounter(
-    int count,
-    ColorScheme colorScheme,
-    AppLocalizations l10n,
-  ) {
-    return Center(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: ShapeDecoration(
-          shape: const StadiumBorder(),
-          color: colorScheme.secondaryContainer,
-        ),
-        child: Text(
-          l10n.foundCount(count),
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 12,
-            color: colorScheme.onSecondaryContainer,
-          ),
-        ),
-      ),
-    );
-  }
 
   Widget _buildDoctorGrid(
     List<DoctorSearchModel> doctors,

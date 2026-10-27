@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/controllers/lab_test_controller.dart';
-import 'package:yodoctor/modules/widgets/app_header.dart';
+import '../../widgets/patient_app_bar.dart';
 import 'widgets/lab_package_card.dart';
 
 class AllLabTestsScreen extends ConsumerWidget {
@@ -26,8 +26,9 @@ class AllLabTestsScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppHeader(
-        title: l10n?.allPackagesAndTests ?? 'All Packages & Tests',
+      appBar: PatientAppBar(
+        titleText: l10n?.allPackagesAndTests ?? 'All Packages & Tests',
+        subtitleText: 'Diagnostic Tests & Health Packages',
         actions: [
           Stack(
             alignment: Alignment.center,

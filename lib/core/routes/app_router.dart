@@ -59,6 +59,7 @@ import 'package:yodoctor/modules/patient/screens/lab_tests/lab_slot_booking_scre
 import 'package:yodoctor/modules/patient/screens/lab_tests/lab_test_details_screen.dart';
 import 'package:yodoctor/modules/patient/screens/lab_tests/lab_tests_screen.dart';
 import 'package:yodoctor/modules/patient/screens/profile/profile_screen.dart';
+import 'package:yodoctor/modules/patient/screens/profile/patient_profile_edit_screen.dart';
 import 'package:yodoctor/modules/patient/screens/search/search_screen.dart';
 import 'package:yodoctor/modules/patient/screens/services/services_screen.dart';
 import 'package:yodoctor/modules/payment/screens/invoice_detail_screen.dart';
@@ -409,11 +410,6 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         parentNavigatorKey: AppRouter.rootNavigatorKey,
-        path: AppRoutes.profile,
-        builder: (context, state) => const ProfileScreen(),
-      ),
-      GoRoute(
-        parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.addFamilyMember,
         builder: (context, state) {
           final member = state.extra;
@@ -510,6 +506,16 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.homeCareHistory,
         name: 'homeCareHistory',
         builder: (context, state) => const HomeCareHistoryScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.history,
+        name: 'appointmentsHistory',
+        builder: (context, state) => const AppointmentsHistoryScreen(),
+      ),
+      GoRoute(
+        parentNavigatorKey: AppRouter.rootNavigatorKey,
+        path: AppRoutes.profileEdit,
+        builder: (context, state) => const PatientProfileEditScreen(),
       ),
 
       // ---- Doctor Shared Routes (non-shell) ----
@@ -702,8 +708,8 @@ final routerProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: AppRoutes.history,
-                builder: (context, state) => const AppointmentsHistoryScreen(),
+                path: AppRoutes.profile,
+                builder: (context, state) => const ProfileScreen(),
               ),
             ],
           ),

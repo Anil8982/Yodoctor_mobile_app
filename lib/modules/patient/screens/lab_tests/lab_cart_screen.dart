@@ -5,7 +5,7 @@ import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/controllers/lab_test_controller.dart';
-import 'package:yodoctor/modules/widgets/app_header.dart';
+import '../../widgets/patient_app_bar.dart';
 
 class LabCartScreen extends ConsumerWidget {
   const LabCartScreen({super.key});
@@ -35,8 +35,9 @@ class LabCartScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppHeader(
-        title: l10n?.myCart ?? 'My Cart',
+      appBar: PatientAppBar(
+        titleText: l10n?.myCart ?? 'My Cart',
+        subtitleText: '${cartItems.length} Tests in Cart',
         actions: [
           if (cartItems.isNotEmpty)
             Padding(

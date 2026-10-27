@@ -7,7 +7,7 @@ import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/controllers/certificate_request.dart';
 import 'package:yodoctor/modules/patient/screens/certificates/widgets/doctor_card_widget.dart';
-import 'package:yodoctor/modules/widgets/app_header.dart';
+import '../../widgets/patient_app_bar.dart';
 import 'package:yodoctor/modules/widgets/app_shimmer.dart';
 
 class DoctorSelectionScreen extends ConsumerStatefulWidget {
@@ -47,8 +47,9 @@ class _DoctorSelectionScreenState extends ConsumerState<DoctorSelectionScreen> {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppHeader(
-        title: l10n.selectCertificateDoctor,
+      appBar: PatientAppBar(
+        titleText: l10n.selectCertificateDoctor,
+        subtitleText: 'Choose Doctor for Verification',
       ),
       body: SafeArea(
         child: RefreshIndicator(

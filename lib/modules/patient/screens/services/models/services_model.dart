@@ -20,6 +20,7 @@ class MedicalService {
   final Color baseColor;
   final bool isQrScanner;
   final String imagePath;
+  final String badgeText;
 
   const MedicalService({
     required this.type,
@@ -30,6 +31,7 @@ class MedicalService {
     required this.baseColor,
     this.isQrScanner = false,
     required this.imagePath,
+    this.badgeText = '',
   });
 
   String getLocalizedTitle(AppLocalizations? l10n) {
@@ -67,62 +69,91 @@ class MedicalService {
         return l10n.serviceHomeNursingCareSubtitle;
     }
   }
+
+  String getLocalizedAction(AppLocalizations? l10n) {
+    if (l10n == null) return 'Book';
+    switch (type) {
+      case MedicalServiceType.qrScanToken:
+        return l10n.scanQrAction;
+      case MedicalServiceType.medicalCertificate:
+        return l10n.applyNowAction;
+      case MedicalServiceType.medicineDelivery:
+        return l10n.comingSoonBadge;
+      default:
+        return l10n.bookNowAction;
+    }
+  }
 }
 
-final List<MedicalService> medicalServicesList = [
+/// Clinical Consultations (Doctor Search, QR Scan, Medical Certificate)
+final List<MedicalService> clinicalServicesList = [
   const MedicalService(
-    type: MedicalServiceType.medicineDelivery,
-    title: 'Medicine Delivery',
-    subtitle: 'Essentials at your doorstep',
-    route: '#',
-    icon: Icons.delivery_dining_rounded,
-    baseColor: Color(0xFFFFB03A),
-    imagePath: 'assets/images/services/medicine_delivery_3d.webp',
-  ),
-  const MedicalService(
-    type: MedicalServiceType.labTest,
-    title: 'Lab Test',
-    subtitle: 'Sample Pickup at Your Door',
-    route: AppRoutes.labTest,
-    icon: Icons.science_rounded,
-    baseColor: Color(0xFF42A5F5),
-    imagePath: 'assets/images/services/lab_test_3d.webp',
+    type: MedicalServiceType.onlineAppointment,
+    title: 'Find Doctors',
+    subtitle: 'Book clinic & video consults',
+    route: AppRoutes.search,
+    icon: Icons.calendar_month_rounded,
+    baseColor: Color(0xFF5C6BC0), // Indigo
+    imagePath: 'assets/images/services/online_appointment_3d.webp',
   ),
   const MedicalService(
     type: MedicalServiceType.qrScanToken,
-    title: 'Scan Qr & get Appointment Token',
-    subtitle: 'Scan & Book Instantly',
+    title: 'Instant QR Token',
+    subtitle: 'Scan desk QR for queue token',
     route: '',
     icon: Icons.qr_code_scanner_rounded,
-    baseColor: Color(0xFF26C6DA),
+    baseColor: Color(0xFF00ACC1), // Cyan / Teal
     isQrScanner: true,
     imagePath: 'assets/images/services/qr_appointment_3d.webp',
   ),
   const MedicalService(
-    type: MedicalServiceType.onlineAppointment,
-    title: 'Online Booking Appointment',
-    subtitle: 'Book from anywhere',
-    route: AppRoutes.search,
-    icon: Icons.calendar_month_rounded,
-    baseColor: Color(0xFF7E57C2),
-    imagePath: 'assets/images/services/online_appointment_3d.webp',
-  ),
-  const MedicalService(
     type: MedicalServiceType.medicalCertificate,
-    title: 'Apply for Medical Certificate',
-    subtitle: 'Consult from home',
+    title: 'Medical Certificate',
+    subtitle: 'Official certified documents',
     route: AppRoutes.doctorSelection,
     icon: Icons.description_rounded,
-    baseColor: Color(0xFFEC407A),
+    baseColor: Color(0xFFE91E63), // Pink
     imagePath: 'assets/images/services/medical_certificate_3d.webp',
   ),
+];
+
+/// Doorstep Services (Lab Tests, Medicine Delivery)
+final List<MedicalService> doorstepServicesList = [
+  const MedicalService(
+    type: MedicalServiceType.labTest,
+    title: 'Lab Tests at Home',
+    subtitle: 'Sample pickup from your doorstep',
+    route: AppRoutes.labTest,
+    icon: Icons.science_rounded,
+    baseColor: Color(0xFF1E88E5), // Blue
+    imagePath: 'assets/images/services/lab_test_3d.webp',
+  ),
+  const MedicalService(
+    type: MedicalServiceType.medicineDelivery,
+    title: 'Medicine Delivery',
+    subtitle: 'Pharmacy essentials at door',
+    route: '#',
+    icon: Icons.local_shipping_rounded,
+    baseColor: Color(0xFFFB8C00), // Amber / Orange
+    imagePath: 'assets/images/services/medicine_delivery_3d.webp',
+    badgeText: 'SOON',
+  ),
+];
+
+/// Full list of services
+final List<MedicalService> medicalServicesList = [
+  doorstepServicesList[0],
+  doorstepServicesList[1],
+  clinicalServicesList[0],
+  clinicalServicesList[1],
+  clinicalServicesList[2],
   const MedicalService(
     type: MedicalServiceType.homeNursingCare,
-    title: 'Home Nursing Care Service booking',
+    title: 'Home Nursing Care',
     subtitle: 'Care at your home',
     route: AppRoutes.homeServiceBooking,
     icon: Icons.home_repair_service_rounded,
-    baseColor: Color(0xFF66BB6A),
+    baseColor: Color(0xFF43A047),
     imagePath: 'assets/images/services/home_nursing_3d.webp',
   ),
 ];

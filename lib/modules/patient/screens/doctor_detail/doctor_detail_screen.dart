@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/l10n/app_localizations.dart';
-import 'package:yodoctor/modules/widgets/app_header.dart';
+import '../../widgets/patient_app_bar.dart';
 import '../../../../core/utils/app_spacing.dart';
 import '../../../../core/utils/responsive.dart';
 import 'widgets/doctor_header_card.dart';
@@ -50,7 +50,10 @@ class _DoctorDetailScreenState extends ConsumerState<DoctorDetailScreen> {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppHeader(title: l10n.doctorDetails),
+      appBar: PatientAppBar(
+        titleText: l10n.doctorDetails,
+        subtitleText: 'Doctor Profile & Specialization',
+      ),
       body: () {
         if (doctorState.isLoading) {
           return const Center(child: CircularProgressIndicator());

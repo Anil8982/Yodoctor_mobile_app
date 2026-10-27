@@ -6,7 +6,7 @@ import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/controllers/lab_test_controller.dart';
 import 'package:yodoctor/modules/patient/models/lab/lab_test_model.dart';
-import 'package:yodoctor/modules/widgets/app_header.dart';
+import '../../widgets/patient_app_bar.dart';
 import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 import 'widgets/lab_shimmer.dart';
 
@@ -60,7 +60,10 @@ class _LabTestDetailsScreenState extends ConsumerState<LabTestDetailsScreen> {
     if (isLoading) {
       return Scaffold(
         backgroundColor: theme.scaffoldBackgroundColor,
-        appBar: AppHeader(title: l10n?.testDetails ?? 'Test Details'),
+        appBar: PatientAppBar(
+          titleText: l10n?.testDetails ?? 'Test Details',
+          subtitleText: 'Diagnostic Test Information',
+        ),
         body: const SingleChildScrollView(
           physics: AlwaysScrollableScrollPhysics(
             parent: ClampingScrollPhysics(),
@@ -76,7 +79,10 @@ class _LabTestDetailsScreenState extends ConsumerState<LabTestDetailsScreen> {
     if (test == null) {
       return Scaffold(
         backgroundColor: theme.scaffoldBackgroundColor,
-        appBar: AppHeader(title: l10n?.testDetails ?? 'Test Details'),
+        appBar: PatientAppBar(
+          titleText: l10n?.testDetails ?? 'Test Details',
+          subtitleText: 'Diagnostic Test Information',
+        ),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -128,7 +134,10 @@ class _LabTestDetailsScreenState extends ConsumerState<LabTestDetailsScreen> {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppHeader(title: test.name),
+      appBar: PatientAppBar(
+        titleText: test.name,
+        subtitleText: 'Diagnostic Test Details',
+      ),
       body: SafeArea(
         child: Column(
           children: [

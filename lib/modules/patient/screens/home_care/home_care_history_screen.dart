@@ -6,7 +6,7 @@ import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/controllers/home_care_history_controller.dart';
 import 'package:yodoctor/modules/patient/screens/home_care/widgets/cancel_booking_dialog.dart';
-import 'package:yodoctor/modules/widgets/app_header.dart';
+import '../../widgets/patient_app_bar.dart';
 import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 
 import 'widgets/home_care_booking_details.dart';
@@ -54,7 +54,10 @@ class _HomeCareHistoryScreenState extends ConsumerState<HomeCareHistoryScreen> {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppHeader(title: l10n?.homeCareHistory ?? 'Home Care History'),
+      appBar: PatientAppBar(
+        titleText: l10n?.homeCareHistory ?? 'Home Care Orders',
+        subtitleText: 'Past & Active Nursing Requests',
+      ),
       body: SafeArea(
         child: Column(
           children: [

@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/models/certificate/patient_doctor_model.dart';
-import 'package:yodoctor/modules/widgets/app_header.dart';
+import '../../widgets/patient_app_bar.dart';
 import 'package:yodoctor/modules/widgets/app_snack_bar.dart';
 
 import '../../../../core/utils/responsive.dart';
@@ -74,7 +74,10 @@ class _ApplyCertificateScreenState
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
 
-      appBar: AppHeader(title: l10n.applyForCertificate),
+      appBar: PatientAppBar(
+        titleText: l10n.applyForCertificate,
+        subtitleText: 'Request Verified Medical Certificate',
+      ),
       body: Column(
         children: [
           Container(

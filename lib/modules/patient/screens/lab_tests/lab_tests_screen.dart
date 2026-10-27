@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/controllers/lab_test_controller.dart';
-import 'package:yodoctor/modules/widgets/app_header.dart';
+import '../../widgets/patient_app_bar.dart';
 import 'widgets/lab_hero_section.dart';
 import 'widgets/lab_package_card.dart';
 import 'widgets/lab_trust_section.dart';
@@ -52,8 +52,9 @@ class _LabTestsScreenState extends ConsumerState<LabTestsScreen> {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppHeader(
-        title: l10n?.labTests ?? 'Lab Tests',
+      appBar: PatientAppBar(
+        titleText: l10n?.labTests ?? 'Diagnostic Lab Tests',
+        subtitleText: 'Doorstep Sample Collection & Reports',
         actions: [
           Stack(
             alignment: Alignment.center,
