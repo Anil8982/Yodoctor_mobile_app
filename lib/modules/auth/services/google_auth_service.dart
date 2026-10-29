@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:debug_bubble/debug_bubble.dart';
 import 'package:yodoctor/modules/auth/models/patient_user.dart';
 
 class GoogleAuthService {
@@ -24,7 +24,7 @@ class GoogleAuthService {
     if (_isGoogleSignInInitialized) return;
 
     try {
-      AppLogger.info(
+      DebugLog.info(
         'Initializing Google Sign-In',
         tag: LogTags.auth,
         subTag: _subTag,
@@ -34,16 +34,16 @@ class GoogleAuthService {
 
       _isGoogleSignInInitialized = true;
 
-      AppLogger.success(
+      DebugLog.success(
         'Google Sign-In initialized',
         tag: LogTags.auth,
         subTag: _subTag,
       );
     } catch (e, st) {
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Failed to initialize Google Sign-In',
+      DebugLog.error(
+        error: e,
+        stackTrace: st,
+        'Failed to initialize Google Sign-In',
         tag: LogTags.auth,
         subTag: _subTag,
       );
@@ -54,7 +54,7 @@ class GoogleAuthService {
 
   Future<PatientUser?> signInWithGoogle() async {
     try {
-      AppLogger.info(
+      DebugLog.info(
         'Starting Google authentication flow',
         tag: LogTags.auth,
         subTag: _subTag,
@@ -93,7 +93,7 @@ class GoogleAuthService {
         );
       }
 
-      AppLogger.success(
+      DebugLog.success(
         'Google login successful',
         tag: LogTags.auth,
         subTag: _subTag,
@@ -101,10 +101,10 @@ class GoogleAuthService {
 
       return _mapFirebaseUserToPatient(user);
     } catch (e, st) {
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Google Sign-In failed',
+      DebugLog.error(
+        error: e,
+        stackTrace: st,
+        'Google Sign-In failed',
         tag: LogTags.auth,
         subTag: _subTag,
       );
@@ -118,16 +118,16 @@ class GoogleAuthService {
       await _googleSignIn.signOut();
       await _firebaseAuth.signOut();
 
-      AppLogger.success(
+      DebugLog.success(
         'User signed out successfully',
         tag: LogTags.auth,
         subTag: _subTag,
       );
     } catch (e, st) {
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Failed to sign out',
+      DebugLog.error(
+        error: e,
+        stackTrace:  st,
+        'Failed to sign out',
         tag: LogTags.auth,
         subTag: _subTag,
       );

@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:debug_bubble/debug_bubble.dart';
 import 'package:yodoctor/modules/payment/providers.dart';
 import '../../../modules/patient/models/lab/lab_category_model.dart';
 import '../models/lab/lab_test_model.dart';
@@ -136,10 +136,12 @@ class LabNotifier extends Notifier<LabState> {
         state = state.copyWith(popularTests: list);
       }
     } catch (e, st) {
-      AppLogger.exception(
-        e, st,
-        message: 'Failed popular tests pipeline',
-        tag: LogTags.patient, subTag: _subTag,
+      DebugLog.error(
+        'Failed popular tests pipeline',
+        error: e,
+        stackTrace: st,
+        tag: LogTags.patient,
+        subTag: _subTag,
       );
     }
   }
@@ -157,10 +159,12 @@ class LabNotifier extends Notifier<LabState> {
         state = state.copyWith(packages: list);
       }
     } catch (e, st) {
-      AppLogger.exception(
-        e, st,
-        message: 'Failed packages load pipeline',
-        tag: LogTags.patient, subTag: _subTag,
+      DebugLog.error(
+        'Failed packages load pipeline',
+        error: e,
+        stackTrace: st,
+        tag: LogTags.patient,
+        subTag: _subTag,
       );
     }
   }
@@ -188,10 +192,12 @@ class LabNotifier extends Notifier<LabState> {
         isLoading: false,
         errorMessage: "Failed to load test details",
       );
-      AppLogger.exception(
-        e, st,
-        message: 'Test details breakdown pipeline',
-        tag: LogTags.patient, subTag: _subTag,
+      DebugLog.error(
+        'Test details breakdown pipeline',
+        error: e,
+        stackTrace: st,
+        tag: LogTags.patient,
+        subTag: _subTag,
       );
     }
   }
@@ -209,10 +215,12 @@ class LabNotifier extends Notifier<LabState> {
         state = state.copyWith(categories: list);
       }
     } catch (e, st) {
-      AppLogger.exception(
-        e, st,
-        message: 'Categories extraction halted',
-        tag: LogTags.patient, subTag: _subTag,
+      DebugLog.error(
+        'Categories extraction halted',
+        error: e,
+        stackTrace: st,
+        tag: LogTags.patient,
+        subTag: _subTag,
       );
     }
   }
@@ -240,7 +248,7 @@ class LabNotifier extends Notifier<LabState> {
         final rawId = response.data["bookingDbId"];
         final id = rawId is int ? rawId : int.tryParse(rawId?.toString() ?? '');
 
-        AppLogger.success(
+        DebugLog.success(
           'Lab booking created. ID: $id',
           tag: LogTags.patient,
           subTag: _subTag,
@@ -259,10 +267,12 @@ class LabNotifier extends Notifier<LabState> {
         isLoading: false,
         errorMessage: "Booking submission halt",
       );
-      AppLogger.exception(
-        e, st,
-        message: 'Lab test booking pipeline crash',
-        tag: LogTags.patient, subTag: _subTag,
+      DebugLog.error(
+        'Lab test booking pipeline crash',
+        error: e,
+        stackTrace: st,
+        tag: LogTags.patient,
+        subTag: _subTag,
       );
       return null;
     }
@@ -303,10 +313,12 @@ class LabNotifier extends Notifier<LabState> {
         state = state.copyWith(tests: list);
       }
     } catch (e, st) {
-      AppLogger.exception(
-        e, st,
-        message: 'Tests catalog pipeline failed',
-        tag: LogTags.patient, subTag: _subTag,
+      DebugLog.error(
+        'Tests catalog pipeline failed',
+        error: e,
+        stackTrace: st,
+        tag: LogTags.patient,
+        subTag: _subTag,
       );
     }
   }
@@ -331,7 +343,7 @@ class LabNotifier extends Notifier<LabState> {
           lastBookingId: bookingId,
         );
 
-        AppLogger.info(
+        DebugLog.info(
           'Opening Razorpay for lab booking #$bookingId, order: $orderId, amount: ₹$amount',
           tag: LogTags.patient, subTag: _subTag,
         );
@@ -356,10 +368,12 @@ class LabNotifier extends Notifier<LabState> {
         isPaymentLoading: false,
         paymentError: 'Payment initiation failed',
       );
-      AppLogger.exception(
-        e, st,
-        message: 'Lab payment initiation failed',
-        tag: LogTags.patient, subTag: _subTag,
+      DebugLog.error(
+        'Lab payment initiation failed',
+        error: e,
+        stackTrace: st,
+        tag: LogTags.patient,
+        subTag: _subTag,
       );
       return false;
     }
@@ -372,7 +386,7 @@ class LabNotifier extends Notifier<LabState> {
       ) async {
     if (state.lastBookingId == null || state.lastOrderId == null) return;
 
-    AppLogger.success(
+    DebugLog.success(
       'Lab payment success: $paymentId, verifying...',
       tag: LogTags.patient, subTag: _subTag,
     );
@@ -389,7 +403,7 @@ class LabNotifier extends Notifier<LabState> {
       if (response.data['success'] == true) {
         clearCart();
         state = state.copyWith(isPaymentLoading: false);
-        AppLogger.success(
+        DebugLog.success(
           'Lab payment verified, booking confirmed',
           tag: LogTags.patient, subTag: _subTag,
         );
@@ -404,10 +418,12 @@ class LabNotifier extends Notifier<LabState> {
         isPaymentLoading: false,
         paymentError: 'Payment verification failed',
       );
-      AppLogger.exception(
-        e, st,
-        message: 'Lab payment verification failed',
-        tag: LogTags.patient, subTag: _subTag,
+      DebugLog.error(
+        'Lab payment verification failed',
+        error: e,
+        stackTrace: st,
+        tag: LogTags.patient,
+        subTag: _subTag,
       );
     }
   }

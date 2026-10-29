@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:debug_bubble/debug_bubble.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
 import 'package:yodoctor/core/storage/storage_service.dart';
 import 'package:yodoctor/core/utils/app_version_utils.dart';
 
@@ -60,7 +60,7 @@ class AppConfigNotifier extends Notifier<AppConfigState> {
     _isLoading = true;
     state = const AppConfigState(status: AppConfigStatus.loading);
 
-    AppLogger.info(
+    DebugLog.info(
       'Loading app configuration...',
       tag: LogTags.app,
       subTag: _subTag,
@@ -70,16 +70,14 @@ class AppConfigNotifier extends Notifier<AppConfigState> {
       final repository = ref.read(appConfigRepositoryProvider);
       final config = await repository.getAppConfig();
 
-
-      AppLogger.success(
+      DebugLog.success(
         'App configuration loaded successfully.',
         tag: LogTags.app,
         subTag: _subTag,
       );
 
-      // 1. Maintenance check
       if (config.status.isMaintenanceMode) {
-        AppLogger.warning(
+        DebugLog.warning(
           'App is currently under maintenance.',
           tag: LogTags.app,
           subTag: _subTag,
@@ -94,11 +92,10 @@ class AppConfigNotifier extends Notifier<AppConfigState> {
         return;
       }
 
-      // 2. Get installed app version
       final packageInfo = await PackageInfo.fromPlatform();
       final currentVersion = packageInfo.version;
 
-      AppLogger.info(
+      DebugLog.info(
         'Current version: $currentVersion | '
             'Minimum version: ${config.versioning.minVersion} | '
             'Latest version: ${config.versioning.latestVersion}',
@@ -106,14 +103,13 @@ class AppConfigNotifier extends Notifier<AppConfigState> {
         subTag: _subTag,
       );
 
-      // 3. Force update check
       final needsForceUpdate = VersionUtils.isLower(
         currentVersion,
         config.versioning.minVersion,
       );
 
       if (needsForceUpdate) {
-        AppLogger.warning(
+        DebugLog.warning(
           'Force update required.',
           tag: LogTags.app,
           subTag: _subTag,
@@ -128,10 +124,9 @@ class AppConfigNotifier extends Notifier<AppConfigState> {
         return;
       }
 
-      // 4. Ready - All checks completed successfully
       _hasLoaded = true;
 
-      AppLogger.success(
+      DebugLog.success(
         'App configuration check passed. Continuing to app.',
         tag: LogTags.app,
         subTag: _subTag,
@@ -151,12 +146,12 @@ class AppConfigNotifier extends Notifier<AppConfigState> {
         errorMessage: userFriendlyMessage,
       );
 
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Failed to load app configuration',
+      DebugLog.error(
+        'Failed to load app configuration',
         tag: LogTags.app,
         subTag: _subTag,
+        error: e,
+        stackTrace: st,
       );
     } finally {
       _isLoading = false;

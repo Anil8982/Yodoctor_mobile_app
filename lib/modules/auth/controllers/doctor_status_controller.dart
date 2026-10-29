@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:debug_bubble/debug_bubble.dart';
 import 'package:yodoctor/core/providers/storage_provider.dart';
 import 'package:yodoctor/modules/auth/repositories/doctor_verification_repository.dart';
 
@@ -92,13 +92,13 @@ class DoctorStatusNotifier extends Notifier<DoctorStatusState> {
   // Called once from SplashScreen for logged-in doctors
   Future<void> initialize() async {
     if (_isInitializing) {
-      AppLogger.debug('Already initializing, skipping duplicate call',
+      DebugLog.debug('Already initializing, skipping duplicate call',
           tag: 'DoctorStatus');
       return;
     }
     _isInitializing = true;
 
-    AppLogger.info('Doctor verification: initializing...',
+    DebugLog.info('Doctor verification: initializing...',
         tag: 'DoctorStatus');
     state = state.copyWith(isLoading: true, isResolved: false);
 
@@ -107,7 +107,7 @@ class DoctorStatusNotifier extends Notifier<DoctorStatusState> {
     } finally {
       state = state.copyWith(isLoading: false, isResolved: true);
       _isInitializing = false;
-      AppLogger.info(
+      DebugLog.info(
           'Doctor verification: initialization complete, '
               'status=${state.status}, usingCache=${state.isUsingCache}',
           tag: 'DoctorStatus');
@@ -116,7 +116,7 @@ class DoctorStatusNotifier extends Notifier<DoctorStatusState> {
 
   // Called on pull-to-refresh from VerificationStatusScreen
   Future<void> checkStatus() async {
-    AppLogger.info('Doctor verification: manual refresh requested',
+    DebugLog.info('Doctor verification: manual refresh requested',
         tag: 'DoctorStatus');
     state = state.copyWith(isLoading: true);
     try {
@@ -142,7 +142,7 @@ class DoctorStatusNotifier extends Notifier<DoctorStatusState> {
         // Update Hive cache with latest server status
         await ref.read(storageProvider).saveStatus(newStatus);
 
-        AppLogger.success(
+        DebugLog.success(
             'Doctor verification: server success, status=$newStatus',
             tag: 'DoctorStatus');
 
@@ -159,16 +159,16 @@ class DoctorStatusNotifier extends Notifier<DoctorStatusState> {
       }
 
       // Server returned non-success response
-      AppLogger.warning(
+      DebugLog.warning(
           'Doctor verification: server returned non-success response',
           tag: 'DoctorStatus');
       _handleFailure(isInitial: isInitial);
     } on TimeoutException {
-      AppLogger.warning('Doctor verification: request timed out',
+      DebugLog.warning('Doctor verification: request timed out',
           tag: 'DoctorStatus');
       _handleFailure(isInitial: isInitial);
     } catch (e) {
-      AppLogger.error('Doctor verification: unexpected error',
+      DebugLog.error('Doctor verification: unexpected error',
           tag: 'DoctorStatus', error: e);
       _handleFailure(isInitial: isInitial);
     }
@@ -179,7 +179,7 @@ class DoctorStatusNotifier extends Notifier<DoctorStatusState> {
       // Try Hive cache as temporary fallback
       final cached = ref.read(storageProvider).getStatus();
       if (cached != null && cached.isNotEmpty) {
-        AppLogger.info('Doctor verification: using cached status=$cached',
+        DebugLog.info('Doctor verification: using cached status=$cached',
             tag: 'DoctorStatus');
         state = state.copyWith(
           status: cached,
@@ -188,7 +188,7 @@ class DoctorStatusNotifier extends Notifier<DoctorStatusState> {
         );
         _startRetry(); // Start background retry with backoff
       } else {
-        AppLogger.error('Doctor verification: no cache available',
+        DebugLog.error('Doctor verification: no cache available',
             tag: 'DoctorStatus');
         state = state.copyWith(
           status: null,
@@ -208,7 +208,7 @@ class DoctorStatusNotifier extends Notifier<DoctorStatusState> {
   void _startRetry() {
     _stopTimer(); // Cancel existing timer, preserve retry state
     if (_retryAttempt >= _maxRetryAttempts) {
-      AppLogger.info(
+      DebugLog.info(
           'Doctor verification: max retries ($_maxRetryAttempts) reached',
           tag: 'DoctorStatus');
       return;
@@ -221,7 +221,7 @@ class DoctorStatusNotifier extends Notifier<DoctorStatusState> {
     ];
     final delay = delays[_retryAttempt];
 
-    AppLogger.info(
+    DebugLog.info(
         'Doctor verification: scheduling retry ${_retryAttempt + 1}/$_maxRetryAttempts '
             'in ${delay.inSeconds}s',
         tag: 'DoctorStatus');
@@ -242,7 +242,7 @@ class DoctorStatusNotifier extends Notifier<DoctorStatusState> {
 
           await ref.read(storageProvider).saveStatus(newStatus);
 
-          AppLogger.success(
+          DebugLog.success(
               'Doctor verification: background retry success, status=$newStatus',
               tag: 'DoctorStatus');
 
@@ -257,7 +257,7 @@ class DoctorStatusNotifier extends Notifier<DoctorStatusState> {
           return;
         }
       } catch (e) {
-        AppLogger.error('Doctor verification: background retry failed',
+        DebugLog.error('Doctor verification: background retry failed',
             tag: 'DoctorStatus', error: e);
       }
 
@@ -287,7 +287,7 @@ class DoctorStatusNotifier extends Notifier<DoctorStatusState> {
     _isInitializing = false;
     state = const DoctorStatusState();
 
-    AppLogger.info(
+    DebugLog.info(
       'Doctor verification state reset',
       tag: 'DoctorStatus',
     );

@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:debug_bubble/debug_bubble.dart';
 import '../models/appointment/prescription_model.dart';
 import '../models/appointment/live_queue_model.dart';
 import '../repositories/doctor_appointment_repository.dart';
@@ -76,7 +76,7 @@ class LiveQueueNotifier extends Notifier<LiveQueueState> {
 
   @override
   LiveQueueState build() {
-    AppLogger.info(
+    DebugLog.info(
       'LiveQueueNotifier Initialized',
       tag: LogTags.doctor,
       subTag: _subTag,
@@ -112,7 +112,7 @@ class LiveQueueNotifier extends Notifier<LiveQueueState> {
       state = state.copyWith(loading: true, clearError: true);
     }
 
-    AppLogger.info(
+    DebugLog.info(
       'Initializing live queue stream pipeline for slot: $slot (isRefresh: $isRefresh, requestId: $requestId)',
       tag: LogTags.doctor,
       subTag: _subTag,
@@ -130,7 +130,7 @@ class LiveQueueNotifier extends Notifier<LiveQueueState> {
       // Race condition guard: ignore if this isn't the latest request
       // OR if slot changed while awaiting
       if (requestId != _requestId || state.selectedSlot != slot) {
-        AppLogger.warning(
+        DebugLog.warning(
           'Stale queue response ignored for slot: $slot (requestId: $requestId, currentRequestId: $_requestId, currentSlot: ${state.selectedSlot})',
           tag: LogTags.doctor,
           subTag: _subTag,
@@ -161,19 +161,15 @@ class LiveQueueNotifier extends Notifier<LiveQueueState> {
           next = LiveQueueItem.fromJson(nextRes.data["appointment"]);
         }
 
-        AppLogger.success(
+        DebugLog.success(
           'Live queue pipeline synchronised flawlessly. Queue Count: ${queue.length}',
           tag: LogTags.doctor,
           subTag: _subTag,
-        );
-        AppLogger.json(
-          {
+          json: {
             "queue_count": queue.length,
             "current_patient": currentRes.data,
             "next_patient": nextRes.data,
           },
-          tag: LogTags.doctor,
-          subTag: '$_subTag/QueueSyncMatrix',
         );
 
         state = state.copyWith(
@@ -186,7 +182,7 @@ class LiveQueueNotifier extends Notifier<LiveQueueState> {
           clearNext: next == null,
         );
       } else {
-        AppLogger.warning(
+        DebugLog.warning(
           'Failed to read live queue bounds. Status: ${queueRes.statusCode}',
           tag: LogTags.doctor,
           subTag: _subTag,
@@ -210,10 +206,10 @@ class LiveQueueNotifier extends Notifier<LiveQueueState> {
         refreshing: false,
         errorMessage: "Runtime synchronization pipeline crash",
       );
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Fatal exception within queue loader thread',
+      DebugLog.error(
+        'Fatal exception within queue loader thread',
+        error: e,
+        stackTrace: st,
         tag: LogTags.doctor,
         subTag: _subTag,
       );
@@ -226,7 +222,7 @@ class LiveQueueNotifier extends Notifier<LiveQueueState> {
     Future<void> Function() action,
     String slot,
   ) async {
-    AppLogger.info(
+    DebugLog.info(
       'Performing action: $actionName for slot: $slot',
       tag: LogTags.doctor,
       subTag: _subTag,
@@ -234,7 +230,7 @@ class LiveQueueNotifier extends Notifier<LiveQueueState> {
 
     try {
       await action();
-      AppLogger.success(
+      DebugLog.success(
         'Action $actionName completed successfully',
         tag: LogTags.doctor,
         subTag: _subTag,
@@ -242,10 +238,10 @@ class LiveQueueNotifier extends Notifier<LiveQueueState> {
       // Refresh silently - maintains existing UI without shimmer flash
       await loadQueue(slot, isRefresh: true);
     } catch (e, st) {
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Action $actionName failed',
+      DebugLog.error(
+        'Action $actionName failed',
+        error: e,
+        stackTrace: st,
         tag: LogTags.doctor,
         subTag: _subTag,
       );
@@ -319,10 +315,10 @@ class LiveQueueNotifier extends Notifier<LiveQueueState> {
 
       return false;
     } catch (e, st) {
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Cancel remaining appointments failed',
+      DebugLog.error(
+        'Cancel remaining appointments failed',
+        error: e,
+        stackTrace: st,
         tag: LogTags.doctor,
         subTag: _subTag,
       );
@@ -358,7 +354,7 @@ class LiveQueueNotifier extends Notifier<LiveQueueState> {
   }
 
   Future<PrescriptionModel?> getPrescription(String appointmentId) async {
-    AppLogger.info(
+    DebugLog.info(
       'Fetching prescription records for ID: $appointmentId',
       tag: LogTags.doctor,
       subTag: _subTag,
@@ -367,29 +363,25 @@ class LiveQueueNotifier extends Notifier<LiveQueueState> {
       final repository = ref.read(doctorAppointmentRepositoryProvider);
       final res = await repository.getPrescription(appointmentId);
       if (res.statusCode == 200 && res.data != null) {
-        AppLogger.success(
+        DebugLog.success(
           'Prescription retrieved on context channel',
           tag: LogTags.doctor,
           subTag: _subTag,
-        );
-        AppLogger.json(
-          res.data,
-          tag: LogTags.doctor,
-          subTag: '$_subTag/PrescriptionData',
+          json: res.data,
         );
         return PrescriptionModel.fromJson(res.data);
       }
-      AppLogger.warning(
+      DebugLog.warning(
         'Prescription response matrix empty or non-200. Status: ${res.statusCode}',
         tag: LogTags.doctor,
         subTag: _subTag,
       );
       return null;
     } catch (e, st) {
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Fetch prescription data fault',
+      DebugLog.error(
+        'Fetch prescription data fault',
+        error: e,
+        stackTrace: st,
         tag: LogTags.doctor,
         subTag: _subTag,
       );
@@ -408,15 +400,11 @@ class LiveQueueNotifier extends Notifier<LiveQueueState> {
       "instructions": instructions,
     };
 
-    AppLogger.info(
+    DebugLog.info(
       'Saving prescription parameters for transaction: $appointmentId',
       tag: LogTags.doctor,
       subTag: _subTag,
-    );
-    AppLogger.json(
-      payload,
-      tag: LogTags.doctor,
-      subTag: '$_subTag/PrescriptionPayload',
+      json: payload,
     );
 
     try {
@@ -429,13 +417,13 @@ class LiveQueueNotifier extends Notifier<LiveQueueState> {
       final success =
           (res.statusCode ?? 0) >= 200 && (res.statusCode ?? 0) < 300;
       if (success) {
-        AppLogger.success(
+        DebugLog.success(
           'Prescription committed to centralized data node',
           tag: LogTags.doctor,
           subTag: _subTag,
         );
       } else {
-        AppLogger.warning(
+        DebugLog.warning(
           'Prescription save denied by remote branch. Status: ${res.statusCode}',
           tag: LogTags.doctor,
           subTag: _subTag,
@@ -443,10 +431,10 @@ class LiveQueueNotifier extends Notifier<LiveQueueState> {
       }
       return success;
     } catch (e, st) {
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Save prescription transmission error',
+      DebugLog.error(
+        'Save prescription transmission error',
+        error: e,
+        stackTrace: st,
         tag: LogTags.doctor,
         subTag: _subTag,
       );

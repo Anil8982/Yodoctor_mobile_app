@@ -6,7 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:debug_bubble/debug_bubble.dart';
 import 'package:yodoctor/core/routes/app_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/modules/payment/controllers/razorpay_controller.dart';
@@ -170,10 +170,10 @@ class CertificateNotifier extends Notifier<CertificateFormState> {
         clearSelectedCertificate: true,
         timeline: const [],
       );
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Failed to load certificate detailed track matrix',
+      DebugLog.error(
+        'Failed to load certificate detailed track matrix',
+        error: e,
+        stackTrace: st,
         tag: LogTags.patient,
         subTag: _subTag,
       );
@@ -198,10 +198,10 @@ class CertificateNotifier extends Notifier<CertificateFormState> {
       }
     } catch (e, st) {
       state = state.copyWith(isDoctorsLoading: false);
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Failed fetching secure repositories doctor list',
+      DebugLog.error(
+        'Failed fetching secure repositories doctor list',
+        error: e,
+        stackTrace: st,
         tag: LogTags.patient,
         subTag: _subTag,
       );
@@ -223,10 +223,10 @@ class CertificateNotifier extends Notifier<CertificateFormState> {
       await file.writeAsBytes(List<int>.from(response.data));
       await OpenFilex.open(file.path);
     } catch (e, st) {
-      AppLogger.exception(
-        e,
-        st,
-        message: 'PDF binary write system failure',
+      DebugLog.error(
+        'PDF binary write system failure',
+        error: e,
+        stackTrace: st,
         tag: LogTags.patient,
         subTag: _subTag,
       );
@@ -246,10 +246,10 @@ class CertificateNotifier extends Notifier<CertificateFormState> {
       state = state.copyWith(allCertificates: list, isLoading: false);
     } catch (e, st) {
       state = state.copyWith(isLoading: false);
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Wallet requests sync engine faulted',
+      DebugLog.error(
+        'Wallet requests sync engine faulted',
+        error: e,
+        stackTrace: st,
         tag: LogTags.patient,
         subTag: _subTag,
       );
@@ -260,7 +260,7 @@ class CertificateNotifier extends Notifier<CertificateFormState> {
     if (!validateDocuments() ||
         state.selectedType == null ||
         state.assignedDoctor == null) {
-      AppLogger.warning(
+      DebugLog.warning(
         "Validation failed for certificate request submission",
         tag: LogTags.patient,
         subTag: _subTag,
@@ -289,12 +289,12 @@ class CertificateNotifier extends Notifier<CertificateFormState> {
       "medications": medicationsController.text,
     };
 
-    AppLogger.info(
+    DebugLog.info(
       "Submitting certificate request and creating payment order",
       tag: LogTags.patient,
       subTag: _subTag,
+      json: payload,
     );
-    AppLogger.json(payload, tag: LogTags.patient, subTag: _subTag);
 
     try {
       final repo = ref.read(patientCertificateRepositoryProvider);
@@ -340,7 +340,7 @@ class CertificateNotifier extends Notifier<CertificateFormState> {
           subscription.cancel();
           if (!completer.isCompleted) {
             try {
-              AppLogger.info(
+              DebugLog.info(
                 "Payment successful. Verifying certificate payment...",
                 tag: LogTags.patient,
                 subTag: _subTag,
@@ -369,7 +369,7 @@ class CertificateNotifier extends Notifier<CertificateFormState> {
               }
 
               final int requestId = int.parse(resId.toString());
-              AppLogger.success(
+              DebugLog.success(
                 "Payment verified. Starting document streams upload...",
                 tag: LogTags.patient,
                 subTag: _subTag,
@@ -383,7 +383,7 @@ class CertificateNotifier extends Notifier<CertificateFormState> {
                 prescription: state.uploadedDocs["Prescription"],
               );
 
-              AppLogger.success(
+              DebugLog.success(
                 "Certificate workflows synchronization complete",
                 tag: LogTags.patient,
                 subTag: _subTag,
@@ -413,11 +413,10 @@ class CertificateNotifier extends Notifier<CertificateFormState> {
                   navContext.pop();
                 }
               }
-              AppLogger.exception(
-                e,
-                st,
-                message:
+              DebugLog.error(
                 'Certificate payment verification or document upload faulted',
+                error: e,
+                stackTrace: st,
                 tag: LogTags.patient,
                 subTag: _subTag,
               );
@@ -433,7 +432,7 @@ class CertificateNotifier extends Notifier<CertificateFormState> {
               navContext.pop();
             }
           }
-          AppLogger.error(
+          DebugLog.error(
             "Razorpay payment failed: ${event.message}",
             tag: LogTags.patient,
             subTag: _subTag,
@@ -448,7 +447,7 @@ class CertificateNotifier extends Notifier<CertificateFormState> {
               navContext.pop();
             }
           }
-          AppLogger.warning(
+          DebugLog.warning(
             "Razorpay payment cancelled by user",
             tag: LogTags.patient,
             subTag: _subTag,
@@ -463,7 +462,7 @@ class CertificateNotifier extends Notifier<CertificateFormState> {
               navContext.pop();
             }
           }
-          AppLogger.info(
+          DebugLog.info(
             "Razorpay external wallet selected: ${event.walletName}",
             tag: LogTags.patient,
             subTag: _subTag,
@@ -488,10 +487,10 @@ class CertificateNotifier extends Notifier<CertificateFormState> {
           navContext.pop();
         }
       }
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Certificate creation workflow halted',
+      DebugLog.error(
+        'Certificate creation workflow halted',
+        error: e,
+        stackTrace: st,
         tag: LogTags.patient,
         subTag: _subTag,
       );

@@ -1,7 +1,7 @@
 // import 'dart:async';
 // import 'package:flutter_riverpod/flutter_riverpod.dart';
 // import 'package:yodoctor/core/constants/log_tags.dart';
-// import 'package:yodoctor/core/debug/app_logger.dart';
+// import 'package:debug_bubble/debug_bubble.dart';
 // import 'package:yodoctor/modules/doctor/controllers/subscription_status_controller.dart';
 // import 'package:yodoctor/modules/payment/controllers/razorpay_controller.dart';
 // import 'package:yodoctor/modules/doctor/models/subscription/available_plan_model.dart';
@@ -102,7 +102,7 @@
 //
 //   @override
 //   DoctorSubscriptionState build() {
-//     AppLogger.info(
+//     DebugLog.info(
 //       'DoctorSubscriptionNotifier Initialized',
 //       tag: LogTags.doctor,
 //       subTag: _subTag,
@@ -137,7 +137,7 @@
 //         }
 //       },
 //       onError: (error) {
-//         AppLogger.error(
+//         DebugLog.error(
 //           'Razorpay event stream error: $error',
 //           tag: LogTags.doctor,
 //           subTag: _subTag,
@@ -179,10 +179,10 @@
 //         isLoading: false,
 //         errorMessage: 'Network error loading plans.',
 //       );
-//       AppLogger.exception(
-//         e,
-//         st,
-//         message: 'Load plans failed',
+//       DebugLog.error(
+//         'Load plans failed',
+//         error: e,
+//         stackTrace: st,
 //         tag: LogTags.doctor,
 //         subTag: _subTag,
 //       );
@@ -190,7 +190,7 @@
 //   }
 //
 //   Future<void> loadSubscriptionDetails() async {
-//     AppLogger.info(
+//     DebugLog.info(
 //       'Loading subscription details',
 //       tag: LogTags.doctor,
 //       subTag: _subTag,
@@ -199,7 +199,7 @@
 //
 //     try {
 //       if (!ref.read(subscriptionStatusProvider).isResolved) {
-//         AppLogger.info(
+//         DebugLog.info(
 //           'Waiting for subscription status to resolve...',
 //           tag: LogTags.doctor,
 //           subTag: _subTag,
@@ -210,7 +210,7 @@
 //       final subStatus = ref.read(subscriptionStatusProvider);
 //
 //       if (!subStatus.hasSubscription) {
-//         AppLogger.info(
+//         DebugLog.info(
 //           'No active subscription (from cache), skipping duplicate API call',
 //           tag: LogTags.doctor,
 //           subTag: _subTag,
@@ -280,9 +280,10 @@
 //         errorMessage: "Network error. Pull to retry.",
 //         isInitialized: true,
 //       );
-//       AppLogger.exception(
-//         e, st,
-//         message: 'Subscription load failed',
+//       DebugLog.error(
+//         'Subscription load failed',
+//         error: e,
+//         stackTrace: st,
 //         tag: LogTags.doctor,
 //         subTag: _subTag,
 //       );
@@ -329,7 +330,7 @@
 //       }
 //     } catch (e) {
 //       state = state.copyWith(isLoadingMore: false);
-//       AppLogger.error(
+//       DebugLog.error(
 //         'Failed to load more billing history: $e',
 //         tag: LogTags.doctor,
 //         subTag: _subTag,
@@ -413,10 +414,10 @@
 //         isLoading: false,
 //         errorMessage: 'Failed to cancel subscription.',
 //       );
-//       AppLogger.exception(
-//         e,
-//         st,
-//         message: 'Cancel failed',
+//       DebugLog.error(
+//         'Cancel failed',
+//         error: e,
+//         stackTrace: st,
 //         tag: LogTags.doctor,
 //         subTag: _subTag,
 //       );
@@ -450,10 +451,10 @@
 //         isLoading: false,
 //         errorMessage: 'Upgrade request failed.',
 //       );
-//       AppLogger.exception(
-//         e,
-//         st,
-//         message: 'Upgrade failed',
+//       DebugLog.error(
+//         'Upgrade failed',
+//         error: e,
+//         stackTrace: st,
 //         tag: LogTags.doctor,
 //         subTag: _subTag,
 //       );
@@ -520,10 +521,10 @@
 //         errorMessage: 'Payment initialization failed.',
 //       );
 //
-//       AppLogger.exception(
-//         e,
-//         st,
-//         message: 'Subscription creation failed',
+//       DebugLog.error(
+//         'Subscription creation failed',
+//         error: e,
+//         stackTrace: st,
 //         tag: LogTags.doctor,
 //         subTag: _subTag,
 //       );
@@ -538,7 +539,7 @@
 //       String? paymentId,
 //       String? signature,
 //       ) async {
-//     AppLogger.success(
+//     DebugLog.success(
 //       'Processing payment success: $paymentId',
 //       tag: LogTags.doctor,
 //       subTag: _subTag,
@@ -559,7 +560,7 @@
 //       _clearPendingPaymentData();
 //
 //       if ((verifyRes.statusCode ?? 0) >= 200 && (verifyRes.statusCode ?? 0) < 300) {
-//         AppLogger.success(
+//         DebugLog.success(
 //           'Subscription verified and activated',
 //           tag: LogTags.doctor,
 //           subTag: _subTag,
@@ -588,10 +589,10 @@
 //     } catch (e, st) {
 //       _clearPendingPaymentData();
 //
-//       AppLogger.exception(
-//         e,
-//         st,
-//         message: 'Verification error',
+//       DebugLog.error(
+//         'Verification error',
+//         error: e,
+//         stackTrace: st,
 //         tag: LogTags.doctor,
 //         subTag: _subTag,
 //       );
@@ -630,7 +631,7 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:debug_bubble/debug_bubble.dart';
 import 'package:yodoctor/core/providers/storage_provider.dart';
 import 'package:yodoctor/modules/doctor/controllers/subscription_status_controller.dart';
 import 'package:yodoctor/modules/payment/controllers/razorpay_controller.dart';
@@ -746,7 +747,7 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
 
   @override
   DoctorSubscriptionState build() {
-    AppLogger.info(
+    DebugLog.info(
       'DoctorSubscriptionNotifier Initialized',
       tag: LogTags.doctor,
       subTag: _subTag,
@@ -781,7 +782,7 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
         }
       },
       onError: (error) {
-        AppLogger.error(
+        DebugLog.error(
           'Razorpay event stream error: $error',
           tag: LogTags.doctor,
           subTag: _subTag,
@@ -823,10 +824,10 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
         isLoading: false,
         errorMessage: 'Network error loading plans.',
       );
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Load plans failed',
+      DebugLog.error(
+        'Load plans failed',
+        error: e,
+        stackTrace: st,
         tag: LogTags.doctor,
         subTag: _subTag,
       );
@@ -834,7 +835,7 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
   }
 
   Future<void> loadSubscriptionDetails() async {
-    AppLogger.info(
+    DebugLog.info(
       'Loading subscription details',
       tag: LogTags.doctor,
       subTag: _subTag,
@@ -843,7 +844,7 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
 
     try {
       if (!ref.read(subscriptionStatusProvider).isResolved) {
-        AppLogger.info(
+        DebugLog.info(
           'Waiting for subscription status to resolve...',
           tag: LogTags.doctor,
           subTag: _subTag,
@@ -860,7 +861,7 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
       }
 
       if (!subStatus.hasSubscription && subStatus.subscriptionPlan == null) {
-        AppLogger.info(
+        DebugLog.info(
           'No active subscription (from cache), skipping duplicate API call',
           tag: LogTags.doctor,
           subTag: _subTag,
@@ -940,9 +941,10 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
         errorMessage: "Network error. Pull to retry.",
         isInitialized: true,
       );
-      AppLogger.exception(
-        e, st,
-        message: 'Subscription load failed',
+      DebugLog.error(
+        'Subscription load failed',
+        error: e,
+        stackTrace: st,
         tag: LogTags.doctor,
         subTag: _subTag,
       );
@@ -989,7 +991,7 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
       }
     } catch (e) {
       state = state.copyWith(isLoadingMore: false);
-      AppLogger.error(
+      DebugLog.error(
         'Failed to load more billing history: $e',
         tag: LogTags.doctor,
         subTag: _subTag,
@@ -1120,10 +1122,10 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
         isLoading: false,
         errorMessage: 'Failed to cancel subscription.',
       );
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Cancel failed',
+      DebugLog.error(
+        'Cancel failed',
+        error: e,
+        stackTrace: st,
         tag: LogTags.doctor,
         subTag: _subTag,
       );
@@ -1196,10 +1198,10 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
         errorMessage: _friendlyError(e),
       );
 
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Subscription creation failed',
+      DebugLog.error(
+        'Subscription creation failed',
+        error: e,
+        stackTrace: st,
         tag: LogTags.doctor,
         subTag: _subTag,
       );
@@ -1273,10 +1275,10 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
         errorMessage: _friendlyError(e),
       );
 
-      AppLogger.exception(
-        e,
-        st,
-        message: 'First-offer order creation failed',
+      DebugLog.error(
+        'First-offer order creation failed',
+        error: e,
+        stackTrace: st,
         tag: LogTags.doctor,
         subTag: _subTag,
       );
@@ -1295,7 +1297,7 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
       ) async {
     // Prevent duplicate verification from double callbacks.
     if (_isVerifyingPayment) {
-      AppLogger.info(
+      DebugLog.info(
         'Ignoring duplicate Razorpay success callback',
         tag: LogTags.doctor,
         subTag: _subTag,
@@ -1304,7 +1306,7 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
     }
 
     if (paymentId != null && _lastVerifiedPaymentId == paymentId) {
-      AppLogger.info(
+      DebugLog.info(
         'Skipping already-verified payment $paymentId',
         tag: LogTags.doctor,
         subTag: _subTag,
@@ -1326,10 +1328,10 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
     } catch (e, st) {
       _clearPendingPaymentData();
 
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Verification error',
+      DebugLog.error(
+        'Verification error',
+        error: e,
+        stackTrace: st,
         tag: LogTags.doctor,
         subTag: _subTag,
       );
@@ -1363,7 +1365,7 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
         localSubscriptionId.isEmpty ||
         signature == null ||
         signature.isEmpty) {
-      AppLogger.error(
+      DebugLog.error(
         'Missing subscription verification data: '
             'paymentId=$paymentId, subId=$razorpaySubscriptionId, '
             'localSubId=$localSubscriptionId, '
@@ -1423,7 +1425,7 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
         orderId.isEmpty ||
         signature == null ||
         signature.isEmpty) {
-      AppLogger.error(
+      DebugLog.error(
         'Missing first-offer verification data: '
             'paymentId=$paymentId, orderId=$orderId, '
             'signature=${signature != null}',
@@ -1473,7 +1475,7 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
   Future<void> _onVerificationSuccess(String paymentId) async {
     final verifiedPlanName = state.selectedNewPlan?.title;
 
-    AppLogger.success(
+    DebugLog.success(
       'Payment verified successfully: $paymentId',
       tag: LogTags.doctor,
       subTag: _subTag,
@@ -1502,10 +1504,10 @@ class DoctorSubscriptionNotifier extends Notifier<DoctorSubscriptionState> {
     try {
       await loadSubscriptionDetails();
     } catch (e, st) {
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Post-verification subscription refresh failed',
+      DebugLog.error(
+        'Post-verification subscription refresh failed',
+        error: e,
+        stackTrace: st,
         tag: LogTags.doctor,
         subTag: _subTag,
       );

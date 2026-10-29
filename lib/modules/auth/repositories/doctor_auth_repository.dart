@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/api_constants.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:debug_bubble/debug_bubble.dart';
 import 'package:yodoctor/core/network/dio_provider.dart';
 import 'package:yodoctor/core/providers/storage_provider.dart';
 import 'package:yodoctor/core/storage/storage_service.dart';
@@ -27,14 +27,14 @@ class DoctorAuthRepository {
 
   Future<Response> login({required String identifier, required String password}) async {
     final payload = {"identifier": identifier, "password": password, "portal": "DOCTOR"};
-    AppLogger.info('Initiating doctor login request', tag: LogTags.auth, subTag: _subTag);
+    DebugLog.info('Initiating doctor login request', tag: LogTags.auth, subTag: _subTag);
 
     try {
       final response = await _dio.post(ApiConstants.login, data: payload);
-      AppLogger.success('Doctor login request completed. Status: ${response.statusCode}', tag: LogTags.auth, subTag: _subTag);
+      DebugLog.success('Doctor login request completed. Status: ${response.statusCode}', tag: LogTags.auth, subTag: _subTag);
       return response;
     } catch (e, st) {
-      AppLogger.error('Doctor login transmission failure', tag: LogTags.auth, subTag: _subTag, error: e, stackTrace: st);
+      DebugLog.error('Doctor login transmission failure', tag: LogTags.auth, subTag: _subTag, error: e, stackTrace: st);
       rethrow;
     }
   }
@@ -46,14 +46,14 @@ class DoctorAuthRepository {
       "portal": "DOCTOR",
       "loginWithOtp": true,
     };
-    AppLogger.info('Initiating doctor send login OTP request to /auth/login', tag: LogTags.auth, subTag: _subTag);
+    DebugLog.info('Initiating doctor send login OTP request to /auth/login', tag: LogTags.auth, subTag: _subTag);
 
     try {
       final response = await _dio.post(ApiConstants.login, data: payload);
-      AppLogger.success('Doctor send login OTP completed. Status: ${response.statusCode}', tag: LogTags.auth, subTag: _subTag);
+      DebugLog.success('Doctor send login OTP completed. Status: ${response.statusCode}', tag: LogTags.auth, subTag: _subTag);
       return response;
     } catch (e, st) {
-      AppLogger.error('Doctor send login OTP transmission failure', tag: LogTags.auth, subTag: _subTag, error: e, stackTrace: st);
+      DebugLog.error('Doctor send login OTP transmission failure', tag: LogTags.auth, subTag: _subTag, error: e, stackTrace: st);
       rethrow;
     }
   }
@@ -75,14 +75,14 @@ class DoctorAuthRepository {
       if (identifier != null && identifier.isNotEmpty) "identifier": identifier,
       "portal": "DOCTOR",
     };
-    AppLogger.info('Initiating doctor OTP verification request', tag: LogTags.auth, subTag: _subTag);
+    DebugLog.info('Initiating doctor OTP verification request', tag: LogTags.auth, subTag: _subTag);
 
     try {
       final response = await _dio.post(ApiConstants.verifyLoginOtp, data: payload);
-      AppLogger.success('Doctor OTP verification completed. Status: ${response.statusCode}', tag: LogTags.auth, subTag: _subTag);
+      DebugLog.success('Doctor OTP verification completed. Status: ${response.statusCode}', tag: LogTags.auth, subTag: _subTag);
       return response;
     } catch (e, st) {
-      AppLogger.error('Doctor OTP verification transmission failure', tag: LogTags.auth, subTag: _subTag, error: e, stackTrace: st);
+      DebugLog.error('Doctor OTP verification transmission failure', tag: LogTags.auth, subTag: _subTag, error: e, stackTrace: st);
       rethrow;
     }
   }
@@ -108,16 +108,21 @@ class DoctorAuthRepository {
       "confirmPassword": confirmPassword,
     };
 
-    AppLogger.info("REG TOKEN => ${_storage.getRegistrationToken()}");
-    AppLogger.info('Submitting registration step 1 payload', tag: LogTags.auth, subTag: _subTag);
-    AppLogger.json(payload, tag: LogTags.auth, subTag: '$_subTag/Step1Payload');
+    DebugLog.info("REG TOKEN => ${_storage.getRegistrationToken()}");
+    DebugLog.info('Submitting registration step 1 payload', tag: LogTags.auth, subTag: _subTag);
+    DebugLog.debug(
+      'Step 1 payload',
+      tag: LogTags.auth,
+      subTag: '$_subTag/Step1Payload',
+      json: payload,
+    );
 
     try {
       final response = await _dio.post(ApiConstants.doctorRegisterStep1, data: payload);
-      AppLogger.success('Registration step 1 finished. Status: ${response.statusCode}', tag: LogTags.auth, subTag: _subTag);
+      DebugLog.success('Registration step 1 finished. Status: ${response.statusCode}', tag: LogTags.auth, subTag: _subTag);
       return response;
     } catch (e, st) {
-      AppLogger.error('Registration step 1 network failure', tag: LogTags.auth, subTag: _subTag, error: e, stackTrace: st);
+      DebugLog.error('Registration step 1 network failure', tag: LogTags.auth, subTag: _subTag, error: e, stackTrace: st);
       rethrow;
     }
   }
@@ -132,7 +137,7 @@ class DoctorAuthRepository {
       "gender": gender,
       "bio": bio,
     };
-    AppLogger.info("REG TOKEN => ${_storage.getRegistrationToken()}");
+    DebugLog.info("REG TOKEN => ${_storage.getRegistrationToken()}");
     return await _dio.patch(ApiConstants.doctorRegisterUpdateStep1, data: payload);
   }
 
@@ -153,16 +158,21 @@ class DoctorAuthRepository {
       "validTill": validTill,
     };
 
-    AppLogger.info("REG TOKEN => ${_storage.getRegistrationToken()}");
-    AppLogger.info('Submitting registration step 2 payload', tag: LogTags.auth, subTag: _subTag);
-    AppLogger.json(payload, tag: LogTags.auth, subTag: '$_subTag/Step2Payload');
+    DebugLog.info("REG TOKEN => ${_storage.getRegistrationToken()}");
+    DebugLog.info('Submitting registration step 2 payload', tag: LogTags.auth, subTag: _subTag);
+    DebugLog.debug(
+      'Step 2 payload',
+      tag: LogTags.auth,
+      subTag: '$_subTag/Step2Payload',
+      json: payload,
+    );
 
     try {
       final response = await _dio.patch(ApiConstants.doctorRegisterStep2, data: payload);
-      AppLogger.success('Registration step 2 finished. Status: ${response.statusCode}', tag: LogTags.auth, subTag: _subTag);
+      DebugLog.success('Registration step 2 finished. Status: ${response.statusCode}', tag: LogTags.auth, subTag: _subTag);
       return response;
     } catch (e, st) {
-      AppLogger.error('Registration step 2 network failure', tag: LogTags.auth, subTag: _subTag, error: e, stackTrace: st);
+      DebugLog.error('Registration step 2 network failure', tag: LogTags.auth, subTag: _subTag, error: e, stackTrace: st);
       rethrow;
     }
   }
@@ -183,38 +193,48 @@ class DoctorAuthRepository {
       ],
     };
 
-    AppLogger.info('Submitting registration step 3 payload', tag: LogTags.auth, subTag: _subTag);
-    AppLogger.json(payload, tag: LogTags.auth, subTag: '$_subTag/Step3Payload');
+    DebugLog.info('Submitting registration step 3 payload', tag: LogTags.auth, subTag: _subTag);
+    DebugLog.debug(
+      'Step 3 payload',
+      tag: LogTags.auth,
+      subTag: '$_subTag/Step3Payload',
+      json: payload,
+    );
 
     try {
       final response = await _dio.patch(ApiConstants.doctorRegisterStep3, data: payload);
-      AppLogger.success('Registration step 3 finished. Status: ${response.statusCode}', tag: LogTags.auth, subTag: _subTag);
+      DebugLog.success('Registration step 3 finished. Status: ${response.statusCode}', tag: LogTags.auth, subTag: _subTag);
       return response;
     } catch (e, st) {
-      AppLogger.error('Registration step 3 network failure', tag: LogTags.auth, subTag: _subTag, error: e, stackTrace: st);
+      DebugLog.error('Registration step 3 network failure', tag: LogTags.auth, subTag: _subTag, error: e, stackTrace: st);
       rethrow;
     }
   }
 
   Future<Response> registerStep4({required DoctorFormData data}) async {
-    AppLogger.info("REG TOKEN => ${_storage.getRegistrationToken()}");
+    DebugLog.info("REG TOKEN => ${_storage.getRegistrationToken()}");
     final payload = {"practiceType": data.practiceType, "hospitalName": data.hospitalName};
 
-    AppLogger.info('Submitting registration step 4 payload', tag: LogTags.auth, subTag: _subTag);
-    AppLogger.json(payload, tag: LogTags.auth, subTag: '$_subTag/Step4Payload');
+    DebugLog.info('Submitting registration step 4 payload', tag: LogTags.auth, subTag: _subTag);
+    DebugLog.debug(
+      'Step 4 payload',
+      tag: LogTags.auth,
+      subTag: '$_subTag/Step4Payload',
+      json: payload,
+    );
 
     try {
       final response = await _dio.patch(ApiConstants.doctorRegisterStep4, data: payload);
-      AppLogger.success('Registration step 4 finished. Status: ${response.statusCode}', tag: LogTags.auth, subTag: _subTag);
+      DebugLog.success('Registration step 4 finished. Status: ${response.statusCode}', tag: LogTags.auth, subTag: _subTag);
       return response;
     } catch (e, st) {
-      AppLogger.error('Registration step 4 network failure', tag: LogTags.auth, subTag: _subTag, error: e, stackTrace: st);
+      DebugLog.error('Registration step 4 network failure', tag: LogTags.auth, subTag: _subTag, error: e, stackTrace: st);
       rethrow;
     }
   }
 
   Future<Response> registerStep5({required DoctorFormData data}) async {
-    AppLogger.info("REG TOKEN => ${_storage.getRegistrationToken()}");
+    DebugLog.info("REG TOKEN => ${_storage.getRegistrationToken()}");
     final payload = {
       "fee": data.fee,
       "duration": data.duration,
@@ -227,15 +247,20 @@ class DoctorAuthRepository {
       "eveningEnd": data.eveningEnd.isEmpty ? null : data.eveningEnd.split(":").first,
     };
 
-    AppLogger.info('Submitting registration step 5 payload', tag: LogTags.auth, subTag: _subTag);
-    AppLogger.json(payload, tag: LogTags.auth, subTag: '$_subTag/Step5Payload');
+    DebugLog.info('Submitting registration step 5 payload', tag: LogTags.auth, subTag: _subTag);
+    DebugLog.debug(
+      'Step 5 payload',
+      tag: LogTags.auth,
+      subTag: '$_subTag/Step5Payload',
+      json: payload,
+    );
 
     try {
       final response = await _dio.patch(ApiConstants.doctorRegisterStep5, data: payload);
-      AppLogger.success('Registration step 5 finished. Status: ${response.statusCode}', tag: LogTags.auth, subTag: _subTag);
+      DebugLog.success('Registration step 5 finished. Status: ${response.statusCode}', tag: LogTags.auth, subTag: _subTag);
       return response;
     } catch (e, st) {
-      AppLogger.error('Registration step 5 network failure', tag: LogTags.auth, subTag: _subTag, error: e, stackTrace: st);
+      DebugLog.error('Registration step 5 network failure', tag: LogTags.auth, subTag: _subTag, error: e, stackTrace: st);
       rethrow;
     }
   }
@@ -243,7 +268,7 @@ class DoctorAuthRepository {
   Future<Response> registerStep6({
     required DoctorFormData data,
   }) async {
-    AppLogger.info(
+    DebugLog.info(
       'Compiling and uploading registration multipart fields for step 6',
       tag: LogTags.auth,
       subTag: _subTag,
@@ -280,7 +305,7 @@ class DoctorAuthRepository {
         ),
       );
 
-      AppLogger.info(
+      DebugLog.info(
         'Step6 files → '
             'profile=${data.profileFile?.path} | '
             'certificate=${data.certificateFile?.path} | '
@@ -292,7 +317,7 @@ class DoctorAuthRepository {
 
       return response;
     } catch (e, st) {
-      AppLogger.error(
+      DebugLog.error(
         'Registration step 6 upload failure',
         tag: LogTags.auth,
         subTag: _subTag,
@@ -311,15 +336,20 @@ class DoctorAuthRepository {
       "terms": data.declTerms,
     };
 
-    AppLogger.info('Submitting final declaration payload to ${ApiConstants.doctorRegisterSubmit}', tag: LogTags.auth, subTag: _subTag);
-    AppLogger.json(payload, tag: LogTags.auth, subTag: '$_subTag/DeclarationPayload');
+    DebugLog.info('Submitting final declaration payload to ${ApiConstants.doctorRegisterSubmit}', tag: LogTags.auth, subTag: _subTag);
+    DebugLog.debug(
+      'Declaration payload',
+      tag: LogTags.auth,
+      subTag: '$_subTag/DeclarationPayload',
+      json: payload,
+    );
 
     try {
       final response = await _dio.patch(ApiConstants.doctorRegisterSubmit, data: payload);
-      AppLogger.success('Final declaration submitted successfully. Status: ${response.statusCode}', tag: LogTags.auth, subTag: _subTag);
+      DebugLog.success('Final declaration submitted successfully. Status: ${response.statusCode}', tag: LogTags.auth, subTag: _subTag);
       return response;
     } catch (e, st) {
-      AppLogger.error('Final registration submission execution loss', tag: LogTags.auth, subTag: _subTag, error: e, stackTrace: st);
+      DebugLog.error('Final registration submission execution loss', tag: LogTags.auth, subTag: _subTag, error: e, stackTrace: st);
       rethrow;
     }
   }
@@ -337,17 +367,17 @@ class DoctorAuthRepository {
   }
 
   Future<void> saveSessionToken(String token) async {
-    AppLogger.info('Storing fresh user context session token', tag: LogTags.auth, subTag: _subTag);
+    DebugLog.info('Storing fresh user context session token', tag: LogTags.auth, subTag: _subTag);
     await _storage.saveToken(token);
   }
 
   Future<void> saveRegistrationToken(String token) async {
-    AppLogger.info('Storing temporary setup registration token key', tag: LogTags.auth, subTag: _subTag);
+    DebugLog.info('Storing temporary setup registration token key', tag: LogTags.auth, subTag: _subTag);
     await _storage.saveRegistrationToken(token);
   }
 
   Future<void> saveUserRole(String role) async {
-    AppLogger.info('Caching user role descriptor natively: $role', tag: LogTags.auth, subTag: _subTag);
+    DebugLog.info('Caching user role descriptor natively: $role', tag: LogTags.auth, subTag: _subTag);
     await _storage.saveRole(role);
   }
 
@@ -364,7 +394,7 @@ class DoctorAuthRepository {
   }
 
   Future<void> clearAuthSession() async {
-    AppLogger.info('Flushing auth session local records and clearing identifiers', tag: LogTags.auth, subTag: _subTag);
+    DebugLog.info('Flushing auth session local records and clearing identifiers', tag: LogTags.auth, subTag: _subTag);
     await _storage.clearToken();
     await _storage.clearRegistrationToken();
     await _storage.clearRole();

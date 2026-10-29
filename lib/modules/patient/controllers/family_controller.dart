@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:debug_bubble/debug_bubble.dart';
 import '../repositories/patient_family_repository.dart';
 import '../models/family/family_member_model.dart';
 
@@ -76,7 +76,7 @@ class FamilyController extends Notifier<FamilyState> {
     if (state.isLoading) return;
     state = state.copyWith(isLoading: true, clearError: true);
 
-    AppLogger.info('Fetching family members...', tag: LogTags.patient, subTag: _subTag);
+    DebugLog.info('Fetching family members...', tag: LogTags.patient, subTag: _subTag);
 
     try {
       final repository = ref.read(patientFamilyRepositoryProvider);
@@ -87,15 +87,15 @@ class FamilyController extends Notifier<FamilyState> {
         final parsedMembers = list.map((e) => FamilyMemberModel.fromJson(e)).toList();
 
         state = state.copyWith(members: parsedMembers, isLoading: false);
-        AppLogger.success('Family members synchronized successfully', tag: LogTags.patient, subTag: _subTag);
+        DebugLog.success('Family members synchronized successfully', tag: LogTags.patient, subTag: _subTag);
       } else {
         final msg = response.data["message"] ?? "Failed to load family sync matrix";
         state = state.copyWith(errorMessage: msg, isLoading: false);
-        AppLogger.warning('Failed to load family members: $msg', tag: LogTags.patient, subTag: _subTag);
+        DebugLog.warning('Failed to load family members: $msg', tag: LogTags.patient, subTag: _subTag);
       }
     } catch (e, st) {
       state = state.copyWith(errorMessage: "Failed to load family members", isLoading: false);
-      AppLogger.exception(e, st, message: 'Failed to load family members', tag: LogTags.patient, subTag: _subTag);
+      DebugLog.error('Failed to load family members', error: e, stackTrace: st, tag: LogTags.patient, subTag: _subTag);
     }
   }
 
@@ -118,22 +118,21 @@ class FamilyController extends Notifier<FamilyState> {
       "relation": relation,
     };
 
-    AppLogger.info('Adding new family member', tag: LogTags.patient, subTag: _subTag);
-    AppLogger.json(payload, tag: LogTags.patient, subTag: '$_subTag/AddPayload');
+    DebugLog.info('Adding new family member', tag: LogTags.patient, subTag: _subTag, json: payload);
 
     try {
       final repository = ref.read(patientFamilyRepositoryProvider);
       final response = await repository.addFamilyMember(payload);
 
       if (response.statusCode == 201) {
-        AppLogger.success('Family member added successfully', tag: LogTags.patient, subTag: _subTag);
+        DebugLog.success('Family member added successfully', tag: LogTags.patient, subTag: _subTag);
         await loadFamilyMembers();
         return true;
       }
-      AppLogger.warning('Failed to add family member: ${response.statusCode}', tag: LogTags.patient, subTag: _subTag);
+      DebugLog.warning('Failed to add family member: ${response.statusCode}', tag: LogTags.patient, subTag: _subTag);
       return false;
     } catch (e, st) {
-      AppLogger.exception(e, st, message: 'Add member execution halted', tag: LogTags.patient, subTag: _subTag);
+      DebugLog.error('Add member execution halted', error: e, stackTrace: st, tag: LogTags.patient, subTag: _subTag);
       return false;
     }
   }
@@ -158,42 +157,41 @@ class FamilyController extends Notifier<FamilyState> {
       "relation": relation,
     };
 
-    AppLogger.info('Updating family member ID: $id', tag: LogTags.patient, subTag: _subTag);
-    AppLogger.json(payload, tag: LogTags.patient, subTag: '$_subTag/UpdatePayload');
+    DebugLog.info('Updating family member ID: $id', tag: LogTags.patient, subTag: _subTag, json: payload);
 
     try {
       final repository = ref.read(patientFamilyRepositoryProvider);
       final response = await repository.updateFamilyMember(id, payload);
 
       if (response.statusCode == 200) {
-        AppLogger.success('Family member ID: $id updated successfully', tag: LogTags.patient, subTag: _subTag);
+        DebugLog.success('Family member ID: $id updated successfully', tag: LogTags.patient, subTag: _subTag);
         await loadFamilyMembers();
         return true;
       }
-      AppLogger.warning('Failed to update family member: ${response.statusCode}', tag: LogTags.patient, subTag: _subTag);
+      DebugLog.warning('Failed to update family member: ${response.statusCode}', tag: LogTags.patient, subTag: _subTag);
       return false;
     } catch (e, st) {
-      AppLogger.exception(e, st, message: 'Update member execution halted', tag: LogTags.patient, subTag: _subTag);
+      DebugLog.error('Update member execution halted', error: e, stackTrace: st, tag: LogTags.patient, subTag: _subTag);
       return false;
     }
   }
 
   Future<bool> deleteMember(int id) async {
-    AppLogger.info('Deleting family member ID: $id', tag: LogTags.patient, subTag: _subTag);
+    DebugLog.info('Deleting family member ID: $id', tag: LogTags.patient, subTag: _subTag);
 
     try {
       final repository = ref.read(patientFamilyRepositoryProvider);
       final response = await repository.deleteFamilyMember(id);
 
       if (response.statusCode == 200) {
-        AppLogger.success('Family member ID: $id deleted successfully', tag: LogTags.patient, subTag: _subTag);
+        DebugLog.success('Family member ID: $id deleted successfully', tag: LogTags.patient, subTag: _subTag);
         await loadFamilyMembers();
         return true;
       }
-      AppLogger.warning('Failed to delete family member: ${response.statusCode}', tag: LogTags.patient, subTag: _subTag);
+      DebugLog.warning('Failed to delete family member: ${response.statusCode}', tag: LogTags.patient, subTag: _subTag);
       return false;
     } catch (e, st) {
-      AppLogger.exception(e, st, message: 'Delete member execution halted', tag: LogTags.patient, subTag: _subTag);
+      DebugLog.error('Delete member execution halted', error: e, stackTrace: st, tag: LogTags.patient, subTag: _subTag);
       return false;
     }
   }

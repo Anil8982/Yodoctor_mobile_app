@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:yodoctor/core/constants/app_assets.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:debug_bubble/debug_bubble.dart';
 import 'package:yodoctor/core/providers/app_role_provider.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
@@ -132,7 +132,7 @@ class _UnifiedLoginScreenState extends ConsumerState<UnifiedLoginScreen>
     final identifier = _cleanInputIdentifier(_identifierController.text);
     final password = _passwordController.text.trim();
 
-    AppLogger.info(
+    DebugLog.info(
       'Submitting login (${_isOtpLogin ? "OTP Flow" : "Normal Password Flow"}) for ${widget.role.name}',
       tag: LogTags.ui,
       subTag: _subTag,
@@ -403,7 +403,7 @@ class _UnifiedLoginScreenState extends ConsumerState<UnifiedLoginScreen>
 
   Future<void> _handleGoogleSignIn() async {
     FocusManager.instance.primaryFocus?.unfocus();
-    AppLogger.info(
+    DebugLog.info(
       'Google button click event received',
       tag: LogTags.ui,
       subTag: _subTag,
@@ -417,7 +417,7 @@ class _UnifiedLoginScreenState extends ConsumerState<UnifiedLoginScreen>
       if (!mounted) return;
 
       if (user != null) {
-        AppLogger.highlight(
+        DebugLog.success(
           'OAuth authorization resolved for user: ${user.name}',
         );
         ref.read(appRoleProvider.notifier).setRole(AppRole.patient);
@@ -432,7 +432,7 @@ class _UnifiedLoginScreenState extends ConsumerState<UnifiedLoginScreen>
         }
       }
     } catch (e, st) {
-      AppLogger.error(
+      DebugLog.error(
         'Unhandled Google Sign-In exception',
         tag: LogTags.ui,
         subTag: _subTag,

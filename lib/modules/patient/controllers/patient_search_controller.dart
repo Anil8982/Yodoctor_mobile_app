@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:debug_bubble/debug_bubble.dart';
 import '../models/search/city_model.dart';
 import '../models/search/doctor_name_model.dart';
 import '../models/search/search_mode.dart';
@@ -225,10 +225,10 @@ class PatientSearchController extends Notifier<PatientSearchState> {
         error: "Failed to load specialties",
         isLoading: false,
       );
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Load specialties failed',
+      DebugLog.error(
+        'Load specialties failed',
+        error: e,
+        stackTrace: st,
         tag: LogTags.patient,
         subTag: _subTag,
       );
@@ -294,10 +294,10 @@ class PatientSearchController extends Notifier<PatientSearchState> {
 
       state = state.copyWith(searchSuggestions: allSuggestions);
     } catch (e, st) {
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Search suggestions failed',
+      DebugLog.error(
+        'Search suggestions failed',
+        error: e,
+        stackTrace: st,
         tag: LogTags.patient,
         subTag: _subTag,
       );
@@ -354,10 +354,10 @@ class PatientSearchController extends Notifier<PatientSearchState> {
         state = state.copyWith(citySuggestions: list);
       }
     } catch (e, st) {
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Location suggestions failed',
+      DebugLog.error(
+        'Location suggestions failed',
+        error: e,
+        stackTrace: st,
         tag: LogTags.patient,
         subTag: _subTag,
       );

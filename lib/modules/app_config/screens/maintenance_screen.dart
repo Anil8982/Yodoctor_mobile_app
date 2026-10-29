@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:debug_bubble/debug_bubble.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
 import 'package:yodoctor/modules/app_config/controllers/app_config_controller.dart';
 
@@ -119,7 +119,7 @@ class MaintenanceScreen extends ConsumerWidget {
       height: 40,
       child: ElevatedButton(
         onPressed: () {
-          AppLogger.info(
+          DebugLog.info(
             'Retrying app configuration check...',
             tag: LogTags.app,
             subTag: 'AppConfigNotifier',

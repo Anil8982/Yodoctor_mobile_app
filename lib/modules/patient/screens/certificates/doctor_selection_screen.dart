@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:debug_bubble/debug_bubble.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/controllers/certificate_request.dart';
@@ -25,13 +25,13 @@ class _DoctorSelectionScreenState extends ConsumerState<DoctorSelectionScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      AppLogger.info('Initializing doctor selection screen', tag: LogTags.patient, subTag: _subTag);
+      DebugLog.info('Initializing doctor selection screen', tag: LogTags.patient, subTag: _subTag);
       ref.read(certificateProvider.notifier).loadDoctors();
     });
   }
 
   Future<void> _onRefresh() async {
-    AppLogger.info('Refreshing doctor list', tag: LogTags.patient, subTag: _subTag);
+    DebugLog.info('Refreshing doctor list', tag: LogTags.patient, subTag: _subTag);
     await ref.read(certificateProvider.notifier).loadDoctors();
   }
 
@@ -94,7 +94,7 @@ class _DoctorSelectionScreenState extends ConsumerState<DoctorSelectionScreen> {
                   doctor: doctor,
                   isSelected: isSelected,
                   onTap: () {
-                    AppLogger.info(
+                    DebugLog.info(
                       'Selected doctor ID: ${doctor.id}, Name: ${doctor.name}',
                       tag: LogTags.patient,
                       subTag: _subTag,

@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:debug_bubble/debug_bubble.dart';
 import '../repositories/patient_appointment_repository.dart';
 import '../models/appointment/book_appointment_request.dart';
 import '../models/appointment/book_appointment_response.dart';
@@ -79,7 +79,7 @@ class BookAppointmentController extends Notifier<BookAppointmentState> {
 
   /// Handles the execution of appointment booking safely
   Future<bool> book(String doctorId) async {
-    AppLogger.info('Initiating appointment booking flow in repositories', tag: LogTags.patient, subTag: _subTag);
+    DebugLog.info('Initiating appointment booking flow in repositories', tag: LogTags.patient, subTag: _subTag);
 
     // Set loading state safely
     state = state.copyWith(bookingStatus: const AsyncLoading());
@@ -97,14 +97,14 @@ class BookAppointmentController extends Notifier<BookAppointmentState> {
       final res = await repository.bookAppointment(request);
 
       if (res.data is Map<String, dynamic>) {
-        AppLogger.json(res.data as Map<String, dynamic>, tag: LogTags.api, subTag: _subTag);
+        DebugLog.info('Appointment booking response', tag: LogTags.api, subTag: _subTag, json: res.data as Map<String, dynamic>);
       }
 
       final payload = res.data["data"] as Map<String, dynamic>;
       final responseModel = BookAppointmentResponse.fromJson(payload);
 
       state = state.copyWith(bookingStatus: AsyncData(responseModel));
-      AppLogger.success('Appointment booking committed and synchronized successfully.', tag: LogTags.patient, subTag: _subTag);
+      DebugLog.success('Appointment booking committed and synchronized successfully.', tag: LogTags.patient, subTag: _subTag);
       return true;
     } catch (errorObj, st) {
       String userError = "Booking Failed";
@@ -119,7 +119,7 @@ class BookAppointmentController extends Notifier<BookAppointmentState> {
       }
 
       state = state.copyWith(bookingStatus: AsyncError(userError, st));
-      AppLogger.exception(errorObj, st, message: userError, tag: LogTags.patient, subTag: _subTag);
+      DebugLog.error(userError, error: errorObj, stackTrace: st, tag: LogTags.patient, subTag: _subTag);
       return false;
     }
   }

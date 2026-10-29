@@ -3,7 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:debug_bubble/debug_bubble.dart';
 import 'package:yodoctor/modules/doctor/models/certificate/doctor_certificate_detail_model.dart';
 import 'package:yodoctor/modules/doctor/models/certificate/doctor_document_model.dart';
 import '../repositories/doctor_certificate_repository.dart';
@@ -85,7 +85,7 @@ class DoctorCertificateReviewNotifier
 
   @override
   DoctorCertificateReviewState build() {
-    AppLogger.info(
+    DebugLog.info(
       'DoctorCertificateReviewNotifier Initialized',
       tag: LogTags.doctor,
       subTag: _subTag,
@@ -96,7 +96,7 @@ class DoctorCertificateReviewNotifier
 
   Future<void> load(int requestId) async {
     state = state.copyWith(loading: true, clearError: true, clearDetail: true);
-    AppLogger.info(
+    DebugLog.info(
       'Loading certificate review for ID: $requestId',
       tag: LogTags.doctor,
       subTag: _subTag,
@@ -132,14 +132,14 @@ class DoctorCertificateReviewNotifier
             .toList();
 
         for (final doc in docs) {
-          AppLogger.info(
+          DebugLog.info(
             'Document #${doc.id}: original=${doc.fileUrl} | normalized=${doc.normalizedUrl} | full=${doc.fullUrl}',
             tag: LogTags.doctor,
             subTag: '$_subTag/DocURL',
           );
         }
 
-        AppLogger.success(
+        DebugLog.success(
           'Certificate loaded for ID: $requestId. Documents: ${docs.length}',
           tag: LogTags.doctor,
           subTag: _subTag,
@@ -173,7 +173,7 @@ class DoctorCertificateReviewNotifier
           );
         }
       } else {
-        AppLogger.warning(
+        DebugLog.warning(
           'Failed to load certificate details. Detail OK: $detailOk, Docs OK: $docsOk',
           tag: LogTags.doctor,
           subTag: _subTag,
@@ -188,10 +188,10 @@ class DoctorCertificateReviewNotifier
         loading: false,
         errorMessage: "Failed to load certificate details",
       );
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Load certificate failed',
+      DebugLog.error(
+        error: e,
+        stackTrace: st,
+        'Load certificate failed',
         tag: LogTags.doctor,
         subTag: _subTag,
       );
@@ -208,7 +208,7 @@ class DoctorCertificateReviewNotifier
     if (state.detail == null || state.submitting) return false;
 
     if (_checkIsFinalized(state.detail!)) {
-      AppLogger.warning(
+      DebugLog.warning(
         'Cannot approve finalized certificate',
         tag: LogTags.doctor,
         subTag: _subTag,
@@ -271,10 +271,10 @@ class DoctorCertificateReviewNotifier
       } catch (_) {}
 
       state = state.copyWith(submitting: false, errorMessage: errorMsg);
-      AppLogger.exception(
-        e,
-        e.stackTrace,
-        message: 'Approve failed with DioException',
+      DebugLog.error(
+        error: e,
+        stackTrace:  e.stackTrace,
+        'Approve failed with DioException',
         tag: LogTags.doctor,
         subTag: _subTag,
       );
@@ -284,10 +284,10 @@ class DoctorCertificateReviewNotifier
         submitting: false,
         errorMessage: "Approval action failed",
       );
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Approve failed',
+      DebugLog.error(
+        error: e,
+        stackTrace: st,
+        'Approve failed',
         tag: LogTags.doctor,
         subTag: _subTag,
       );
@@ -299,7 +299,7 @@ class DoctorCertificateReviewNotifier
     if (state.detail == null || state.submitting) return false;
 
     if (_checkIsFinalized(state.detail!)) {
-      AppLogger.warning(
+      DebugLog.warning(
         'Cannot reject finalized certificate',
         tag: LogTags.doctor,
         subTag: _subTag,
@@ -338,10 +338,10 @@ class DoctorCertificateReviewNotifier
       } catch (_) {}
 
       state = state.copyWith(submitting: false, errorMessage: errorMsg);
-      AppLogger.exception(
-        e,
-        e.stackTrace,
-        message: 'Reject failed with DioException',
+      DebugLog.error(
+        error: e,
+        stackTrace:  e.stackTrace,
+        'Reject failed with DioException',
         tag: LogTags.doctor,
         subTag: _subTag,
       );
@@ -351,10 +351,10 @@ class DoctorCertificateReviewNotifier
         submitting: false,
         errorMessage: "Rejection action failed",
       );
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Reject failed',
+      DebugLog.error(
+        error: e,
+        stackTrace: st,
+        'Reject failed',
         tag: LogTags.doctor,
         subTag: _subTag,
       );

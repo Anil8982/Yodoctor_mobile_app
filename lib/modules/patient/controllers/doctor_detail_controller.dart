@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:debug_bubble/debug_bubble.dart';
 import '../models/search/doctor_detail_model.dart';
 import '../repositories/patient_search_repository.dart';
 
@@ -46,7 +46,7 @@ class DoctorDetailController extends Notifier<DoctorDetailState> {
       clearDoctor: true,
     );
 
-    AppLogger.info(
+    DebugLog.info(
       'Loading doctor profile details',
       tag: LogTags.patient,
       subTag: _subTag,
@@ -62,10 +62,11 @@ class DoctorDetailController extends Notifier<DoctorDetailState> {
           statusCode < 300 &&
           response.data["success"] == true) {
         if (response.data is Map<String, dynamic>) {
-          AppLogger.json(
-            response.data as Map<String, dynamic>,
+          DebugLog.info(
+            'Doctor profile data received',
             tag: LogTags.api,
             subTag: _subTag,
+            json: response.data as Map<String, dynamic>,
           );
         }
 
@@ -75,7 +76,7 @@ class DoctorDetailController extends Notifier<DoctorDetailState> {
         final errorMsg =
             response.data["message"] ?? "Failed to load doctor profile";
         state = state.copyWith(errorMessage: errorMsg, isLoading: false);
-        AppLogger.warning(
+        DebugLog.warning(
           'Failed to load doctor profile: $errorMsg',
           tag: LogTags.patient,
           subTag: _subTag,
@@ -86,10 +87,10 @@ class DoctorDetailController extends Notifier<DoctorDetailState> {
         errorMessage: "Failed to load doctor profile",
         isLoading: false,
       );
-      AppLogger.exception(
-        e,
-        stackTrace,
-        message: 'Failed to load doctor profile',
+      DebugLog.error(
+        'Failed to load doctor profile',
+        error: e,
+        stackTrace: stackTrace,
         tag: LogTags.patient,
         subTag: _subTag,
       );

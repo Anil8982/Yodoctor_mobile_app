@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:debug_bubble/debug_bubble.dart';
 import '../models/search/doctor_search_model.dart';
 import '../models/search/search_params.dart';
 import '../repositories/patient_search_repository.dart';
@@ -144,10 +144,10 @@ class DoctorListingController extends Notifier<DoctorListingState> {
         error: "Failed to load doctors",
         isLoading: false,
       );
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Load doctors failed',
+      DebugLog.error(
+        'Load doctors failed',
+        error: e,
+        stackTrace: st,
         tag: LogTags.patient,
         subTag: _subTag,
       );

@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:debug_bubble/debug_bubble.dart';
 import 'core/providers/storage_provider.dart';
 import 'core/storage/hive_boxes.dart';
 import 'core/storage/storage_service.dart';
@@ -17,6 +18,36 @@ import 'modules/widgets/app_snack_bar.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  DebugLog.init(
+    DebugBubbleConfig(
+      captureUncaughtErrors: true,
+      consoleOutput: true,
+
+      redaction: DebugRedactionConfig(
+        enabled: true,
+        sensitiveKeys: {
+          ...DebugRedactionConfig.defaultSensitiveKeys,
+          'accesstoken',
+          'token',
+          'access_token',
+          'refreshtoken',
+          'refresh_token',
+          'firebasetoken',
+          'firebase_token',
+          'confirmpassword',
+          'confirm_password',
+        },
+        sensitiveKeyTokens: {
+          ...DebugRedactionConfig.defaultSensitiveKeyTokens,
+        },
+        allowedKeys: {
+          'todayToken',
+        },
+        replacement: '[REDACTED] 0000',
+      ),
+    ),
+  );
 
   await dotenv.load(fileName: ".env");
 
@@ -63,6 +94,9 @@ class YoDoctorApp extends ConsumerWidget {
       title: 'YoDoctor',
       debugShowCheckedModeBanner: false,
       routerConfig: goRouter,
+      builder: (context, child) => DebugBubble(
+        child: child ?? const SizedBox.shrink(),
+      ),
       locale: currentLocale,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,

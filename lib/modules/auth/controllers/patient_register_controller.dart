@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:debug_bubble/debug_bubble.dart';
 import 'package:yodoctor/core/providers/app_role_provider.dart';
 import 'package:yodoctor/core/providers/otp_cooldown_provider.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
@@ -117,7 +117,7 @@ class PatientRegisterController extends Notifier<PatientRegisterState> {
 
   @override
   PatientRegisterState build() {
-    AppLogger.info(
+    DebugLog.info(
       'PatientRegisterController Initialized',
       tag: LogTags.auth,
       subTag: _subTag,
@@ -126,7 +126,7 @@ class PatientRegisterController extends Notifier<PatientRegisterState> {
   }
 
   void selectGender(String gender) {
-    AppLogger.info(
+    DebugLog.info(
       'Gender selection updated locally to: $gender',
       tag: LogTags.auth,
       subTag: _subTag,
@@ -135,7 +135,7 @@ class PatientRegisterController extends Notifier<PatientRegisterState> {
   }
 
   void toggleTerms(bool value) {
-    AppLogger.info(
+    DebugLog.info(
       'Terms & conditions agreement toggle value: $value',
       tag: LogTags.auth,
       subTag: _subTag,
@@ -146,7 +146,7 @@ class PatientRegisterController extends Notifier<PatientRegisterState> {
   void selectDateOfBirth(DateTime? date) {
     if (date == null) return;
 
-    AppLogger.info(
+    DebugLog.info(
       'Date of Birth selected: ${DateFormat('dd MMM yyyy').format(date)}',
       tag: LogTags.auth,
       subTag: _subTag,
@@ -158,7 +158,7 @@ class PatientRegisterController extends Notifier<PatientRegisterState> {
   void onEmailChanged(String currentText) {
     final trimmed = currentText.trim();
     if (state.isEmailVerified && trimmed != state.verifiedEmail) {
-      AppLogger.info(
+      DebugLog.info(
         'Verified email text modified. Resetting email verification state.',
         tag: LogTags.auth,
         subTag: _subTag,
@@ -173,7 +173,7 @@ class PatientRegisterController extends Notifier<PatientRegisterState> {
   void onPhoneChanged(String currentText) {
     final trimmed = currentText.trim();
     if (state.isMobileVerified && trimmed != state.verifiedPhone) {
-      AppLogger.info(
+      DebugLog.info(
         'Verified mobile number modified. Resetting mobile verification state.',
         tag: LogTags.auth,
         subTag: _subTag,
@@ -370,7 +370,7 @@ class PatientRegisterController extends Notifier<PatientRegisterState> {
 
     // 1. Mobile verification check (MANDATORY)
     if (!state.isMobileVerified) {
-      AppLogger.warning(
+      DebugLog.warning(
         'Patient registration blocked: Mobile number not verified',
         tag: LogTags.auth,
         subTag: _subTag,
@@ -384,7 +384,7 @@ class PatientRegisterController extends Notifier<PatientRegisterState> {
 
     // 2. Email verification check (MANDATORY ONLY IF EMAIL IS PROVIDED)
     if (hasEmail && !state.isEmailVerified) {
-      AppLogger.warning(
+      DebugLog.warning(
         'Patient registration blocked: Email provided but not verified',
         tag: LogTags.auth,
         subTag: _subTag,
@@ -398,7 +398,7 @@ class PatientRegisterController extends Notifier<PatientRegisterState> {
 
     // 3. Date of birth check
     if (state.selectedDOB == null) {
-      AppLogger.warning(
+      DebugLog.warning(
         'Patient registration aborted: Missing selected Date of Birth',
         tag: LogTags.auth,
         subTag: _subTag,
@@ -409,7 +409,7 @@ class PatientRegisterController extends Notifier<PatientRegisterState> {
 
     // 4. Gender check
     if (state.selectedGender == null) {
-      AppLogger.warning(
+      DebugLog.warning(
         'Patient registration aborted: Missing selected Gender reference',
         tag: LogTags.auth,
         subTag: _subTag,
@@ -420,7 +420,7 @@ class PatientRegisterController extends Notifier<PatientRegisterState> {
 
     // 5. Terms check
     if (!state.agreedToTerms) {
-      AppLogger.warning(
+      DebugLog.warning(
         'Patient registration aborted: Terms not agreed',
         tag: LogTags.auth,
         subTag: _subTag,
@@ -447,15 +447,16 @@ class PatientRegisterController extends Notifier<PatientRegisterState> {
       "isEmailVerified": state.isEmailVerified,
     };
 
-    AppLogger.info(
+    DebugLog.info(
       'Initiating patient registration pipeline workflow...',
       tag: LogTags.auth,
       subTag: _subTag,
     );
-    AppLogger.json(
-      payloadSummary,
+    DebugLog.debug(
+      'Patient registration payload summary',
       tag: LogTags.auth,
       subTag: '$_subTag/RegistrationPayloadSummary',
+      json: payloadSummary,
     );
 
     try {
@@ -475,7 +476,7 @@ class PatientRegisterController extends Notifier<PatientRegisterState> {
       if (!context.mounted) return;
 
       if (result.success) {
-        AppLogger.success(
+        DebugLog.success(
           'Patient account registration dispatched and approved successfully on backend',
           tag: LogTags.auth,
           subTag: _subTag,
@@ -490,7 +491,7 @@ class PatientRegisterController extends Notifier<PatientRegisterState> {
         ref.read(appRoleProvider.notifier).setRole(AppRole.patient);
         context.go(AppRoutes.patientLogin);
       } else {
-        AppLogger.warning(
+        DebugLog.warning(
           'Patient registration rejected by backend: ${result.message}',
           tag: LogTags.auth,
           subTag: _subTag,
@@ -503,7 +504,7 @@ class PatientRegisterController extends Notifier<PatientRegisterState> {
         );
       }
     } catch (e, st) {
-      AppLogger.error(
+      DebugLog.error(
         'Registration pipeline error',
         tag: LogTags.auth,
         subTag: _subTag,

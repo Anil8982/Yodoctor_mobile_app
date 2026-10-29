@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/constants/app_constants.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:debug_bubble/debug_bubble.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/modules/app_config/controllers/app_config_controller.dart';
 import 'package:yodoctor/modules/auth/controllers/patient_register_controller.dart';
@@ -45,7 +45,7 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
   @override
   void initState() {
     super.initState();
-    AppLogger.info(
+    DebugLog.info(
       'PatientRegisterScreen Initialized',
       tag: LogTags.ui,
       subTag: _subTag,
@@ -78,7 +78,7 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
 
   @override
   void dispose() {
-    AppLogger.info(
+    DebugLog.info(
       'PatientRegisterScreen Disposed',
       tag: LogTags.ui,
       subTag: _subTag,
@@ -245,7 +245,7 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
     });
 
     if (!_formKey.currentState!.validate()) {
-      AppLogger.warning(
+      DebugLog.warning(
         'Form validation failed for patient registration',
         tag: LogTags.ui,
         subTag: _subTag,
@@ -272,7 +272,7 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
       return;
     }
 
-    AppLogger.info(
+    DebugLog.info(
       'Form validation passed. Triggering patient registration flow...',
       tag: LogTags.ui,
       subTag: _subTag,
@@ -333,7 +333,7 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                         children: [
                           GestureDetector(
                             onTap: () {
-                              AppLogger.info(
+                              DebugLog.info(
                                 'Back arrow tapped, popping register screen',
                                 tag: LogTags.ui,
                                 subTag: _subTag,
@@ -608,7 +608,7 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                         GestureDetector(
                           onTap: () {
                             final targetValue = !registerState.agreedToTerms;
-                            AppLogger.info(
+                            DebugLog.info(
                               'Toggling terms checkbox selection path to: $targetValue',
                               tag: LogTags.ui,
                               subTag: _subTag,
@@ -738,7 +738,7 @@ class _PatientRegisterScreenState extends ConsumerState<PatientRegisterScreen>
                               ),
                               GestureDetector(
                                 onTap: () {
-                                  AppLogger.info(
+                                  DebugLog.info(
                                     'Redirecting to login via navigation pop block',
                                     tag: LogTags.ui,
                                     subTag: _subTag,

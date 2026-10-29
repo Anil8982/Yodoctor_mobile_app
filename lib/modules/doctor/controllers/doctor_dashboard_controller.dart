@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:debug_bubble/debug_bubble.dart';
 import '../models/dashboard/doctor_dashboard_data.dart';
 import '../repositories/doctor_dashboard_repository.dart';
 
@@ -15,7 +15,7 @@ class DoctorDashboardNotifier extends AsyncNotifier<DoctorDashboardData> {
 
   @override
   Future<DoctorDashboardData> build() async {
-    AppLogger.info(
+    DebugLog.info(
       'Initializing Doctor Dashboard telemetry pipeline',
       tag: LogTags.doctor,
       subTag: _subTag,
@@ -38,7 +38,7 @@ class DoctorDashboardNotifier extends AsyncNotifier<DoctorDashboardData> {
       final errorMsg =
           response.data["message"] ?? "Failed to load dashboard metrics";
 
-      AppLogger.warning(
+      DebugLog.warning(
         'Dashboard API error response. Status: $statusCode, Message: $errorMsg',
         tag: LogTags.doctor,
         subTag: _subTag,
@@ -54,7 +54,7 @@ class DoctorDashboardNotifier extends AsyncNotifier<DoctorDashboardData> {
     // Preserve existing data before refresh
     final previous = state.value;
 
-    AppLogger.info(
+    DebugLog.info(
       'Triggering manual dashboard sync operation...',
       tag: LogTags.doctor,
       subTag: _subTag,
@@ -63,16 +63,16 @@ class DoctorDashboardNotifier extends AsyncNotifier<DoctorDashboardData> {
     try {
       final freshData = await _fetchDashboard();
       state = AsyncData(freshData);
-      AppLogger.success(
+      DebugLog.success(
         'Dashboard data synchronized seamlessly',
         tag: LogTags.doctor,
         subTag: _subTag,
       );
     } catch (e, st) {
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Dashboard refresh failed',
+      DebugLog.error(
+        error: e,
+        stackTrace: st,
+        'Dashboard refresh failed',
         tag: LogTags.doctor,
         subTag: _subTag,
       );
@@ -80,7 +80,7 @@ class DoctorDashboardNotifier extends AsyncNotifier<DoctorDashboardData> {
       if (previous != null) {
         // Refresh failed → keep existing dashboard data
         state = AsyncData(previous);
-        AppLogger.info(
+        DebugLog.info(
           'Preserved previous dashboard data during refresh failure',
           tag: LogTags.doctor,
           subTag: _subTag,
@@ -96,7 +96,7 @@ class DoctorDashboardNotifier extends AsyncNotifier<DoctorDashboardData> {
     final previous = state.value;
     if (previous == null) return;
 
-    AppLogger.info(
+    DebugLog.info(
       'Toggling availability state checkpoint to: $available',
       tag: LogTags.doctor,
       subTag: _subTag,
@@ -116,16 +116,16 @@ class DoctorDashboardNotifier extends AsyncNotifier<DoctorDashboardData> {
 
       final fresh = await _fetchDashboard();
       state = AsyncData(fresh);
-      AppLogger.success(
+      DebugLog.success(
         'Availability state locked and saved successfully',
         tag: LogTags.doctor,
         subTag: _subTag,
       );
     } catch (e, st) {
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Availability toggle engine exception',
+      DebugLog.error(
+        error: e,
+        stackTrace: st,
+        'Availability toggle engine exception',
         tag: LogTags.doctor,
         subTag: _subTag,
       );

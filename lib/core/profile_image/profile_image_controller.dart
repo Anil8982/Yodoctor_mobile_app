@@ -1,6 +1,6 @@
 import 'dart:io';
+import 'package:debug_bubble/debug_bubble.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'profile_image_repository.dart';
 
@@ -16,7 +16,7 @@ class ProfileImageController extends AsyncNotifier<String?> {
       final res = await ref.read(profileImageRepoProvider).get();
       return res.success ? res.imageUrl : null;
     } catch (e, st) {
-      AppLogger.error('Failed to load profile image', tag: _tag, subTag: _subTag, error: e, stackTrace: st);
+      DebugLog.error('Failed to load profile image', tag: _tag, subTag: _subTag, error: e, stackTrace: st);
       return null;
     }
   }
@@ -44,7 +44,7 @@ class ProfileImageController extends AsyncNotifier<String?> {
         throw Exception('Server returned failure');
       }
     } catch (e, st) {
-      AppLogger.error('Upload operation failed', tag: _tag, subTag: _subTag, error: e, stackTrace: st);
+      DebugLog.error('Upload operation failed', tag: _tag, subTag: _subTag, error: e, stackTrace: st);
       state = AsyncError(e, st);
     }
   }
@@ -59,7 +59,7 @@ class ProfileImageController extends AsyncNotifier<String?> {
         throw Exception('Delete API failed');
       }
     } catch (e, st) {
-      AppLogger.error('Delete operation failed', tag: _tag, subTag: _subTag, error: e, stackTrace: st);
+      DebugLog.error('Delete operation failed', tag: _tag, subTag: _subTag, error: e, stackTrace: st);
       state = AsyncError(e, st);
     }
   }

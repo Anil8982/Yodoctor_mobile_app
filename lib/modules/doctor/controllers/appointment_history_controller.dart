@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:debug_bubble/debug_bubble.dart';
 import 'package:yodoctor/modules/doctor/models/appointment/appointment_history_item.dart';
 import '../repositories/doctor_appointment_repository.dart';
 
@@ -50,7 +50,7 @@ class AppointmentHistoryNotifier extends Notifier<AppointmentHistoryState> {
 
   @override
   AppointmentHistoryState build() {
-    AppLogger.info('AppointmentHistoryNotifier Initialized', tag: LogTags.doctor, subTag: _subTag);
+    DebugLog.info('AppointmentHistoryNotifier Initialized', tag: LogTags.doctor, subTag: _subTag);
     return const AppointmentHistoryState();
   }
 
@@ -58,7 +58,7 @@ class AppointmentHistoryNotifier extends Notifier<AppointmentHistoryState> {
     if (state.isLoading) return;
     state = state.copyWith(isLoading: true, clearError: true);
 
-    AppLogger.info('Fetching doctor appointment history for filter: ${state.selectedFilter.name}', tag: LogTags.doctor, subTag: _subTag);
+    DebugLog.info('Fetching doctor appointment history for filter: ${state.selectedFilter.name}', tag: LogTags.doctor, subTag: _subTag);
 
     try {
       final repository = ref.read(doctorAppointmentRepositoryProvider);
@@ -74,29 +74,40 @@ class AppointmentHistoryNotifier extends Notifier<AppointmentHistoryState> {
         final rawList = response.data["appointments"] as List? ?? [];
         final parsedList = rawList.map((e) => AppointmentHistoryItem.fromJson(e)).toList();
 
-        AppLogger.success('Doctor appointment history fetched successfully. Count: ${parsedList.length}', tag: LogTags.doctor, subTag: _subTag);
-        AppLogger.json(response.data, tag: LogTags.doctor, subTag: '$_subTag/HistoryData');
+        DebugLog.success(
+          'Doctor appointment history fetched successfully. Count: ${parsedList.length}',
+          tag: LogTags.doctor,
+          subTag: _subTag,
+          json: response.data,
+
+        );
 
         state = state.copyWith(allAppointments: parsedList, isLoading: false);
       } else {
         final msg = response.data["message"] ?? "Failed to load appointment history";
         state = state.copyWith(errorMessage: msg, isLoading: false);
-        AppLogger.warning('Failed to fetch appointment history: $msg', tag: LogTags.doctor, subTag: _subTag);
+        DebugLog.warning('Failed to fetch appointment history: $msg', tag: LogTags.doctor, subTag: _subTag);
       }
     } catch (e, st) {
       state = state.copyWith(errorMessage: "Failed to load appointment history", isLoading: false);
-      AppLogger.exception(e, st, message: 'Appointment history request crash', tag: LogTags.doctor, subTag: _subTag);
+      DebugLog.error(
+        'Appointment history request crash',
+        tag: LogTags.doctor,
+        subTag: _subTag,
+        error: e,
+        stackTrace: st,
+      );
     }
   }
 
   Future<void> setFilter(DoctorAppointmentFilter filter) async {
-    AppLogger.info('Changing filter to: ${filter.name}', tag: LogTags.doctor, subTag: _subTag);
+    DebugLog.info('Changing filter to: ${filter.name}', tag: LogTags.doctor, subTag: _subTag);
     state = state.copyWith(selectedFilter: filter);
     await loadHistory();
   }
 
   void setSearchQuery(String query) {
-    AppLogger.info('Updating search query: $query', tag: LogTags.doctor, subTag: _subTag);
+    DebugLog.info('Updating search query: $query', tag: LogTags.doctor, subTag: _subTag);
     state = state.copyWith(searchQuery: query);
   }
 
@@ -110,7 +121,7 @@ class AppointmentHistoryNotifier extends Notifier<AppointmentHistoryState> {
           item.status.toLowerCase().contains(query);
     }).toList();
 
-    AppLogger.info('Filtered appointment list local lookup count: ${filtered.length}', tag: LogTags.doctor, subTag: _subTag);
+    DebugLog.info('Filtered appointment list local lookup count: ${filtered.length}', tag: LogTags.doctor, subTag: _subTag);
     return filtered;
   }
 }

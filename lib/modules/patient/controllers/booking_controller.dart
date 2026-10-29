@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:debug_bubble/debug_bubble.dart';
 import 'package:yodoctor/modules/patient/models/lab/booking_state_model.dart';
 
 class LabBookingNotifier extends Notifier<BookingStateModel> {
@@ -12,7 +12,7 @@ class LabBookingNotifier extends Notifier<BookingStateModel> {
 
   @override
   BookingStateModel build() {
-    AppLogger.info(
+    DebugLog.info(
       'LabBookingNotifier Initialized',
       tag: LogTags.patient,
       subTag: _subTag,
@@ -29,7 +29,7 @@ class LabBookingNotifier extends Notifier<BookingStateModel> {
   }) {
     if (gender == null) return;
 
-    AppLogger.info(
+    DebugLog.info(
       'Updating gender for lab booking',
       tag: LogTags.patient,
       subTag: _subTag,
@@ -45,7 +45,7 @@ class LabBookingNotifier extends Notifier<BookingStateModel> {
     required String phone,
     String? gender,
   }) {
-    AppLogger.info(
+    DebugLog.info(
       'Setting patient details for booking submission',
       tag: LogTags.patient,
       subTag: _subTag,
@@ -66,15 +66,11 @@ class LabBookingNotifier extends Notifier<BookingStateModel> {
       "longitude": longitude,
     };
 
-    AppLogger.info(
+    DebugLog.info(
       'Updating booking address and coordinates',
       tag: LogTags.patient,
       subTag: _subTag,
-    );
-    AppLogger.json(
-      payload,
-      tag: LogTags.patient,
-      subTag: '$_subTag/AddressPayload',
+      json: payload,
     );
 
     state = state.copyWith(
@@ -144,7 +140,7 @@ class LabBookingNotifier extends Notifier<BookingStateModel> {
   }
 
   void selectDate(DateTime date) {
-    AppLogger.info(
+    DebugLog.info(
       'Selecting lab booking date: ${date.toIso8601String()}',
       tag: LogTags.patient,
       subTag: _subTag,
@@ -153,7 +149,7 @@ class LabBookingNotifier extends Notifier<BookingStateModel> {
   }
 
   void selectTimeSlot(String slot) {
-    AppLogger.info(
+    DebugLog.info(
       'Selecting time slot: $slot',
       tag: LogTags.patient,
       subTag: _subTag,
@@ -162,7 +158,7 @@ class LabBookingNotifier extends Notifier<BookingStateModel> {
   }
 
   void reset() {
-    AppLogger.info(
+    DebugLog.info(
       'Resetting lab booking state to default',
       tag: LogTags.patient,
       subTag: _subTag,

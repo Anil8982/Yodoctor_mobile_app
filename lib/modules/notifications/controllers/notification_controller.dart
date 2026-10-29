@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:debug_bubble/debug_bubble.dart';
 import '../models/notification_model.dart';
 import '../repositories/notification_repository.dart';
 
@@ -44,7 +44,7 @@ class NotificationNotifier extends Notifier<NotificationState> {
 
   @override
   NotificationState build() {
-    AppLogger.info(
+    DebugLog.info(
       'Initializing Notification Feed Pipeline...',
       tag: LogTags.notifications,
       subTag: _subTag,
@@ -74,7 +74,7 @@ class NotificationNotifier extends Notifier<NotificationState> {
           errorMsg = "Failed to fetch notifications";
         }
       } catch (e, st) {
-        AppLogger.error(
+        DebugLog.error(
           'Failed to fetch notifications list',
           tag: LogTags.notifications,
           subTag: _subTag,
@@ -91,7 +91,7 @@ class NotificationNotifier extends Notifier<NotificationState> {
           unreadCount = unreadRes.data["unreadCount"] ?? 0;
         }
       } catch (e, st) {
-        AppLogger.error(
+        DebugLog.error(
           'Failed to fetch unread count, preserving: $unreadCount',
           tag: LogTags.notifications,
           subTag: _subTag,
@@ -100,7 +100,7 @@ class NotificationNotifier extends Notifier<NotificationState> {
         );
       }
 
-      AppLogger.success(
+      DebugLog.success(
         'Feed synced. Count: ${notifications.length}, Unread: $unreadCount',
         tag: LogTags.notifications,
         subTag: _subTag,
@@ -113,7 +113,7 @@ class NotificationNotifier extends Notifier<NotificationState> {
         errorMessage: errorMsg,
       );
     } catch (e, st) {
-      AppLogger.error(
+      DebugLog.error(
         'Notification sync crashed',
         tag: LogTags.notifications,
         subTag: _subTag,
@@ -129,7 +129,7 @@ class NotificationNotifier extends Notifier<NotificationState> {
   }
 
   Future<bool> markAsRead(int id) async {
-    AppLogger.info(
+    DebugLog.info(
       'Marking ID: $id as read',
       tag: LogTags.notifications,
       subTag: _subTag,
@@ -151,7 +151,7 @@ class NotificationNotifier extends Notifier<NotificationState> {
           clearError: true, // Clear any previous errors on success
         );
 
-        AppLogger.success(
+        DebugLog.success(
           'ID: $id marked read',
           tag: LogTags.notifications,
           subTag: _subTag,
@@ -159,14 +159,14 @@ class NotificationNotifier extends Notifier<NotificationState> {
         return true;
       }
 
-      AppLogger.info(
+      DebugLog.info(
         'ID: $id already read or not found',
         tag: LogTags.notifications,
         subTag: _subTag,
       );
       return false;
     } catch (e, st) {
-      AppLogger.error(
+      DebugLog.error(
         'MarkAsRead failed for ID: $id',
         tag: LogTags.notifications,
         subTag: _subTag,
@@ -178,7 +178,7 @@ class NotificationNotifier extends Notifier<NotificationState> {
   }
 
   Future<bool> markAllAsRead() async {
-    AppLogger.info(
+    DebugLog.info(
       'Marking all notifications as read',
       tag: LogTags.notifications,
       subTag: _subTag,
@@ -198,7 +198,7 @@ class NotificationNotifier extends Notifier<NotificationState> {
           clearError: true, // Clear any previous errors on success
         );
 
-        AppLogger.success(
+        DebugLog.success(
           'All marked read',
           tag: LogTags.notifications,
           subTag: _subTag,
@@ -207,7 +207,7 @@ class NotificationNotifier extends Notifier<NotificationState> {
       }
       return false;
     } catch (e, st) {
-      AppLogger.error(
+      DebugLog.error(
         'MarkAllAsRead failed',
         tag: LogTags.notifications,
         subTag: _subTag,

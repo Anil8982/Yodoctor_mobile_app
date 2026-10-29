@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:debug_bubble/debug_bubble.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
 import '../../controllers/profile_controller.dart';
 import 'widgets/profile_action_bar.dart';
@@ -27,7 +27,7 @@ class _PatientProfileEditScreenState
   @override
   void initState() {
     super.initState();
-    AppLogger.info(
+    DebugLog.info(
       'PatientProfileEditScreen Initialized',
       tag: LogTags.ui,
       subTag: _subTag,

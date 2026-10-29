@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:debug_bubble/debug_bubble.dart';
 import '../repositories/manual_booking_repository.dart';
 
 class ManualBookingState {
@@ -49,7 +49,7 @@ class ManualBookingNotifier extends Notifier<ManualBookingState> {
 
   @override
   ManualBookingState build() {
-    AppLogger.info(
+    DebugLog.info(
       'ManualBookingNotifier Initialized',
       tag: LogTags.doctor,
       subTag: _subTag,
@@ -63,7 +63,7 @@ class ManualBookingNotifier extends Notifier<ManualBookingState> {
   }
 
   void changeShift(String shift) {
-    AppLogger.info(
+    DebugLog.info(
       'Shift changed locally to: $shift',
       tag: LogTags.doctor,
       subTag: _subTag,
@@ -72,7 +72,7 @@ class ManualBookingNotifier extends Notifier<ManualBookingState> {
   }
 
   void selectGender(String gender) {
-    AppLogger.info(
+    DebugLog.info(
       'Gender selection updated locally to: $gender',
       tag: LogTags.doctor,
       subTag: _subTag,
@@ -86,7 +86,7 @@ class ManualBookingNotifier extends Notifier<ManualBookingState> {
     required String age,
   }) async {
     if (state.selectedGender == null) {
-      AppLogger.warning(
+      DebugLog.warning(
         'Manual Patient booking registration aborted: Missing selected Gender reference',
         tag: LogTags.doctor,
         subTag: _subTag,
@@ -95,7 +95,7 @@ class ManualBookingNotifier extends Notifier<ManualBookingState> {
       return false;
     }
     if (state.loading) {
-      AppLogger.warning(
+      DebugLog.warning(
         'Submission blocked due to loading state',
         tag: LogTags.doctor,
         subTag: _subTag,
@@ -116,15 +116,11 @@ class ManualBookingNotifier extends Notifier<ManualBookingState> {
       "slot": mappedSlot,
     };
 
-    AppLogger.info(
+    DebugLog.info(
       'Submitting manual walk-in registration pipeline request...',
       tag: LogTags.doctor,
       subTag: _subTag,
-    );
-    AppLogger.json(
-      payload,
-      tag: LogTags.doctor,
-      subTag: '$_subTag/BookingPayload',
+      json: payload,
     );
 
     try {
@@ -140,7 +136,7 @@ class ManualBookingNotifier extends Notifier<ManualBookingState> {
       final statusCode = response.statusCode ?? 0;
 
       if (statusCode >= 200 && statusCode < 300) {
-        AppLogger.success(
+        DebugLog.success(
           'Manual patient entry committed and synced successfully on backend',
           tag: LogTags.doctor,
           subTag: _subTag,
@@ -151,7 +147,7 @@ class ManualBookingNotifier extends Notifier<ManualBookingState> {
       } else {
         final msg =
             response.data["message"] ?? "Failed to save walk-in appointment";
-        AppLogger.warning(
+        DebugLog.warning(
           'Backend rejected manual booking submission. Status: $statusCode, Message: $msg',
           tag: LogTags.doctor,
           subTag: _subTag,
@@ -169,10 +165,10 @@ class ManualBookingNotifier extends Notifier<ManualBookingState> {
 
       state = state.copyWith(loading: false, errorMessage: message);
 
-      AppLogger.exception(
-        e,
-        st,
-        message: message,
+      DebugLog.error(
+        message,
+        error: e,
+        stackTrace: st,
         tag: LogTags.doctor,
         subTag: _subTag,
       );
@@ -183,10 +179,10 @@ class ManualBookingNotifier extends Notifier<ManualBookingState> {
         loading: false,
         errorMessage: "Booking transaction failure",
       );
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Fatal exception within manual booking engine thread',
+      DebugLog.error(
+        'Fatal exception within manual booking engine thread',
+        error: e,
+        stackTrace: st,
         tag: LogTags.doctor,
         subTag: _subTag,
       );

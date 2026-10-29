@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:debug_bubble/debug_bubble.dart';
 
 import 'package:yodoctor/modules/patient/models/home_care/home_care_history_model.dart';
 import 'package:yodoctor/modules/patient/repositories/patient_homecare_repository.dart';
@@ -111,7 +111,7 @@ class HomeCareHistoryNotifier extends Notifier<HomeCareHistoryState> {
         );
       }
     } on DioException catch (e, stackTrace) {
-      AppLogger.error(
+      DebugLog.error(
         'Failed to fetch home care history',
         error: e,
         stackTrace: stackTrace,
@@ -125,7 +125,7 @@ class HomeCareHistoryNotifier extends Notifier<HomeCareHistoryState> {
             'Failed to fetch home care history. Please try again.',
       );
     } catch (e, stackTrace) {
-      AppLogger.error(
+      DebugLog.error(
         'Unexpected error fetching home care history',
         error: e,
         stackTrace: stackTrace,
@@ -162,7 +162,7 @@ class HomeCareHistoryNotifier extends Notifier<HomeCareHistoryState> {
         );
       }
     } on DioException catch (e, stackTrace) {
-      AppLogger.error(
+      DebugLog.error(
         'Failed to fetch home care booking details for id: $bookingId',
         error: e,
         stackTrace: stackTrace,
@@ -175,7 +175,7 @@ class HomeCareHistoryNotifier extends Notifier<HomeCareHistoryState> {
             'Failed to fetch booking details. Please try again.',
       );
     } catch (e, stackTrace) {
-      AppLogger.error(
+      DebugLog.error(
         'Unexpected error fetching booking details for id: $bookingId',
         error: e,
         stackTrace: stackTrace,
@@ -234,7 +234,7 @@ class HomeCareHistoryNotifier extends Notifier<HomeCareHistoryState> {
 
       return true;
     } on DioException catch (e, stackTrace) {
-      AppLogger.error(
+      DebugLog.error(
         'Failed to cancel home care booking for id: $bookingId',
         error: e,
         stackTrace: stackTrace,
@@ -250,7 +250,7 @@ class HomeCareHistoryNotifier extends Notifier<HomeCareHistoryState> {
 
       return false;
     } catch (e, stackTrace) {
-      AppLogger.error(
+      DebugLog.error(
         'Unexpected error cancelling booking for id: $bookingId',
         error: e,
         stackTrace: stackTrace,

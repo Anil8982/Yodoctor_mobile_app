@@ -4,7 +4,7 @@ import 'package:yodoctor/core/constants/api_constants.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:yodoctor/core/network/dio_provider.dart';
 import 'package:yodoctor/core/providers/storage_provider.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:debug_bubble/debug_bubble.dart';
 import 'package:yodoctor/core/utils/app_error_utils.dart';
 import 'package:yodoctor/modules/auth/models/login_response.dart';
 import 'package:yodoctor/modules/auth/models/otp_response.dart';
@@ -36,7 +36,7 @@ class PatientAuthRepository implements AuthRepository {
     required String password,
   }) async {
     try {
-      AppLogger.info(
+      DebugLog.info(
         'Starting patient email authentication process over network wire',
         tag: LogTags.auth,
         subTag: _subTag,
@@ -55,7 +55,7 @@ class PatientAuthRepository implements AuthRepository {
       final loginResponse = LoginResponse.fromJson(data);
 
       if (loginResponse.requiresOtp) {
-        AppLogger.info(
+        DebugLog.info(
           'Login requires OTP verification. VerificationId: ${loginResponse.verificationId}, Channel: ${loginResponse.channel}',
           tag: LogTags.auth,
           subTag: _subTag,
@@ -64,7 +64,7 @@ class PatientAuthRepository implements AuthRepository {
       }
 
       if (!loginResponse.success) {
-        AppLogger.warning(
+        DebugLog.warning(
           'Authentication rejected by gateway branch: ${loginResponse.message}',
           tag: LogTags.auth,
           subTag: _subTag,
@@ -76,14 +76,14 @@ class PatientAuthRepository implements AuthRepository {
         await _storage.saveToken(loginResponse.token!);
         await _storage.saveRole('patient');
 
-        AppLogger.success(
+        DebugLog.success(
           'Master JWT session key and patient role captured to secure local storage',
           tag: LogTags.auth,
           subTag: _subTag,
         );
       }
 
-      AppLogger.success(
+      DebugLog.success(
         'Patient identity context compiled and authenticated successfully',
         tag: LogTags.auth,
         subTag: _subTag,
@@ -91,12 +91,12 @@ class PatientAuthRepository implements AuthRepository {
 
       return loginResponse;
     } on DioException catch (e, st) {
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Login API request transmission failed',
+      DebugLog.error(
+        'Login API request transmission failed',
         tag: LogTags.auth,
         subTag: _subTag,
+        error: e,
+        stackTrace: st,
       );
 
       return LoginResponse(
@@ -104,12 +104,12 @@ class PatientAuthRepository implements AuthRepository {
         message: AppErrorUtils.getFriendlyMessage(e, fallbackMessage: 'Unable to login. Please check your credentials.'),
       );
     } catch (e, st) {
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Unexpected error during login mapping',
+      DebugLog.error(
+        'Unexpected error during login mapping',
         tag: LogTags.auth,
         subTag: _subTag,
+        error: e,
+        stackTrace: st,
       );
 
       return LoginResponse(
@@ -124,7 +124,7 @@ class PatientAuthRepository implements AuthRepository {
     required String identifier,
   }) async {
     try {
-      AppLogger.info(
+      DebugLog.info(
         'Sending patient login OTP request to /auth/login for identifier: $identifier',
         tag: LogTags.auth,
         subTag: _subTag,
@@ -146,7 +146,7 @@ class PatientAuthRepository implements AuthRepository {
       final loginResponse = LoginResponse.fromJson(data);
 
       if (loginResponse.requiresOtp) {
-        AppLogger.info(
+        DebugLog.info(
           'Login OTP requested successfully. VerificationId: ${loginResponse.verificationId}, Channel: ${loginResponse.channel}, Destination: ${loginResponse.destination}',
           tag: LogTags.auth,
           subTag: _subTag,
@@ -161,12 +161,12 @@ class PatientAuthRepository implements AuthRepository {
 
       return loginResponse;
     } on DioException catch (e, st) {
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Send login OTP API request failed',
+      DebugLog.error(
+        'Send login OTP API request failed',
         tag: LogTags.auth,
         subTag: _subTag,
+        error: e,
+        stackTrace: st,
       );
 
       return LoginResponse(
@@ -174,7 +174,13 @@ class PatientAuthRepository implements AuthRepository {
         message: AppErrorUtils.getFriendlyMessage(e, fallbackMessage: 'Unable to send OTP. Please try again.'),
       );
     } catch (e, st) {
-      AppLogger.exception(e, st, tag: LogTags.auth, subTag: _subTag);
+      DebugLog.error(
+        'Send login OTP failed',
+        tag: LogTags.auth,
+        subTag: _subTag,
+        error: e,
+        stackTrace: st,
+      );
       return LoginResponse(
         success: false,
         message: AppErrorUtils.getFriendlyMessage(e),
@@ -192,7 +198,7 @@ class PatientAuthRepository implements AuthRepository {
     String? identifier,
   }) async {
     try {
-      AppLogger.info(
+      DebugLog.info(
         'Submitting patient OTP verification request',
         tag: LogTags.auth,
         subTag: _subTag,
@@ -222,7 +228,7 @@ class PatientAuthRepository implements AuthRepository {
       final loginResponse = LoginResponse.fromJson(data);
 
       if (!loginResponse.success) {
-        AppLogger.warning(
+        DebugLog.warning(
           'OTP verification rejected: ${loginResponse.message}',
           tag: LogTags.auth,
           subTag: _subTag,
@@ -234,7 +240,7 @@ class PatientAuthRepository implements AuthRepository {
         await _storage.saveToken(loginResponse.token!);
         await _storage.saveRole('patient');
 
-        AppLogger.success(
+        DebugLog.success(
           'Master JWT session key and patient role saved post OTP verification',
           tag: LogTags.auth,
           subTag: _subTag,
@@ -243,12 +249,12 @@ class PatientAuthRepository implements AuthRepository {
 
       return loginResponse;
     } on DioException catch (e, st) {
-      AppLogger.exception(
-        e,
-        st,
-        message: 'OTP verification API request failed',
+      DebugLog.error(
+        'OTP verification API request failed',
         tag: LogTags.auth,
         subTag: _subTag,
+        error: e,
+        stackTrace: st,
       );
 
       return LoginResponse(
@@ -256,12 +262,12 @@ class PatientAuthRepository implements AuthRepository {
         message: AppErrorUtils.getFriendlyMessage(e, fallbackMessage: 'Incorrect OTP. Please check the code and try again.'),
       );
     } catch (e, st) {
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Unexpected error during OTP verification',
+      DebugLog.error(
+        'Unexpected error during OTP verification',
         tag: LogTags.auth,
         subTag: _subTag,
+        error: e,
+        stackTrace: st,
       );
 
       return LoginResponse(
@@ -280,7 +286,7 @@ class PatientAuthRepository implements AuthRepository {
     required String email,
   }) async {
     try {
-      AppLogger.info(
+      DebugLog.info(
         'Sending registration email OTP to: $email',
         tag: LogTags.auth,
         subTag: _subTag,
@@ -296,12 +302,12 @@ class PatientAuthRepository implements AuthRepository {
       final Map<String, dynamic> data = Map<String, dynamic>.from(response.data);
       return OtpSendResponse.fromJson(data);
     } on DioException catch (e, st) {
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Send registration email OTP request failed',
+      DebugLog.error(
+        'Send registration email OTP request failed',
         tag: LogTags.auth,
         subTag: _subTag,
+        error: e,
+        stackTrace: st,
       );
 
       return OtpSendResponse(
@@ -309,7 +315,13 @@ class PatientAuthRepository implements AuthRepository {
         message: AppErrorUtils.getFriendlyMessage(e, fallbackMessage: 'Failed to send OTP to email. Please try again.'),
       );
     } catch (e, st) {
-      AppLogger.exception(e, st, tag: LogTags.auth, subTag: _subTag);
+      DebugLog.error(
+        'Send registration email OTP failed',
+        tag: LogTags.auth,
+        subTag: _subTag,
+        error: e,
+        stackTrace: st,
+      );
       return OtpSendResponse(
         success: false,
         message: AppErrorUtils.getFriendlyMessage(e),
@@ -324,7 +336,7 @@ class PatientAuthRepository implements AuthRepository {
     required String verificationId,
   }) async {
     try {
-      AppLogger.info(
+      DebugLog.info(
         'Verifying registration email OTP for: $email',
         tag: LogTags.auth,
         subTag: _subTag,
@@ -342,12 +354,12 @@ class PatientAuthRepository implements AuthRepository {
       final Map<String, dynamic> data = Map<String, dynamic>.from(response.data);
       return OtpVerifyResponse.fromJson(data);
     } on DioException catch (e, st) {
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Verify registration email OTP failed',
+      DebugLog.error(
+        'Verify registration email OTP failed',
         tag: LogTags.auth,
         subTag: _subTag,
+        error: e,
+        stackTrace: st,
       );
 
       return OtpVerifyResponse(
@@ -355,7 +367,13 @@ class PatientAuthRepository implements AuthRepository {
         message: AppErrorUtils.getFriendlyMessage(e, fallbackMessage: 'Incorrect OTP. Please check the code and try again.'),
       );
     } catch (e, st) {
-      AppLogger.exception(e, st, tag: LogTags.auth, subTag: _subTag);
+      DebugLog.error(
+        'Verify registration email OTP failed',
+        tag: LogTags.auth,
+        subTag: _subTag,
+        error: e,
+        stackTrace: st,
+      );
       return OtpVerifyResponse(
         success: false,
         message: AppErrorUtils.getFriendlyMessage(e),
@@ -368,7 +386,7 @@ class PatientAuthRepository implements AuthRepository {
     required String phone,
   }) async {
     try {
-      AppLogger.info(
+      DebugLog.info(
         'Sending registration mobile OTP to: $phone',
         tag: LogTags.auth,
         subTag: _subTag,
@@ -384,12 +402,12 @@ class PatientAuthRepository implements AuthRepository {
       final Map<String, dynamic> data = Map<String, dynamic>.from(response.data);
       return OtpSendResponse.fromJson(data);
     } on DioException catch (e, st) {
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Send registration mobile OTP request failed',
+      DebugLog.error(
+        'Send registration mobile OTP request failed',
         tag: LogTags.auth,
         subTag: _subTag,
+        error: e,
+        stackTrace: st,
       );
 
       return OtpSendResponse(
@@ -397,7 +415,13 @@ class PatientAuthRepository implements AuthRepository {
         message: AppErrorUtils.getFriendlyMessage(e, fallbackMessage: 'Failed to send OTP to mobile number. Please try again.'),
       );
     } catch (e, st) {
-      AppLogger.exception(e, st, tag: LogTags.auth, subTag: _subTag);
+      DebugLog.error(
+        'Send registration mobile OTP failed',
+        tag: LogTags.auth,
+        subTag: _subTag,
+        error: e,
+        stackTrace: st,
+      );
       return OtpSendResponse(
         success: false,
         message: AppErrorUtils.getFriendlyMessage(e),
@@ -412,7 +436,7 @@ class PatientAuthRepository implements AuthRepository {
     required String verificationId,
   }) async {
     try {
-      AppLogger.info(
+      DebugLog.info(
         'Verifying registration mobile OTP for: $phone',
         tag: LogTags.auth,
         subTag: _subTag,
@@ -430,12 +454,12 @@ class PatientAuthRepository implements AuthRepository {
       final Map<String, dynamic> data = Map<String, dynamic>.from(response.data);
       return OtpVerifyResponse.fromJson(data);
     } on DioException catch (e, st) {
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Verify registration mobile OTP failed',
+      DebugLog.error(
+        'Verify registration mobile OTP failed',
         tag: LogTags.auth,
         subTag: _subTag,
+        error: e,
+        stackTrace: st,
       );
 
       return OtpVerifyResponse(
@@ -443,7 +467,13 @@ class PatientAuthRepository implements AuthRepository {
         message: AppErrorUtils.getFriendlyMessage(e, fallbackMessage: 'Incorrect OTP. Please check the code and try again.'),
       );
     } catch (e, st) {
-      AppLogger.exception(e, st, tag: LogTags.auth, subTag: _subTag);
+      DebugLog.error(
+        'Verify registration mobile OTP failed',
+        tag: LogTags.auth,
+        subTag: _subTag,
+        error: e,
+        stackTrace: st,
+      );
       return OtpVerifyResponse(
         success: false,
         message: AppErrorUtils.getFriendlyMessage(e),
@@ -464,7 +494,7 @@ class PatientAuthRepository implements AuthRepository {
     String? mobileVerificationId,
   }) async {
     try {
-      AppLogger.info(
+      DebugLog.info(
         'Initiating network register request for new patient context',
         tag: LogTags.auth,
         subTag: _subTag,
@@ -497,12 +527,12 @@ class PatientAuthRepository implements AuthRepository {
         message: data['message'] ?? 'Patient registered successfully',
       );
     } on DioException catch (e, st) {
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Registration pipeline rejected by gateway branch',
+      DebugLog.error(
+        'Registration pipeline rejected by gateway branch',
         tag: LogTags.auth,
         subTag: _subTag,
+        error: e,
+        stackTrace: st,
       );
 
       return LoginResponse(
@@ -510,12 +540,12 @@ class PatientAuthRepository implements AuthRepository {
         message: AppErrorUtils.getFriendlyMessage(e, fallbackMessage: 'Registration failed. Please try again.'),
       );
     } catch (e, st) {
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Unexpected crash during register parser',
+      DebugLog.error(
+        'Unexpected crash during register parser',
         tag: LogTags.auth,
         subTag: _subTag,
+        error: e,
+        stackTrace: st,
       );
       return LoginResponse(
         success: false,
@@ -527,7 +557,7 @@ class PatientAuthRepository implements AuthRepository {
   @override
   Future<void> signOut() async {
     try {
-      AppLogger.info(
+      DebugLog.info(
         'Initiating session cancellation request',
         tag: LogTags.auth,
         subTag: _subTag,
@@ -535,18 +565,18 @@ class PatientAuthRepository implements AuthRepository {
 
       await _storage.clearAll();
 
-      AppLogger.success(
+      DebugLog.success(
         'Local token session and role blocks flushed cleanly',
         tag: LogTags.auth,
         subTag: _subTag,
       );
     } catch (e, st) {
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Failed to clear local token vectors cleanly',
+      DebugLog.error(
+        'Failed to clear local token vectors cleanly',
         tag: LogTags.auth,
         subTag: _subTag,
+        error: e,
+        stackTrace: st,
       );
       rethrow;
     }
@@ -576,13 +606,25 @@ class PatientAuthRepository implements AuthRepository {
 
       return loginResponse;
     } on DioException catch (e, st) {
-      AppLogger.exception(e, st, tag: LogTags.auth, subTag: _subTag);
+      DebugLog.error(
+        'Google login failed',
+        tag: LogTags.auth,
+        subTag: _subTag,
+        error: e,
+        stackTrace: st,
+      );
       return LoginResponse(
         success: false,
         message: AppErrorUtils.getFriendlyMessage(e, fallbackMessage: 'Google login failed. Please try again.'),
       );
     } catch (e, st) {
-      AppLogger.exception(e, st, tag: LogTags.auth, subTag: _subTag);
+      DebugLog.error(
+        'Google login failed',
+        tag: LogTags.auth,
+        subTag: _subTag,
+        error: e,
+        stackTrace: st,
+      );
       return LoginResponse(
         success: false,
         message: AppErrorUtils.getFriendlyMessage(e),

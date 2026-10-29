@@ -2,7 +2,7 @@
 // import 'package:flutter_riverpod/flutter_riverpod.dart';
 // import 'package:yodoctor/core/constants/api_constants.dart';
 // import 'package:yodoctor/core/constants/log_tags.dart';
-// import 'package:yodoctor/core/debug/app_logger.dart';
+// import 'package:debug_bubble/debug_bubble.dart';
 // import 'package:yodoctor/core/network/dio_provider.dart';
 //
 // final subscriptionRepositoryProvider = Provider<SubscriptionRepository>((ref) {
@@ -15,11 +15,11 @@
 //   static const String _subTag = 'SubscriptionRepository';
 //
 //   Future<Response> getActiveSubscription() async {
-//     AppLogger.info('Fetching active subscription status from server', tag: LogTags.doctor, subTag: _subTag);
+//     DebugLog.info('Fetching active subscription status from server', tag: LogTags.doctor, subTag: _subTag);
 //     try {
 //       return await _dio.get(ApiConstants.activeSubscription);
 //     } catch (e, st) {
-//       AppLogger.error('Failed to fetch active subscription', tag: LogTags.doctor, subTag: _subTag, error: e, stackTrace: st);
+//       DebugLog.error('Failed to fetch active subscription', tag: LogTags.doctor, subTag: _subTag, error: e, stackTrace: st);
 //       rethrow;
 //     }
 //   }
@@ -89,7 +89,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:yodoctor/core/constants/api_constants.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:debug_bubble/debug_bubble.dart';
 import 'package:yodoctor/core/network/dio_provider.dart';
 
 final subscriptionRepositoryProvider =
@@ -106,7 +106,7 @@ class SubscriptionRepository {
 
   // ACTIVE SUBSCRIPTION
   Future<Response> getActiveSubscription() async {
-    AppLogger.info(
+    DebugLog.info(
       'Fetching active subscription status from server',
       tag: LogTags.doctor,
       subTag: _subTag,
@@ -117,7 +117,7 @@ class SubscriptionRepository {
         ApiConstants.activeSubscription,
       );
     } catch (e, st) {
-      AppLogger.error(
+      DebugLog.error(
         'Failed to fetch active subscription',
         tag: LogTags.doctor,
         subTag: _subTag,

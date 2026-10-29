@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:debug_bubble/debug_bubble.dart';
 import 'package:yodoctor/core/enums/auth_type.dart' show AuthType;
 import 'package:yodoctor/core/providers/storage_provider.dart';
 import 'package:yodoctor/l10n/app_localizations.dart';
@@ -140,7 +140,7 @@ class ProfileController extends Notifier<ProfileState> {
 
   Future<void> loadProfile() async {
     state = state.copyWith(isLoading: true, clearError: true);
-    AppLogger.info(
+    DebugLog.info(
       'Loading patient profile metrics...',
       tag: LogTags.patient,
       subTag: _subTag,
@@ -162,15 +162,11 @@ class ProfileController extends Notifier<ProfileState> {
         dobController.text = patient.dob;
         genderController.text = patient.gender;
 
-        AppLogger.success(
+        DebugLog.success(
           'Patient profile metrics loaded successfully',
           tag: LogTags.patient,
           subTag: _subTag,
-        );
-        AppLogger.json(
-          response.data,
-          tag: LogTags.patient,
-          subTag: '$_subTag/ProfileData',
+          json: response.data,
         );
 
         state = state.copyWith(
@@ -181,7 +177,7 @@ class ProfileController extends Notifier<ProfileState> {
       } else {
         final msg = response.data["message"] ?? "Failed to load profile";
         state = state.copyWith(errorMessage: msg, isLoading: false);
-        AppLogger.warning(
+        DebugLog.warning(
           'Failed to load profile: $msg',
           tag: LogTags.patient,
           subTag: _subTag,
@@ -192,10 +188,10 @@ class ProfileController extends Notifier<ProfileState> {
         errorMessage: "Failed to load profile",
         isLoading: false,
       );
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Profile load halted',
+      DebugLog.error(
+        'Profile load halted',
+        error: e,
+        stackTrace: st,
         tag: LogTags.patient,
         subTag: _subTag,
       );
@@ -212,15 +208,11 @@ class ProfileController extends Notifier<ProfileState> {
       "dob": dobController.text.trim(),
     };
 
-    AppLogger.info(
+    DebugLog.info(
       'Updating patient profile...',
       tag: LogTags.patient,
       subTag: _subTag,
-    );
-    AppLogger.json(
-      payload,
-      tag: LogTags.patient,
-      subTag: '$_subTag/UpdatePayload',
+      json: payload,
     );
 
     try {
@@ -235,7 +227,7 @@ class ProfileController extends Notifier<ProfileState> {
       if (response.statusCode != null &&
           response.statusCode! >= 200 &&
           response.statusCode! < 300) {
-        AppLogger.success(
+        DebugLog.success(
           'Patient profile updated successfully',
           tag: LogTags.patient,
           subTag: _subTag,
@@ -245,7 +237,7 @@ class ProfileController extends Notifier<ProfileState> {
       } else {
         final msg = response.data["message"] ?? "Failed to update profile";
         state = state.copyWith(errorMessage: msg, isLoading: false);
-        AppLogger.warning(
+        DebugLog.warning(
           'Profile update rejected by backend: $msg',
           tag: LogTags.patient,
           subTag: _subTag,
@@ -257,10 +249,10 @@ class ProfileController extends Notifier<ProfileState> {
         errorMessage: "Failed to update profile",
         isLoading: false,
       );
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Profile write execution faulted',
+      DebugLog.error(
+        'Profile write execution faulted',
+        error: e,
+        stackTrace: st,
         tag: LogTags.patient,
         subTag: _subTag,
       );
@@ -269,7 +261,7 @@ class ProfileController extends Notifier<ProfileState> {
   }
 
   void discardChanges() {
-    AppLogger.info(
+    DebugLog.info(
       'Discarding profile changes, reloading original data',
       tag: LogTags.patient,
       subTag: _subTag,

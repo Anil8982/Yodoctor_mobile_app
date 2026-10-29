@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/constants/app_assets.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:debug_bubble/debug_bubble.dart';
 import 'package:yodoctor/core/providers/storage_provider.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/modules/app_config/controllers/app_config_controller.dart';
@@ -41,7 +41,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   void initState() {
     super.initState();
 
-    AppLogger.info('Splash: Initializing cinematic pipeline', tag: LogTags.app, subTag: 'Splash');
+    DebugLog.info('Splash: Initializing cinematic pipeline', tag: LogTags.app, subTag: 'Splash');
 
     // 1. Entrance Controller (Choreographed entrance in 1100ms)
     _entranceController = AnimationController(
@@ -103,7 +103,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   Future<void> _initialize() async {
     final startTime = DateTime.now();
 
-    AppLogger.info('Splash: Starting initialization...', tag: LogTags.app, subTag: 'Splash');
+    DebugLog.info('Splash: Starting initialization...', tag: LogTags.app, subTag: 'Splash');
 
     await ref.read(appConfigProvider.notifier).checkAppConfig();
     await Future<void>.delayed(Duration.zero);

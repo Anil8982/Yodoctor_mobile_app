@@ -1,8 +1,8 @@
+import 'package:debug_bubble/debug_bubble.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
 import 'package:yodoctor/core/providers/app_role_provider.dart';
 import 'package:yodoctor/core/providers/storage_provider.dart';
 import 'package:yodoctor/modules/admin/admin_scaffold_shell.dart';
@@ -81,7 +81,7 @@ final routerProvider = Provider<GoRouter>((ref) {
 
   // Listen: Login / Logout / Role changes
   ref.listen(appRoleProvider, (_, _) {
-    AppLogger.debug(
+    DebugLog.debug(
       'Router: appRoleProvider changed, refreshing',
       tag: LogTags.auth,
       subTag: 'Router',
@@ -91,7 +91,7 @@ final routerProvider = Provider<GoRouter>((ref) {
 
   // Listen: Doctor verification status changes
   ref.listen(doctorStatusProvider, (_, _) {
-    AppLogger.debug(
+    DebugLog.debug(
       'Router: doctorStatusProvider changed, refreshing',
       tag: LogTags.auth,
       subTag: 'Router',
@@ -101,7 +101,7 @@ final routerProvider = Provider<GoRouter>((ref) {
 
   // Listen: Doctor subscription status changes
   ref.listen(subscriptionStatusProvider, (previous, next) {
-    AppLogger.debug(
+    DebugLog.debug(
       'Router: subscriptionStatusProvider changed, refreshing',
       tag: LogTags.auth,
       subTag: 'Router',
@@ -110,7 +110,7 @@ final routerProvider = Provider<GoRouter>((ref) {
   });
 
   ref.listen(appConfigProvider, (_, _) {
-    AppLogger.debug(
+    DebugLog.debug(
       'Router: appConfigProvider changed, refreshing',
       tag: LogTags.app,
       subTag: 'Router',
@@ -205,7 +205,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       final authType = storage.getAuthType();
       final subState = ref.read(subscriptionStatusProvider);
 
-      AppLogger.info(
+      DebugLog.info(
         'Router → '
         'TOKEN=${token != null ? 'YES' : 'NO'} | '
         'ROLE=$role | '
@@ -228,7 +228,7 @@ final routerProvider = Provider<GoRouter>((ref) {
 
         // Redirect everything except auth screens to landing
         if (!isAuthScreen(matchedPath) && matchedPath != AppRoutes.landing) {
-          AppLogger.debug(
+          DebugLog.debug(
             'Router: unauthenticated → landing',
             tag: LogTags.auth,
             subTag: 'Router',
@@ -242,7 +242,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       if (role == 'patient') {
         // Redirect from splash/auth to dashboard
         if (matchedPath == AppRoutes.splash || isAuthScreen(matchedPath)) {
-          AppLogger.debug(
+          DebugLog.debug(
             'Router: patient → dashboard',
             tag: LogTags.auth,
             subTag: 'Router',
@@ -276,7 +276,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         // 2. Doctor has NO confirmed active subscription -> must complete payment first
         if (!subState.hasActiveSubscription) {
           if (matchedPath != AppRoutes.doctorSubscriptionVerification) {
-            AppLogger.debug(
+            DebugLog.debug(
               'Router: doctor has no active subscription (payment pending or unsubscribed) -> subscription verification page',
               tag: LogTags.auth,
               subTag: 'Router',
@@ -290,7 +290,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         final effectiveDoctorStatus = doctorState.status ?? storage.getStatus();
         if (effectiveDoctorStatus != 'APPROVED') {
           if (matchedPath != AppRoutes.waitingApproval) {
-            AppLogger.debug(
+            DebugLog.debug(
               'Router: doctor subscribed but status=$effectiveDoctorStatus -> waiting approval',
               tag: LogTags.auth,
               subTag: 'Router',
@@ -306,7 +306,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             isAuthScreen(matchedPath) ||
             matchedPath == AppRoutes.waitingApproval ||
             matchedPath == AppRoutes.doctorSubscriptionVerification) {
-          AppLogger.debug(
+          DebugLog.debug(
             'Router: doctor approved and subscribed -> redirecting to dashboard',
             tag: LogTags.auth,
             subTag: 'Router',

@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:debug_bubble/debug_bubble.dart';
 
 /// Events emitted by RazorpayController
 sealed class RazorpayEvent {
@@ -59,7 +59,7 @@ class RazorpayController {
     _razorpay = Razorpay();
     _registerListeners();
 
-    AppLogger.info(
+    DebugLog.info(
       'RazorpayController Initialized',
       tag: LogTags.razorpay,
       subTag: _tag,
@@ -80,7 +80,7 @@ class RazorpayController {
     Map<String, String> prefill = const {},
   }) {
     if (_isCheckoutOpen) {
-      AppLogger.warning(
+      DebugLog.warning(
         'Checkout already open, ignoring duplicate call',
         tag: LogTags.razorpay,
         subTag: _tag,
@@ -105,7 +105,7 @@ class RazorpayController {
         'send_sms_hash': true,
       };
 
-      AppLogger.info(
+      DebugLog.info(
         'Opening Razorpay checkout for subscription: $subscriptionId',
         tag: LogTags.razorpay,
         subTag: _tag,
@@ -115,10 +115,10 @@ class RazorpayController {
     } catch (e, st) {
       _isCheckoutOpen = false;
 
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Failed to open Razorpay checkout',
+      DebugLog.error(
+        'Failed to open Razorpay checkout',
+        error: e,
+        stackTrace: st,
         tag: LogTags.razorpay,
         subTag: _tag,
       );
@@ -138,7 +138,7 @@ class RazorpayController {
     Map<String, String> prefill = const {},
   }) {
     if (_isCheckoutOpen) {
-      AppLogger.warning(
+      DebugLog.warning(
         'Checkout already open, ignoring duplicate call',
         tag: LogTags.razorpay,
         subTag: _tag,
@@ -162,7 +162,7 @@ class RazorpayController {
         },
       };
 
-      AppLogger.info(
+      DebugLog.info(
         'Opening Razorpay checkout for order: $orderId, amount: ₹$amount',
         tag: LogTags.razorpay,
         subTag: _tag,
@@ -172,10 +172,10 @@ class RazorpayController {
     } catch (e, st) {
       _isCheckoutOpen = false;
 
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Failed to open Razorpay order checkout',
+      DebugLog.error(
+        'Failed to open Razorpay order checkout',
+        error: e,
+        stackTrace: st,
         tag: LogTags.razorpay,
         subTag: _tag,
       );
@@ -189,7 +189,7 @@ class RazorpayController {
   void _onPaymentSuccess(PaymentSuccessResponse response) {
     _isCheckoutOpen = false;
 
-    AppLogger.success(
+    DebugLog.success(
       'Razorpay Payment Success: ${response.paymentId}',
       tag: LogTags.razorpay,
       subTag: _tag,
@@ -209,7 +209,7 @@ class RazorpayController {
 
     final errorCode = response.code ?? 0;
 
-    AppLogger.error(
+    DebugLog.error(
       'Razorpay Payment Failed - Code: $errorCode, '
           'Message: ${response.message}, Error: ${response.error}',
       tag: LogTags.razorpay,
@@ -231,7 +231,7 @@ class RazorpayController {
   void _onExternalWallet(ExternalWalletResponse response) {
     _isCheckoutOpen = false;
 
-    AppLogger.info(
+    DebugLog.info(
       'External Wallet Selected: ${response.walletName}',
       tag: LogTags.razorpay,
       subTag: _tag,
@@ -247,7 +247,7 @@ class RazorpayController {
     _razorpay.clear();
     _eventController.close();
 
-    AppLogger.info(
+    DebugLog.info(
       'RazorpayController Disposed',
       tag: LogTags.razorpay,
       subTag: _tag,

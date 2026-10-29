@@ -71,6 +71,7 @@ dependencies:
   path: ^1.9.0
   pin_code_fields: ^10.1.0
   webview_flutter: ^4.14.1
+  debug_bubble: ^0.2.0
 
 dev_dependencies:
   flutter_test:

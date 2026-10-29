@@ -3,7 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:debug_bubble/debug_bubble.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 
 class QrScannerState {
@@ -53,7 +53,7 @@ class QrScannerController extends Notifier<QrScannerState> {
       return;
     }
 
-    AppLogger.info(
+    DebugLog.info(
       'Parsing scanned QR string: $scannedString',
       tag: LogTags.patient,
       subTag: _subTag,
@@ -69,7 +69,7 @@ class QrScannerController extends Notifier<QrScannerState> {
       final String? doctorIdParam = uri.queryParameters['doctorId'];
 
       if (doctorIdParam == null || doctorIdParam.isEmpty) {
-        AppLogger.error(
+        DebugLog.error(
           'Missing "doctorId" parameter in scanned URL',
           tag: LogTags.patient,
           subTag: _subTag,
@@ -80,7 +80,7 @@ class QrScannerController extends Notifier<QrScannerState> {
 
       final int? doctorId = int.tryParse(doctorIdParam);
       if (doctorId == null) {
-        AppLogger.error(
+        DebugLog.error(
           'Failed to parse "doctorId" as integer: $doctorIdParam',
           tag: LogTags.patient,
           subTag: _subTag,
@@ -89,7 +89,7 @@ class QrScannerController extends Notifier<QrScannerState> {
         return;
       }
 
-      AppLogger.success(
+      DebugLog.success(
         'Valid Doctor ID extracted: $doctorId. Routing directly to detail page.',
         tag: LogTags.patient,
         subTag: _subTag,
@@ -103,10 +103,10 @@ class QrScannerController extends Notifier<QrScannerState> {
         GoRouter.of(context).push('${AppRoutes.doctorDetail}/$doctorId');
       }
     } catch (e, stackTrace) {
-      AppLogger.exception(
-        e,
-        stackTrace,
-        message: 'Failed to parse QR code string',
+      DebugLog.error(
+        'Failed to parse QR code string',
+        error: e,
+        stackTrace: stackTrace,
         tag: LogTags.patient,
         subTag: _subTag,
       );

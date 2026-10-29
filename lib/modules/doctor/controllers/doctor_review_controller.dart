@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:debug_bubble/debug_bubble.dart';
 import '../models/review/doctor_review_model.dart';
 import '../repositories/doctor_review_repository.dart';
 
@@ -58,7 +58,7 @@ class DoctorReviewNotifier extends Notifier<DoctorReviewState> {
 
   @override
   DoctorReviewState build() {
-    AppLogger.info('DoctorReviewNotifier Initialized', tag: LogTags.doctor, subTag: _subTag);
+    DebugLog.info('DoctorReviewNotifier Initialized', tag: LogTags.doctor, subTag: _subTag);
     Future.microtask(() => loadReviews(page: 1));
     return const DoctorReviewState();
   }
@@ -68,7 +68,7 @@ class DoctorReviewNotifier extends Notifier<DoctorReviewState> {
     _loadingPages.add(page);
 
     state = state.copyWith(loading: true, clearError: true);
-    AppLogger.info('Fetching doctor reviews feed stream. Page: $page', tag: LogTags.doctor, subTag: _subTag);
+    DebugLog.info('Fetching doctor reviews feed stream. Page: $page', tag: LogTags.doctor, subTag: _subTag);
 
     try {
       final repository = ref.read(doctorReviewRepositoryProvider);
@@ -80,8 +80,12 @@ class DoctorReviewNotifier extends Notifier<DoctorReviewState> {
         final newReviews = rawList.map((e) => DoctorReviewModel.fromJson(e)).toList();
         final updatedReviews = page == 1 ? newReviews : [...state.reviews, ...newReviews];
 
-        AppLogger.success('Reviews page $page compiled safely. Current list size: ${updatedReviews.length}', tag: LogTags.doctor, subTag: _subTag);
-        AppLogger.json(response.data, tag: LogTags.doctor, subTag: '$_subTag/ReviewsResponsePage_$page');
+        DebugLog.success(
+          'Reviews page $page compiled safely. Current list size: ${updatedReviews.length}',
+          tag: LogTags.doctor,
+          subTag: _subTag,
+          json: response.data,
+        );
 
         state = state.copyWith(
           loading: false,
@@ -94,11 +98,17 @@ class DoctorReviewNotifier extends Notifier<DoctorReviewState> {
       } else {
         final msg = response.data["message"] ?? "Failed to load patient feedback";
         state = state.copyWith(loading: false, errorMessage: msg);
-        AppLogger.warning('Reviews point dropped execution block safely. Status: $statusCode, Message: $msg', tag: LogTags.doctor, subTag: _subTag);
+        DebugLog.warning('Reviews point dropped execution block safely. Status: $statusCode, Message: $msg', tag: LogTags.doctor, subTag: _subTag);
       }
     } catch (e, st) {
       state = state.copyWith(loading: false, errorMessage: "Failed to read reviews feed");
-      AppLogger.exception(e, st, message: 'Reviews pipeline thread exception crash', tag: LogTags.doctor, subTag: _subTag);
+      DebugLog.error(
+        'Reviews pipeline thread exception crash',
+        tag: LogTags.doctor,
+        subTag: _subTag,
+        error: e,
+        stackTrace: st,
+      );
     } finally {
       _loadingPages.remove(page);
     }
@@ -106,7 +116,7 @@ class DoctorReviewNotifier extends Notifier<DoctorReviewState> {
 
   Future<void> loadNextPage() async {
     if (state.hasMore && !state.loading) {
-      AppLogger.info('Requesting next page pointer row: ${state.page + 1}', tag: LogTags.doctor, subTag: _subTag);
+      DebugLog.info('Requesting next page pointer row: ${state.page + 1}', tag: LogTags.doctor, subTag: _subTag);
       await loadReviews(page: state.page + 1);
     }
   }

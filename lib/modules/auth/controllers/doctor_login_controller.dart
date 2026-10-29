@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:debug_bubble/debug_bubble.dart';
 import 'package:yodoctor/core/providers/app_role_provider.dart';
 import 'package:yodoctor/core/providers/otp_cooldown_provider.dart';
 import 'package:yodoctor/core/providers/storage_provider.dart';
@@ -33,7 +33,7 @@ class DoctorLoginController extends AsyncNotifier<Map<String, dynamic>?> {
     _pendingOtpPayload = null;
     ref.read(otpCooldownProvider.notifier).reset();
 
-    AppLogger.info(
+    DebugLog.info(
       'Initiating doctor normal password authentication',
       tag: LogTags.auth,
       subTag: _subTag,
@@ -91,7 +91,7 @@ class DoctorLoginController extends AsyncNotifier<Map<String, dynamic>?> {
         if (token != null) {
           final status = data["status"] ?? data["data"]?["status"];
 
-          AppLogger.info(
+          DebugLog.info(
             'Doctor login API Response Status: $status',
             tag: LogTags.auth,
             subTag: _subTag,
@@ -136,12 +136,12 @@ class DoctorLoginController extends AsyncNotifier<Map<String, dynamic>?> {
       final message = AppErrorUtils.getFriendlyMessage(e, fallbackMessage: 'Unable to login. Please check your credentials.');
       state = AsyncError(message, st);
 
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Doctor login exception',
+      DebugLog.error(
+        'Doctor login exception',
         tag: LogTags.auth,
         subTag: _subTag,
+        error: e,
+        stackTrace: st
       );
 
       return null;
@@ -161,7 +161,7 @@ class DoctorLoginController extends AsyncNotifier<Map<String, dynamic>?> {
 
     final remaining = ref.read(otpCooldownProvider.notifier).remainingSeconds;
     if (remaining > 0 && _pendingOtpPayload != null) {
-      AppLogger.info(
+      DebugLog.info(
         'Active doctor OTP cooldown running (${remaining}s remaining). Returning cached pending OTP state.',
         tag: LogTags.auth,
         subTag: _subTag,
@@ -169,7 +169,7 @@ class DoctorLoginController extends AsyncNotifier<Map<String, dynamic>?> {
       return _pendingOtpPayload;
     }
 
-    AppLogger.info(
+    DebugLog.info(
       'Initiating doctor send login OTP for: $cleanId',
       tag: LogTags.auth,
       subTag: _subTag,
@@ -269,12 +269,13 @@ class DoctorLoginController extends AsyncNotifier<Map<String, dynamic>?> {
       final message = AppErrorUtils.getFriendlyMessage(e, fallbackMessage: 'Failed to send OTP. Please try again.');
       state = AsyncError(message, st);
 
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Doctor send login OTP exception',
+      DebugLog.error(
+        'Doctor send login OTP exception',
         tag: LogTags.auth,
         subTag: _subTag,
+        error:  e,
+        stackTrace: st,
+
       );
 
       return null;
@@ -290,7 +291,7 @@ class DoctorLoginController extends AsyncNotifier<Map<String, dynamic>?> {
     String? email,
     String? identifier,
   }) async {
-    AppLogger.info(
+    DebugLog.info(
       'Initiating doctor OTP verification sequence',
       tag: LogTags.auth,
       subTag: _subTag,
@@ -359,12 +360,12 @@ class DoctorLoginController extends AsyncNotifier<Map<String, dynamic>?> {
       final message = AppErrorUtils.getFriendlyMessage(e, fallbackMessage: 'Incorrect OTP. Please check the code and try again.');
       state = AsyncError(message, st);
 
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Doctor OTP verification exception',
+      DebugLog.error(
+        'Doctor OTP verification exception',
         tag: LogTags.auth,
         subTag: _subTag,
+        error: e,
+        stackTrace: st,
       );
 
       return null;
@@ -376,7 +377,7 @@ class DoctorLoginController extends AsyncNotifier<Map<String, dynamic>?> {
     required String identifier,
     String? password,
   }) async {
-    AppLogger.info(
+    DebugLog.info(
       'Initiating doctor OTP resend sequence for: $identifier',
       tag: LogTags.auth,
       subTag: _subTag,
@@ -427,12 +428,12 @@ class DoctorLoginController extends AsyncNotifier<Map<String, dynamic>?> {
         };
       }
     } catch (e, st) {
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Doctor OTP resend failed',
+      DebugLog.error(
+        'Doctor OTP resend failed',
         tag: LogTags.auth,
         subTag: _subTag,
+        error: e,
+        stackTrace: st,
       );
       return {
         "success": false,
@@ -451,7 +452,7 @@ class DoctorLoginController extends AsyncNotifier<Map<String, dynamic>?> {
 
       state = const AsyncData(null);
 
-      AppLogger.success(
+      DebugLog.success(
         'Doctor logout completed successfully',
         tag: LogTags.auth,
         subTag: _subTag,
@@ -459,10 +460,10 @@ class DoctorLoginController extends AsyncNotifier<Map<String, dynamic>?> {
     } catch (e, st) {
       state = AsyncError(AppErrorUtils.getFriendlyMessage(e), st);
 
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Doctor logout failed',
+      DebugLog.error(
+        error: e,
+        stackTrace: st,
+        'Doctor logout failed',
         tag: LogTags.auth,
         subTag: _subTag,
       );

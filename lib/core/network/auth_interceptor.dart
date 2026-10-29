@@ -1,7 +1,7 @@
+import 'package:debug_bubble/debug_bubble.dart';
 import 'package:dio/dio.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
 import 'package:yodoctor/core/routes/app_router.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/core/storage/storage_service.dart';
@@ -34,7 +34,7 @@ class AuthInterceptor extends Interceptor {
         ? (_storage.getRegistrationToken() ?? _storage.getToken())
         : (_storage.getToken() ?? _storage.getRegistrationToken());
 
-    AppLogger.info(
+    DebugLog.info(
       'Intercepting outgoing HTTP request: [${options.method}] -> ${options.uri}',
       tag: LogTags.api,
       subTag: _subTag,
@@ -43,7 +43,7 @@ class AuthInterceptor extends Interceptor {
     if (token != null && token.isNotEmpty) {
       options.headers['Authorization'] = 'Bearer $token';
 
-      AppLogger.success(
+      DebugLog.success(
         'Security context attached safely (${isRegistrationApi ? "Temporary Registration Token" : "Active Session Token"})',
         tag: LogTags.api,
         subTag: _subTag,
@@ -87,7 +87,7 @@ class AuthInterceptor extends Interceptor {
       if (!_isLoggingOut) {
         _isLoggingOut = true;
 
-        AppLogger.warning(
+        DebugLog.warning(
           'Session expired or invalid token detected. Triggering force logout...',
           tag: LogTags.api,
           subTag: _subTag,

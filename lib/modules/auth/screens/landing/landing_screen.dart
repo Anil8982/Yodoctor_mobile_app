@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/constants/app_assets.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:debug_bubble/debug_bubble.dart';
 import 'package:yodoctor/core/providers/app_role_provider.dart';
 import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/core/theme/app_theme.dart';
@@ -515,7 +515,7 @@ class _LandingScreenState extends ConsumerState<LandingScreen> {
               recognizer: TapGestureRecognizer()
                 ..onTap = () {
                   final url = appConfig?.legalAndSupport.privacyPolicyUrl ?? '';
-                  AppLogger.info(
+                  DebugLog.info(
                     'Privacy Policy URL: $url',
                     tag: LogTags.app,
                     subTag: 'Landing',
@@ -549,7 +549,7 @@ class _LandingScreenState extends ConsumerState<LandingScreen> {
               recognizer: TapGestureRecognizer()
                 ..onTap = () {
                   final url = appConfig?.legalAndSupport.termsServiceUrl ?? '';
-                  AppLogger.info(
+                  DebugLog.info(
                     'Terms of Service URL: $url',
                     tag: LogTags.app,
                     subTag: 'Landing',

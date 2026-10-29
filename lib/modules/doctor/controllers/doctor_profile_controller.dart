@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:debug_bubble/debug_bubble.dart';
 
 import '../models/dashboard/doctor_profile_model.dart';
 import '../repositories/doctor_profile_repository.dart';
@@ -106,7 +106,7 @@ class DoctorProfileNotifier extends Notifier<ProfileFormState> {
 
   @override
   ProfileFormState build() {
-    AppLogger.info(
+    DebugLog.info(
       'DoctorProfileNotifier Initialized',
       tag: LogTags.doctor,
       subTag: _subTag,
@@ -140,7 +140,7 @@ class DoctorProfileNotifier extends Notifier<ProfileFormState> {
     if (state.isLoading && !force) return false;
 
     state = state.copyWith(isLoading: true, clearError: true);
-    AppLogger.info(
+    DebugLog.info(
       'Loading doctor profile data matrix...',
       tag: LogTags.doctor,
       subTag: _subTag,
@@ -152,15 +152,11 @@ class DoctorProfileNotifier extends Notifier<ProfileFormState> {
       final statusCode = response.statusCode ?? 0;
 
       if (statusCode >= 200 && statusCode < 300) {
-        AppLogger.success(
+        DebugLog.success(
           'Doctor profile data fetched successfully',
           tag: LogTags.doctor,
           subTag: _subTag,
-        );
-        AppLogger.json(
-          response.data,
-          tag: LogTags.doctor,
-          subTag: '$_subTag/ProfileFetchData',
+          json: response.data,
         );
 
         final profile = DoctorProfileModel.fromJson(response.data["doctor"]);
@@ -169,7 +165,7 @@ class DoctorProfileNotifier extends Notifier<ProfileFormState> {
       } else {
         final msg = response.data["message"] ?? "Failed to fetch profile info";
         state = state.copyWith(isLoading: false, errorMessage: msg);
-        AppLogger.warning(
+        DebugLog.warning(
           'Profile fetch failed with status: $statusCode. Message: $msg',
           tag: LogTags.doctor,
           subTag: _subTag,
@@ -181,10 +177,10 @@ class DoctorProfileNotifier extends Notifier<ProfileFormState> {
         isLoading: false,
         errorMessage: "Runtime crash loading profile",
       );
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Fatal crash in profile load pipeline',
+      DebugLog.error(
+        error: e,
+        stackTrace: st,
+        'Fatal crash in profile load pipeline',
         tag: LogTags.doctor,
         subTag: _subTag,
       );
@@ -231,7 +227,7 @@ class DoctorProfileNotifier extends Notifier<ProfileFormState> {
   }
 
   void updateGender(String gender) {
-    AppLogger.info(
+    DebugLog.info(
       'Gender updated to: $gender',
       tag: LogTags.doctor,
       subTag: _subTag,
@@ -246,7 +242,7 @@ class DoctorProfileNotifier extends Notifier<ProfileFormState> {
   }
 
   void updatePracticeType(String type) {
-    AppLogger.info(
+    DebugLog.info(
       'Practice type updated to: $type',
       tag: LogTags.doctor,
       subTag: _subTag,
@@ -258,7 +254,7 @@ class DoctorProfileNotifier extends Notifier<ProfileFormState> {
   }
 
   void updateDuration(int value) {
-    AppLogger.info(
+    DebugLog.info(
       'Consultation duration updated to: $value mins',
       tag: LogTags.doctor,
       subTag: _subTag,
@@ -273,7 +269,7 @@ class DoctorProfileNotifier extends Notifier<ProfileFormState> {
     } else {
       days.add(day);
     }
-    AppLogger.info(
+    DebugLog.info(
       'Toggled available day: $day. Active days roster: $days',
       tag: LogTags.doctor,
       subTag: _subTag,
@@ -315,15 +311,17 @@ class DoctorProfileNotifier extends Notifier<ProfileFormState> {
       "availableDays": state.activeDays,
     };
 
-    AppLogger.info(
+    DebugLog.info(
       'Submitting doctor profile revision batch...',
       tag: LogTags.doctor,
       subTag: _subTag,
     );
-    AppLogger.json(
-      payload,
+
+    DebugLog.debug(
+      'Doctor profile update payload',
       tag: LogTags.doctor,
       subTag: '$_subTag/UpdatePayload',
+      json: payload,
     );
 
     try {
@@ -332,7 +330,7 @@ class DoctorProfileNotifier extends Notifier<ProfileFormState> {
       final statusCode = response.statusCode ?? 0;
 
       if (statusCode >= 200 && statusCode < 300) {
-        AppLogger.success(
+        DebugLog.success(
           'Doctor profile changes saved successfully on backend',
           tag: LogTags.doctor,
           subTag: _subTag,
@@ -343,7 +341,7 @@ class DoctorProfileNotifier extends Notifier<ProfileFormState> {
         final msg =
             response.data["message"] ?? "Failed to save profile changes";
         state = state.copyWith(isLoading: false, errorMessage: msg);
-        AppLogger.warning(
+        DebugLog.warning(
           'Failed to save profile updates. Backend rejected with status: $statusCode',
           tag: LogTags.doctor,
           subTag: _subTag,
@@ -355,10 +353,10 @@ class DoctorProfileNotifier extends Notifier<ProfileFormState> {
         isLoading: false,
         errorMessage: "Profile mutation failure",
       );
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Profile save execution failure',
+      DebugLog.error(
+        error: e,
+        stackTrace: st,
+        'Profile save execution failure',
         tag: LogTags.doctor,
         subTag: _subTag,
       );

@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/api_constants.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:debug_bubble/debug_bubble.dart';
 import 'package:yodoctor/core/network/dio_provider.dart';
 
 final patientCertificateRepositoryProvider =
@@ -18,26 +18,26 @@ class PatientCertificateRepository {
   static const String _subTag = 'PatientCertificate';
 
   Future<Response> createRequest(Map<String, dynamic> data) async {
-    AppLogger.info(
+    DebugLog.info(
       'Creating certificate request',
       tag: LogTags.api,
       subTag: _subTag,
+      json: data,
     );
-    AppLogger.json(data, tag: LogTags.api, subTag: _subTag);
 
     try {
       final response = await _dio.post(
         ApiConstants.createCertificate,
         data: data,
       );
-      AppLogger.success(
+      DebugLog.success(
         'Certificate request created successfully',
         tag: LogTags.api,
         subTag: _subTag,
       );
       return response;
     } catch (e, stack) {
-      AppLogger.error(
+      DebugLog.error(
         'Failed to create certificate request',
         tag: LogTags.api,
         subTag: _subTag,
@@ -55,7 +55,7 @@ class PatientCertificateRepository {
     String? medicalReports,
     String? prescription,
   }) async {
-    AppLogger.info(
+    DebugLog.info(
       'Uploading documents for request ID: $requestId',
       tag: LogTags.api,
       subTag: _subTag,
@@ -77,14 +77,14 @@ class PatientCertificateRepository {
         ApiConstants.uploadCertificateDocuments,
         data: formData,
       );
-      AppLogger.success(
+      DebugLog.success(
         'Documents uploaded successfully',
         tag: LogTags.api,
         subTag: _subTag,
       );
       return response;
     } catch (e, stack) {
-      AppLogger.error(
+      DebugLog.error(
         'Failed to upload documents',
         tag: LogTags.api,
         subTag: _subTag,
@@ -96,7 +96,7 @@ class PatientCertificateRepository {
   }
 
   Future<Response> getMyRequests() async {
-    AppLogger.info(
+    DebugLog.info(
       'Fetching my certificate requests',
       tag: LogTags.api,
       subTag: _subTag,
@@ -104,14 +104,14 @@ class PatientCertificateRepository {
 
     try {
       final response = await _dio.get(ApiConstants.myCertificates);
-      AppLogger.success(
+      DebugLog.success(
         'Fetched certificate requests successfully',
         tag: LogTags.api,
         subTag: _subTag,
       );
       return response;
     } catch (e, stack) {
-      AppLogger.error(
+      DebugLog.error(
         'Failed to fetch certificate requests',
         tag: LogTags.api,
         subTag: _subTag,
@@ -123,7 +123,7 @@ class PatientCertificateRepository {
   }
 
   Future<Response> getRequestDetail(int id) async {
-    AppLogger.info(
+    DebugLog.info(
       'Fetching request detail for ID: $id',
       tag: LogTags.api,
       subTag: _subTag,
@@ -131,14 +131,14 @@ class PatientCertificateRepository {
 
     try {
       final response = await _dio.get('${ApiConstants.certificateDetail}/$id');
-      AppLogger.success(
+      DebugLog.success(
         'Fetched request details successfully for ID: $id',
         tag: LogTags.api,
         subTag: _subTag,
       );
       return response;
     } catch (e, stack) {
-      AppLogger.error(
+      DebugLog.error(
         'Failed to fetch request detail for ID: $id',
         tag: LogTags.api,
         subTag: _subTag,
@@ -150,7 +150,7 @@ class PatientCertificateRepository {
   }
 
   Future<Response> downloadCertificate(int id) async {
-    AppLogger.info(
+    DebugLog.info(
       'Downloading certificate for ID: $id',
       tag: LogTags.api,
       subTag: _subTag,
@@ -161,14 +161,14 @@ class PatientCertificateRepository {
         '${ApiConstants.downloadCertificate}/$id',
         options: Options(responseType: ResponseType.bytes),
       );
-      AppLogger.success(
+      DebugLog.success(
         'Certificate downloaded successfully for ID: $id',
         tag: LogTags.api,
         subTag: _subTag,
       );
       return response;
     } catch (e, stack) {
-      AppLogger.error(
+      DebugLog.error(
         'Failed to download certificate for ID: $id',
         tag: LogTags.api,
         subTag: _subTag,
@@ -180,7 +180,7 @@ class PatientCertificateRepository {
   }
 
   Future<Response> getDoctors() async {
-    AppLogger.info(
+    DebugLog.info(
       'Fetching certificate doctors',
       tag: LogTags.api,
       subTag: _subTag,
@@ -189,7 +189,7 @@ class PatientCertificateRepository {
     try {
       final response = await _dio.get(ApiConstants.certificateDoctors);
 
-      AppLogger.success(
+      DebugLog.success(
         'Fetched certificate doctors successfully',
         tag: LogTags.api,
         subTag: _subTag,
@@ -197,7 +197,7 @@ class PatientCertificateRepository {
 
       return response;
     } catch (e, stack) {
-      AppLogger.error(
+      DebugLog.error(
         'Failed to fetch certificate doctors',
         tag: LogTags.api,
         subTag: _subTag,
@@ -211,27 +211,27 @@ class PatientCertificateRepository {
   // --- Certificate Payment ---
 
   Future<Response> createPaymentOrder(Map<String, dynamic> data) async {
-    AppLogger.info(
+    DebugLog.info(
       'Creating certificate payment order',
       tag: LogTags.api,
       subTag: _subTag,
+      json: data,
     );
-    AppLogger.json(data, tag: LogTags.api, subTag: _subTag);
 
     try {
       final response = await _dio.post(
         ApiConstants.createCertificatePaymentOrder,
         data: data,
       );
-      AppLogger.success(
+      DebugLog.success(
         'Certificate payment order created successfully',
         tag: LogTags.api,
         subTag: _subTag,
+        json: response.data,
       );
-      AppLogger.json(response.data, tag: LogTags.api, subTag: _subTag);
       return response;
     } catch (e, stack) {
-      AppLogger.error(
+      DebugLog.error(
         'Failed to create certificate payment order',
         tag: LogTags.api,
         subTag: _subTag,
@@ -247,34 +247,33 @@ class PatientCertificateRepository {
     required String razorpayPaymentId,
     required String razorpaySignature,
   }) async {
-    AppLogger.info(
-      'Verifying certificate payment',
-      tag: LogTags.api,
-      subTag: _subTag,
-    );
-
     final data = {
       'razorpay_order_id': razorpayOrderId,
       'razorpay_payment_id': razorpayPaymentId,
       'razorpay_signature': razorpaySignature,
     };
 
-    AppLogger.json(data, tag: LogTags.api, subTag: _subTag);
+    DebugLog.info(
+      'Verifying certificate payment',
+      tag: LogTags.api,
+      subTag: _subTag,
+      json: data,
+    );
 
     try {
       final response = await _dio.post(
         ApiConstants.verifyCertificatePayment,
         data: data,
       );
-      AppLogger.success(
+      DebugLog.success(
         'Certificate payment verified successfully',
         tag: LogTags.api,
         subTag: _subTag,
+        json: response.data,
       );
-      AppLogger.json(response.data, tag: LogTags.api, subTag: _subTag);
       return response;
     } catch (e, stack) {
-      AppLogger.error(
+      DebugLog.error(
         'Failed to verify certificate payment',
         tag: LogTags.api,
         subTag: _subTag,

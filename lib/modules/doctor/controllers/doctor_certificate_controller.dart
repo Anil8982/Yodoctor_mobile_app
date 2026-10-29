@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:debug_bubble/debug_bubble.dart';
 import 'package:yodoctor/modules/doctor/models/certificate/doctor_certificate_request_model.dart';
 import '../repositories/doctor_certificate_repository.dart';
 import 'doctor_certificate_review_controller.dart';
@@ -56,16 +56,16 @@ class CertificateState {
 }
 
 final doctorCertificateProvider =
-NotifierProvider<DoctorCertificateNotifier, CertificateState>(
-  DoctorCertificateNotifier.new,
-);
+    NotifierProvider<DoctorCertificateNotifier, CertificateState>(
+      DoctorCertificateNotifier.new,
+    );
 
 class DoctorCertificateNotifier extends Notifier<CertificateState> {
   static const String _subTag = 'DoctorCertificateNotifier';
 
   @override
   CertificateState build() {
-    AppLogger.info(
+    DebugLog.info(
       'DoctorCertificateNotifier Initialized',
       tag: LogTags.doctor,
       subTag: _subTag,
@@ -76,7 +76,7 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
 
   List<dynamic> _extractList(dynamic data) {
     if (data == null || data == '') {
-      AppLogger.info(
+      DebugLog.info(
         'Response data is null or empty, returning empty list',
         tag: LogTags.doctor,
         subTag: _subTag,
@@ -85,7 +85,7 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
     }
 
     if (data is List) {
-      AppLogger.info(
+      DebugLog.info(
         'Extracted direct list with ${data.length} items',
         tag: LogTags.doctor,
         subTag: _subTag,
@@ -96,7 +96,7 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
     if (data is Map<String, dynamic>) {
       final hasSuccess = data.containsKey('success');
       if (hasSuccess && data['success'] != true) {
-        AppLogger.warning(
+        DebugLog.warning(
           'Response has success=false, but returning data anyway if present',
           tag: LogTags.doctor,
           subTag: _subTag,
@@ -106,7 +106,7 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
       if (data.containsKey('data')) {
         final innerData = data['data'];
         if (innerData is List) {
-          AppLogger.info(
+          DebugLog.info(
             'Extracted wrapped list with ${innerData.length} items',
             tag: LogTags.doctor,
             subTag: _subTag,
@@ -114,14 +114,14 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
           return innerData;
         }
         if (innerData == null) {
-          AppLogger.info(
+          DebugLog.info(
             'Wrapped data is null, returning empty list',
             tag: LogTags.doctor,
             subTag: _subTag,
           );
           return [];
         }
-        AppLogger.warning(
+        DebugLog.warning(
           'Wrapped data is not a List: ${innerData.runtimeType}',
           tag: LogTags.doctor,
           subTag: _subTag,
@@ -130,7 +130,7 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
       }
 
       if (data.containsKey('id') && data.containsKey('full_name')) {
-        AppLogger.info(
+        DebugLog.info(
           'Response is a single object, wrapping in list',
           tag: LogTags.doctor,
           subTag: _subTag,
@@ -139,7 +139,7 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
       }
     }
 
-    AppLogger.warning(
+    DebugLog.warning(
       'Unexpected response structure: ${data.runtimeType}',
       tag: LogTags.doctor,
       subTag: _subTag,
@@ -148,42 +148,42 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
   }
 
   List<DoctorCertificateRequestModel> _parseCertificateList(
-      dynamic data,
-      String endpoint,
-      ) {
+    dynamic data,
+    String endpoint,
+  ) {
     try {
       final rawList = _extractList(data);
       final models = rawList
           .map((item) {
-        try {
-          if (item is Map<String, dynamic>) {
-            return DoctorCertificateRequestModel.fromJson(item);
-          }
-          final map = Map<String, dynamic>.from(item as Map);
-          return DoctorCertificateRequestModel.fromJson(map);
-        } catch (e) {
-          AppLogger.warning(
-            'Failed to parse individual certificate item: $e',
-            tag: LogTags.doctor,
-            subTag: _subTag,
-          );
-          return null;
-        }
-      })
+            try {
+              if (item is Map<String, dynamic>) {
+                return DoctorCertificateRequestModel.fromJson(item);
+              }
+              final map = Map<String, dynamic>.from(item as Map);
+              return DoctorCertificateRequestModel.fromJson(map);
+            } catch (e) {
+              DebugLog.warning(
+                'Failed to parse individual certificate item: $e',
+                tag: LogTags.doctor,
+                subTag: _subTag,
+              );
+              return null;
+            }
+          })
           .whereType<DoctorCertificateRequestModel>()
           .toList();
 
-      AppLogger.info(
+      DebugLog.info(
         'Parsed ${models.length} certificates from $endpoint',
         tag: LogTags.doctor,
         subTag: _subTag,
       );
       return models;
     } catch (e, st) {
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Failed to parse certificate list from $endpoint',
+      DebugLog.error(
+        error: e,
+        stackTrace: st,
+        'Failed to parse certificate list from $endpoint',
         tag: LogTags.doctor,
         subTag: _subTag,
       );
@@ -193,7 +193,7 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
 
   Future<void> loadRequests() async {
     state = state.copyWith(loading: true, clearError: true);
-    AppLogger.info(
+    DebugLog.info(
       'Fetching pending certificate requests...',
       tag: LogTags.doctor,
       subTag: _subTag,
@@ -210,7 +210,7 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
           '/certificate/requests',
         );
 
-        AppLogger.success(
+        DebugLog.success(
           'Pending requests fetched successfully. Count: ${list.length}',
           tag: LogTags.doctor,
           subTag: _subTag,
@@ -218,7 +218,7 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
         state = state.copyWith(loading: false, pendingCertificates: list);
       } else {
         final msg = response.data?['message'] ?? "Failed to load requests";
-        AppLogger.warning(
+        DebugLog.warning(
           'Failed to load pending requests: $msg',
           tag: LogTags.doctor,
           subTag: _subTag,
@@ -230,19 +230,19 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
         loading: false,
         errorMessage: "Failed to load requests",
       );
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Load requests execution failure',
+      DebugLog.error(
+        'Load requests execution failure',
         tag: LogTags.doctor,
         subTag: _subTag,
+        error: e,
+        stackTrace: st,
       );
     }
   }
 
   Future<void> loadIssuedCertificates() async {
     state = state.copyWith(loading: true, clearError: true);
-    AppLogger.info(
+    DebugLog.info(
       'Fetching issued certificates...',
       tag: LogTags.doctor,
       subTag: _subTag,
@@ -259,7 +259,7 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
           '/certificate/issued',
         );
 
-        AppLogger.success(
+        DebugLog.success(
           'Issued certificates fetched successfully. Count: ${list.length}',
           tag: LogTags.doctor,
           subTag: _subTag,
@@ -267,7 +267,7 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
         state = state.copyWith(loading: false, issuedCertificates: list);
       } else {
         final msg = response.data?['message'] ?? "Failed to load issued certs";
-        AppLogger.warning(
+        DebugLog.warning(
           'Failed to load issued certificates: $msg',
           tag: LogTags.doctor,
           subTag: _subTag,
@@ -279,12 +279,12 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
         loading: false,
         errorMessage: "Failed to load issued certs",
       );
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Load issued certificates exception',
+      DebugLog.error(
+        'Load issued certificates exception',
         tag: LogTags.doctor,
         subTag: _subTag,
+        error: e,
+        stackTrace: st,
       );
     }
   }
@@ -294,7 +294,7 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
   int get totalCount => pendingCount + issuedCount;
 
   void setTabIndex(int index) {
-    AppLogger.info(
+    DebugLog.info(
       'Switching to tab index: $index',
       tag: LogTags.doctor,
       subTag: _subTag,
@@ -311,7 +311,7 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
   }
 
   void updateStatusFilter(String status) {
-    AppLogger.info(
+    DebugLog.info(
       'Filter change -> Status: $status',
       tag: LogTags.doctor,
       subTag: _subTag,
@@ -320,7 +320,7 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
   }
 
   void updateTypeFilter(String type) {
-    AppLogger.info(
+    DebugLog.info(
       'Filter change -> Type: $type',
       tag: LogTags.doctor,
       subTag: _subTag,
@@ -336,14 +336,17 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
     final filtered = source.where((cert) {
       final status = cert.status.trim().toLowerCase();
 
-      final matchesStatus = state.selectedStatusFilter == "All Status" ||
+      final matchesStatus =
+          state.selectedStatusFilter == "All Status" ||
           status == state.selectedStatusFilter.toLowerCase();
 
-      final matchesType = state.selectedTypeFilter == "All Types" ||
+      final matchesType =
+          state.selectedTypeFilter == "All Types" ||
           cert.certificateType.toLowerCase() ==
               state.selectedTypeFilter.toLowerCase();
 
-      final matchesSearch = state.searchQuery.isEmpty ||
+      final matchesSearch =
+          state.searchQuery.isEmpty ||
           cert.fullName.toLowerCase().contains(state.searchQuery) ||
           cert.id.toString().contains(state.searchQuery);
 
@@ -362,7 +365,7 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
     // ✅ Validate fitness status
     final fitnessStatusLower = fitnessStatus.trim().toLowerCase();
     if (fitnessStatusLower.isEmpty) {
-      AppLogger.warning(
+      DebugLog.warning(
         'Fitness status is empty, cannot approve',
         tag: LogTags.doctor,
         subTag: _subTag,
@@ -373,7 +376,7 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
     if (!CertificateConstants.fitnessStatuses
         .map((status) => status.toLowerCase())
         .contains(fitnessStatusLower)) {
-      AppLogger.warning(
+      DebugLog.warning(
         'Invalid fitness status: $fitnessStatusLower',
         tag: LogTags.doctor,
         subTag: _subTag,
@@ -381,7 +384,7 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
       return false;
     }
 
-    AppLogger.info(
+    DebugLog.info(
       'Approving certificate ID: $id with fitness: $fitnessStatusLower',
       tag: LogTags.doctor,
       subTag: _subTag,
@@ -398,14 +401,15 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
 
       final statusCode = response.statusCode ?? 0;
 
-      final isSuccess = statusCode >= 200 &&
+      final isSuccess =
+          statusCode >= 200 &&
           statusCode < 300 &&
           (response.data is! Map ||
               response.data["success"] == null ||
               response.data["success"] == true);
 
       if (isSuccess) {
-        AppLogger.success(
+        DebugLog.success(
           'Certificate ID: $id approved successfully',
           tag: LogTags.doctor,
           subTag: _subTag,
@@ -413,17 +417,17 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
         await refresh();
         return true;
       }
-      AppLogger.warning(
+      DebugLog.warning(
         'Certificate approval rejected by backend for ID: $id',
         tag: LogTags.doctor,
         subTag: _subTag,
       );
       return false;
     } catch (e, st) {
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Approve certificate faulted',
+      DebugLog.error(
+        error: e,
+        stackTrace: st,
+        'Approve certificate faulted',
         tag: LogTags.doctor,
         subTag: _subTag,
       );
@@ -432,7 +436,7 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
   }
 
   Future<bool> rejectCertificate(int id) async {
-    AppLogger.info(
+    DebugLog.info(
       'Rejecting certificate ID: $id',
       tag: LogTags.doctor,
       subTag: _subTag,
@@ -444,14 +448,15 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
 
       final statusCode = response.statusCode ?? 0;
 
-      final isSuccess = statusCode >= 200 &&
+      final isSuccess =
+          statusCode >= 200 &&
           statusCode < 300 &&
           (response.data is! Map ||
               response.data["success"] == null ||
               response.data["success"] == true);
 
       if (isSuccess) {
-        AppLogger.success(
+        DebugLog.success(
           'Certificate ID: $id rejected successfully',
           tag: LogTags.doctor,
           subTag: _subTag,
@@ -459,17 +464,17 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
         await refresh();
         return true;
       }
-      AppLogger.warning(
+      DebugLog.warning(
         'Certificate rejection failed on backend for ID: $id',
         tag: LogTags.doctor,
         subTag: _subTag,
       );
       return false;
     } catch (e, st) {
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Reject certificate faulted',
+      DebugLog.error(
+        error: e,
+        stackTrace: st,
+        'Reject certificate faulted',
         tag: LogTags.doctor,
         subTag: _subTag,
       );
@@ -478,19 +483,20 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
   }
 
   Future<void> refresh() async {
-    final previousDataExists = state.pendingCertificates.isNotEmpty ||
+    final previousDataExists =
+        state.pendingCertificates.isNotEmpty ||
         state.issuedCertificates.isNotEmpty;
 
     if (previousDataExists) {
       state = state.copyWith(refreshing: true, clearError: true);
-      AppLogger.info(
+      DebugLog.info(
         'Refreshing certificate data (preserving existing UI)',
         tag: LogTags.doctor,
         subTag: _subTag,
       );
     } else {
       state = state.copyWith(loading: true, clearError: true);
-      AppLogger.info(
+      DebugLog.info(
         'Loading certificate data (first load)',
         tag: LogTags.doctor,
         subTag: _subTag,
@@ -504,8 +510,7 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
 
       List<DoctorCertificateRequestModel> pendingList =
           state.pendingCertificates;
-      List<DoctorCertificateRequestModel> issuedList =
-          state.issuedCertificates;
+      List<DoctorCertificateRequestModel> issuedList = state.issuedCertificates;
 
       if (reqResponse.statusCode != null &&
           reqResponse.statusCode! >= 200 &&
@@ -514,13 +519,13 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
           reqResponse.data,
           '/certificate/requests',
         );
-        AppLogger.info(
+        DebugLog.info(
           'Refresh: Parsed ${pendingList.length} pending certificates',
           tag: LogTags.doctor,
           subTag: _subTag,
         );
       } else {
-        AppLogger.warning(
+        DebugLog.warning(
           'Refresh: Failed to fetch pending certificates. Status: ${reqResponse.statusCode}. Preserving existing data (${pendingList.length} items)',
           tag: LogTags.doctor,
           subTag: _subTag,
@@ -534,20 +539,20 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
           issuedResponse.data,
           '/certificate/issued',
         );
-        AppLogger.info(
+        DebugLog.info(
           'Refresh: Parsed ${issuedList.length} issued certificates',
           tag: LogTags.doctor,
           subTag: _subTag,
         );
       } else {
-        AppLogger.warning(
+        DebugLog.warning(
           'Refresh: Failed to fetch issued certificates. Status: ${issuedResponse.statusCode}. Preserving existing data (${issuedList.length} items)',
           tag: LogTags.doctor,
           subTag: _subTag,
         );
       }
 
-      AppLogger.success(
+      DebugLog.success(
         'Global certificate sync complete. Pending: ${pendingList.length}, Issued: ${issuedList.length}',
         tag: LogTags.doctor,
         subTag: _subTag,
@@ -561,14 +566,11 @@ class DoctorCertificateNotifier extends Notifier<CertificateState> {
         clearError: true,
       );
     } catch (e, st) {
-      state = state.copyWith(
-        loading: false,
-        refreshing: false,
-      );
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Global synchronization pipeline crash',
+      state = state.copyWith(loading: false, refreshing: false);
+      DebugLog.error(
+        error: e,
+        stackTrace: st,
+        'Global synchronization pipeline crash',
         tag: LogTags.doctor,
         subTag: _subTag,
       );

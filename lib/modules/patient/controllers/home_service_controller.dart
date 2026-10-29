@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:debug_bubble/debug_bubble.dart';
 import 'package:yodoctor/modules/patient/models/home_care/home_service_booking_model.dart';
 import '../repositories/patient_homecare_repository.dart';
 
@@ -93,7 +93,7 @@ class HomeServiceBookingNotifier extends Notifier<HomeServiceBookingState> {
 
     state = state.copyWith(isLoading: true, clearError: true);
 
-    AppLogger.info(
+    DebugLog.info(
       'Submitting home care request pipeline',
       tag: LogTags.patient,
       subTag: _subTag,
@@ -113,7 +113,7 @@ class HomeServiceBookingNotifier extends Notifier<HomeServiceBookingState> {
         if (success) {
           state = state.copyWith(isLoading: false);
 
-          AppLogger.success(
+          DebugLog.success(
             'Home care booking created successfully',
             tag: LogTags.patient,
             subTag: _subTag,
@@ -142,10 +142,10 @@ class HomeServiceBookingNotifier extends Notifier<HomeServiceBookingState> {
         isLoading: false,
       );
 
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Home care booking failed',
+      DebugLog.error(
+        'Home care booking failed',
+        error: e,
+        stackTrace: st,
         tag: LogTags.patient,
         subTag: _subTag,
       );
@@ -216,10 +216,10 @@ class HomeServiceBookingNotifier extends Notifier<HomeServiceBookingState> {
         errorMessage: e.toString().replaceFirst("Exception: ", ""),
         isLoading: false,
       );
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Location hardware link telemetry failure',
+      DebugLog.error(
+        'Location hardware link telemetry failure',
+        error: e,
+        stackTrace: st,
         tag: LogTags.patient,
         subTag: _subTag,
       );
@@ -229,7 +229,7 @@ class HomeServiceBookingNotifier extends Notifier<HomeServiceBookingState> {
   void resetBooking() {
     state = const HomeServiceBookingState();
 
-    AppLogger.info(
+    DebugLog.info(
       'Home service booking state reset',
       tag: LogTags.patient,
       subTag: _subTag,

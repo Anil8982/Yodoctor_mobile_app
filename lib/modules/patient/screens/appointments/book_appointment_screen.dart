@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:debug_bubble/debug_bubble.dart';
 import 'package:yodoctor/l10n/app_localizations.dart';
 import 'package:yodoctor/modules/patient/controllers/book_appointment_controller.dart';
 import 'package:yodoctor/modules/patient/controllers/family_controller.dart';
@@ -47,7 +47,7 @@ class BookAppointmentScreen extends ConsumerWidget {
     WidgetRef ref,
     AppLocalizations l10n,
   ) async {
-    AppLogger.info(
+    DebugLog.info(
       'User triggered appointment confirmation process',
       tag: LogTags.patient,
       subTag: _subTag,

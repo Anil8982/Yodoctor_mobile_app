@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:debug_bubble/debug_bubble.dart';
 import '../models/dashboard/dashboard_model.dart';
 import '../repositories/patient_dashboard_repository.dart';
 
@@ -72,14 +72,14 @@ class PatientDashboardController extends Notifier<PatientDashboardState> {
   Future<void> _loadDashboard({String? filter}) async {
     _setLoading(error: true);
 
-    AppLogger.info('Loading dashboard', tag: LogTags.patient, subTag: _subTag);
+    DebugLog.info('Loading dashboard', tag: LogTags.patient, subTag: _subTag);
 
     try {
       final response = await _repo.getDashboard();
 
       if (_isSuccess(response.statusCode)) {
         if (response.data is Map<String, dynamic>) {
-          AppLogger.json(response.data, tag: LogTags.api, subTag: _subTag);
+          DebugLog.info('Dashboard data received', tag: LogTags.api, subTag: _subTag, json: response.data);
         }
         state = state.copyWith(
           isLoading: false,
@@ -96,7 +96,7 @@ class PatientDashboardController extends Notifier<PatientDashboardState> {
   }
 
   Future<bool> _cancelAppointment(int appointmentId) async {
-    AppLogger.info(
+    DebugLog.info(
       'Cancelling $appointmentId',
       tag: LogTags.patient,
       subTag: _subTag,
@@ -106,7 +106,7 @@ class PatientDashboardController extends Notifier<PatientDashboardState> {
       final response = await _repo.cancelAppointment(appointmentId);
 
       if (_isSuccess(response.statusCode) && response.data["success"] == true) {
-        AppLogger.success('Cancelled', tag: LogTags.patient, subTag: _subTag);
+        DebugLog.success('Cancelled', tag: LogTags.patient, subTag: _subTag);
         await _loadDashboard(filter: state.selectedFilter);
         return true;
       }
@@ -131,7 +131,7 @@ class PatientDashboardController extends Notifier<PatientDashboardState> {
 
     state = state.copyWith(isRefreshingToken: true);
 
-    AppLogger.info('Refreshing token', tag: LogTags.patient, subTag: _subTag);
+    DebugLog.info('Refreshing token', tag: LogTags.patient, subTag: _subTag);
 
     try {
       final response = await _repo.getTokenStatus(token.appointmentId);
@@ -153,10 +153,10 @@ class PatientDashboardController extends Notifier<PatientDashboardState> {
         state = state.copyWith(dashboardData: updatedDashboard);
       }
     } catch (e, st) {
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Failed to refresh token status',
+      DebugLog.error(
+        'Failed to refresh token status',
+        error: e,
+        stackTrace: st,
         tag: LogTags.patient,
         subTag: _subTag,
       );
@@ -170,7 +170,7 @@ class PatientDashboardController extends Notifier<PatientDashboardState> {
   }
 
   void _handleError(String message, String logMessage) {
-    AppLogger.warning(
+    DebugLog.warning(
       '$logMessage: $message',
       tag: LogTags.patient,
       subTag: _subTag,
@@ -184,10 +184,10 @@ class PatientDashboardController extends Notifier<PatientDashboardState> {
     String logMessage, {
     String? userErrorMessage,
   }) {
-    AppLogger.exception(
-      e,
-      st,
-      message: logMessage,
+    DebugLog.error(
+      logMessage,
+      error: e,
+      stackTrace: st,
       tag: LogTags.patient,
       subTag: _subTag,
     );

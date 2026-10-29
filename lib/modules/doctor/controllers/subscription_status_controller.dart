@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:debug_bubble/debug_bubble.dart';
 import 'package:yodoctor/core/providers/storage_provider.dart';
 import 'package:yodoctor/modules/doctor/models/subscription/subscription_model.dart';
 import 'package:yodoctor/modules/doctor/repositories/subscription_repository.dart';
@@ -65,7 +65,7 @@ class SubscriptionStatusNotifier extends Notifier<SubscriptionStatusState> {
     final cachedSub = storage.getActiveSubscription() ?? false;
 
     if (cachedSub) {
-      AppLogger.info(
+      DebugLog.info(
         'Loaded cached subscription from Hive: $cachedSub',
         tag: LogTags.doctor,
         subTag: _subTag,
@@ -81,7 +81,7 @@ class SubscriptionStatusNotifier extends Notifier<SubscriptionStatusState> {
   }
 
   Future<void> checkActiveSubscription() async {
-    AppLogger.info(
+    DebugLog.info(
       'Checking active subscription status from server...',
       tag: LogTags.doctor,
       subTag: _subTag,
@@ -121,7 +121,7 @@ class SubscriptionStatusNotifier extends Notifier<SubscriptionStatusState> {
         // Only save true in Hive if the subscription is confirmed ACTIVE (paid)
         await storage.saveActiveSubscription(isConfirmedActive);
 
-        AppLogger.success(
+        DebugLog.success(
           'Active subscription fetched & cached: '
               'hasSubscription=$hasSub, isActive=$isConfirmedActive, status=$subStatus, plan=${plan?.title} (${plan?.amount})',
           tag: LogTags.doctor,
@@ -151,10 +151,10 @@ class SubscriptionStatusNotifier extends Notifier<SubscriptionStatusState> {
         );
       }
     } catch (e, st) {
-      AppLogger.exception(
-        e,
-        st,
-        message: 'Error checking active subscription',
+      DebugLog.error(
+        'Error checking active subscription',
+        error: e,
+        stackTrace: st,
         tag: LogTags.doctor,
         subTag: _subTag,
       );

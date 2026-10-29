@@ -1,9 +1,9 @@
+import 'package:debug_bubble/debug_bubble.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:mime/mime.dart';
 import 'package:yodoctor/core/constants/api_constants.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
 import 'package:yodoctor/core/network/dio_provider.dart';
 import 'package:yodoctor/core/profile_image/profile_image_response.dart';
 
@@ -24,7 +24,7 @@ class ProfileImageRepository {
         response.data as Map<String, dynamic>,
       );
     } catch (e, st) {
-      AppLogger.error('Profile API Error', error: e, stackTrace: st);
+      DebugLog.error('Profile API Error', error: e, stackTrace: st);
       rethrow;
     }
   }

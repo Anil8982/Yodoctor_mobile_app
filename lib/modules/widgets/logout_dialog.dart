@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:debug_bubble/debug_bubble.dart';
 import 'package:yodoctor/core/providers/app_role_provider.dart';
 import 'package:yodoctor/core/session/app_session_controller.dart';
 import 'package:yodoctor/l10n/app_localizations.dart';
@@ -26,7 +26,7 @@ class LogoutDialog {
       cancelLabel: l10n.cancel,
       isDestructive: true,
       onConfirm: () async {
-        AppLogger.info(
+        DebugLog.info(
           '${isDoctor ? "Doctor" : "Patient"} confirmed logout from dialog gate',
           tag: LogTags.auth,
           subTag: 'LogoutDialog',
@@ -35,16 +35,16 @@ class LogoutDialog {
         try {
           await sessionController.logout(role);
 
-          AppLogger.success(
+          DebugLog.success(
             'Flushed session context. Dropping core router anchor.',
             tag: LogTags.auth,
             subTag: 'LogoutDialog',
           );
         } catch (e, st) {
-          AppLogger.exception(
-            e,
-            st,
-            message: 'Failed to intercept and cleanly terminate session',
+          DebugLog.error(
+            'Failed to intercept and cleanly terminate session',
+            error: e,
+            stackTrace: st,
             tag: LogTags.auth,
             subTag: 'LogoutDialog',
           );

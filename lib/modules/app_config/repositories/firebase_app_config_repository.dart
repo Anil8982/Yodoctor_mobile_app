@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:yodoctor/core/debug/app_logger.dart';
+import 'package:debug_bubble/debug_bubble.dart';
 import 'package:yodoctor/core/storage/storage_service.dart';
 
 import '../models/app_config_model.dart';
@@ -20,27 +20,26 @@ class FirebaseAppConfigRepository implements AppConfigRepository {
     try {
       final config = await _fetchFromFirestore();
 
-      // Save to cache - but don't fail if caching fails
       await _saveToCache(config);
 
       return config;
     } on FirebaseException catch (e, stackTrace) {
-      AppLogger.exception(
-        e,
-        stackTrace,
-        message: 'Firebase error while loading app configuration: [${e.code}] ${e.message}',
+      DebugLog.error(
+        'Firebase error while loading app configuration: [${e.code}] ${e.message}',
         subTag: 'AppConfig',
+        error: e,
+        stackTrace: stackTrace,
       );
 
       return _getCachedConfigOrThrow(
         errorMessage: 'Unable to connect to servers. Please check your internet connection and try again.',
       );
     } catch (e, stackTrace) {
-      AppLogger.exception(
-        e,
-        stackTrace,
-        message: 'Unexpected parsing or configuration error',
+      DebugLog.error(
+        'Unexpected parsing or configuration error',
         subTag: 'AppConfig',
+        error: e,
+        stackTrace: stackTrace,
       );
 
       return _getCachedConfigOrThrow(
@@ -52,7 +51,6 @@ class FirebaseAppConfigRepository implements AppConfigRepository {
   Future<AppConfigModel> _fetchFromFirestore() async {
     final configCollection = _firestore.collection('app_config');
 
-    // Fetch all 4 separate documents in parallel
     final results = await Future.wait([
       configCollection.doc('versioning').get(),
       configCollection.doc('status').get(),
@@ -69,7 +67,7 @@ class FirebaseAppConfigRepository implements AppConfigRepository {
         !statusDoc.exists &&
         !legalDoc.exists &&
         !appLinksDoc.exists) {
-      AppLogger.warning(
+      DebugLog.warning(
         'App configuration documents not found in app_config collection',
         subTag: 'AppConfig',
       );
@@ -87,13 +85,12 @@ class FirebaseAppConfigRepository implements AppConfigRepository {
   Future<void> _saveToCache(AppConfigModel config) async {
     try {
       await _storageService.saveAppConfig(config);
-      AppLogger.info(
+      DebugLog.info(
         'Latest app configuration cached locally.',
         subTag: 'AppConfig',
       );
     } catch (e) {
-      // Don't fail the whole operation if caching fails
-      AppLogger.warning(
+      DebugLog.warning(
         'Failed to cache app configuration locally: $e',
         subTag: 'AppConfig',
       );
@@ -105,14 +102,14 @@ class FirebaseAppConfigRepository implements AppConfigRepository {
       final cachedConfig = _storageService.getAppConfig();
 
       if (cachedConfig != null) {
-        AppLogger.warning(
+        DebugLog.warning(
           'Using cached app configuration as fallback.',
           subTag: 'AppConfig',
         );
         return cachedConfig;
       }
     } catch (e) {
-      AppLogger.warning(
+      DebugLog.warning(
         'Failed to read cached configuration: $e',
         subTag: 'AppConfig',
       );
