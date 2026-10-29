@@ -67,7 +67,7 @@ class AppointmentHistoryTable extends StatelessWidget {
                 appointment.status.toUpperCase() == 'COMPLETED';
 
             final canOpenPrescription =
-                completed && !appointment.isWalkIn;
+                completed && !appointment.isWalkIn && appointment.hasPrescription;
 
             return DataRow(
               cells: [

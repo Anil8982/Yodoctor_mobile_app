@@ -29,7 +29,7 @@ class MobileAppointmentList extends StatelessWidget {
       children: appointments.map((appointment) {
         final completed = appointment.status.toUpperCase() == 'COMPLETED';
         final canOpenPrescription =
-            completed && !appointment.isWalkIn;
+            completed && !appointment.isWalkIn && appointment.hasPrescription;
         return Container(
           width: double.infinity,
           margin: const EdgeInsets.only(bottom: AppSpacing.md),

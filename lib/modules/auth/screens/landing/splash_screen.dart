@@ -41,7 +41,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   void initState() {
     super.initState();
 
-    DebugLog.info('Splash: Initializing cinematic pipeline', tag: LogTags.app, subTag: 'Splash');
+    DebugLog.info(
+      'Splash: Initializing cinematic pipeline',
+      tag: LogTags.app,
+      subTag: 'Splash',
+    );
 
     // 1. Entrance Controller (Choreographed entrance in 1100ms)
     _entranceController = AnimationController(
@@ -63,15 +67,13 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       ),
     );
 
-    _textSlide = Tween<Offset>(
-      begin: const Offset(0, 0.35),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: _entranceController,
-        curve: const Interval(0.35, 0.85, curve: Curves.easeOutCubic),
-      ),
-    );
+    _textSlide = Tween<Offset>(begin: const Offset(0, 0.35), end: Offset.zero)
+        .animate(
+          CurvedAnimation(
+            parent: _entranceController,
+            curve: const Interval(0.35, 0.85, curve: Curves.easeOutCubic),
+          ),
+        );
 
     _textFade = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
@@ -101,36 +103,67 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   }
 
   Future<void> _initialize() async {
+    if (!mounted) return;
+
     final startTime = DateTime.now();
 
-    DebugLog.info('Splash: Starting initialization...', tag: LogTags.app, subTag: 'Splash');
+    DebugLog.info(
+      'Splash: Starting initialization...',
+      tag: LogTags.app,
+      subTag: 'Splash',
+    );
 
-    await ref.read(appConfigProvider.notifier).checkAppConfig();
-    await Future<void>.delayed(Duration.zero);
+    try {
+      await ref.read(appConfigProvider.notifier).checkAppConfig();
 
-    final appConfigState = ref.read(appConfigProvider);
+      if (!mounted) return;
 
-    if (appConfigState.status != AppConfigStatus.ready) {
+      final appConfigState = ref.read(appConfigProvider);
+
+      if (appConfigState.status != AppConfigStatus.ready) {
+        _goToApp();
+        return;
+      }
+
+      final storage = ref.read(storageProvider);
+      final token = storage.getToken();
+      final role = storage.getRole();
+
+      if (token != null && token.isNotEmpty && role == 'doctor') {
+        await ref.read(doctorStatusProvider.notifier).initialize();
+
+        if (!mounted) return;
+
+        await ref
+            .read(subscriptionStatusProvider.notifier)
+            .checkActiveSubscription();
+
+        if (!mounted) return;
+      }
+
+      final elapsed = DateTime.now().difference(startTime).inMilliseconds;
+
+      if (elapsed < 1200) {
+        await Future<void>.delayed(Duration(milliseconds: 1200 - elapsed));
+      }
+
+      if (!mounted) return;
+
       _goToApp();
-      return;
+    } catch (e, st) {
+      DebugLog.error(
+        'Splash initialization failed',
+        error: e,
+        stackTrace: st,
+        tag: LogTags.app,
+        subTag: 'Splash',
+      );
+
+      if (!mounted) return;
+
+      // Avoid leaving the user stuck on the splash screen.
+      _goToApp();
     }
-
-    final storage = ref.read(storageProvider);
-    final token = storage.getToken();
-    final role = storage.getRole();
-
-    if (token != null && token.isNotEmpty && role == 'doctor') {
-      await ref.read(doctorStatusProvider.notifier).initialize();
-      await ref.read(subscriptionStatusProvider.notifier).checkActiveSubscription();
-    }
-
-    // Ensure smooth entrance experience before transition (minimum 1.2s viewing window)
-    final elapsed = DateTime.now().difference(startTime).inMilliseconds;
-    if (elapsed < 1200) {
-      await Future<void>.delayed(Duration(milliseconds: 1200 - elapsed));
-    }
-
-    _goToApp();
   }
 
   void _goToApp() {
@@ -186,10 +219,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
               decoration: const BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
-                  colors: [
-                    Color(0x1F0284C7),
-                    Color(0x000284C7),
-                  ],
+                  colors: [Color(0x1F0284C7), Color(0x000284C7)],
                 ),
               ),
             ),
@@ -203,10 +233,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
               decoration: const BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
-                  colors: [
-                    Color(0x1A0D9488),
-                    Color(0x000D9488),
-                  ],
+                  colors: [Color(0x1A0D9488), Color(0x000D9488)],
                 ),
               ),
             ),
@@ -230,7 +257,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                         builder: (context, child) {
                           final value = _pulseController.value;
                           final waveScale = 1.0 + (value * 0.42);
-                          final waveOpacity = (1.0 - value).clamp(0.0, 1.0) * 0.35;
+                          final waveOpacity =
+                              (1.0 - value).clamp(0.0, 1.0) * 0.35;
 
                           return Container(
                             width: 110 * waveScale,
@@ -238,12 +266,16 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: primaryBlue.withValues(alpha: waveOpacity),
+                                color: primaryBlue.withValues(
+                                  alpha: waveOpacity,
+                                ),
                                 width: 2.5,
                               ),
                               gradient: RadialGradient(
                                 colors: [
-                                  primaryBlue.withValues(alpha: waveOpacity * 0.4),
+                                  primaryBlue.withValues(
+                                    alpha: waveOpacity * 0.4,
+                                  ),
                                   Colors.transparent,
                                 ],
                               ),
@@ -268,10 +300,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                                 gradient: const LinearGradient(
                                   begin: Alignment.topLeft,
                                   end: Alignment.bottomRight,
-                                  colors: [
-                                    Colors.white,
-                                    Color(0xFFF1F5F9),
-                                  ],
+                                  colors: [Colors.white, Color(0xFFF1F5F9)],
                                 ),
                                 boxShadow: [
                                   BoxShadow(
@@ -362,14 +391,20 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                               AnimatedBuilder(
                                 animation: _pulseController,
                                 builder: (context, child) {
-                                  final opacity = 0.4 +
-                                      (0.6 * math.sin(_pulseController.value * math.pi));
+                                  final opacity =
+                                      0.4 +
+                                      (0.6 *
+                                          math.sin(
+                                            _pulseController.value * math.pi,
+                                          ));
                                   return Container(
                                     width: 7,
                                     height: 7,
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
-                                      color: primaryTeal.withValues(alpha: opacity),
+                                      color: primaryTeal.withValues(
+                                        alpha: opacity,
+                                      ),
                                     ),
                                   );
                                 },

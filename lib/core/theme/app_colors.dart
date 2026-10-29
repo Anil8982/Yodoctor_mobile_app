@@ -490,7 +490,7 @@ class AppColors {
   static const Color patientDarkCard = Color(0xFF101D22);
   static const Color patientDarkElevatedSurface = Color(0xFF16272D);
   static const Color patientDarkPrimaryText = Color(0xFFEAF7F7);
-  static const Color patientDarkSecondaryText = Color(0xA5BEC0);
+  static const Color patientDarkSecondaryText = Color(0xFFA5BEC0);
   static const Color patientDarkBorder = Color(0xFF243940);
 
   // Admin (Original YoPurple)

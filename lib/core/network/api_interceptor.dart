@@ -41,7 +41,7 @@ class ApiInterceptor extends Interceptor {
         '✅ ${response.statusCode} ${response.requestOptions.path}',
         tag: LogTags.api,
         subTag: _subTag,
-        json: response.data, // रेडॅक्शन आपोआप होते
+        json: response.data,
       );
     }
 
@@ -53,14 +53,40 @@ class ApiInterceptor extends Interceptor {
       DioException err,
       ErrorInterceptorHandler handler,
       ) {
-    DebugLog.error(
-      '❌ ${err.requestOptions.method} ${err.requestOptions.path} (${err.response?.statusCode ?? 'NO_STATUS'})',
-      tag: LogTags.api,
-      subTag: _subTag,
-      error: err,
-      stackTrace: err.stackTrace,
-      json: err.response?.data,
-    );
+    final statusCode = err.response?.statusCode;
+    final method = err.requestOptions.method;
+    final path = err.requestOptions.path;
+
+    final serverMessage = err.response?.data is Map
+        ? (err.response?.data['message'] ?? err.message)
+        : err.message;
+
+    if (statusCode == 404) {
+      DebugLog.info(
+        'ℹ️ $method $path (404 Not Found)',
+        tag: LogTags.api,
+        subTag: _subTag,
+        error: serverMessage,
+        json: err.response?.data,
+      );
+    } else if (statusCode != null && statusCode >= 400 && statusCode < 500) {
+      DebugLog.warning(
+        '⚠️ $method $path ($statusCode)',
+        tag: LogTags.api,
+        subTag: _subTag,
+        error: serverMessage,
+        json: err.response?.data,
+      );
+    } else {
+      DebugLog.error(
+        '❌ $method $path (${statusCode ?? 'NETWORK_FAIL'})',
+        tag: LogTags.api,
+        subTag: _subTag,
+        error: serverMessage,
+        stackTrace: err.stackTrace,
+        json: err.response?.data,
+      );
+    }
 
     handler.next(err);
   }

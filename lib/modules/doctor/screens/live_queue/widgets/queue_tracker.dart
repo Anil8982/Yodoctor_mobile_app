@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/core/utils/app_spacing.dart';
 import '../../../controllers/live_queue_controller.dart';
 import '../../../models/appointment/live_queue_model.dart';
@@ -50,18 +52,60 @@ class QueueTracker extends ConsumerWidget {
             ),
             borderColor: colorScheme.primary.withValues(alpha: 0.4),
             isLive: current != null,
-            action: (current != null && !hasWaitingPatient)
-                ? SizedBox(
-                    width: double.infinity,
-                    child: FilledButton.tonalIcon(
-                      onPressed: () => notifier.nextToken(slot),
-                      style: FilledButton.styleFrom(
-                        backgroundColor: colorScheme.secondary,
-                        foregroundColor: colorScheme.onSecondary,
-                      ),
-                      icon: const Icon(Icons.stop_circle_rounded, size: 18),
-                      label: const Text("Finish Consultation"),
-                    ),
+            action: current != null
+                ? Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      if (!current!.isWalkIn) ...[
+                        FilledButton.icon(
+                          onPressed: () async {
+                            final hasRx = current!.hasPrescription;
+                            if (hasRx) {
+                              await context.push(
+                                '${AppRoutes.doctorViewPrescription.replaceFirst(':id', current!.id)}?name=${Uri.encodeComponent(current!.patientName)}&token=${Uri.encodeComponent(current!.tokenNumber)}',
+                              );
+                            } else {
+                              await context.push(
+                                '${AppRoutes.doctorAddPrescription.replaceFirst(':id', current!.id)}?name=${Uri.encodeComponent(current!.patientName)}&token=${Uri.encodeComponent(current!.tokenNumber)}&hasPrescription=false',
+                              );
+                            }
+                            notifier.loadQueue(slot, isRefresh: true);
+                          },
+                          icon: Icon(
+                            current!.hasPrescription
+                                ? Icons.visibility_outlined
+                                : Icons.receipt_long_rounded,
+                            size: 18,
+                          ),
+                          label: Text(
+                            current!.hasPrescription
+                                ? "View Rx"
+                                : "Add Prescription",
+                          ),
+                          style: FilledButton.styleFrom(
+                            backgroundColor: colorScheme.primary,
+                            foregroundColor: colorScheme.onPrimary,
+                          ),
+                        ),
+                      ],
+                      if (!hasWaitingPatient) ...[
+                        if (!current!.isWalkIn)
+                          const SizedBox(height: AppSpacing.xs),
+                        FilledButton.tonalIcon(
+                          onPressed: () => notifier.nextToken(slot),
+                          style: FilledButton.styleFrom(
+                            backgroundColor: colorScheme.secondary,
+                            foregroundColor: colorScheme.onSecondary,
+                          ),
+                          icon: const Icon(
+                            Icons.stop_circle_rounded,
+                            size: 18,
+                          ),
+                          label: const Text("Finish Consultation"),
+                        ),
+                      ],
+                    ],
                   )
                 : null,
           ),

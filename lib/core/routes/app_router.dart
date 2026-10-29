@@ -24,6 +24,7 @@ import 'package:yodoctor/modules/doctor/controllers/subscription_status_controll
 import 'package:yodoctor/modules/doctor/doctor_scaffold_shell.dart';
 import 'package:yodoctor/modules/doctor/models/subscription/subscription_model.dart';
 import 'package:yodoctor/modules/doctor/screens/appointments/add_prescription_screen.dart';
+import 'package:yodoctor/modules/doctor/screens/appointments/view_prescription_screen.dart';
 import 'package:yodoctor/modules/doctor/screens/appointments/doctor_appointment_history_screen.dart';
 import 'package:yodoctor/modules/doctor/screens/live_queue/live_queue_screen.dart';
 import 'package:yodoctor/modules/doctor/screens/certificate/review_screen/certificate_review_screen.dart';
@@ -456,12 +457,15 @@ final routerProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.patientCertificateDetail,
         builder: (context, state) {
-          final certId = state.extra as int;
+          final certId = state.extra is int
+              ? state.extra as int
+              : int.tryParse(state.extra?.toString() ?? '') ?? 0;
 
           return PatientCertificateDetailScreen(
             certificateId: certId,
           );
-        },      ),
+        },
+      ),
       GoRoute(
         parentNavigatorKey: AppRouter.rootNavigatorKey,
         path: AppRoutes.family,
@@ -565,7 +569,29 @@ final routerProvider = Provider<GoRouter>((ref) {
           if (token.isEmpty) {
             token = '-';
           }
+          final hasPrescription =
+              state.uri.queryParameters['hasPrescription'] == 'true';
           return AddPrescriptionScreen(
+            appointmentId: state.pathParameters['id']!,
+            patientName: patientName,
+            tokenNumber: token,
+            hasPrescription: hasPrescription,
+          );
+        },
+      ),
+      GoRoute(
+        parentNavigatorKey: AppRouter.rootNavigatorKey,
+        path: AppRoutes.doctorViewPrescription,
+        builder: (context, state) {
+          final patientName = state.uri.queryParameters['name'] ?? 'Patient';
+          var token = state.uri.queryParameters['token'] ?? '';
+          if (token.isEmpty && state.uri.fragment.isNotEmpty) {
+            token = state.uri.fragment;
+          }
+          if (token.isEmpty) {
+            token = '-';
+          }
+          return ViewPrescriptionScreen(
             appointmentId: state.pathParameters['id']!,
             patientName: patientName,
             tokenNumber: token,

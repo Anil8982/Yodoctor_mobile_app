@@ -61,6 +61,7 @@ class AppRoutes {
   static const String doctorLiveQueue = '/doctor/live-queue';
   static const String doctorManualBooking = '/doctor/manual-booking';
   static const String doctorAddPrescription = '/doctor/add-prescription/:id';
+  static const String doctorViewPrescription = '/doctor/prescription/:id';
   static const String doctorProfile = '/doctor/profile';
   static const String doctorProfileEdit = '/doctor/profile/edit';
   static const String doctorSubscription = '/doctor/subscription';

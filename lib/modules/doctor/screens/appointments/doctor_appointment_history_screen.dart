@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:yodoctor/core/routes/app_routes.dart';
 import 'package:yodoctor/modules/doctor/models/appointment/appointment_history_item.dart';
 import 'package:yodoctor/modules/widgets/status_chip.dart';
 
@@ -239,9 +240,15 @@ class _DoctorAppointmentHistoryScreenState
   }
 
   void _openPrescription(AppointmentHistoryItem appointment) {
-    context.push(
-      '/doctor/add-prescription/${appointment.id}?name=${Uri.encodeComponent(appointment.patientLabel)}&token=${Uri.encodeComponent(appointment.tokenNumber)}',
-    );
+    if (appointment.hasPrescription) {
+      context.push(
+        '${AppRoutes.doctorViewPrescription.replaceFirst(':id', appointment.id)}?name=${Uri.encodeComponent(appointment.patientLabel)}&token=${Uri.encodeComponent(appointment.tokenNumber)}',
+      );
+    } else {
+      context.push(
+        '${AppRoutes.doctorAddPrescription.replaceFirst(':id', appointment.id)}?name=${Uri.encodeComponent(appointment.patientLabel)}&token=${Uri.encodeComponent(appointment.tokenNumber)}&hasPrescription=false',
+      );
+    }
   }
 
   String _patientName(String label) {

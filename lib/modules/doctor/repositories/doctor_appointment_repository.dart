@@ -45,20 +45,20 @@ class DoctorAppointmentRepository {
     return _dio.post(ApiConstants.nextToken, data: {"slot": slot});
   }
 
-  Future<Response> addPrescription({
-    required String appointmentId,
-    required String medicines,
-    required String instructions,
-  }) {
-    return _dio.post('${ApiConstants.addPrescription}/$appointmentId/prescription', data: {
-      "medicines": medicines,
-      "instructions": instructions,
-    });
-  }
-
-  Future<Response> getPrescription(String appointmentId) {
-    return _dio.get('${ApiConstants.getPrescriptionDoctor}/$appointmentId');
-  }
+  // Future<Response> addPrescription({
+  //   required String appointmentId,
+  //   required String medicines,
+  //   required String instructions,
+  // }) {
+  //   return _dio.post('${ApiConstants.addPrescription}/$appointmentId/prescription', data: {
+  //     "medicines": medicines,
+  //     "instructions": instructions,
+  //   });
+  // }
+  //
+  // Future<Response> getPrescription(String appointmentId) {
+  //   return _dio.get('${ApiConstants.getPrescriptionDoctor}/$appointmentId');
+  // }
 
   Future<Response> completeAppointment(String appointmentId) {
     return _dio.post('${ApiConstants.completeAppointment}/$appointmentId/summary', data: {

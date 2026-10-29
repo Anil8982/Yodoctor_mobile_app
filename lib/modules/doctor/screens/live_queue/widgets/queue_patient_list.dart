@@ -234,18 +234,47 @@ class QueuePatientList extends ConsumerWidget {
       );
     }
 
-    if (status == "COMPLETED" && !appointment.isWalkIn) {
+    if (status == "IN_PROGRESS" && !appointment.isWalkIn) {
+      final hasRx = appointment.hasPrescription;
       return FilledButton.tonalIcon(
-        onPressed: () => context.push(
-          '${AppRoutes.doctorAddPrescription.replaceFirst(':id', appointment.id)}?name=${Uri.encodeComponent(appointment.patientName)}&token=${Uri.encodeComponent(appointment.tokenNumber)}',
-        ),
+        onPressed: () async {
+          if (hasRx) {
+            await context.push(
+              '${AppRoutes.doctorViewPrescription.replaceFirst(':id', appointment.id)}?name=${Uri.encodeComponent(appointment.patientName)}&token=${Uri.encodeComponent(appointment.tokenNumber)}',
+            );
+          } else {
+            await context.push(
+              '${AppRoutes.doctorAddPrescription.replaceFirst(':id', appointment.id)}?name=${Uri.encodeComponent(appointment.patientName)}&token=${Uri.encodeComponent(appointment.tokenNumber)}&hasPrescription=false',
+            );
+          }
+          final slot = ref.read(liveQueueProvider).selectedSlot;
+          notifier.loadQueue(slot, isRefresh: true);
+        },
         icon: Icon(
-          appointment.hasPrescription
-              ? Icons.edit_note_rounded
-              : Icons.receipt_long_rounded,
+          hasRx ? Icons.visibility_outlined : Icons.receipt_long_rounded,
           size: 16,
         ),
-        label: Text(appointment.hasPrescription ? "Update Rx" : "Rx"),
+        label: Text(hasRx ? "View Rx" : "Add Rx"),
+        style: FilledButton.styleFrom(
+          visualDensity: VisualDensity.compact,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        ),
+      );
+    }
+
+    if (status == "COMPLETED" && !appointment.isWalkIn) {
+      final hasRx = appointment.hasPrescription;
+      if (!hasRx) {
+        return const SizedBox.shrink();
+      }
+      return FilledButton.tonalIcon(
+        onPressed: () {
+          context.push(
+            '${AppRoutes.doctorViewPrescription.replaceFirst(':id', appointment.id)}?name=${Uri.encodeComponent(appointment.patientName)}&token=${Uri.encodeComponent(appointment.tokenNumber)}',
+          );
+        },
+        icon: const Icon(Icons.visibility_outlined, size: 16),
+        label: const Text("View Rx"),
         style: FilledButton.styleFrom(
           visualDensity: VisualDensity.compact,
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),

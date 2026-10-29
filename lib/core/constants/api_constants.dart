@@ -112,14 +112,25 @@ class ApiConstants {
   static const startAppointment = '/doctor/appointments'; // /$id/start
   static const skipAppointment = '/doctor/appointments'; // /$id/skip
   static const nextToken = '/doctor/appointments/next-token';
-  static const addPrescription = '/doctor/appointments'; // /$id/prescription
-  static const getPrescriptionDoctor = '/doctor/prescription'; // /$id
+  // static const addPrescription = '/doctor/appointments'; // /$id/prescription
+  // static const getPrescriptionDoctor = '/doctor/prescription'; // /$id
   static const completeAppointment = '/doctor/appointments'; // /$id/summary
   static const noShow = '/doctor/appointments/noShow';
   static const recallPatient = '/doctor/appointments/recall'; // /$id
   static const incomingAppointments = '/doctor/appointments/incoming';
   static const respondAppointment = '/doctor/respond-appointment'; // /$id
   static const autoAccept = '/doctor/appointments/auto-accept';
+
+
+  static String addPrescription(String appointmentId) =>
+      '/doctor/appointments/$appointmentId/prescription';
+
+  static String getPrescriptionDoctor(String appointmentId) =>
+      '/doctor/prescription/$appointmentId';
+
+  static String uploadPrescription(String appointmentId) =>
+      '/doctor/appointments/$appointmentId/prescription/upload';
+
 
   static const addVisitSummary = '/doctor/appointments';
 

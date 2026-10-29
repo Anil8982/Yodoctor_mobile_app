@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yodoctor/core/constants/log_tags.dart';
 import 'package:debug_bubble/debug_bubble.dart';
-import '../models/appointment/prescription_model.dart';
 import '../models/appointment/live_queue_model.dart';
 import '../repositories/doctor_appointment_repository.dart';
 
@@ -351,94 +350,5 @@ class LiveQueueNotifier extends Notifier<LiveQueueState> {
       final repository = ref.read(doctorAppointmentRepositoryProvider);
       await repository.callNextToken(slot: slot);
     }, slot);
-  }
-
-  Future<PrescriptionModel?> getPrescription(String appointmentId) async {
-    DebugLog.info(
-      'Fetching prescription records for ID: $appointmentId',
-      tag: LogTags.doctor,
-      subTag: _subTag,
-    );
-    try {
-      final repository = ref.read(doctorAppointmentRepositoryProvider);
-      final res = await repository.getPrescription(appointmentId);
-      if (res.statusCode == 200 && res.data != null) {
-        DebugLog.success(
-          'Prescription retrieved on context channel',
-          tag: LogTags.doctor,
-          subTag: _subTag,
-          json: res.data,
-        );
-        return PrescriptionModel.fromJson(res.data);
-      }
-      DebugLog.warning(
-        'Prescription response matrix empty or non-200. Status: ${res.statusCode}',
-        tag: LogTags.doctor,
-        subTag: _subTag,
-      );
-      return null;
-    } catch (e, st) {
-      DebugLog.error(
-        'Fetch prescription data fault',
-        error: e,
-        stackTrace: st,
-        tag: LogTags.doctor,
-        subTag: _subTag,
-      );
-      return null;
-    }
-  }
-
-  Future<bool> savePrescription({
-    required String appointmentId,
-    required String medicines,
-    required String instructions,
-  }) async {
-    final payload = {
-      "appointmentId": appointmentId,
-      "medicines": medicines,
-      "instructions": instructions,
-    };
-
-    DebugLog.info(
-      'Saving prescription parameters for transaction: $appointmentId',
-      tag: LogTags.doctor,
-      subTag: _subTag,
-      json: payload,
-    );
-
-    try {
-      final repository = ref.read(doctorAppointmentRepositoryProvider);
-      final res = await repository.addPrescription(
-        appointmentId: appointmentId,
-        medicines: medicines,
-        instructions: instructions,
-      );
-      final success =
-          (res.statusCode ?? 0) >= 200 && (res.statusCode ?? 0) < 300;
-      if (success) {
-        DebugLog.success(
-          'Prescription committed to centralized data node',
-          tag: LogTags.doctor,
-          subTag: _subTag,
-        );
-      } else {
-        DebugLog.warning(
-          'Prescription save denied by remote branch. Status: ${res.statusCode}',
-          tag: LogTags.doctor,
-          subTag: _subTag,
-        );
-      }
-      return success;
-    } catch (e, st) {
-      DebugLog.error(
-        'Save prescription transmission error',
-        error: e,
-        stackTrace: st,
-        tag: LogTags.doctor,
-        subTag: _subTag,
-      );
-      return false;
-    }
   }
 }

@@ -293,7 +293,10 @@ class _CertificateWalletScreenState
             .loadCertificateDetail(cert.id);
 
         if (context.mounted) {
-          context.push(AppRoutes.patientCertificateDetail);
+          context.push(
+            AppRoutes.patientCertificateDetail,
+            extra: cert.id,
+          );
         }
       },
       child: Card(

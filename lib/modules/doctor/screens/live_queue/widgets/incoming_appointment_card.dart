@@ -27,349 +27,304 @@ class IncomingAppointmentCard extends StatelessWidget {
     final isPending = status == "PENDING";
     final isAccepted = status == "ACCEPTED";
 
-    final date = DateFormat(
-      "dd MMM yyyy",
-    ).format(DateTime.parse(appointment.appointmentDate));
+    DateTime parsedDate;
+    try {
+      parsedDate = DateTime.parse(appointment.appointmentDate);
+    } catch (_) {
+      parsedDate = DateTime.now();
+    }
+    final formattedDate = DateFormat("dd MMM yyyy").format(parsedDate);
 
     final slotText = appointment.appointmentSlot;
     final isMorning = slotText.toUpperCase().contains("MORNING");
-
     final formattedSlot = slotText.isNotEmpty
-        ? slotText.substring(0, 1).toUpperCase() +
-        slotText.substring(1).toLowerCase()
+        ? slotText[0].toUpperCase() + slotText.substring(1).toLowerCase()
         : '';
 
     final successColor = AppTheme.success(context);
     final warningColor = AppTheme.warning(context);
-    final infoColor = AppTheme.info(context);
 
-    final borderColor = isAccepted
-        ? successColor.withValues(alpha: 0.4)
-        : colorScheme.outlineVariant.withValues(alpha: 0.4);
+    // Dynamic status color
+    final statusColor = isAccepted
+        ? successColor
+        : isPending
+        ? warningColor
+        : colorScheme.outline;
+
+    final cardBgColor = Color.alphaBlend(
+      statusColor.withValues(alpha: 0.09), // soft tint
+      colorScheme.surface,
+    );
 
     return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: borderColor, width: 1),
+        color: cardBgColor,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: statusColor.withValues(alpha: 0.2), // gentle matching border
+          width: 1.2,
+        ),
         boxShadow: [
           BoxShadow(
-            color: colorScheme.shadow.withValues(alpha: 0.04),
-            blurRadius: 12,
+            color: statusColor.withValues(alpha: 0.03),
+            blurRadius: 18,
             offset: const Offset(0, 4),
           ),
         ],
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(27),
-        clipBehavior: Clip.antiAlias,
-        child: Stack(
-          children: [
-            Positioned(
-              right: 0,
-              bottom: 0,
-              width: 170,
-              height: 150,
-              child: ClipPath(
-                clipper: RightCurveClipper(),
-                child: Container(
-                  color: isAccepted
-                      ? successColor.withValues(alpha: 0.12)
-                      : isPending
-                      ? warningColor.withValues(alpha: 0.12)
-                      : infoColor.withValues(alpha: 0.12),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 1. Header: Patient Profile, Name ani Token
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              _buildAvatar(context, statusColor),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      appointment.patientName.isNotEmpty
+                          ? appointment.patientName
+                          : 'Walk-in Patient',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: colorScheme.onSurface,
+                        letterSpacing: -0.2,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      "Appointment #${appointment.id}",
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ),
-            Positioned(
-              right: 18,
-              bottom: 8,
-              child: Icon(
-                isAccepted
-                    ? Icons.check_circle_outline_rounded
-                    : Icons.access_time_rounded,
-                size: 32,
-                color: isAccepted
-                    ? successColor.withValues(alpha: 0.25)
-                    : isPending
-                    ? warningColor.withValues(alpha: 0.25)
-                    : infoColor.withValues(alpha: 0.25),
+              _buildTokenBadge(context, statusColor),
+            ],
+          ),
+
+          const SizedBox(height: AppSpacing.md),
+
+          // 2. Schedule Bar: Date ani Session Information
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: colorScheme.surfaceContainerLowest.withValues(alpha: 0.7),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: colorScheme.outlineVariant.withValues(alpha: 0.2),
               ),
             ),
-
-            Padding(
-              padding: const EdgeInsets.all(15),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Top Row: Avatar, Info & Token
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Patient Avatar
-                      Container(
-                        padding: const EdgeInsets.all(2),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: isAccepted
-                                ? successColor.withValues(alpha: 0.4)
-                                : colorScheme.primary.withValues(alpha: 0.25),
-                            width: 2,
-                          ),
-                        ),
-                        child: CircleAvatar(
-                          radius: 24,
-                          backgroundColor: isAccepted
-                              ? successColor.withValues(alpha: 0.15)
-                              : colorScheme.primaryContainer,
-                          backgroundImage:
-                          appointment.profileImage != null &&
-                              appointment.profileImage!.isNotEmpty
-                              ? NetworkImage(appointment.profileImage!)
-                              : null,
-                          child:
-                          appointment.profileImage == null ||
-                              appointment.profileImage!.isEmpty
-                              ? Text(
-                            appointment.patientName.isNotEmpty
-                                ? appointment.patientName[0].toUpperCase()
-                                : 'P',
-                            style: TextStyle(
-                              color: isAccepted
-                                  ? successColor
-                                  : colorScheme.onPrimaryContainer,
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          )
-                              : null,
-                        ),
-                      ),
-
-                      const SizedBox(width: 12),
-
-                      // Name & Slot/Date Info
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              appointment.patientName,
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.w700,
-                                color: colorScheme.onSurface,
-                              ),
-                            ),
-                            const SizedBox(height: AppSpacing.xxs),
-                            Row(
-                              children: [
-                                Icon(
-                                  isMorning
-                                      ? Icons.wb_sunny_rounded
-                                      : Icons.nightlight_round_outlined,
-                                  color: isMorning
-                                      ? warningColor
-                                      : colorScheme.secondary,
-                                  size: 14,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  formattedSlot,
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    color: colorScheme.onSurfaceVariant,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                  ),
-                                  child: Text(
-                                    "|",
-                                    style: TextStyle(
-                                      color: colorScheme.outlineVariant,
-                                    ),
-                                  ),
-                                ),
-                                Icon(
-                                  Icons.calendar_today_outlined,
-                                  size: 13,
-                                  color: colorScheme.onSurfaceVariant,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  date,
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    color: colorScheme.onSurfaceVariant,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      // Token Badge
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: isAccepted
-                              ? successColor.withValues(alpha: 0.15)
-                              : colorScheme.secondaryContainer,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          "#${appointment.tokenNumber.toString().padLeft(2, '0')}",
-                          style: theme.textTheme.labelMedium?.copyWith(
-                            color: isAccepted
-                                ? successColor
-                                : colorScheme.onSecondaryContainer,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                      ),
-                    ],
+            child: Row(
+              children: [
+                Icon(
+                  Icons.calendar_today_rounded,
+                  size: 13,
+                  color: colorScheme.onSurfaceVariant,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  formattedDate,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: colorScheme.onSurface,
                   ),
-
-                  const SizedBox(height: 12),
-
-                  Divider(
-                    color: isAccepted
-                        ? successColor.withValues(alpha: 0.2)
-                        : colorScheme.outlineVariant.withValues(alpha: 0.3),
-                    thickness: 1,
-                    endIndent: 22,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Text(
+                    "•",
+                    style: TextStyle(
+                      color: colorScheme.outlineVariant,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-
-                  const SizedBox(height: 8),
-
-                  // Bottom Actions / Status
-                  if (isAccepted)
-                    Padding(
-                      padding: const EdgeInsets.only(right: 45),
-                      child: Row(
-                        children: [
-                          StatusChip(
-                            status: appointment.status,
-                            isSmall: true,
-                          ),
-                          const Spacer(),
-                          Text(
-                            "Appointment Confirmed",
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: successColor,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
+                ),
+                Icon(
+                  isMorning
+                      ? Icons.wb_sunny_rounded
+                      : Icons.nightlight_round_rounded,
+                  size: 13,
+                  color: isMorning ? warningColor : colorScheme.secondary,
+                ),
+                const SizedBox(width: 5),
+                Expanded(
+                  child: Text(
+                    "$formattedSlot Session",
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: colorScheme.onSurface,
                     ),
-
-                  if (isPending)
-                    Padding(
-                      padding: const EdgeInsets.only(right: 55),
-                      child: Row(
-                        children: [
-                          StatusChip(
-                            status: appointment.status,
-                            isSmall: true,
-                          ),
-
-                          const Spacer(),
-
-                          OutlinedButton.icon(
-                            onPressed: onReject,
-                            icon: const Icon(Icons.close_rounded, size: 15),
-                            label: const Text("Reject"),
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: colorScheme.error,
-                              side: BorderSide(
-                                color: colorScheme.error.withValues(alpha: 0.4),
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 8,
-                              ),
-                              minimumSize: Size.zero,
-                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              textStyle: const TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-
-                          const SizedBox(width: 6),
-
-                          FilledButton.icon(
-                            onPressed: onAccept,
-                            icon: const Icon(Icons.check_rounded, size: 15),
-                            label: const Text("Accept"),
-                            style: FilledButton.styleFrom(
-                              backgroundColor: successColor,
-                              foregroundColor: AppTheme.onSuccess(context),
-                              elevation: 0,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 8,
-                              ),
-                              minimumSize: Size.zero,
-                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              textStyle: const TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                ],
-              ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
+
+          const SizedBox(height: AppSpacing.md),
+
+          // 3. Actions / Confirmed Indicator
+          Row(
+            children: [
+              StatusChip(
+                status: appointment.status,
+                isSmall: true,
+              ),
+              const Spacer(),
+
+              if (isAccepted)
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.check_circle_rounded,
+                      size: 16,
+                      color: successColor,
+                    ),
+                    const SizedBox(width: 5),
+                    Text(
+                      "Confirmed",
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: successColor,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+
+              if (isPending) ...[
+                TextButton(
+                  onPressed: onReject,
+                  style: TextButton.styleFrom(
+                    foregroundColor: colorScheme.error,
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: Text(
+                    "Decline",
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: colorScheme.error,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 6),
+                FilledButton(
+                  onPressed: onAccept,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: successColor,
+                    foregroundColor: AppTheme.onSuccess(context),
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: Text(
+                    "Accept",
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: AppTheme.onSuccess(context),
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAvatar(BuildContext context, Color statusColor) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final hasImage =
+        appointment.profileImage != null && appointment.profileImage!.isNotEmpty;
+
+    return Container(
+      width: 44,
+      height: 44,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: colorScheme.surfaceContainerHigh,
+        border: Border.all(
+          color: statusColor.withValues(alpha: 0.35),
+          width: 1.5,
+        ),
+      ),
+      child: ClipOval(
+        child: hasImage
+            ? Image.network(
+          appointment.profileImage!,
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => _buildFallbackInitial(context),
+        )
+            : _buildFallbackInitial(context),
+      ),
+    );
+  }
+
+  Widget _buildFallbackInitial(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final initial = appointment.patientName.isNotEmpty
+        ? appointment.patientName[0].toUpperCase()
+        : 'P';
+
+    return Container(
+      color: colorScheme.primary.withValues(alpha: 0.08),
+      alignment: Alignment.center,
+      child: Text(
+        initial,
+        style: TextStyle(
+          color: colorScheme.primary,
+          fontWeight: FontWeight.w700,
+          fontSize: 18,
         ),
       ),
     );
   }
-}
 
-class RightCurveClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    final path = Path();
+  Widget _buildTokenBadge(BuildContext context, Color statusColor) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final token = appointment.tokenNumber.toString().padLeft(2, '0');
 
-    path.moveTo(0, 0);
-    path.lineTo(size.width, 0);
-    path.lineTo(size.width, size.height);
-
-    path.lineTo(size.width * 0.28, size.height);
-
-    path.cubicTo(
-      size.width * 0.72,
-      size.height * 0.92,
-      size.width * 0.95,
-      size.height * 0.42,
-      size.width,
-      0,
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: statusColor.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: statusColor.withValues(alpha: 0.25),
+        ),
+      ),
+      child: Text(
+        "#$token",
+        style: theme.textTheme.labelMedium?.copyWith(
+          color: statusColor,
+          fontWeight: FontWeight.w800,
+          fontSize: 13,
+        ),
+      ),
     );
-
-    path.close();
-
-    return path;
   }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }
