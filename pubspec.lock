@@ -268,10 +268,11 @@ packages:
   debug_bubble:
     dependency: "direct main"
     description:
-      path: "D:/Flutter/myPlug/debug_bubble"
-      relative: false
-    source: path
-    version: "0.1.1"
+      name: debug_bubble
+      sha256: "6137bde9a4abaa9be2f2be15eebc847bd4aa9a5a18e38c1cacc8ef168c7c6add"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.0"
   dio:
     dependency: "direct main"
     description:
