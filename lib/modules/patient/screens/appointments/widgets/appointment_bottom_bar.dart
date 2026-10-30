@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 
 class AppointmentBottomBar extends StatelessWidget {
   const AppointmentBottomBar({
@@ -6,29 +7,24 @@ class AppointmentBottomBar extends StatelessWidget {
     required this.consultationFee,
     required this.canConfirm,
     required this.onConfirmPressed,
+    this.isLoading = false,
   });
 
   final double consultationFee;
   final bool canConfirm;
-  final VoidCallback onConfirmPressed;
+  final VoidCallback? onConfirmPressed;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        border: Border(
-          top: BorderSide(
-            color: colorScheme.outlineVariant.withValues(alpha: 0.4),
-            width: 1,
-          ),
-        ),
-      ),
+      decoration: BoxDecoration(color: colorScheme.surface),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -36,9 +32,9 @@ class AppointmentBottomBar extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Consultation Fee',
+                '${l10n.consultation} ${l10n.feeLabel}',
                 style: textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.outline,
+                  color: colorScheme.onSurfaceVariant,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -55,27 +51,36 @@ class AppointmentBottomBar extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: FilledButton(
-              onPressed: canConfirm ? onConfirmPressed : null,
+              onPressed: (canConfirm && !isLoading) ? onConfirmPressed : null,
               style: FilledButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),
-              child: const Text(
-                'Confirm Appointment',
-                style: TextStyle(
-                  fontWeight: FontWeight.w900,
-                  fontSize: 16,
-                ),
-              ),
+              child: isLoading
+                  ? SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.5,
+                        color: colorScheme.onPrimary,
+                      ),
+                    )
+                  : Text(
+                      l10n.confirmAppointment,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w900,
+                        fontSize: 16,
+                      ),
+                    ),
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            'Payable at clinic during visit',
+            l10n.payableAtClinic,
             style: textTheme.bodySmall?.copyWith(
-              color: colorScheme.outline,
+              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
               fontStyle: FontStyle.italic,
             ),
           ),

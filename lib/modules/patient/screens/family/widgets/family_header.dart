@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:yodoctor/l10n/app_localizations.dart';
 
-import '../../../../../core/utils/app_spacing.dart';
-import '../../../../../core/widgets/gradient_background.dart';
 
 class FamilyHeader extends StatelessWidget {
-  const FamilyHeader({
-    super.key,
-    required this.membersCount,
-  });
+  const FamilyHeader({super.key, required this.membersCount});
 
   final int membersCount;
 
@@ -15,62 +11,81 @@ class FamilyHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final TextTheme textTheme = Theme.of(context).textTheme;
-    final double topPadding = MediaQuery.of(context).padding.top;
+    final l10n = AppLocalizations.of(context);
 
-    return GradientBackground(
-      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(32)),
-      padding: EdgeInsets.fromLTRB(
-        AppSpacing.xl,
-        topPadding + 70,
-        AppSpacing.xl,
-        AppSpacing.xl,
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: colorScheme.primary,
+        borderRadius: const BorderRadius.all(
+          Radius.circular(20),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Text(
-            'Family Members',
-            style: textTheme.headlineMedium?.copyWith(
-              color: colorScheme.onPrimary,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            'Manage health profiles for your loved ones.',
-            style: textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onPrimary.withValues(alpha: 0.9),
-            ),
-          ),
-          const SizedBox(height: 14),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: colorScheme.onPrimary.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: colorScheme.onPrimary.withValues(alpha: 0.12),
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Icon(
-                  Icons.groups_rounded,
-                  color: colorScheme.onPrimary,
-                  size: 16,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  '$membersCount members linked',
-                  style: textTheme.bodySmall?.copyWith(
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: Text(
+                  l10n?.familyHealthNetwork ?? 'Family Health Network',
+                  style: textTheme.titleLarge?.copyWith(
                     color: colorScheme.onPrimary,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 19,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 9,
+                  vertical: 3.5,
+                ),
+                decoration: BoxDecoration(
+                  color: colorScheme.onPrimary.withValues(alpha: 0.16),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: colorScheme.onPrimary.withValues(alpha: 0.15),
                   ),
                 ),
-              ],
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Icon(
+                      Icons.groups_rounded,
+                      color: colorScheme.onPrimary,
+                      size: 13,
+                    ),
+                    const SizedBox(width: 5),
+                    Text(
+                      l10n?.activeProfilesCount(membersCount) ??
+                          '$membersCount profiles active',
+                      style: textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onPrimary,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 11.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 2),
+          Text(
+            l10n?.familyHealthNetworkSubtitle ??
+                'Monitor and manage medical data for your linked family profiles.',
+            style: textTheme.bodySmall?.copyWith(
+              color: colorScheme.onPrimary.withValues(alpha: 0.85),
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),

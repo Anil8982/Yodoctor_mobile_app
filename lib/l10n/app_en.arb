@@ -1,0 +1,2415 @@
+{
+  "@@locale": "en",
+  "dashboard": "Dashboard",
+  "@dashboard": {
+    "description": "Dashboard title"
+  },
+  "dashboardLoadError": "Dashboard Load Error",
+  "@dashboardLoadError": {
+    "description": "Error title shown when dashboard fails to load"
+  },
+  "dashboardLoadErrorSubtitle": "Unable to connect to the server. Please check your internet connection.",
+  "@dashboardLoadErrorSubtitle": {
+    "description": "Error message when dashboard loading fails"
+  },
+  "tryAgain": "Try Again",
+  "@tryAgain": {
+    "description": "Retry button label"
+  },
+  "upcomingAppointments": "Upcoming Appointments",
+  "@upcomingAppointments": {
+    "description": "Section header for upcoming appointments"
+  },
+  "noAppointments": "No Appointments",
+  "@noAppointments": {
+    "description": "Title shown when there are no appointments"
+  },
+  "bookAppointmentSubtitle": "Book an appointment with a doctor",
+  "@bookAppointmentSubtitle": {
+    "description": "Subtitle suggesting user to book an appointment"
+  },
+  "bookAppointment": "Book Appointment",
+  "@bookAppointment": {
+    "description": "Button to book an appointment"
+  },
+  "patientDashboard": "Patient Dashboard",
+  "@patientDashboard": {
+    "description": "Header title when dashboard has not loaded data"
+  },
+  "upcomingVisitsCount": "{count, plural, =0{0 upcoming visits} =1{1 upcoming visit} other{{count} upcoming visits}}",
+  "@upcomingVisitsCount": {
+    "description": "Badge showing number of upcoming visits",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "findYour": "Find Your",
+  "@findYour": {
+    "description": "Find your prefix in doctor search promo"
+  },
+  "bestDoctorNearYou": "Best Doctor Near You",
+  "@bestDoctorNearYou": {
+    "description": "Headline in doctor search card"
+  },
+  "searchNow": "Search Now",
+  "@searchNow": {
+    "description": "Search button CTA text"
+  },
+  "location": "Location",
+  "@location": {
+    "description": "Search doctors by location"
+  },
+  "searchDoctors": "Search doctors",
+  "@searchDoctors": {
+    "description": "Search doctors by name etc."
+  },
+  "noActiveToken": "No Active Token",
+  "@noActiveToken": {
+    "description": "Title when user has no active token today"
+  },
+  "tokenAppearHere": "Your token for today will appear here",
+  "@tokenAppearHere": {
+    "description": "Subtitle for empty token card"
+  },
+  "tokenLabel": "TOKEN",
+  "@tokenLabel": {
+    "description": "Token badge label"
+  },
+  "waiting": "WAITING",
+  "@waiting": {
+    "description": "Status badge for waiting token"
+  },
+  "servingToken": "Serving: {token}",
+  "@servingToken": {
+    "description": "Current serving token display",
+    "placeholders": {
+      "token": {
+        "type": "String",
+        "example": "12"
+      }
+    }
+  },
+  "patientsAhead": "{count} ahead",
+  "@patientsAhead": {
+    "description": "Number of patients ahead in the queue",
+    "placeholders": {
+      "count": {
+        "type": "String",
+        "example": "3"
+      }
+    }
+  },
+  "patientLabel": "Patient: {name}",
+  "@patientLabel": {
+    "description": "Label displaying patient name in appointment card",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Self"
+      }
+    }
+  },
+  "patientSelf": "Self",
+  "@patientSelf": {
+    "description": "Default name when appointment is for the user themselves"
+  },
+  "notification": "Notification",
+  "@notification": {
+    "description": "Notification screen title"
+  },
+  "allCaughtUp": "All caught up!",
+  "@allCaughtUp": {
+    "description": "Title when no notifications match the search or filter"
+  },
+  "noNotificationsMatchFilter": "You don't have any notifications right now.",
+  "@noNotificationsMatchFilter": {
+    "description": "Subtitle when filter don't have any notifications."
+  },
+  "today": "Today",
+  "@today": {
+    "description": "Shows notifications for today"
+  },
+  "older": "Older",
+  "@older": {
+    "description": "Shows older notifications"
+  },
+  "unreadCount": "{count, plural, =0{0 unread} =1{1 unread} other{{count} unread}}",
+  "@unreadCount": {
+    "description": "Shows badge of unread notifications"
+  },
+  "selectLanguage": "Select Language",
+  "@selectLanguage": {
+    "description": "Modal title for language selector"
+  },
+  "languageEnglish": "English",
+  "@languageEnglish": {
+    "description": "English language option"
+  },
+  "languageHindi": "Hindi",
+  "@languageHindi": {
+    "description": "Hindi language option"
+  },
+  "changeLanguage": "Change Language",
+  "@changeLanguage": {
+    "description": "Tooltip or action description for language switcher"
+  },
+  "language": "Language",
+  "@language": {
+    "description": "Language setting label"
+  },
+  "chooseAppLanguage": "Choose application language",
+  "@chooseAppLanguage": {
+    "description": "Subtitle for language settings option"
+  },
+  "profileSettings": "Profile Settings",
+  "@profileSettings": {
+    "description": "Profile settings screen title"
+  },
+  "estimatedMinutes": "{count} mins",
+  "@estimatedMinutes": {
+    "description": "Estimated wait time in minutes",
+    "placeholders": {
+      "count": {
+        "type": "String",
+        "example": "15"
+      }
+    }
+  },
+  "unableToCancelAppointment": "Unable to cancel appointment",
+  "@unableToCancelAppointment": {
+    "description": "Error message when appointment cancellation fails"
+  },
+  "appointmentCancelledSuccess": "Appointment cancelled successfully",
+  "@appointmentCancelledSuccess": {
+    "description": "Success message when appointment is cancelled"
+  },
+  "cancelAppointment": "Cancel Appointment",
+  "@cancelAppointment": {
+    "description": "Cancel appointment button or dialog title"
+  },
+  "cancelAppointmentConfirmation": "Are you sure you want to cancel this appointment?\n\nThis action cannot be undone.",
+  "@cancelAppointmentConfirmation": {
+    "description": "Confirmation message when canceling appointment"
+  },
+  "keepAppointment": "Keep",
+  "@keepAppointment": {
+    "description": "Button to keep appointment"
+  },
+  "close": "Close",
+  "@close": {
+    "description": "Close button label"
+  },
+  "appointmentTitle": "Appointment",
+  "@appointmentTitle": {
+    "description": "Appointment header line 1"
+  },
+  "detailsTitle": "Details",
+  "@detailsTitle": {
+    "description": "Appointment header line 2"
+  },
+  "appointmentInformation": "Appointment Information",
+  "@appointmentInformation": {
+    "description": "Section header for appointment info"
+  },
+  "clinicInformation": "Clinic Information",
+  "@clinicInformation": {
+    "description": "Section header for clinic info"
+  },
+  "clinicAddress": "Clinic Address",
+  "@clinicAddress": {
+    "description": "Clinic address card label"
+  },
+  "patientInfoLabel": "Patient",
+  "@patientInfoLabel": {
+    "description": "Patient card label"
+  },
+  "dateLabel": "Date",
+  "@dateLabel": {
+    "description": "Date card label"
+  },
+  "timeSlotLabel": "Time Slot",
+  "@timeSlotLabel": {
+    "description": "Time slot card label"
+  },
+  "timeSessionLabel": "Time Session",
+  "@timeSessionLabel": {
+    "description": "Time session card label"
+  },
+  "tokenNumberLabel": "Token",
+  "@tokenNumberLabel": {
+    "description": "Token number card label"
+  },
+  "clinicLabel": "Clinic",
+  "@clinicLabel": {
+    "description": "Clinic name card label"
+  },
+  "feeLabel": "Fee",
+  "@feeLabel": {
+    "description": "Fee card label"
+  },
+  "cityLabel": "City",
+  "@cityLabel": {
+    "description": "City card label"
+  },
+  "experienceLabel": "Experience",
+  "@experienceLabel": {
+    "description": "Experience card label"
+  },
+  "experienceYears": "{count} Yrs",
+  "@experienceYears": {
+    "description": "Doctor years of experience",
+    "placeholders": {
+      "count": {
+        "type": "String",
+        "example": "5"
+      }
+    }
+  },
+  "morning": "Morning",
+  "@morning": {
+    "description": "Morning slot label"
+  },
+  "evening": "Evening",
+  "@evening": {
+    "description": "Evening slot label"
+  },
+  "licenseNum": "License No.",
+  "@licenseNum": {
+    "description": "License number label"
+  },
+  "availableDays": "Available Days",
+  "@availableDays": {
+    "description": "Available days label"
+  },
+  "findDoctors": "Find Doctors",
+  "@findDoctors": {
+    "description": "Find Doctors screen title"
+  },
+  "foundCount": "{count, plural, =0{0 found} =1{1 found} other{{count} found}}",
+  "@foundCount": {
+    "description": "Doctor count badge",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "featuredSpecialties": "Featured Specialties",
+  "@featuredSpecialties": {
+    "description": "Featured Specialties header line 1 on Find doctors screen "
+  },
+  "availableDoctors": "Available Doctors",
+  "@availableDoctors": {
+    "description": "Available Doctors header line 2 on Find doctors screen "
+  },
+  "noDoctorsFound": "No doctors found",
+  "@noDoctorsFound": {
+    "description": "Title when no doctors match the search or filter"
+  },
+  "noDoctorsMatchFilter": "Try adjusting your search terms or location",
+  "@noDoctorsMatchFilter": {
+    "description": "Subtitle when filter yields no doctors"
+  },
+  "consultation": "Consultation",
+  "@consultation": {
+    "description": "Consultation fees of doctor"
+  },
+  "contact": "Contact",
+  "@contact": {
+    "description": "Contact number label"
+  },
+  "bookNow": "Book Now",
+  "@bookNow": {
+    "description": "Button to book an appointment now"
+  },
+  "doctorDetails": "Doctor Details",
+  "@doctorDetails": {
+    "description": "Doctor Details screen title"
+  },
+  "available": "Available",
+  "@available": {
+    "description": "Shows status of doctor availability."
+  },
+  "notAvailable": "Not Available",
+  "@notAvailable": {
+    "description": "Shows status of doctor availability."
+  },
+  "aboutDoctor": "About Doctor",
+  "@aboutDoctor": {
+    "description": "Header 1 on doctor details screen"
+  },
+  "readMore": "Read More",
+  "@readMore": {
+    "description": "When need to read, doctor details more"
+  },
+  "readLess": "Read Less",
+  "@readLess": {
+    "description": "When need to read, doctor details less"
+  },
+  "noDescriptionFound": "No description available.",
+  "@noDescriptionFound": {
+    "description": "When no details found for doctor"
+  },
+  "patientProfile": "Patient Profile",
+  "@patientProfile": {
+    "description": "Heading 1 on book appointment screen"
+  },
+  "forSelf": "For Self",
+  "@forSelf": {
+    "description": "Subtitle 1 on book appointment screen"
+  },
+  "familyMember": "Family Member",
+  "@familyMember": {
+    "description": "Subtitle 2 on book appointment screen"
+  },
+  "confirmAppointment": "Confirm Appointment",
+  "@confirmAppointment": {
+    "description": "Button label to confirms the appointment "
+  },
+  "payableAtClinic": "Payable at clinic during visit",
+  "@payableAtClinic": {
+    "description": "Message for payable information"
+  },
+  "bookingConfirmed": "Booking Confirmed",
+  "@bookingConfirmed": {
+    "description": "Dialog title to confirms appointment"
+  },
+  "estimatedWaitingTime": "Est. Wait Time",
+  "@estimatedWaitingTime": {
+    "description": "Shows waiting time for own turn"
+  },
+  "backToHome": "Back to Home",
+  "@backToHome": {
+    "description": "Button label back to home"
+  },
+  "certificateWallet": "Certificate Wallet",
+  "@certificateWallet": {
+    "description": "Certificate Wallet screen title"
+  },
+  "medicalCertificates": "Medical Certificates",
+  "@medicalCertificates": {
+    "description": "Medical certificates header title"
+  },
+  "trackRequestsSubtitle": "Track requests and download approved certificate.",
+  "@trackRequestsSubtitle": {
+    "description": "Subtitle explaining certificate wallet functionality"
+  },
+  "certificateCountWithFilter": "{count, plural, =0{0 certificates | {filter}} =1{1 certificate | {filter}} other{{count} certificates | {filter}}}",
+  "@certificateCountWithFilter": {
+    "description": "Certificate count badge with active filter label",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      },
+      "filter": {
+        "type": "String",
+        "example": "All"
+      }
+    }
+  },
+  "certificateCountText": "{count, plural, =0{0 certificates} =1{1 certificate} other{{count} certificates}}",
+  "@certificateCountText": {
+    "description": "Certificate count badge text without filter",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "searchByTypeOrDoctor": "Search by type or doctor...",
+  "@searchByTypeOrDoctor": {
+    "description": "Search input placeholder in certificate wallet"
+  },
+  "filterAll": "All",
+  "@filterAll": {
+    "description": "All filter option"
+  },
+  "filterPending": "Pending",
+  "@filterPending": {
+    "description": "Pending filter option"
+  },
+  "filterApproved": "Approved",
+  "@filterApproved": {
+    "description": "Approved filter option"
+  },
+  "filterRejected": "Rejected",
+  "@filterRejected": {
+    "description": "Rejected filter option"
+  },
+  "applyCertificate": "Apply Certificate",
+  "@applyCertificate": {
+    "description": "Floating action button label for applying certificate"
+  },
+  "assignedTo": "Assigned to: ",
+  "@assignedTo": {
+    "description": "Label indicating which doctor is assigned"
+  },
+  "viewAndDownloadCertificate": "View & Download Certificate",
+  "@viewAndDownloadCertificate": {
+    "description": "Button to view and download approved certificate"
+  },
+  "requestDeclinedNote": "Note: Request was declined by doctor due to insufficient medical evidence.",
+  "@requestDeclinedNote": {
+    "description": "Note displayed on rejected certificate card"
+  },
+  "noCertificatesFound": "No Certificates Found",
+  "@noCertificatesFound": {
+    "description": "Title when no certificates match the search or filter"
+  },
+  "noCertificatesMatchFilter": "No certificate match the \"{filter}\" filter.",
+  "@noCertificatesMatchFilter": {
+    "description": "Subtitle when filter yields no certificates",
+    "placeholders": {
+      "filter": {
+        "type": "String",
+        "example": "Pending"
+      }
+    }
+  },
+  "selectCertificateDoctor": "Select Certificate Doctor",
+  "@selectCertificateDoctor": {
+    "description": "Screen title for doctor selection screen"
+  },
+  "noCertificateDoctorsAvailable": "No certificate doctors available at the moment.",
+  "@noCertificateDoctorsAvailable": {
+    "description": "Message when no certificate doctors are available"
+  },
+  "certificateFee": "Certificate Fee — ₹{fee}",
+  "@certificateFee": {
+    "description": "Doctor card certificate fee display",
+    "placeholders": {
+      "fee": {
+        "type": "String",
+        "example": "200"
+      }
+    }
+  },
+  "applyForCertificate": "Apply for Certificate",
+  "@applyForCertificate": {
+    "description": "Screen title for certificate application"
+  },
+  "requestingFromDoctor": "Requesting from {name} — {specialty}",
+  "@requestingFromDoctor": {
+    "description": "Subtitle showing assigned doctor and specialty",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Dr. Sarah"
+      },
+      "specialty": {
+        "type": "String",
+        "example": "Cardiology"
+      }
+    }
+  },
+  "chooseCertificateTypeSubtitle": "Choose certificate type and details",
+  "@chooseCertificateTypeSubtitle": {
+    "description": "Default subtitle on certificate application screen"
+  },
+  "stepType": "Type",
+  "@stepType": {
+    "description": "Step 1 name: certificate type"
+  },
+  "stepMedicalInfo": "Medical Info",
+  "@stepMedicalInfo": {
+    "description": "Step 2 name: medical info"
+  },
+  "stepDocuments": "Documents",
+  "@stepDocuments": {
+    "description": "Step 3 name: documents"
+  },
+  "stepReview": "Review",
+  "@stepReview": {
+    "description": "Step 4 name: review and submit"
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel button label"
+  },
+  "back": "Back",
+  "@back": {
+    "description": "Back button label"
+  },
+  "continueButton": "Continue",
+  "@continueButton": {
+    "description": "Continue button label"
+  },
+  "submitRequest": "Submit Request",
+  "@submitRequest": {
+    "description": "Submit request button label"
+  },
+  "pleaseSelectCertificateType": "Please select a certificate type",
+  "@pleaseSelectCertificateType": {
+    "description": "Validation message when no certificate type is selected"
+  },
+  "pleaseUploadRequiredFiles": "Please upload required verification files.",
+  "@pleaseUploadRequiredFiles": {
+    "description": "Validation message when mandatory files are missing"
+  },
+  "pleaseConfirmAccuracy": "Please confirm accuracy verification to proceed.",
+  "@pleaseConfirmAccuracy": {
+    "description": "Validation message when disclaimer checkbox is not ticked"
+  },
+  "certificateRequestSuccess": "Payment completed and certificate request submitted successfully.",
+  "@certificateRequestSuccess": {
+    "description": "Success message after completing certificate application and payment"
+  },
+  "certificateRequestFailed": "We couldn’t complete your certificate request. Please try again in a moment.",
+  "@certificateRequestFailed": {
+    "description": "Error message when certificate request submission fails"
+  },
+  "selectCertificateType": "Select Certificate Type",
+  "@selectCertificateType": {
+    "description": "Header title for step 1"
+  },
+  "selectCertificateTypeDesc": "Choose the matching variant for your application.",
+  "@selectCertificateTypeDesc": {
+    "description": "Header description for step 1"
+  },
+  "certMedicalFitness": "Medical Fitness",
+  "@certMedicalFitness": {
+    "description": "Medical Fitness certificate option"
+  },
+  "certMedicalFitnessDesc": "For employment or sports",
+  "@certMedicalFitnessDesc": {
+    "description": "Medical Fitness certificate description"
+  },
+  "certVaccination": "Vaccination",
+  "@certVaccination": {
+    "description": "Vaccination certificate option"
+  },
+  "certVaccinationDesc": "Immunization records",
+  "@certVaccinationDesc": {
+    "description": "Vaccination certificate description"
+  },
+  "certDisability": "Disability",
+  "@certDisability": {
+    "description": "Disability certificate option"
+  },
+  "certDisabilityDesc": "Official disability proof",
+  "@certDisabilityDesc": {
+    "description": "Disability certificate description"
+  },
+  "certSecondOpinion": "Second Opinion",
+  "@certSecondOpinion": {
+    "description": "Second Opinion certificate option"
+  },
+  "certSecondOpinionDesc": "Expert medical review",
+  "@certSecondOpinionDesc": {
+    "description": "Second Opinion certificate description"
+  },
+  "certDischargeSummary": "Discharge Summary",
+  "@certDischargeSummary": {
+    "description": "Discharge Summary certificate option"
+  },
+  "certDischargeSummaryDesc": "Summary of hospital discharge",
+  "@certDischargeSummaryDesc": {
+    "description": "Discharge Summary certificate description"
+  },
+  "assignedDoctor": "Assigned Doctor",
+  "@assignedDoctor": {
+    "description": "Assigned Doctor card title"
+  },
+  "purposeOfCertificate": "Purpose of Certificate",
+  "@purposeOfCertificate": {
+    "description": "Dropdown label for purpose of certificate"
+  },
+  "selectPurpose": "Select Purpose",
+  "@selectPurpose": {
+    "description": "Dropdown hint for certificate purpose"
+  },
+  "purposeTravel": "Travel",
+  "@purposeTravel": {
+    "description": "Travel purpose option"
+  },
+  "purposeEmployment": "Employment",
+  "@purposeEmployment": {
+    "description": "Employment purpose option"
+  },
+  "purposeSports": "Sports",
+  "@purposeSports": {
+    "description": "Sports purpose option"
+  },
+  "purposeSchoolUniversity": "School/University",
+  "@purposeSchoolUniversity": {
+    "description": "School/University purpose option"
+  },
+  "purposeInsurance": "Insurance",
+  "@purposeInsurance": {
+    "description": "Insurance purpose option"
+  },
+  "purposeOther": "Other",
+  "@purposeOther": {
+    "description": "Other purpose option"
+  },
+  "pleaseSelectPurpose": "Please select a purpose",
+  "@pleaseSelectPurpose": {
+    "description": "Validation error for purpose field"
+  },
+  "additionalNotesForDoctor": "Additional Notes For Doctor",
+  "@additionalNotesForDoctor": {
+    "description": "Label for additional notes text field"
+  },
+  "additionalNotesHint": "Any special instructions? (Optional)",
+  "@additionalNotesHint": {
+    "description": "Hint text for additional notes field"
+  },
+  "medicalDetails": "Medical Details",
+  "@medicalDetails": {
+    "description": "Header title for step 2"
+  },
+  "medicalDetailsDesc": "Provide baseline biometrics to appear on your medical clearance.",
+  "@medicalDetailsDesc": {
+    "description": "Header description for step 2"
+  },
+  "notProvided": "Not Provided",
+  "@notProvided": {
+    "description": "It shows when no data/value is available"
+  },
+  "fullName": "Full Name",
+  "@fullName": {
+    "description": "Full name input field label"
+  },
+  "enterFullName": "Enter full name",
+  "@enterFullName": {
+    "description": "Full name field hint"
+  },
+  "pleaseEnterName": "Please enter name",
+  "@pleaseEnterName": {
+    "description": "Validation message when name is empty"
+  },
+  "nameMinCharacters": "Name should have at least 2 characters",
+  "@nameMinCharacters": {
+    "description": "Validation message for minimum characters in name"
+  },
+  "onlyAlphabetsAllowed": "Only alphabets are allowed",
+  "@onlyAlphabetsAllowed": {
+    "description": "Validation error for non-alphabet characters"
+  },
+  "emailAddress": "Email Address",
+  "@emailAddress": {
+    "description": "Email address input field label"
+  },
+  "enterEmailAddress": "Enter email address",
+  "@enterEmailAddress": {
+    "description": "Email address field hint"
+  },
+  "pleaseEnterEmailAddress": "Please enter email address",
+  "@pleaseEnterEmailAddress": {
+    "description": "Validation message when email address is empty"
+  },
+  "phoneNumber": "Phone Number",
+  "@phoneNumber": {
+    "description": "Phone number input field label"
+  },
+  "enterPhoneNumber": "Enter phone number",
+  "@enterPhoneNumber": {
+    "description": "Validation error for empty phone"
+  },
+  "pleaseEnterPhoneNumber": "Please enter phone number",
+  "@pleaseEnterPhoneNumber": {
+    "description": "Validation message when phone number is empty"
+  },
+  "phoneMinDigitsAllowed": "Enter a valid 10-digit mobile number",
+  "@phoneMinDigitsAllowed": {
+    "description": "Validation message when less than 10 digits are entered in number"
+  },
+  "dateOfBirth": "Date of Birth",
+  "@dateOfBirth": {
+    "description": "Date of birth field label"
+  },
+  "selectDate": "Select Date",
+  "@selectDate": {
+    "description": "Hint for date picker field"
+  },
+  "selectedDate": "Selected Date",
+  "@selectedDate": {
+    "description": "Shows Selected Date"
+  },
+  "requiredField": "Required",
+  "@requiredField": {
+    "description": "Generic required validation text"
+  },
+  "gender": "Gender",
+  "@gender": {
+    "description": "Gender dropdown label"
+  },
+  "selectGender": "Select Gender",
+  "@selectGender": {
+    "description": "Gender dropdown hint"
+  },
+  "genderMale": "Male",
+  "@genderMale": {
+    "description": "Male gender option"
+  },
+  "genderFemale": "Female",
+  "@genderFemale": {
+    "description": "Female gender option"
+  },
+  "genderOther": "Other",
+  "@genderOther": {
+    "description": "Other gender option"
+  },
+  "bloodGroup": "Blood Group",
+  "@bloodGroup": {
+    "description": "Blood group dropdown label"
+  },
+  "selectBloodGroup": "Select Blood Group",
+  "@selectBloodGroup": {
+    "description": "Blood group dropdown hint"
+  },
+  "height": "Height",
+  "@height": {
+    "description": "Height label"
+  },
+  "heightHint": "e.g. 170",
+  "@heightHint": {
+    "description": "Hint for height field"
+  },
+  "enterValidNumber": "Enter a valid number",
+  "@enterValidNumber": {
+    "description": "Validation message when age is not a valid number"
+  },
+  "enterValidHeight": "Enter a valid height",
+  "@enterValidHeight": {
+    "description": "Validation error when height is invalid"
+  },
+  "weight": "Weight",
+  "@weight": {
+    "description": "Weight label"
+  },
+  "weightHint": "e.g. 65",
+  "@weightHint": {
+    "description": "Hint for weight field"
+  },
+  "enterValidWeight": "Enter a valid weight",
+  "@enterValidWeight": {
+    "description": "Validation error when weight is invalid"
+  },
+  "knownMedicalConditions": "Known Medical Conditions",
+  "@knownMedicalConditions": {
+    "description": "Known medical conditions label"
+  },
+  "medicalConditionsHint": "e.g., Diabetes, Hypertension, Asthma",
+  "@medicalConditionsHint": {
+    "description": "Medical conditions hint"
+  },
+  "currentMedications": "Current Medications",
+  "@currentMedications": {
+    "description": "Current medications label"
+  },
+  "medicationsHint": "e.g., Metformin 500mg, Daily Multivitamins",
+  "@medicationsHint": {
+    "description": "Medications hint"
+  },
+  "uploadSupportingFiles": "Upload Supporting Files",
+  "@uploadSupportingFiles": {
+    "description": "Header title for step 3"
+  },
+  "uploadSupportingFilesDesc": "Provide documentation for validation processing.",
+  "@uploadSupportingFilesDesc": {
+    "description": "Header description for step 3"
+  },
+  "docProfilePhoto": "Profile Photo",
+  "@docProfilePhoto": {
+    "description": "Profile photo upload label"
+  },
+  "docProfilePhotoHint": "Upload your profile picture (jpg, png)",
+  "@docProfilePhotoHint": {
+    "description": "Profile photo upload hint"
+  },
+  "docGovtId": "Government ID Proof",
+  "@docGovtId": {
+    "description": "Government ID proof upload label"
+  },
+  "docGovtIdHint": "Official Identity Documentation",
+  "@docGovtIdHint": {
+    "description": "Government ID proof upload hint"
+  },
+  "docMedicalReports": "Medical Reports",
+  "@docMedicalReports": {
+    "description": "Medical reports upload label"
+  },
+  "docMedicalReportsHint": "Previous diagnostic data reports",
+  "@docMedicalReportsHint": {
+    "description": "Medical reports upload hint"
+  },
+  "docPrescription": "Prescription",
+  "@docPrescription": {
+    "description": "Prescription upload label"
+  },
+  "docPrescriptionHint": "Doctor's authorized prescriptions",
+  "@docPrescriptionHint": {
+    "description": "Prescription upload hint"
+  },
+  "uploadingDocument": "Uploading document...",
+  "@uploadingDocument": {
+    "description": "Status text while uploading a file"
+  },
+  "documentUploadedSuccess": "Document uploaded successfully",
+  "@documentUploadedSuccess": {
+    "description": "Status text when file upload is complete"
+  },
+  "deleteUploadTooltip": "Delete Upload",
+  "@deleteUploadTooltip": {
+    "description": "Tooltip for removing uploaded file"
+  },
+  "clickToUpload": "Click to upload",
+  "@clickToUpload": {
+    "description": "CTA text inside document upload box"
+  },
+  "documentRequired": "This document is required!",
+  "@documentRequired": {
+    "description": "Error text when required document is missing"
+  },
+  "reviewApplication": "Review Application",
+  "@reviewApplication": {
+    "description": "Header title for step 4"
+  },
+  "reviewApplicationDesc": "Confirm accuracy of entries before submitting to evaluation channels.",
+  "@reviewApplicationDesc": {
+    "description": "Header description for step 4"
+  },
+  "certificateBaselineParameters": "Certificate Baseline Parameters",
+  "@certificateBaselineParameters": {
+    "description": "Card header for certificate info in review step"
+  },
+  "certificateTypeLabel": "Certificate Type",
+  "@certificateTypeLabel": {
+    "description": "Certificate type review label"
+  },
+  "assignedDoctorLabel": "Assigned Medical Doctor",
+  "@assignedDoctorLabel": {
+    "description": "Assigned doctor review label"
+  },
+  "medicalSpecialtyLabel": "Medical Specialty",
+  "@medicalSpecialtyLabel": {
+    "description": "Specialty review label"
+  },
+  "intendedPurposeLabel": "Intended Purpose",
+  "@intendedPurposeLabel": {
+    "description": "Purpose review label"
+  },
+  "additionalNotesLabel": "Additional Context Notes",
+  "@additionalNotesLabel": {
+    "description": "Additional notes review label"
+  },
+  "noneLabel": "None",
+  "@noneLabel": {
+    "description": "Default label when field is empty"
+  },
+  "notAvailableLabel": "N/A",
+  "@notAvailableLabel": {
+    "description": "Not available placeholder"
+  },
+  "patientDiagnosticInformation": "Patient Diagnostic Information",
+  "@patientDiagnosticInformation": {
+    "description": "Card header for patient info in review step"
+  },
+  "fullLegalNameLabel": "Full Legal Name",
+  "@fullLegalNameLabel": {
+    "description": "Full legal name review label"
+  },
+  "dateOfBirthLabel": "Date of Birth",
+  "@dateOfBirthLabel": {
+    "description": "Date of birth review label"
+  },
+  "biologicalGenderLabel": "Biological Gender",
+  "@biologicalGenderLabel": {
+    "description": "Gender review label"
+  },
+  "bloodGroupStagingLabel": "Blood Group Staging",
+  "@bloodGroupStagingLabel": {
+    "description": "Blood group review label"
+  },
+  "heightMetricLabel": "Height Metric",
+  "@heightMetricLabel": {
+    "description": "Height review label"
+  },
+  "weightMetricLabel": "Weight Metric",
+  "@weightMetricLabel": {
+    "description": "Weight review label"
+  },
+  "chronicMedicalConditionsLabel": "Chronic Medical Conditions",
+  "@chronicMedicalConditionsLabel": {
+    "description": "Conditions review label"
+  },
+  "activePrescriptionsLabel": "Current Active Prescriptions",
+  "@activePrescriptionsLabel": {
+    "description": "Prescriptions review label"
+  },
+  "uploadedVerificationMaterials": "Uploaded Verification Materials",
+  "@uploadedVerificationMaterials": {
+    "description": "Header for uploaded files list in review step"
+  },
+  "disclaimerNotice": "By dispatching this electronic request profile, you explicitly affirm that all biometric info matches verified personal medical tracking history.",
+  "@disclaimerNotice": {
+    "description": "Legal disclaimer notice box in review step"
+  },
+  "disclaimerCheckbox": "I legally verify that my submitted profile fields are accurate.",
+  "@disclaimerCheckbox": {
+    "description": "Legal confirmation checkbox in review step"
+  },
+  "certificateDetails": "Certificate Details",
+  "@certificateDetails": {
+    "description": "Certificate details screen title"
+  },
+  "certificateNotFound": "Certificate not found",
+  "@certificateNotFound": {
+    "description": "Message when certificate is not found"
+  },
+  "certificateLabel": "Certificate",
+  "@certificateLabel": {
+    "description": "Certificate label"
+  },
+  "doctorLabel": "Doctor",
+  "@doctorLabel": {
+    "description": "Doctor label"
+  },
+  "purposeLabel": "Purpose",
+  "@purposeLabel": {
+    "description": "Purpose label"
+  },
+  "statusLabel": "Status",
+  "@statusLabel": {
+    "description": "Status label"
+  },
+  "medicinesLabel": "Medicines",
+  "@medicinesLabel": {
+    "description": "Medicines label"
+  },
+  "notesLabel": "Notes",
+  "@notesLabel": {
+    "description": "Notes label"
+  },
+  "timelineLabel": "Timeline",
+  "@timelineLabel": {
+    "description": "Timeline label"
+  },
+  "logoutButtonLabel": "Log Out",
+  "@logoutButtonLabel": {
+    "description": "When press Log Out, user exists out of the app"
+  },
+  "endingSessionTitle": "Ending Session?",
+  "@endingSessionTitle": {
+    "description": "Session ends"
+  },
+  "logoutContent": "Are you sure you want to log out? You will need to re-authenticate to access your medical dashboard.",
+  "@logoutContent": {
+    "description": "Take confirmation from user when they exists out of app."
+  },
+  "logoutDrawerItem": "Logout",
+  "@logoutDrawerItem": {
+    "description": "Logout item label in drawer"
+  },
+  "myProfileDrawerItem": "My Profile",
+  "@myProfileDrawerItem": {
+    "description": "My Profile item label in drawer"
+  },
+  "familyDrawerItem": "Family",
+  "@familyDrawerItem": {
+    "description": "Family item label in drawer"
+  },
+  "homeTab": "Home",
+  "@homeTab": {
+    "description": "Home tab label on bottom nav"
+  },
+  "homeDrawerItem": "Home",
+  "@homeDrawerItem": {
+    "description": "Home item label in drawer"
+  },
+  "certificatesTab": "Certificates",
+  "@certificatesTab": {
+    "description": "Certificates tab label on bottom nav"
+  },
+  "certificateDrawerItem": "Certificate",
+  "@certificateDrawerItem": {
+    "description": "Certificate item label in drawer"
+  },
+  "appointmentsTab": "History",
+  "@appointmentsTab": {
+    "description": "Appointments history tab label on bottom nav"
+  },
+  "appointmentsDrawerItem": "Appointments",
+  "@appointmentsDrawerItem": {
+    "description": "Appointments history item label in drawer"
+  },
+  "services": "Services",
+  "@services": {
+    "description": "Services header or screen title"
+  },
+  "servicesTab": "Services",
+  "@servicesTab": {
+    "description": "Services tab label on bottom nav"
+  },
+  "servicesHeaderTitle": "YoDoctor Services",
+  "@servicesHeaderTitle": {
+    "description": "Title displayed on services header"
+  },
+  "servicesHeaderSubtitle": "Select a service to get instant medical care.",
+  "@servicesHeaderSubtitle": {
+    "description": "Subtitle displayed on services header"
+  },
+  "activeServicesCount": "{count, plural, =0{0 active services} =1{1 active service} other{{count} active services}}",
+  "@activeServicesCount": {
+    "description": "Active services count badge",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "6"
+      }
+    }
+  },
+  "serviceMedicineDeliveryTitle": "Medicine Delivery",
+  "@serviceMedicineDeliveryTitle": {
+    "description": "Medicine Delivery service title"
+  },
+  "serviceMedicineDeliverySubtitle": "Essentials at your doorstep",
+  "@serviceMedicineDeliverySubtitle": {
+    "description": "Medicine Delivery service subtitle"
+  },
+  "medicineDeliveryComingSoon": "Medicine delivery coming soon",
+  "@medicineDeliveryComingSoon": {
+    "description": "Message shown when medicine delivery is tapped"
+  },
+  "serviceLabTestTitle": "Lab Test",
+  "@serviceLabTestTitle": {
+    "description": "Lab Test service title"
+  },
+  "serviceLabTestSubtitle": "Sample Pickup at Your Door",
+  "@serviceLabTestSubtitle": {
+    "description": "Lab Test service subtitle"
+  },
+  "serviceQrScanTokenTitle": "Scan Qr & get Appointment Token",
+  "@serviceQrScanTokenTitle": {
+    "description": "Scan QR service title"
+  },
+  "serviceQrScanTokenSubtitle": "Scan & Book Instantly",
+  "@serviceQrScanTokenSubtitle": {
+    "description": "Scan QR service subtitle"
+  },
+  "serviceOnlineAppointmentTitle": "Online Booking Appointment",
+  "@serviceOnlineAppointmentTitle": {
+    "description": "Online booking service title"
+  },
+  "serviceOnlineAppointmentSubtitle": "Book from anywhere",
+  "@serviceOnlineAppointmentSubtitle": {
+    "description": "Online booking service subtitle"
+  },
+  "serviceMedicalCertificateTitle": "Apply for Medical Certificate",
+  "@serviceMedicalCertificateTitle": {
+    "description": "Medical certificate service title"
+  },
+  "serviceMedicalCertificateSubtitle": "Consult from home",
+  "@serviceMedicalCertificateSubtitle": {
+    "description": "Medical certificate service subtitle"
+  },
+  "serviceHomeNursingCareTitle": "Home Nursing Care Service booking",
+  "@serviceHomeNursingCareTitle": {
+    "description": "Home nursing care service title"
+  },
+  "serviceHomeNursingCareSubtitle": "Care at your home",
+  "@serviceHomeNursingCareSubtitle": {
+    "description": "Home nursing care service subtitle"
+  },
+  "scanDoctorQr": "Scan Doctor QR",
+  "@scanDoctorQr": {
+    "description": "Scan doctor QR sheet title"
+  },
+  "verifying": "Verifying...",
+  "@verifying": {
+    "description": "Verifying state in QR scanner"
+  },
+  "alignQrCodeWithinFrame": "Align the QR code within the frame",
+  "@alignQrCodeWithinFrame": {
+    "description": "Instruction text in QR scanner"
+  },
+  "invalidQrTryAgain": "Invalid QR - Try Again",
+  "@invalidQrTryAgain": {
+    "description": "Error label in QR scanner"
+  },
+  "scannerWillResumeShortly": "Scanner will resume shortly...",
+  "@scannerWillResumeShortly": {
+    "description": "Cooldown message in QR scanner"
+  },
+  "scanQrCodeTooltip": "Scan QR Code",
+  "@scanQrCodeTooltip": {
+    "description": "Tooltip for QR scan FAB"
+  },
+  "invalidQrDoctorIdNotFound": "Invalid QR: Doctor ID not found.",
+  "@invalidQrDoctorIdNotFound": {
+    "description": "Error when doctor ID is missing in scanned QR"
+  },
+  "invalidQrMalformedDoctorId": "Invalid QR: Malformed Doctor ID.",
+  "@invalidQrMalformedDoctorId": {
+    "description": "Error when doctor ID in scanned QR is not a valid number"
+  },
+  "invalidQrStructure": "Invalid QR structure.",
+  "@invalidQrStructure": {
+    "description": "Error when QR format/structure is invalid"
+  },
+  "bookCareService": "Book a Care Service",
+  "@bookCareService": {
+    "description": "Title for Book a Care Service screen"
+  },
+  "bookCareServiceDrawerItem": "Book Care Service",
+  "@bookCareServiceDrawerItem": {
+    "description": "Drawer item label for Book Care Service"
+  },
+  "homeCareHistoryDrawerItem": "Home Care History",
+  "@homeCareHistoryDrawerItem": {
+    "description": "Drawer item label for Home Care History"
+  },
+  "homeHealthcareServices": "HOME HEALTHCARE SERVICES",
+  "@homeHealthcareServices": {
+    "description": "Category badge on Book Care Service screen"
+  },
+  "scheduleNurseDesc": "Schedule a nurse, home care, or consultation at your doorstep.",
+  "@scheduleNurseDesc": {
+    "description": "Subtitle describing home care booking"
+  },
+  "personalDetails": "Personal Details",
+  "@personalDetails": {
+    "description": "Personal Details section header"
+  },
+  "caregiverAndUrgency": "Caregiver & Urgency",
+  "@caregiverAndUrgency": {
+    "description": "Caregiver & Urgency section header"
+  },
+  "typeOfService": "Type of Service",
+  "@typeOfService": {
+    "description": "Type of Service section header"
+  },
+  "medicalCondition": "Medical Condition",
+  "@medicalCondition": {
+    "description": "Medical Condition field/section header"
+  },
+  "serviceDuration": "Service Duration",
+  "@serviceDuration": {
+    "description": "Service Duration section header"
+  },
+  "timePreference": "Time Preference",
+  "@timePreference": {
+    "description": "Time Preference section header"
+  },
+  "additionalNotes": "Additional Notes",
+  "@additionalNotes": {
+    "description": "Additional Notes field/section header"
+  },
+  "serviceTypeGeneralNursing": "General Nursing",
+  "@serviceTypeGeneralNursing": {
+    "description": "General Nursing service option"
+  },
+  "serviceTypeElderlyCare": "Elderly Care",
+  "@serviceTypeElderlyCare": {
+    "description": "Elderly Care service option"
+  },
+  "serviceTypePostSurgery": "Post Surgery",
+  "@serviceTypePostSurgery": {
+    "description": "Post Surgery service option"
+  },
+  "serviceTypeIcuNurse": "ICU Nurse",
+  "@serviceTypeIcuNurse": {
+    "description": "ICU Nurse service option"
+  },
+  "serviceTypeAttendant": "Attendant",
+  "@serviceTypeAttendant": {
+    "description": "Attendant service option"
+  },
+  "timeSlotMorning": "Morning (6am - 12pm)",
+  "@timeSlotMorning": {
+    "description": "Morning time slot option"
+  },
+  "timeSlotAfternoon": "Afternoon (12pm - 5pm)",
+  "@timeSlotAfternoon": {
+    "description": "Afternoon time slot option"
+  },
+  "timeSlotEvening": "Evening (5pm - 9pm)",
+  "@timeSlotEvening": {
+    "description": "Evening time slot option"
+  },
+  "timeSlotNight": "Night (9pm - 6am)",
+  "@timeSlotNight": {
+    "description": "Night time slot option"
+  },
+  "medicalConditionHint": "Describe medical condition, symptoms...",
+  "@medicalConditionHint": {
+    "description": "Hint text for medical condition field"
+  },
+  "submitBookingRequest": "Submit Booking Request",
+  "@submitBookingRequest": {
+    "description": "Button to submit booking request"
+  },
+  "bookingSubmittedSuccess": "Booking submitted successfully",
+  "@bookingSubmittedSuccess": {
+    "description": "Success message when booking is submitted"
+  },
+  "bookingRequestFailed": "Booking request failed",
+  "@bookingRequestFailed": {
+    "description": "Error message when booking submission fails"
+  },
+  "pleaseSelectServiceDuration": "Please select service duration",
+  "@pleaseSelectServiceDuration": {
+    "description": "Validation message when duration is empty"
+  },
+  "pleaseSelectStartDate": "Please select start date",
+  "@pleaseSelectStartDate": {
+    "description": "Validation message when start date is not selected"
+  },
+  "contactNumber": "Contact Number",
+  "@contactNumber": {
+    "description": "Contact number field label"
+  },
+  "patientAge": "Patient Age",
+  "@patientAge": {
+    "description": "Patient age field label"
+  },
+  "patientGender": "Patient Gender",
+  "@patientGender": {
+    "description": "Patient gender field label"
+  },
+  "address": "Address",
+  "@address": {
+    "description": "Address field label"
+  },
+  "enterContactNumber": "Enter contact number",
+  "@enterContactNumber": {
+    "description": "Contact number field hint"
+  },
+  "enterAge": "Enter age",
+  "@enterAge": {
+    "description": "Validation error for empty age"
+  },
+  "enterCompleteAddress": "Enter complete address",
+  "@enterCompleteAddress": {
+    "description": "Address field hint"
+  },
+  "fullNameRequired": "Full name required",
+  "@fullNameRequired": {
+    "description": "Validation message when full name is empty"
+  },
+  "enterValidName": "Enter a valid name",
+  "@enterValidName": {
+    "description": "Validation message for invalid name"
+  },
+  "phoneRequired": "Phone number is required",
+  "@phoneRequired": {
+    "description": "Validation message when phone is empty"
+  },
+  "phoneInvalidPrefix": "Phone no. must start with 6, 7, 8, or 9",
+  "@phoneInvalidPrefix": {
+    "description": "Validation message when phone has invalid starting digit"
+  },
+  "ageRequired": "Age is required",
+  "@ageRequired": {
+    "description": "Validation message when age is empty"
+  },
+  "ageMinValidation": "Age must be greater than 0",
+  "@ageMinValidation": {
+    "description": "Validation message when age <= 0"
+  },
+  "ageMaxValidation": "Age cannot be more than 120",
+  "@ageMaxValidation": {
+    "description": "Validation message when age > 120"
+  },
+  "selectGenderValidation": "Select gender",
+  "@selectGenderValidation": {
+    "description": "Validation message when gender is not selected"
+  },
+  "addressRequired": "Address is required",
+  "@addressRequired": {
+    "description": "Validation message when address is empty"
+  },
+  "addressMinValidation": "Address at least 5 characters",
+  "@addressMinValidation": {
+    "description": "Validation message when address is too short"
+  },
+  "useCurrentLocation": "Use Current Location",
+  "@useCurrentLocation": {
+    "description": "Button to autofill location using GPS"
+  },
+  "preferredCaregiverGender": "Preferred Caregiver Gender",
+  "@preferredCaregiverGender": {
+    "description": "Label for caregiver gender preference"
+  },
+  "selectPreference": "Select Preference",
+  "@selectPreference": {
+    "description": "Hint for caregiver gender preference"
+  },
+  "noPreference": "No Preference",
+  "@noPreference": {
+    "description": "Option for no caregiver gender preference"
+  },
+  "selectGenderPreferenceValidation": "Please select gender preference",
+  "@selectGenderPreferenceValidation": {
+    "description": "Validation message when caregiver gender is empty"
+  },
+  "needEmergencyService": "Need Emergency Service",
+  "@needEmergencyService": {
+    "description": "Checkbox title for emergency service"
+  },
+  "within2Hours": "Within 2 hours",
+  "@within2Hours": {
+    "description": "Subtitle explaining emergency turnaround time"
+  },
+  "duration1Day": "1 Day",
+  "@duration1Day": {
+    "description": "1 Day duration option"
+  },
+  "durationMultipleDays": "Multiple Days",
+  "@durationMultipleDays": {
+    "description": "Multiple Days duration option"
+  },
+  "durationWeekly": "Weekly",
+  "@durationWeekly": {
+    "description": "Weekly duration option"
+  },
+  "durationMonthly": "Monthly",
+  "@durationMonthly": {
+    "description": "Monthly duration option"
+  },
+  "numberOfDays": "Number of Days",
+  "@numberOfDays": {
+    "description": "Label for number of days field"
+  },
+  "enterDays": "Enter days",
+  "@enterDays": {
+    "description": "Hint for number of days field"
+  },
+  "invalidDays": "Invalid days",
+  "@invalidDays": {
+    "description": "Validation message for invalid days value"
+  },
+  "max365Days": "Max 365 days",
+  "@max365Days": {
+    "description": "Validation message when days exceed 365"
+  },
+  "startDate": "Start Date",
+  "@startDate": {
+    "description": "Label for start date field"
+  },
+  "homeCareHistory": "Home Care History",
+  "@homeCareHistory": {
+    "description": "Title for Home Care History screen"
+  },
+  "noHomeCareHistoryYet": "No Home Care History Yet",
+  "@noHomeCareHistoryYet": {
+    "description": "Title when home care history is empty"
+  },
+  "noHomeCareHistoryDesc": "Your requested home care services will appear here once you schedule a session with our specialists.",
+  "@noHomeCareHistoryDesc": {
+    "description": "Description when home care history is empty"
+  },
+  "emergencyBadge": "Emergency",
+  "@emergencyBadge": {
+    "description": "Badge label for emergency booking"
+  },
+  "tapForFullDetails": "Tap for full details",
+  "@tapForFullDetails": {
+    "description": "Hint on card indicating it can be tapped"
+  },
+  "cancelBooking": "Cancel Booking",
+  "@cancelBooking": {
+    "description": "Button and dialog title to cancel booking"
+  },
+  "homeCareService": "Home Care Service",
+  "@homeCareService": {
+    "description": "Fallback service title"
+  },
+  "yearsOld": "{count, plural, =0{0 Years} =1{1 Year} other{{count} Years}}",
+  "@yearsOld": {
+    "description": "Age with years suffix",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "25"
+      }
+    }
+  },
+  "daysCount": "{count, plural, =0{0 Days} =1{1 Day} other{{count} Days}}",
+  "@daysCount": {
+    "description": "Number of days with days suffix",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "homeCareFilterAll": "ALL",
+  "@homeCareFilterAll": {
+    "description": "All filter option for home care history"
+  },
+  "homeCareFilterPending": "PENDING",
+  "@homeCareFilterPending": {
+    "description": "Pending filter option for home care history"
+  },
+  "homeCareFilterConfirmed": "CONFIRMED",
+  "@homeCareFilterConfirmed": {
+    "description": "Confirmed filter option for home care history"
+  },
+  "homeCareFilterCompleted": "COMPLETED",
+  "@homeCareFilterCompleted": {
+    "description": "Completed filter option for home care history"
+  },
+  "homeCareFilterCancelled": "CANCELLED",
+  "@homeCareFilterCancelled": {
+    "description": "Cancelled filter option for home care history"
+  },
+  "bookingDetails": "Booking Details",
+  "@bookingDetails": {
+    "description": "Header for booking details sheet"
+  },
+  "patientInformation": "Patient Information",
+  "@patientInformation": {
+    "description": "Patient information section header"
+  },
+  "patientName": "Patient Name",
+  "@patientName": {
+    "description": "Patient name label"
+  },
+  "ageGender": "Age / Gender",
+  "@ageGender": {
+    "description": "Combined age and gender label"
+  },
+  "preference": "Preference",
+  "@preference": {
+    "description": "Caregiver preference label"
+  },
+  "serviceInformation": "Service Information",
+  "@serviceInformation": {
+    "description": "Service information section header"
+  },
+  "serviceType": "Service Type",
+  "@serviceType": {
+    "description": "Service type label"
+  },
+  "durationType": "Duration Type",
+  "@durationType": {
+    "description": "Duration type label"
+  },
+  "timeSlot": "Time Slot",
+  "@timeSlot": {
+    "description": "Time slot label"
+  },
+  "preferredDate": "Preferred Date",
+  "@preferredDate": {
+    "description": "Preferred date label"
+  },
+  "locationAndNotes": "Location & Notes",
+  "@locationAndNotes": {
+    "description": "Location & Notes section header"
+  },
+  "serviceAddress": "Service Address",
+  "@serviceAddress": {
+    "description": "Service address label"
+  },
+  "standardBooking": "Standard",
+  "@standardBooking": {
+    "description": "Standard non-emergency booking badge"
+  },
+  "failedToLoadDetails": "Failed to Load Details",
+  "@failedToLoadDetails": {
+    "description": "Error header when booking details cannot be loaded"
+  },
+  "unableToRetrieveBookingDetails": "Unable to retrieve complete booking details. Please try again later.",
+  "@unableToRetrieveBookingDetails": {
+    "description": "Error message when booking details cannot be loaded"
+  },
+  "cancelBookingConfirmation": "Are you sure you want to cancel this home care booking?",
+  "@cancelBookingConfirmation": {
+    "description": "Confirmation message when canceling a home care booking"
+  },
+  "yesCancel": "Yes, Cancel",
+  "@yesCancel": {
+    "description": "Confirmation button to cancel"
+  },
+  "noKeep": "No",
+  "@noKeep": {
+    "description": "Cancel button to keep booking"
+  },
+  "cancellingBooking": "Cancelling booking...",
+  "@cancellingBooking": {
+    "description": "Loading message while cancellation is in progress"
+  },
+  "bookingCancelledSuccess": "Booking cancelled successfully",
+  "@bookingCancelledSuccess": {
+    "description": "Success message when booking is cancelled"
+  },
+  "bookNewCareService": "Book New Care Service",
+  "@bookNewCareService": {
+    "description": "Button to book new care service"
+  },
+  "regularBooking": "Regular",
+  "@regularBooking": {
+    "description": "Regular non-emergency booking badge"
+  },
+  "familyMembers": "Family Members",
+  "@familyMembers": {
+    "description": "Family members screen title"
+  },
+  "familyHealthNetwork": "Family Health Network",
+  "@familyHealthNetwork": {
+    "description": "Header title on family members screen"
+  },
+  "familyHealthNetworkSubtitle": "Monitor and manage medical data for your linked family profiles.",
+  "@familyHealthNetworkSubtitle": {
+    "description": "Subtitle describing family health network"
+  },
+  "activeProfilesCount": "{count, plural, =0{0 profiles active} =1{1 profile active} other{{count} profiles active}}",
+  "@activeProfilesCount": {
+    "description": "Active linked family member profile count",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "addMember": "Add Member",
+  "@addMember": {
+    "description": "Floating action button to add family member"
+  },
+  "addFamilyMember": "Add Family Member",
+  "@addFamilyMember": {
+    "description": "Button to add family member in selection sheet"
+  },
+  "chooseMember": "Choose Member",
+  "@chooseMember": {
+    "description": "Dropdown placeholder to choose family member"
+  },
+  "addNewMember": "Add New Member",
+  "@addNewMember": {
+    "description": "Screen header when adding a new family member"
+  },
+  "updateMember": "Update Member",
+  "@updateMember": {
+    "description": "Screen header when updating an existing family member"
+  },
+  "memberAddedSuccess": "Member added successfully.",
+  "@memberAddedSuccess": {
+    "description": "Snackbar message when a family member is added"
+  },
+  "memberUpdatedSuccess": "Member updated successfully.",
+  "@memberUpdatedSuccess": {
+    "description": "Snackbar message when a family member is updated"
+  },
+  "noFamilyMembersYet": "No family members yet",
+  "@noFamilyMembersYet": {
+    "description": "Empty state title when no family members exist"
+  },
+  "createFamilyProfilesDesc": "Create profiles for your family members to manage their health records easily.",
+  "@createFamilyProfilesDesc": {
+    "description": "Empty state description for family members"
+  },
+  "age": "Age",
+  "@age": {
+    "description": "Age label"
+  },
+  "heightCmLabel": "Height (cm)",
+  "@heightCmLabel": {
+    "description": "Height field label with unit"
+  },
+  "weightKgLabel": "Weight (kg)",
+  "@weightKgLabel": {
+    "description": "Weight field label with unit"
+  },
+  "remove": "Remove",
+  "@remove": {
+    "description": "Remove button label"
+  },
+  "update": "Update",
+  "@update": {
+    "description": "Update button label"
+  },
+  "saveChanges": "Save Changes",
+  "@saveChanges": {
+    "description": "Button label to save updated member details"
+  },
+  "saveMember": "Save Member",
+  "@saveMember": {
+    "description": "Button label to save new member"
+  },
+  "relation": "Relation",
+  "@relation": {
+    "description": "Relation label"
+  },
+  "selectRelation": "Select Relation",
+  "@selectRelation": {
+    "description": "Select relation dropdown hint"
+  },
+  "relationFather": "Father",
+  "@relationFather": {
+    "description": "Father relation label"
+  },
+  "relationMother": "Mother",
+  "@relationMother": {
+    "description": "Mother relation label"
+  },
+  "relationSpouse": "Spouse",
+  "@relationSpouse": {
+    "description": "Spouse relation label"
+  },
+  "relationSon": "Son",
+  "@relationSon": {
+    "description": "Son relation label"
+  },
+  "relationDaughter": "Daughter",
+  "@relationDaughter": {
+    "description": "Daughter relation label"
+  },
+  "relationBrother": "Brother",
+  "@relationBrother": {
+    "description": "Brother relation label"
+  },
+  "relationSister": "Sister",
+  "@relationSister": {
+    "description": "Sister relation label"
+  },
+  "relationOther": "Other",
+  "@relationOther": {
+    "description": "Other relation label"
+  },
+  "pleaseEnterFullName": "Please enter full name",
+  "@pleaseEnterFullName": {
+    "description": "Validation error when name is empty"
+  },
+  "nameMinLengthError": "Name should have at least 2 characters",
+  "@nameMinLengthError": {
+    "description": "Validation error when name has fewer than 2 characters"
+  },
+  "pleaseSelectGender": "Please select gender",
+  "@pleaseSelectGender": {
+    "description": "Validation error when gender is not selected"
+  },
+  "selectDateOfBirth": "Select date of birth",
+  "@selectDateOfBirth": {
+    "description": "Hint for date of birth field"
+  },
+  "pleaseSelectRelation": "Please select relation",
+  "@pleaseSelectRelation": {
+    "description": "Validation error when relation is not selected"
+  },
+  "heightRangeError": "Height should be between 30 and 250 cm",
+  "@heightRangeError": {
+    "description": "Validation error when height is out of range"
+  },
+  "weightRangeError": "Weight should be between 2 and 350 kg",
+  "@weightRangeError": {
+    "description": "Validation error when weight is out of range"
+  },
+  "heightInCm": "{height} cm",
+  "@heightInCm": {
+    "description": "Height with cm unit",
+    "placeholders": {
+      "height": {
+        "type": "String",
+        "example": "170"
+      }
+    }
+  },
+  "weightInKg": "{weight} kg",
+  "@weightInKg": {
+    "description": "Weight with kg unit",
+    "placeholders": {
+      "weight": {
+        "type": "String",
+        "example": "65"
+      }
+    }
+  },
+  "labTests": "Lab Tests",
+  "@labTests": {
+    "description": "Lab tests screen title"
+  },
+  "popularPackages": "Popular Packages",
+  "@popularPackages": {
+    "description": "Popular packages section title"
+  },
+  "viewAll": "View All",
+  "@viewAll": {
+    "description": "View all button text"
+  },
+  "noTestsAvailableInCategory": "No tests available in this category",
+  "@noTestsAvailableInCategory": {
+    "description": "Empty state when no lab tests match category"
+  },
+  "allPackagesAndTests": "All Packages & Tests",
+  "@allPackagesAndTests": {
+    "description": "All packages and tests screen title"
+  },
+  "trustedByFamilies": "Trusted by 50,000+ Families",
+  "@trustedByFamilies": {
+    "description": "Badge in lab hero section"
+  },
+  "bookLabTestsComfortOfHome": "Book Lab Tests from the Comfort of Home",
+  "@bookLabTestsComfortOfHome": {
+    "description": "Heading in lab hero section"
+  },
+  "labHeroSubtitle": "Accurate Reports • Affordable Prices • Home Sample Collection",
+  "@labHeroSubtitle": {
+    "description": "Subtitle in lab hero section"
+  },
+  "lowestPrices": "Lowest Prices",
+  "@lowestPrices": {
+    "description": "Trust banner item 1 title"
+  },
+  "transparentDesc": "Transparent",
+  "@transparentDesc": {
+    "description": "Trust banner item 1 description"
+  },
+  "homeCollectionShort": "Home Coll.",
+  "@homeCollectionShort": {
+    "description": "Trust banner item 2 title"
+  },
+  "sevenDaysAWeek": "7 days/week",
+  "@sevenDaysAWeek": {
+    "description": "Trust banner item 2 description"
+  },
+  "accurateTitle": "Accurate",
+  "@accurateTitle": {
+    "description": "Trust banner item 3 title"
+  },
+  "verifiedDesc": "Verified",
+  "@verifiedDesc": {
+    "description": "Trust banner item 3 description"
+  },
+  "hundredPercentPrivate": "100% Private",
+  "@hundredPercentPrivate": {
+    "description": "Trust banner item 4 title"
+  },
+  "encryptedDesc": "Encrypted",
+  "@encryptedDesc": {
+    "description": "Trust banner item 4 description"
+  },
+  "notSureWhichTestToBook": "Not sure which test to book?",
+  "@notSureWhichTestToBook": {
+    "description": "Lab support banner heading"
+  },
+  "labSupportAdvisorsAvailable": "Our advisors are available 7 days a week to guide you.",
+  "@labSupportAdvisorsAvailable": {
+    "description": "Lab support banner description"
+  },
+  "callSupportPhone": "Call {phone}",
+  "@callSupportPhone": {
+    "description": "Call support button with phone number",
+    "placeholders": {
+      "phone": {
+        "type": "String",
+        "example": "+91 92772 07339"
+      }
+    }
+  },
+  "packageType": "Package",
+  "@packageType": {
+    "description": "Package badge label"
+  },
+  "essentialType": "Essential",
+  "@essentialType": {
+    "description": "Essential test badge label"
+  },
+  "percentOff": "{percent}% OFF",
+  "@percentOff": {
+    "description": "Discount badge",
+    "placeholders": {
+      "percent": {
+        "type": "String",
+        "example": "20"
+      }
+    }
+  },
+  "paramsCount": "{count, plural, =0{0 Params} =1{1 Param} other{{count} Params}}",
+  "@paramsCount": {
+    "description": "Number of parameters count",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "60"
+      }
+    }
+  },
+  "homeSampleCollection": "Home Sample Collection",
+  "@homeSampleCollection": {
+    "description": "Home sample collection feature tag"
+  },
+  "viewButton": "View",
+  "@viewButton": {
+    "description": "View button label"
+  },
+  "addedButton": "Added",
+  "@addedButton": {
+    "description": "Added to cart state label"
+  },
+  "addButton": "+ Add",
+  "@addButton": {
+    "description": "Add to cart button label"
+  },
+  "testDetails": "Test Details",
+  "@testDetails": {
+    "description": "Test details title"
+  },
+  "testNotFound": "Test not found",
+  "@testNotFound": {
+    "description": "Error message when test is not found"
+  },
+  "addedToCart": "{title} added to cart",
+  "@addedToCart": {
+    "description": "Snackbar when test is added to cart",
+    "placeholders": {
+      "title": {
+        "type": "String",
+        "example": "Complete Blood Count"
+      }
+    }
+  },
+  "removedFromCart": "{title} removed from cart",
+  "@removedFromCart": {
+    "description": "Snackbar when test is removed from cart",
+    "placeholders": {
+      "title": {
+        "type": "String",
+        "example": "Complete Blood Count"
+      }
+    }
+  },
+  "parametersCount": "{count, plural, =0{0 Parameters} =1{1 Parameter} other{{count} Parameters}}",
+  "@parametersCount": {
+    "description": "Number of parameters in test details",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "60"
+      }
+    }
+  },
+  "saveAmount": "Save ₹{amount}",
+  "@saveAmount": {
+    "description": "Saved amount label",
+    "placeholders": {
+      "amount": {
+        "type": "String",
+        "example": "200"
+      }
+    }
+  },
+  "nablCertifiedLabs": "NABL Certified Labs",
+  "@nablCertifiedLabs": {
+    "description": "NABL certified badge"
+  },
+  "freeHomeSamplePickup": "Free Home Sample Pickup",
+  "@freeHomeSamplePickup": {
+    "description": "Free home sample pickup badge"
+  },
+  "twentyFourHoursReport": "24 Hours Report",
+  "@twentyFourHoursReport": {
+    "description": "24 hours report badge"
+  },
+  "aboutThisTest": "About This Test",
+  "@aboutThisTest": {
+    "description": "Section header about this test"
+  },
+  "includes": "Includes",
+  "@includes": {
+    "description": "Includes section header"
+  },
+  "defaultTestDescription": "This test helps evaluate overall health status and detects a wide range of conditions, including anemia, infection, and various other clinical parameters.",
+  "@defaultTestDescription": {
+    "description": "Fallback description for lab test"
+  },
+  "addToCart": "Add to Cart",
+  "@addToCart": {
+    "description": "Add to cart button label"
+  },
+  "addAndBook": "Add & Book",
+  "@addAndBook": {
+    "description": "Add and book button label"
+  },
+  "myCart": "My Cart",
+  "@myCart": {
+    "description": "My cart screen title"
+  },
+  "parametersIncluded": "{count, plural, =0{0 Parameters Included} =1{1 Parameter Included} other{{count} Parameters Included}}",
+  "@parametersIncluded": {
+    "description": "Parameters included in package",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "50"
+      }
+    }
+  },
+  "addMoreTests": "Add More Tests",
+  "@addMoreTests": {
+    "description": "Add more tests button"
+  },
+  "priceSummary": "Price Summary",
+  "@priceSummary": {
+    "description": "Price summary section title"
+  },
+  "totalMRP": "Total MRP",
+  "@totalMRP": {
+    "description": "Total MRP line item"
+  },
+  "youSave": "You Save",
+  "@youSave": {
+    "description": "You save line item"
+  },
+  "savingDiscountNotice": "Great deal! You're saving {discount}% on this order.",
+  "@savingDiscountNotice": {
+    "description": "Banner showing discount savings in cart",
+    "placeholders": {
+      "discount": {
+        "type": "String",
+        "example": "25"
+      }
+    }
+  },
+  "totalPayable": "Total Payable",
+  "@totalPayable": {
+    "description": "Total payable line item"
+  },
+  "proceedToBookSlot": "Proceed to Book Slot",
+  "@proceedToBookSlot": {
+    "description": "Proceed to book slot button"
+  },
+  "yourCartIsEmpty": "Your cart is empty",
+  "@yourCartIsEmpty": {
+    "description": "Empty cart title"
+  },
+  "cartEmptyDesc": "Looks like you haven't added any lab tests yet. Explore our packages to get started.",
+  "@cartEmptyDesc": {
+    "description": "Empty cart description"
+  },
+  "addTestsAndPackages": "Add Tests & Packages",
+  "@addTestsAndPackages": {
+    "description": "Button to add tests from empty cart"
+  },
+  "bookSlotTitle": "Book a Slot",
+  "@bookSlotTitle": {
+    "description": "Book a slot screen title"
+  },
+  "testsSelectedCount": "{count, plural, =0{0 tests selected • } =1{1 test selected • } other{{count} tests selected • }}",
+  "@testsSelectedCount": {
+    "description": "Number of tests selected in slot booking",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "patientDetails": "Patient Details",
+  "@patientDetails": {
+    "description": "Step 1 title for patient details"
+  },
+  "samplePickupAddress": "Sample Pickup Address",
+  "@samplePickupAddress": {
+    "description": "Step 2 title for sample pickup address"
+  },
+  "selectDateTime": "Select Date & Time",
+  "@selectDateTime": {
+    "description": "Step 3 title for date & time selection"
+  },
+  "enterYourFullName": "Enter your full name",
+  "@enterYourFullName": {
+    "description": "Validation error and hint for full name"
+  },
+  "nameMin3Characters": "Name must be at least 3 characters",
+  "@nameMin3Characters": {
+    "description": "Validation error for short name"
+  },
+  "invalidAge": "Invalid age",
+  "@invalidAge": {
+    "description": "Validation error for invalid age"
+  },
+  "ageRangeError": "Age must be between 1 and 120",
+  "@ageRangeError": {
+    "description": "Validation error for age range"
+  },
+  "enter10DigitNumber": "Enter 10-digit number",
+  "@enter10DigitNumber": {
+    "description": "Hint for phone number"
+  },
+  "enterValid10DigitNumber": "Enter valid 10-digit number",
+  "@enterValid10DigitNumber": {
+    "description": "Validation error for invalid phone"
+  },
+  "useMyCurrentLocation": "Use My Current Location",
+  "@useMyCurrentLocation": {
+    "description": "Button to fetch current location"
+  },
+  "fullAddress": "Full Address",
+  "@fullAddress": {
+    "description": "Full address field label"
+  },
+  "fullAddressHint": "House/Flat No., Street, Area, City",
+  "@fullAddressHint": {
+    "description": "Full address field hint"
+  },
+  "enterAddress": "Enter address",
+  "@enterAddress": {
+    "description": "Validation error for empty address"
+  },
+  "addressTooShort": "Address is too short",
+  "@addressTooShort": {
+    "description": "Validation error for short address"
+  },
+  "todaySlotsClosedMessage": "Today's slots are closed. select other day slots",
+  "@todaySlotsClosedMessage": {
+    "description": "Snackbar message when today slots are full"
+  },
+  "morningSlot": "Morning Slot",
+  "@morningSlot": {
+    "description": "Morning shift header"
+  },
+  "afternoonSlot": "Afternoon Slot",
+  "@afternoonSlot": {
+    "description": "Afternoon shift header"
+  },
+  "eveningSlot": "Evening Slot",
+  "@eveningSlot": {
+    "description": "Evening shift header"
+  },
+  "totalPrice": "Total Price",
+  "@totalPrice": {
+    "description": "Total price label"
+  },
+  "selectTimeSlotValidation": "Select a time slot",
+  "@selectTimeSlotValidation": {
+    "description": "Validation error when time slot is not selected"
+  },
+  "bookingFailed": "Booking failed",
+  "@bookingFailed": {
+    "description": "Error message when booking fails"
+  },
+  "confirmAndPay": "Confirm & Pay",
+  "@confirmAndPay": {
+    "description": "Confirm and pay button"
+  },
+  "labTestBooking": "Lab Test Booking",
+  "@labTestBooking": {
+    "description": "Plan name for lab test booking in payment success"
+  },
+  "myAppointmentsTitle": "My Appointments",
+  "@myAppointmentsTitle": {
+    "description": "Title in appointment history header"
+  },
+  "trackConsultationsSubtitle": "Track completed consultations and rate doctors.",
+  "@trackConsultationsSubtitle": {
+    "description": "Subtitle in appointment history header"
+  },
+  "appointmentCountText": "{count, plural, =0{0 appointments} =1{1 appointment} other{{count} appointments}}",
+  "@appointmentCountText": {
+    "description": "Badge showing appointment count in history header",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "ratedDoctorSuccess": "Thanks! You rated {doctorName} {rating} stars.",
+  "@ratedDoctorSuccess": {
+    "description": "Snackbar message after rating a doctor",
+    "placeholders": {
+      "doctorName": {
+        "type": "String",
+        "example": "Dr. Sharma"
+      },
+      "rating": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "loadingAppointments": "Loading appointments...",
+  "@loadingAppointments": {
+    "description": "Loading message in appointment history"
+  },
+  "noAppointmentHistory": "No appointment history available",
+  "@noAppointmentHistory": {
+    "description": "Title for empty appointment history"
+  },
+  "bookedAppointmentsAppearHere": "Booked appointments will appear here.",
+  "@bookedAppointmentsAppearHere": {
+    "description": "Subtitle for empty appointment history"
+  },
+  "tokenNumberWithHash": "Token #{token}",
+  "@tokenNumberWithHash": {
+    "description": "Token number chip label in history card",
+    "placeholders": {
+      "token": {
+        "type": "String",
+        "example": "12"
+      }
+    }
+  },
+  "viewDetails": "View Details",
+  "@viewDetails": {
+    "description": "Button to view appointment details"
+  },
+  "tableHeaderDoctor": "DOCTOR & SPECIALIZATION",
+  "@tableHeaderDoctor": {
+    "description": "Table column header for doctor and specialization"
+  },
+  "tableHeaderDateShift": "DATE & SHIFT",
+  "@tableHeaderDateShift": {
+    "description": "Table column header for date and shift"
+  },
+  "tableHeaderToken": "TOKEN",
+  "@tableHeaderToken": {
+    "description": "Table column header for token"
+  },
+  "tableHeaderStatus": "STATUS",
+  "@tableHeaderStatus": {
+    "description": "Table column header for status"
+  },
+  "tableHeaderActions": "ACTIONS",
+  "@tableHeaderActions": {
+    "description": "Table column header for actions"
+  },
+  "tokenWithNumber": "Token {token}",
+  "@tokenWithNumber": {
+    "description": "Token badge in appointment details sheet",
+    "placeholders": {
+      "token": {
+        "type": "String",
+        "example": "12"
+      }
+    }
+  },
+  "viewPrescription": "View Prescription",
+  "@viewPrescription": {
+    "description": "Button/banner to view prescription"
+  },
+  "tapToViewPrescription": "Tap to view consultation files",
+  "@tapToViewPrescription": {
+    "description": "Subtitle under view prescription"
+  },
+  "rateYourExperience": "Rate your experience",
+  "@rateYourExperience": {
+    "description": "Heading for doctor rating section"
+  },
+  "shareYourThoughts": "Share your thoughts",
+  "@shareYourThoughts": {
+    "description": "Label and hint for feedback field"
+  },
+  "reviewSubmittedSuccess": "Review submitted successfully!",
+  "@reviewSubmittedSuccess": {
+    "description": "Snackbar when review is submitted successfully"
+  },
+  "saveFeedback": "Save Feedback",
+  "@saveFeedback": {
+    "description": "Button label to save feedback"
+  },
+  "maybeLater": "Maybe Later",
+  "@maybeLater": {
+    "description": "Button label to dismiss feedback sheet"
+  },
+  "prescriptionTitle": "Prescription",
+  "@prescriptionTitle": {
+    "description": "Header title for prescription bottom sheet"
+  },
+  "instructionsLabel": "Instructions",
+  "@instructionsLabel": {
+    "description": "Label for instructions card in prescription bottom sheet"
+  },
+  "clinicalCareSectionTitle": "Doctor & Clinic Visits",
+  "@clinicalCareSectionTitle": {
+    "description": "Title for clinical services section"
+  },
+  "clinicalCareSectionSubtitle": "Consult verified doctors and get instant tokens",
+  "@clinicalCareSectionSubtitle": {
+    "description": "Subtitle for clinical services section"
+  },
+  "doorstepCareSectionTitle": "Doorstep Healthcare",
+  "@doorstepCareSectionTitle": {
+    "description": "Title for doorstep services section"
+  },
+  "doorstepCareSectionSubtitle": "Diagnostic lab tests and pharmacy delivery",
+  "@doorstepCareSectionSubtitle": {
+    "description": "Subtitle for doorstep services section"
+  },
+  "myActivitySectionTitle": "My Bookings & History",
+  "@myActivitySectionTitle": {
+    "description": "Title for activity and history section"
+  },
+  "myActivitySectionSubtitle": "Track past and upcoming appointments and care visits",
+  "@myActivitySectionSubtitle": {
+    "description": "Subtitle for activity and history section"
+  },
+  "doctorVisitsHistoryTitle": "Doctor Visits",
+  "@doctorVisitsHistoryTitle": {
+    "description": "Title for doctor visits history card"
+  },
+  "doctorVisitsHistorySubtitle": "Clinic & video history",
+  "@doctorVisitsHistorySubtitle": {
+    "description": "Subtitle for doctor visits history card"
+  },
+  "homeCareOrdersTitle": "Home Care",
+  "@homeCareOrdersTitle": {
+    "description": "Title for home care orders history card"
+  },
+  "homeCareOrdersSubtitle": "Nursing care orders",
+  "@homeCareOrdersSubtitle": {
+    "description": "Subtitle for home care orders history card"
+  },
+  "appointmentsBadge": "Appointments",
+  "@appointmentsBadge": {
+    "description": "Badge for appointments history"
+  },
+  "careVisitsBadge": "Care Visits",
+  "@careVisitsBadge": {
+    "description": "Badge for care visits history"
+  },
+  "viewHistoryAction": "View History",
+  "@viewHistoryAction": {
+    "description": "Action label to view history"
+  },
+  "needHelpBookingTitle": "Need Help with a Booking?",
+  "@needHelpBookingTitle": {
+    "description": "Title for assistance card"
+  },
+  "needHelpBookingSubtitle": "Track past requests or contact patient support",
+  "@needHelpBookingSubtitle": {
+    "description": "Subtitle for assistance card"
+  },
+  "contactSupportBtn": "Contact Support",
+  "@contactSupportBtn": {
+    "description": "Button label for patient assistance"
+  },
+  "comingSoonBadge": "SOON",
+  "@comingSoonBadge": {
+    "description": "Badge for upcoming services"
+  },
+  "bookNowAction": "Book Now",
+  "@bookNowAction": {
+    "description": "Action label for booking a service"
+  },
+  "scanQrAction": "Scan QR",
+  "@scanQrAction": {
+    "description": "Action label for scanning QR code"
+  },
+  "applyNowAction": "Apply Now",
+  "@applyNowAction": {
+    "description": "Action label for applying"
+  },
+  "healthAndFamilySection": "HEALTH & RECORDS",
+  "@healthAndFamilySection": {
+    "description": "Section header for health and family"
+  },
+  "appPreferencesSection": "APP PREFERENCES",
+  "@appPreferencesSection": {
+    "description": "Section header for app preferences"
+  },
+  "helpAndLegalSection": "HELP & SUPPORT",
+  "@helpAndLegalSection": {
+    "description": "Section header for help and legal"
+  },
+  "accountSection": "ACCOUNT ACTIONS",
+  "@accountSection": {
+    "description": "Section header for account actions"
+  },
+  "deleteAccount": "Delete Account",
+  "@deleteAccount": {
+    "description": "Delete account button label"
+  },
+  "deleteAccountDesc": "Permanently delete account and health data",
+  "@deleteAccountDesc": {
+    "description": "Delete account description"
+  },
+  "notificationsTitle": "Notifications & Alerts",
+  "@notificationsTitle": {
+    "description": "Notifications title"
+  },
+  "notificationsDesc": "Reminders and appointment alerts",
+  "@notificationsDesc": {
+    "description": "Notifications description"
+  },
+  "darkModeTitle": "Dark Mode",
+  "@darkModeTitle": {
+    "description": "Dark mode title"
+  },
+  "helpSupportTitle": "Help & Support",
+  "@helpSupportTitle": {
+    "description": "Help and support title"
+  },
+  "helpSupportDesc": "24/7 Patient assistance & FAQs",
+  "@helpSupportDesc": {
+    "description": "Help and support description"
+  },
+  "privacyTermsTitle": "Privacy Policy & Terms",
+  "@privacyTermsTitle": {
+    "description": "Privacy policy and terms title"
+  },
+  "privacyTermsDesc": "Data protection and terms of use",
+  "@privacyTermsDesc": {
+    "description": "Privacy policy description"
+  },
+  "editProfileBtn": "Edit Profile",
+  "@editProfileBtn": {
+    "description": "Edit profile button label"
+  },
+  "myHealthcareSection": "MY HEALTHCARE",
+  "@myHealthcareSection": {
+    "description": "Section header for healthcare records in profile"
+  },
+  "appointmentsHistory": "Appointments History",
+  "@appointmentsHistory": {
+    "description": "Appointments history title in profile"
+  },
+  "appointmentsHistorySubtitle": "Past, ongoing & scheduled appointments",
+  "@appointmentsHistorySubtitle": {
+    "description": "Appointments history subtitle in profile"
+  },
+  "certificateWalletSubtitle": "View, verify & download medical certificates",
+  "@certificateWalletSubtitle": {
+    "description": "Certificate wallet subtitle in profile"
+  },
+  "personalDetailsSubtitle": "View and update your personal info",
+  "@personalDetailsSubtitle": {
+    "description": "Personal details subtitle in profile"
+  },
+  "privacyPolicyOnlyTitle": "Privacy Policy",
+  "@privacyPolicyOnlyTitle": {
+    "description": "Privacy policy title"
+  },
+  "privacyPolicySubtitle": "How we protect your medical data",
+  "@privacyPolicySubtitle": {
+    "description": "Privacy policy subtitle"
+  },
+  "termsOfServiceTitle": "Terms of Service",
+  "@termsOfServiceTitle": {
+    "description": "Terms of service title"
+  },
+  "termsOfServiceSubtitle": "Terms and conditions of use",
+  "@termsOfServiceSubtitle": {
+    "description": "Terms of service subtitle"
+  },
+  "supportAndLegalSection": "SUPPORT & LEGAL",
+  "@supportAndLegalSection": {
+    "description": "Section header for support and legal policies in profile"
+  },
+  "accountAndFamilySection": "ACCOUNT & FAMILY",
+  "@accountAndFamilySection": {
+    "description": "Section header for account and family in profile"
+  },
+  "logoutAccountSubtitle": "Sign out of your YoDoctor account",
+  "@logoutAccountSubtitle": {
+    "description": "Logout subtitle in profile"
+  },
+  "doorstepCareBannerTag": "DOORSTEP MEDICAL CARE",
+  "@doorstepCareBannerTag": {
+    "description": "Tag on featured home care banner"
+  },
+  "familyMembersSubtitle": "Add & manage dependents",
+  "@familyMembersSubtitle": {
+    "description": "Subtitle for family members tile in profile"
+  }
+}

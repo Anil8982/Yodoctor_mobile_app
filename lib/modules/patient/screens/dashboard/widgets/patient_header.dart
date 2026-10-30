@@ -1,78 +1,58 @@
 import 'package:flutter/material.dart';
 
-import '../../../../../core/utils/app_spacing.dart';
-import '../../../../../core/utils/dummy_data.dart';
-import '../../../../../core/widgets/gradient_background.dart';
+import '../../../models/dashboard/dashboard_model.dart';
 
 class PatientHeader extends StatelessWidget {
-  const PatientHeader({super.key, required this.user});
-  final PatientUser user;
+  const PatientHeader({super.key, this.dashboard});
+
+  final DashboardModel? dashboard;
+
+  String _getTimeGreeting(BuildContext context) {
+    final hour = DateTime.now().hour;
+    final locale = Localizations.localeOf(context).languageCode;
+    if (hour < 12) {
+      return locale == 'hi' ? 'शुभ प्रभात' : 'Good morning';
+    } else if (hour < 17) {
+      return locale == 'hi' ? 'शुभ दोपहर' : 'Good afternoon';
+    } else {
+      return locale == 'hi' ? 'शुभ संध्या' : 'Good evening';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final topPadding = MediaQuery.of(context).padding.top;
 
-    return GradientBackground(
-      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(32)),
-      padding: EdgeInsets.fromLTRB(
-        AppSpacing.xl,
-        topPadding + 50,
-        AppSpacing.xl,
-        AppSpacing.xl,
+    final String rawName = dashboard?.patientName.trim() ?? '';
+    final String greeting = _getTimeGreeting(context);
+    final String fullGreeting = rawName.isNotEmpty
+        ? '$greeting, $rawName'
+        : greeting;
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
+      decoration: BoxDecoration(
+        color: colorScheme.primary,
+        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(24)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          const SizedBox(height: 10),
-          // Text(
-          //   'Hello ??',
-          //   style: theme.textTheme.bodyLarge?.copyWith(
-          //     color: colorScheme.onPrimary.withValues(alpha: 0.85),
-          //     fontWeight: FontWeight.w500,
-          //   ),
-          // ),
           Text(
-            user.name,
-            style: theme.textTheme.headlineMedium?.copyWith(
+            fullGreeting,
+            style: theme.textTheme.titleLarge?.copyWith(
               color: colorScheme.onPrimary,
               fontWeight: FontWeight.w800,
+              fontSize: 20,
+              letterSpacing: -0.3,
             ),
-          ),
-          const SizedBox(height: AppSpacing.md),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: colorScheme.onPrimary.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: colorScheme.onPrimary.withValues(alpha: 0.1),
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.calendar_today_rounded,
-                  color: colorScheme.onPrimary,
-                  size: 14,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  '4 upcoming visits',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onPrimary,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ],
-            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
     );
   }
 }
-
